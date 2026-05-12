@@ -1,0 +1,20 @@
+node_modules/
+
+# Lokale Binärdateien (nicht auf GitHub)
+*.exe
+*.bat
+
+# Mediendateien (bleiben lokal, zu groß für GitHub)
+*.mp3
+*.m4a
+*.mp4
+*.wav
+*.ogg
+*.flac
+*.JPG
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+*.pdf

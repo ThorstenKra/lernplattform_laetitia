@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Lernen</title>
+<style>
+:root{
+  --bg:#f6f7fb; --panel:#ffffff;
+  --border:rgba(15,23,42,.14);
+  --shadow:0 10px 26px rgba(15,23,42,.08);
+  --text:#0f172a; --muted:rgba(15,23,42,.65);
+  --akzent:#3b82f6; --akzent2:#2563eb;
+  --akzent-bg:rgba(59,130,246,0.08);
+  --radius:18px;
+}
+*{ box-sizing:border-box; }
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg); color:var(--text);
+  height:100vh; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+}
+.app{ width:min(900px,96vw); display:flex; flex-direction:column; gap:14px; padding:16px; }
+.greeting{
+  background:var(--panel); border:2px solid var(--akzent);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:22px 26px; text-align:center;
+}
+.greeting-emoji{ font-size:56px; margin-bottom:8px; }
+.greeting-title{ font-size:clamp(28px,5vw,42px); font-weight:1000; margin:0 0 8px 0; color:var(--akzent); }
+.greeting-sub{ font-size:clamp(16px,3vw,22px); font-weight:800; color:var(--muted); margin:0; }
+.moduleGrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; }
+a.modBtn{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:8px; min-height:110px; padding:16px 12px;
+  background:var(--panel); border:2px solid var(--border);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  text-decoration:none; color:var(--text); font-weight:1000;
+  user-select:none; cursor:pointer; position:relative; transition:none;
+}
+a.modBtn:hover, a.modBtn:focus{
+  transform:scale(1.05); outline:4px solid var(--akzent);
+  background:var(--akzent-bg);
+}
+a.modBtn.is-disabled{ pointer-events:none; opacity:0.45; }
+.mod-emoji{ font-size:36px; }
+.mod-label{ font-size:16px; text-align:center; }
+.mod-badge{
+  position:absolute; top:10px; right:10px;
+  padding:6px 10px; border-radius:999px;
+  font-size:12px; font-weight:1000;
+  border:1px solid var(--border);
+  background:rgba(15,23,42,.06); color:rgba(15,23,42,.80);
+}
+.mod-badge.ok  { background:rgba(29,185,84,.16); border-color:rgba(29,185,84,.35); color:#0b5c22; }
+.mod-badge.wip { background:rgba(255,193,7,.18);  border-color:rgba(255,193,7,.45);  color:#7a5a00; }
+.mod-badge.bald{ background:rgba(156,163,175,.18); border-color:rgba(156,163,175,.45); color:#374151; }
+.statusbar{
+  background:var(--panel); border:1px solid var(--border); border-radius:12px;
+  box-shadow:var(--shadow); padding:8px 14px; font-size:13px; font-weight:900;
+  color:var(--muted); display:flex; align-items:center; justify-content:flex-start; gap:10px;
+}
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  pointer-events:none; z-index:10; width:70px; height:70px;
+}
+.dwell-ring-svg circle{
+  fill:none; stroke:var(--akzent); stroke-width:5;
+  stroke-dasharray:220; stroke-dashoffset:220;
+  transform:rotate(-90deg); transform-origin:35px 35px;
+}
+.dwell-ring-svg circle.animating{ animation:dwellRing var(--dwell-duration,0.4s) linear forwards; }
+.dwell-active{
+  transform:scale(1.07) !important; outline:4px solid var(--akzent) !important;
+  box-shadow:0 0 0 5px rgba(0,0,0,0.15) !important; transition:none !important;
+}
+
+  /* Zurueck-Button einheitlich helllila */
+  .zurueck-leiste{ padding:8px 12px; flex-shrink:0; }
+  .zurueckBtn, a.zurueckBtn {
+    display:flex; align-items:center; justify-content:center;
+    min-height:72px; font-size:20px; font-weight:1000;
+    border-radius:16px; border:2px solid #8b5cf6;
+    background:#ede9fe; color:#4c1d95;
+    text-decoration:none; cursor:pointer; user-select:none;
+    position:relative; transition:none; width:100%;
+  }
+  .zurueckBtn:hover, a.zurueckBtn:hover,
+  .zurueckBtn:focus, a.zurueckBtn:focus {
+    background:#ddd6fe; outline:4px solid #8b5cf6; transition:none;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="greeting">
+    <div class="greeting-emoji">🎓</div>
+    <div class="greeting-title">Lernen</div>
+    <div class="greeting-sub">Was wollen wir heute lernen?</div>
+  </div>
+  <div class="moduleGrid" id="moduleGrid">
+
+    <a class="modBtn" href="./modules/deutsch/deutsch.html" data-modul="deutsch">
+      <div class="mod-emoji">📖</div>
+      <div class="mod-label">Deutsch</div>
+      <div class="mod-badge ok">stabil</div>
+    </a>
+
+    <a class="modBtn" href="./modules/lesen/lesen.html" data-modul="lesen">
+      <div class="mod-emoji">🔊</div>
+      <div class="mod-label">Leseverständnis</div>
+      <div class="mod-badge ok">stabil</div>
+    </a>
+
+    <a class="modBtn" href="./modules/mathe/mathe.html" data-modul="mathe">
+      <div class="mod-emoji">🔢</div>
+      <div class="mod-label">Mathematik</div>
+      <div class="mod-badge ok">stabil</div>
+    </a>
+
+    <a class="modBtn" href="./modules/logik/logik.html" data-modul="logik">
+      <div class="mod-emoji">🧩</div>
+      <div class="mod-label">Logik</div>
+      <div class="mod-badge ok">bereit</div>
+    </a>
+
+    <a class="modBtn" href="./modules/platzhalter.html" data-modul="sachkunde">
+      <div class="mod-emoji">🌍</div>
+      <div class="mod-label">Sachkunde</div>
+      <div class="mod-badge bald">bald</div>
+    </a>
+
+    <a class="modBtn" href="./modules/reim/reim.html" data-modul="reim">
+      <div class="mod-emoji">🎵</div>
+      <div class="mod-label">Reimen</div>
+      <div class="mod-badge ok">bereit</div>
+    </a>
+
+    <a class="modBtn" href="./modules/englisch/englisch.html" data-modul="englisch">
+      <div class="mod-emoji">🇬🇧</div>
+      <div class="mod-label">Englisch</div>
+      <div class="mod-badge ok">bereit</div>
+    </a>
+
+  </div>
+  <div class="zurueck-leiste">
+    <a class="zurueckBtn" href="./index.html" id="btnZurueck">← Zurück zur Startseite</a>
+  </div>
+</div>
+<script src="./core/dwell.js"></script>
+<script src="./core/error_handler.js"></script>
+<script>
+var attachDwell = window.LaetitiaAttachDwell || function(){ return {cancelDwell:function(){}}; };
+var dwellMs    = parseInt(localStorage.getItem("laetitia_dwell_ms")) || 2000;
+var leaveGrace = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 100;
+function bindDwell(){
+  attachDwell("a.modBtn:not(.is-disabled), #btnZurueck", {
+    dwellMs: dwellMs, leaveGrace: leaveGrace,
+    onActivate: function(el){
+      if(el.getAttribute("aria-disabled") === "true") return;
+      if(el.classList.contains("is-disabled")) return;
+      try{ el.click(); }catch(e){}
+    }
+  });
+}
+try{
+  var _retAbs = new URL("./lernen.html", window.location.href).href;
+  localStorage.setItem("laetitia_return_url_v1", _retAbs);
+}catch(e){}
+
+// Dwell direkt mit pointerenter
+var dwellMs2 = parseInt(localStorage.getItem("laetitia_dwell_ms")) || 900;
+document.querySelectorAll("a.modBtn:not(.is-disabled), #btnZurueck").forEach(function(el){
+  var timer = null;
+  function start(){ if(timer) return; el.classList.add("dwell-active"); timer = setTimeout(function(){ timer=null; try{ el.click(); }catch(e){} }, dwellMs2); }
+  function stop(){ if(timer){ clearTimeout(timer); timer=null; } el.classList.remove("dwell-active"); }
+  el.addEventListener("pointerenter", start);
+  el.addEventListener("pointerleave", stop);
+  el.addEventListener("click", stop);
+  el.addEventListener("mouseenter", start);
+  el.addEventListener("mouseleave", stop);
+});
+</script>
+</body>
+</html>

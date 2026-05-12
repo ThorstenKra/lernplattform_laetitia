@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Laetitia – Turm lernen</title>
+  <style>
+    :root{
+      --bg:#f6f7fb; --panel:#ffffff; --panel2:#eef0f5;
+      --text:#0f172a; --muted:#64748b; --line:#d1d9e6;
+      --good:#1a9e4a; --warn:#b45a00;
+      --tileA:#e8e0d4; --tileB:#c8bfb0; --radius:16px;
+      --green:#1db954; --red:#e24a4a;
+      --turmblau:#2563eb; --turmblau-hell:rgba(37,99,235,.22);
+      --dwell-color: rgba(29,185,84,.95);
+    }
+    html,body{ height:100%; margin:0; }
+    body{
+      background:var(--bg); color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      overflow:hidden;
+    }
+    .app{
+      height:100vh; display:flex; align-items:stretch;
+      padding:8px; box-sizing:border-box; gap:8px;
+    }
+
+    /* ── Linke Seite: Brett ── */
+    .brett-seite{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:6px; }
+    .boardWrap{
+      flex:1 1 auto; min-height:0; padding:8px; border-radius:var(--radius);
+      border:1px solid var(--line); background:rgba(0,0,0,.18); box-sizing:border-box;
+    }
+    .grid{ height:100%; width:100%; display:grid; gap:5px; }
+
+    /* Topbar UNTEN */
+    .topbar{
+      display:flex; align-items:center; gap:8px;
+      background:var(--panel2); border:1px solid var(--line);
+      border-radius:12px; padding:6px 10px; flex:0 0 auto;
+    }
+    .topTitle{ flex:1; text-align:center; font-weight:900; font-size:15px; }
+
+    /* ── Zellen ── */
+    .cell{
+      border-radius:10px; border:2px solid var(--line);
+      background:var(--tileA); position:relative;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:900; cursor:pointer; user-select:none; transition:none;
+    }
+    .cell.alt{ background:var(--tileB); }
+    .cell.inactive{ cursor:default; }
+
+    /* Aktive Züge → GRÜN (wie König) */
+    .cell.active{
+      background:rgba(29,185,84,.22);
+      border:3px solid rgba(29,185,84,.80);
+      box-shadow:0 0 0 2px rgba(29,185,84,.15) inset;
+      cursor:pointer;
+    }
+    .cell.active:hover, .cell.active.dwell-active{
+      background:rgba(29,185,84,.40);
+      border-color:#1db954;
+      transform:scale(1.06);
+      outline:3px solid rgba(29,185,84,.60);
+      box-shadow:0 0 12px rgba(29,185,84,.35);
+    }
+    /* Turm → Blau */
+    .cell.player{ border-color:rgba(37,99,235,.90); background:rgba(37,99,235,.15); }
+    /* Ziel → Gold; wenn anwählbar → grün */
+    .cell.goal-cell{
+      border-color:rgba(245,158,11,.90);
+      background:rgba(245,158,11,.18);
+    }
+    .cell.active.goal-cell{
+      border-color:rgba(29,185,84,.90) !important;
+      background:rgba(29,185,84,.30) !important;
+      box-shadow:0 0 0 3px rgba(29,185,84,.25) inset !important;
+    }
+    .cell.active.goal-cell:hover, .cell.active.goal-cell.dwell-active{
+      background:rgba(29,185,84,.50) !important;
+      border-color:#1db954 !important;
+    }
+    /* Linie-Indikator */
+    .cell.linie{ background:rgba(29,185,84,.06); border-color:rgba(29,185,84,.20); }
+
+    .cell.check-warn{ animation:checkFlash .5s ease-in-out 2; }
+    @keyframes checkFlash{ 0%,100%{background:var(--tileA);} 50%{background:rgba(255,80,80,.30);} }
+
+    /* ── Dwell-Ring ── */
+    @keyframes dwellRing{ from{stroke-dashoffset:220;} to{stroke-dashoffset:0;} }
+    .dwell-ring-svg{
+      position:absolute; top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      pointer-events:none; z-index:10; width:64px; height:64px;
+    }
+    .dwell-ring-svg circle{
+      fill:none; stroke:var(--dwell-color); stroke-width:5;
+      stroke-dasharray:220; stroke-dashoffset:220;
+      transform:rotate(-90deg); transform-origin:32px 32px;
+    }
+    .dwell-ring-svg circle.animating{
+      animation:dwellRing var(--dwell-duration,0.9s) linear forwards;
+    }
+    .dwell-active{ outline:3px solid var(--dwell-color) !important; transform:scale(1.05); transition:none; }
+
+    /* ── Rechte Seite ── */
+    .info-seite{
+      flex:0 0 200px; display:flex; flex-direction:column; gap:8px;
+      background:var(--panel); border:1px solid var(--line);
+      border-radius:var(--radius); padding:10px; overflow-y:auto;
+    }
+    .progressWrap{
+      flex:0 0 auto; padding:8px 10px; border:1px solid var(--line);
+      border-radius:12px; background:rgba(0,0,0,.18);
+    }
+    .progressTop{ display:flex; justify-content:space-between; color:var(--muted); font-size:11px; margin-bottom:5px; }
+    .bar{ height:8px; border-radius:999px; background:rgba(255,255,255,.06); overflow:hidden; }
+    .bar>div{ height:100%; width:0%; background:rgba(29,185,84,.75); transition:width .4s; }
+    .moveInfo{ font-size:12px; color:var(--muted); margin-top:5px; text-align:center; }
+    .instruction{ font-size:15px; font-weight:900; line-height:1.3; text-align:center; color:var(--text); }
+    .subline{ font-size:12px; color:var(--muted); text-align:center; }
+    .legend{ display:flex; flex-direction:column; gap:4px; }
+    .pill{
+      display:flex; gap:6px; align-items:center;
+      padding:5px 8px; border:1px solid var(--line);
+      border-radius:8px; background:rgba(0,0,0,.10); font-size:12px;
+    }
+    .pill b{ font-size:14px; }
+    .pill.blau  { border-color:rgba(29,185,84,.50);  background:rgba(29,185,84,.10);  color:#0b5c22; }
+    .pill.gold  { border-color:rgba(160,90,0,.40);   background:rgba(160,90,0,.08);   color:#7a4200; }
+    .pill.grau  { border-color:rgba(100,100,100,.40); background:rgba(100,100,100,.08); }
+    .feedback{
+      font-size:13px; font-weight:900; text-align:center; min-height:36px;
+      padding:6px; border-radius:10px; background:rgba(0,0,0,.12);
+      border:1px solid var(--line); line-height:1.3;
+    }
+    .feedback.good{ color:#0b5c22; border-color:rgba(29,185,84,.35); background:rgba(29,185,84,.08); }
+    .feedback.warn{ color:#7a3d00; border-color:rgba(160,90,0,.35); background:rgba(160,90,0,.08); }
+    .btn{
+      border:1px solid var(--line); background:transparent; color:var(--text);
+      border-radius:12px; padding:10px 8px; font-weight:800; font-size:14px;
+      cursor:pointer; width:100%; user-select:none; position:relative;
+      display:flex; align-items:center; justify-content:center; min-height:68px;
+    }
+    .btn.small{ min-height:44px; padding:8px; }
+    .btn.primary{ background:rgba(29,185,84,.18); border-color:rgba(29,185,84,.55); }
+    .btn.blau{ background:rgba(29,185,84,.22); border-color:rgba(29,185,84,.55); color:#0b5c22; }
+    .btn.topbtn{ background:rgba(29,185,84,.18); border-color:rgba(29,185,84,.50); color:#0b5c22; }
+    .btn:disabled{ opacity:.4; cursor:not-allowed; }
+    .btn:not(:disabled):hover, .btn:not(:disabled).dwell-active{
+      background:rgba(29,185,84,.30); border-color:rgba(29,185,84,.80);
+      outline:3px solid rgba(29,185,84,.45); transform:scale(1.03);
+    }
+    .btn.topbtn:not(:disabled):hover, .btn.topbtn:not(:disabled).dwell-active{
+      background:rgba(29,185,84,.35); border-color:rgba(29,185,84,.80);
+      outline:3px solid rgba(29,185,84,.45); transform:scale(1.03);
+    }
+    .btn.aktion{ background:rgba(29,185,84,.15); border-color:rgba(29,185,84,.45); color:#0b5c22; }
+    .btn.aktion:not(:disabled):hover, .btn.aktion:not(:disabled).dwell-active{
+      background:rgba(29,185,84,.35); border-color:rgba(29,185,84,.80);
+      outline:3px solid rgba(29,185,84,.45); transform:scale(1.03);
+    }
+    .btn.zurueck{
+      background:rgba(139,92,246,.12); border-color:rgba(139,92,246,.50);
+      color:#c4b5fd; margin-top:auto;
+    }
+    .btn.zurueck:not(:disabled):hover, .btn.zurueck:not(:disabled).dwell-active{
+      background:rgba(139,92,246,.28); border-color:rgba(139,92,246,.80);
+      outline:3px solid rgba(139,92,246,.40);
+    }
+    .btn-gruppe{ display:flex; flex-direction:column; gap:6px; }
+
+    /* Overlay */
+    .overlay{
+      position:fixed; inset:0; background:rgba(0,0,0,.65);
+      display:none; align-items:center; justify-content:center;
+      padding:12px; box-sizing:border-box; z-index:100;
+    }
+    .overlay.show{ display:flex; }
+    .modal{
+      width:min(700px,96vw); background:var(--panel); border:1px solid var(--line);
+      border-radius:calc(var(--radius)+8px); padding:20px; box-shadow:0 22px 70px rgba(0,0,0,.7);
+    }
+    .modal h2{ margin:0 0 10px; font-size:20px; }
+    .modal p{ margin:0 0 14px; color:var(--muted); font-size:15px; line-height:1.4; }
+    .modal .highlight{
+      background:rgba(29,185,84,.12); border:1px solid rgba(29,185,84,.35);
+      border-radius:12px; padding:10px 14px; font-size:15px;
+      font-weight:900; color:var(--text); margin-bottom:14px; line-height:1.4;
+    }
+    .modal .bottomRow{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+    .modal .btn{ width:auto; min-width:120px; }
+    .levelSelectGrid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+    .lvlSelectBtn{
+      min-height:70px; border-radius:14px; border:1px solid var(--line);
+      background:rgba(0,0,0,.18); color:var(--text); cursor:pointer;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:4px; font-weight:900; position:relative;
+    }
+    .lvlSelectBtn:hover, .lvlSelectBtn.dwell-active{
+      background:rgba(29,185,84,.18); border-color:rgba(29,185,84,.55);
+      outline:3px solid rgba(29,185,84,.40); transform:scale(1.03);
+    }
+    .lvlSelectBtn.done{ border-color:rgba(126,242,154,.45); background:rgba(126,242,154,.08); }
+    .lvlSelectBtn .lvlNum{ font-size:16px; font-weight:1000; }
+    .lvlSelectBtn .lvlName{ font-size:12px; color:var(--muted); }
+    .lvlSelectBtn .lvlStar{ font-size:11px; color:var(--warn); }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <div class="brett-seite">
+    <div class="boardWrap">
+      <div class="grid" id="grid"></div>
+    </div>
+    <div class="topbar">
+      <button class="btn small topbtn" id="btnBack" style="width:auto;min-width:80px;">← Start</button>
+      <div class="topTitle" id="topTitle">Turm – Schach lernen</div>
+      <button class="btn small topbtn" id="btnPause" style="width:auto;min-width:80px;">⏸ Pause</button>
+    </div>
+  </div>
+
+  <div class="info-seite" id="viewRoot"></div>
+
+</div>
+
+<!-- Overlays -->
+<div class="overlay" id="overlayPause">
+  <div class="modal">
+    <h2>⏸ Pause</h2>
+    <p>Kurze Pause.</p>
+    <div class="bottomRow">
+      <button id="btnPauseContinue" class="btn primary">▶ Weiter</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlayTutorial">
+  <div class="modal">
+    <h2 id="tutTitle">Erklärung</h2>
+    <p id="tutText">–</p>
+    <div class="highlight" id="tutTip">–</div>
+    <div class="bottomRow">
+      <button class="btn primary" id="btnTutOk">Verstanden – Los!</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlayLevelSelect">
+  <div class="modal">
+    <h2>Level wählen</h2>
+    <div id="levelSelectGrid" class="levelSelectGrid"></div>
+    <div class="bottomRow">
+      <button class="btn small" id="btnLevelSelectClose">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<script src="../../core/dwell.js"></script>
+<script>
+"use strict";
+
+// ── Storage & State ───────────────────────────────────────────────────────
+const STORAGE_KEY = "turm_v1";
+function loadState(){ try{ const r=localStorage.getItem(STORAGE_KEY); return r?JSON.parse(r):null; }catch{return null;} }
+function saveState(s){ try{localStorage.setItem(STORAGE_KEY,JSON.stringify(s));}catch{} }
+function defaultState(){ return {stars:0, bestUnlocked:1, completed:{}, lastLevel:1}; }
+
+let state = loadState() || defaultState();
+if(typeof state.bestUnlocked!=="number") state.bestUnlocked=1;
+if(!state.completed) state.completed={};
+if(typeof state.lastLevel!=="number") state.lastLevel=1;
+saveState(state);
+
+// ── Level-Definitionen ────────────────────────────────────────────────────
+const LEVELS = [
+  // ── GRUPPE 1: Gerade Linien verstehen ──
+  {
+    id:1, group:"Turm lernen", name:"Erste Linie",
+    boardSize:4, playerStart:[3,0], goal:[0,0], blocks:[], enemy:null, moveLimit:1,
+    tutorial:{
+      title:"Der Turm – wie er zieht",
+      text:"Der Turm zieht in geraden Linien: nach oben, unten, links oder rechts — so weit er will! Er kann nicht diagonal ziehen.",
+      tip:"♖ = Turm  |  ⭐ = Ziel  |  Blaue Felder = mögliche Züge"
+    }
+  },
+  {
+    id:2, group:"Turm lernen", name:"Eine Reihe",
+    boardSize:4, playerStart:[3,0], goal:[3,3], blocks:[], enemy:null, moveLimit:1,
+    tutorial:null
+  },
+  {
+    id:3, group:"Turm lernen", name:"Zwei Züge",
+    boardSize:4, playerStart:[3,0], goal:[0,3], blocks:[], enemy:null, moveLimit:2,
+    tutorial:{
+      title:"Zwei Züge reichen!",
+      text:"Der Turm braucht von einer Ecke zur anderen nur zwei Züge: einmal nach oben, einmal nach rechts.",
+      tip:"Erst Spalte oder erst Reihe — beides funktioniert!"
+    }
+  },
+  {
+    id:4, group:"Turm lernen", name:"Kreuz und quer",
+    boardSize:5, playerStart:[4,2], goal:[0,2], blocks:[], enemy:null, moveLimit:1,
+    tutorial:null
+  },
+  {
+    id:5, group:"Turm lernen", name:"Zickzack",
+    boardSize:5, playerStart:[4,0], goal:[0,4], blocks:[], enemy:null, moveLimit:2,
+    tutorial:null
+  },
+
+  // ── GRUPPE 2: Hindernisse umfahren ──
+  {
+    id:6, group:"Hindernisse", name:"Erster Block",
+    boardSize:4, playerStart:[3,0], goal:[0,0], blocks:[[2,0]], enemy:null, moveLimit:3,
+    tutorial:{
+      title:"Hindernisse ausweichen",
+      text:"Blöcke stoppen den Turm! Er kann nicht über sie hinweg ziehen. Fahre drum herum: in eine andere Reihe oder Spalte wechseln.",
+      tip:"■ = Block — der Turm muss davor stoppen!"
+    }
+  },
+  {
+    id:7, group:"Hindernisse", name:"Zwei Blöcke",
+    boardSize:4, playerStart:[3,0], goal:[0,3], blocks:[[3,2],[1,0]], enemy:null, moveLimit:4,
+    tutorial:null
+  },
+  {
+    id:8, group:"Hindernisse", name:"Engpass",
+    boardSize:5, playerStart:[4,0], goal:[0,4], blocks:[[2,1],[2,2],[2,3]], enemy:null, moveLimit:4,
+    tutorial:{
+      title:"Engpass",
+      text:"Manchmal gibt es nur eine Lücke. Finde den einzigen freien Weg durch die Blockade!",
+      tip:"Suche die Lücke in der Blockade!"
+    }
+  },
+  {
+    id:9, group:"Hindernisse", name:"Labyrinth",
+    boardSize:5, playerStart:[4,0], goal:[0,4],
+    blocks:[[3,1],[3,3],[1,1],[1,3],[2,2]], enemy:null, moveLimit:6,
+    tutorial:null
+  },
+
+  // ── GRUPPE 3: Planung ──
+  {
+    id:10, group:"Planung", name:"Kürzester Weg",
+    boardSize:5, playerStart:[4,4], goal:[0,0], blocks:[], enemy:null, moveLimit:2,
+    tutorial:{
+      title:"Immer nur 2 Züge!",
+      text:"Mit dem Turm kommt man von jeder Ecke zu jeder anderen Ecke in genau 2 Zügen. Das ist sein großer Vorteil!",
+      tip:"Erst Reihe, dann Spalte — oder umgekehrt."
+    }
+  },
+  {
+    id:11, group:"Planung", name:"Umwege",
+    boardSize:5, playerStart:[4,0], goal:[0,4],
+    blocks:[[3,0],[0,1],[0,2],[0,3]], enemy:null, moveLimit:4,
+    tutorial:null
+  },
+  {
+    id:12, group:"Planung", name:"Drei Züge",
+    boardSize:5, playerStart:[2,2], goal:[0,4],
+    blocks:[[2,3],[2,4],[1,4],[0,0],[0,1],[0,2],[0,3]], enemy:null, moveLimit:3,
+    tutorial:null
+  },
+
+  // ── GRUPPE 4: Großes Brett ──
+  {
+    id:13, group:"Großes Brett", name:"6×6 Freies Feld",
+    boardSize:6, playerStart:[5,0], goal:[0,5], blocks:[], enemy:null, moveLimit:2,
+    tutorial:{
+      title:"Noch mehr Platz!",
+      text:"Auf einem größeren Brett hat der Turm noch mehr Kraft — er zieht genauso weit wie er will.",
+      tip:"Denke in Linien: erst Reihe oder erst Spalte?"
+    }
+  },
+  {
+    id:14, group:"Großes Brett", name:"6×6 mit Blöcken",
+    boardSize:6, playerStart:[5,0], goal:[0,5],
+    blocks:[[4,1],[3,2],[2,3],[1,4]], enemy:null, moveLimit:6,
+    tutorial:null
+  },
+  {
+    id:15, group:"Großes Brett", name:"Finale",
+    boardSize:6, playerStart:[5,0], goal:[0,5],
+    blocks:[[4,0],[4,2],[2,0],[2,2],[2,4],[0,1],[0,3]], enemy:null, moveLimit:6,
+    tutorial:{
+      title:"Das große Finale!",
+      text:"Das schwierigste Labyrinth. Plane jeden Zug genau vor!",
+      tip:"Suche den freien Weg — es gibt einen!"
+    }
+  }
+];
+
+// ── TTS ───────────────────────────────────────────────────────────────────
+function speak(text, rate){
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(String(text||""));
+    const voices = speechSynthesis.getVoices();
+    const de = voices.find(v=>(v.lang||"").toLowerCase().startsWith("de"));
+    if(de) u.voice = de;
+    u.rate  = rate || 0.95;
+    u.pitch = 1.0;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+// ── Dwell ─────────────────────────────────────────────────────────────────
+const DWELL_MS    = parseInt(localStorage.getItem("laetitia_dwell_ms"))       || 900;
+const LEAVE_GRACE = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
+
+// Dwell direkt mit pointerenter — wie Eierjagd-Muster
+function bindPointerDwell(el, onActivate){
+  if(el.getAttribute("data-pdwell") === "1") return;
+  el.setAttribute("data-pdwell", "1");
+  var timer = null;
+
+  function start(){
+    if(timer) return;
+    el.classList.add("dwell-active");
+    var ring = el.querySelector(".dwell-ring-svg circle");
+    if(ring){
+      ring.classList.remove("animating");
+      void ring.offsetWidth;
+      ring.style.setProperty("--dwell-duration", (DWELL_MS/1000)+"s");
+      ring.classList.add("animating");
+    }
+    timer = setTimeout(function(){
+      timer = null;
+      onActivate(el);
+    }, DWELL_MS);
+  }
+  function stop(){
+    if(timer){ clearTimeout(timer); timer = null; }
+    el.classList.remove("dwell-active");
+    var ring = el.querySelector(".dwell-ring-svg circle");
+    if(ring) ring.classList.remove("animating");
+  }
+
+  el.addEventListener("pointerenter", start);
+  el.addEventListener("pointerleave", stop);
+  el.addEventListener("click",        stop);
+
+  // Desktop-Fallback: mouseenter
+  el.addEventListener("mouseenter", function(){
+    if(!el._lastPointer || Date.now() - el._lastPointer > 50) start();
+  });
+  el.addEventListener("mouseleave", stop);
+}
+
+function rebindDwell(noProtect){
+  // Zellen: data-pdwell entfernen (werden neu erstellt)
+  // Buttons: data-pdwell entfernen für statische Buttons
+  document.querySelectorAll("[data-pdwell]").forEach(function(el){
+    if(!el.classList.contains("cell")) el.removeAttribute("data-pdwell");
+  });
+
+  // Brett-Zellen
+  document.querySelectorAll(".cell.active").forEach(function(el){
+    bindPointerDwell(el, function(){
+      if(typeof el.onclick === "function") el.onclick();
+    });
+  });
+
+  // Alle Buttons
+  var btnSelector = [
+    "#btnBack","#btnPause",
+    "#viewRoot .btn:not(:disabled)","#viewRoot button:not(:disabled)",
+    ".overlay .btn:not(:disabled)",".overlay button:not(:disabled)",
+    ".lvlSelectBtn:not(:disabled)",
+    "#btnTutOk","#btnPauseContinue","#btnLevelSelectClose","#btnZurueckInfo"
+  ].join(",");
+  document.querySelectorAll(btnSelector).forEach(function(el){
+    if(el.disabled || el.getAttribute("aria-disabled")==="true") return;
+    bindPointerDwell(el, function(){ try{ el.click(); }catch(e){} });
+  });
+}
+
+function initDwell(){ rebindDwell(); }
+
+// ── Spiellogik ────────────────────────────────────────────────────────────
+let game = null;
+const viewRoot = document.getElementById("viewRoot");
+
+function samePos(a,b){ return a[0]===b[0]&&a[1]===b[1]; }
+function keyPos(p){ return `${p[0]},${p[1]}`; }
+function inBounds(r,c,n){ return r>=0&&c>=0&&r<n&&c<n; }
+function clampLevel(id){ return Math.max(1,Math.min(LEVELS.length,id)); }
+
+// Turm-Zugberechnung: alle erreichbaren Felder in 4 Richtungen
+function legalMoves(fromPos, n, blocksSet){
+  const moves = [];
+  const dirs = [[-1,0],[1,0],[0,-1],[0,1]]; // oben, unten, links, rechts
+  dirs.forEach(([dr,dc])=>{
+    let r = fromPos[0]+dr;
+    let c = fromPos[1]+dc;
+    while(inBounds(r,c,n)){
+      if(blocksSet.has(`${r},${c}`)) break; // Block stoppt
+      moves.push([r,c]);
+      r += dr;
+      c += dc;
+    }
+  });
+  return moves;
+}
+
+function startLevel(levelId, skipTutorial){
+  const lvl = LEVELS.find(x=>x.id===clampLevel(levelId)) || LEVELS[0];
+  state.lastLevel = lvl.id;
+  saveState(state);
+
+  game = {
+    level:     lvl,
+    n:         lvl.boardSize,
+    player:    [...lvl.playerStart],
+    goal:      [...lvl.goal],
+    blocks:    new Set((lvl.blocks||[]).map(keyPos)),
+    movesMade: 0,
+    status:    "playing",
+    _hintGiven: false,
+    feedback:  {text:"Wähle ein leuchtendes Feld.", kind:""}
+  };
+
+  if(!skipTutorial && lvl.tutorial){
+    showTutorial(lvl.tutorial, ()=>{ render(); });
+  } else {
+    render();
+    speak(`Level ${lvl.id}: ${lvl.name}. ${lvl.group}.`);
+  }
+}
+
+function showTutorial(tut, onOk){ onOk(); } // Tutorial deaktiviert — direkt zum Level
+
+function render(){
+  const lvl   = game.level;
+  const total = LEVELS.length;
+  const cur   = lvl.id;
+  const pct   = Math.round((cur/total)*100);
+  const moveInfo = `Züge: ${game.movesMade} · ⭐ ${state.stars}`;
+
+  const moves   = game.status==="playing" ? legalMoves(game.player, game.n, game.blocks) : [];
+  const moveSet = new Set(moves.map(keyPos));
+
+  // Rechte Seite
+  viewRoot.innerHTML = `
+    <div class="progressWrap">
+      <div class="progressTop">
+        <div>Level ${cur}/${total}</div>
+        <div>${lvl.group||""}</div>
+      </div>
+      <div class="bar"><div style="width:${pct}%"></div></div>
+      <div class="moveInfo">${moveInfo}</div>
+    </div>
+    <div class="instruction" id="instruction">${lvl.name}</div>
+    <div class="subline" id="subline">Wähle ein leuchtendes Feld.</div>
+    <div class="legend">
+      <div class="pill blau"><b>▪</b> Zug möglich</div>
+      <div class="pill blau"><b>♖</b> Turm</div>
+      <div class="pill gold"><b>⭐</b> Ziel</div>
+      ${lvl.blocks?.length ? `<div class="pill grau"><b>■</b> Block</div>` : ""}
+    </div>
+    <div class="feedback ${game.feedback.kind}" id="feedback">${game.feedback.text}</div>
+    <div class="btn-gruppe">
+      <button class="btn blau" id="btnNextLevel" ${game.status==="won"?"":"disabled"}>Nächstes ▶</button>
+      <button class="btn aktion" id="btnRestart">↺ Neu starten</button>
+      <button class="btn aktion" id="btnHint">💡 Tipp</button>
+      <button class="btn aktion" id="btnLevels">☰ Alle Level</button>
+      <button class="btn aktion" id="btnLevel1">⏮ Level 1</button>
+      <button class="btn zurueck" id="btnZurueckInfo">← Zurück</button>
+    </div>
+  `;
+
+  // Brett
+  const grid = document.getElementById("grid");
+  grid.style.gridTemplateColumns = `repeat(${game.n},1fr)`;
+  grid.style.gridTemplateRows    = `repeat(${game.n},1fr)`;
+  grid.innerHTML = "";
+
+  for(let r=0; r<game.n; r++){
+    for(let c=0; c<game.n; c++){
+      const k        = keyPos([r,c]);
+      const alt      = (r+c)%2===0;
+      const isBlock  = game.blocks.has(k);
+      const isPlayer = samePos([r,c], game.player);
+      const isGoal   = samePos([r,c], game.goal);
+      const isActive = moveSet.has(k) && game.status==="playing";
+      // Felder auf derselben Linie wie der Turm (visueller Hinweis)
+      const sameLinie = !isBlock && !isPlayer &&
+        (r===game.player[0] || c===game.player[1]);
+
+      let symbol = "";
+      if(isBlock)  symbol = "■";
+      if(isGoal)   symbol = "⭐";
+      if(isPlayer) symbol = "♖";
+
+      let cls = "cell";
+      if(alt)       cls += " alt";
+      if(isActive)  cls += " active";
+      else if(sameLinie && !isGoal) cls += " linie";
+      else          cls += " inactive";
+      if(isPlayer)  cls += " player";
+      if(isGoal && !isPlayer) cls += " goal-cell";
+
+      const cell = document.createElement("div");
+      cell.className = cls;
+
+      if(isActive){
+        // Dwell-Ring für aktive Felder
+        cell.innerHTML = `<svg class="dwell-ring-svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="28"/></svg>`;
+        if(symbol){
+          const sym = document.createElement("span");
+          sym.textContent = symbol;
+          sym.style.cssText = "position:relative;z-index:1;";
+          cell.appendChild(sym);
+        }
+        cell.onclick = ()=> makeMove([r,c]);
+      } else {
+        cell.textContent = symbol;
+      }
+
+      grid.appendChild(cell);
+    }
+  }
+
+  // Font-Größe
+  const rect = grid.getBoundingClientRect();
+  const fs = Math.max(26, Math.min(64, Math.floor((Math.min(rect.width,rect.height)/game.n)*0.50)));
+  grid.querySelectorAll(".cell").forEach(el=> el.style.fontSize = fs+"px");
+
+  // Button-Handler
+  document.getElementById("btnLevel1").onclick    = ()=> startLevel(1);
+  document.getElementById("btnLevels").onclick    = ()=> openLevelSelect();
+  document.getElementById("btnRestart").onclick   = ()=> startLevel(game.level.id, true);
+  document.getElementById("btnNextLevel").onclick = ()=>{ if(game.status==="won") startLevel(clampLevel(game.level.id+1)); };
+  document.getElementById("btnHint").onclick      = ()=> showHint();
+  document.getElementById("btnZurueckInfo").onclick = ()=> location.href = returnUrl;
+
+  rebindDwell(true);
+}
+
+function makeMove(pos){
+  if(game.status!=="playing") return;
+  game.player = [...pos];
+  game.movesMade++;
+
+  if(samePos(game.player, game.goal)){
+    win();
+  } else {
+    const lim = game.level.moveLimit;
+    if(lim && game.movesMade === lim + 1 && !game._hintGiven){
+      game._hintGiven = true;
+      game.feedback = {text:"💡 Tipp: Es gibt einen kürzeren Weg!", kind:""};
+      speak("Tipp: Es gibt einen kürzeren Weg!");
+    } else if(!game._hintGiven || game.movesMade > lim + 1){
+      game.feedback = {text:"Gut! Weiter zum Ziel.", kind:""};
+    }
+    render();
+  }
+}
+
+function win(){
+  game.status = "won";
+  game.feedback = {text:"🎉 Geschafft! Sehr gut!", kind:"good"};
+  speak(`Geschafft! Level ${game.level.id} abgeschlossen. Super gemacht!`);
+
+  if(!state.completed[String(game.level.id)]){
+    state.completed[String(game.level.id)] = true;
+    state.stars++;
+  }
+  if(game.level.id >= state.bestUnlocked){
+    state.bestUnlocked = Math.min(LEVELS.length, game.level.id+1);
+  }
+  saveState(state);
+  render();
+}
+
+function showHint(){
+  const hints = [
+    "Der Turm zieht in geraden Linien — nie diagonal!",
+    "Wechsle zuerst in die richtige Reihe oder Spalte.",
+    "Blaue Felder zeigen alle möglichen Züge.",
+    "Blöcke stoppen den Turm — fahre drum herum.",
+    "Von Ecke zu Ecke: nur 2 Züge nötig!"
+  ];
+  const hint = hints[Math.min(game.level.id-1, hints.length-1)];
+  game.feedback = {text:"💡 "+hint, kind:""};
+  speak(hint);
+  render();
+}
+
+// ── Level-Auswahl ─────────────────────────────────────────────────────────
+function openLevelSelect(){
+  const grid = document.getElementById("levelSelectGrid");
+  grid.innerHTML = "";
+  let lastGroup = "";
+  LEVELS.forEach(lvl=>{
+    if(lvl.group !== lastGroup){
+      lastGroup = lvl.group;
+      const header = document.createElement("div");
+      header.style.cssText = "grid-column:1/-1;font-size:12px;font-weight:900;color:var(--muted);padding:6px 0 2px;";
+      header.textContent = lvl.group;
+      grid.appendChild(header);
+    }
+    const locked = lvl.id > state.bestUnlocked;
+    const done   = !!state.completed[String(lvl.id)];
+    const btn    = document.createElement("button");
+    btn.className = "lvlSelectBtn"+(done?" done":"");
+    btn.disabled  = locked;
+    btn.innerHTML = `
+      <span class="lvlNum">${lvl.id}. ${lvl.name}</span>
+      <span class="lvlName">${lvl.group}</span>
+      ${done ? `<span class="lvlStar">⭐ Abgeschlossen</span>` : ""}
+      ${locked ? `<span class="lvlName" style="color:#ff8a8a">🔒 Gesperrt</span>` : ""}
+    `;
+    btn.onclick = ()=>{
+      document.getElementById("overlayLevelSelect").classList.remove("show");
+      startLevel(lvl.id);
+    };
+    grid.appendChild(btn);
+  });
+  document.getElementById("overlayLevelSelect").classList.add("show");
+  setTimeout(rebindDwell, 50);
+}
+
+document.getElementById("btnLevelSelectClose").onclick = ()=>{
+  document.getElementById("overlayLevelSelect").classList.remove("show");
+};
+
+// ── Top-Bar ───────────────────────────────────────────────────────────────
+const returnUrl = localStorage.getItem("laetitia_return_url_v1") || "../schach.html";
+document.getElementById("btnBack").onclick  = ()=> location.href = returnUrl;
+document.getElementById("btnPause").onclick = ()=> document.getElementById("overlayPause").classList.add("show");
+document.getElementById("btnPauseContinue").onclick = ()=>{
+  document.getElementById("overlayPause").classList.remove("show");
+  rebindDwell();
+};
+
+// ── Start ─────────────────────────────────────────────────────────────────
+try{ speechSynthesis.getVoices(); }catch(e){}
+startLevel(state.lastLevel || 1);
+initDwell();
+</script>
+</body>
+</html>

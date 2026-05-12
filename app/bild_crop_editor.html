@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Laetitia – Bild-Crop-Editor</title>
+<style>
+:root{ --akzent:#16a34a; }
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  font-family:system-ui,Arial,sans-serif;
+  background:#1a1a2e; color:#e8e8f0;
+  height:100vh; display:flex; flex-direction:column; overflow:hidden;
+}
+
+/* ── Header ── */
+.header{
+  background:#0f3460; padding:10px 16px;
+  display:flex; align-items:center; gap:12px; flex-shrink:0;
+  border-bottom:2px solid var(--akzent);
+}
+.header h1{ font-size:18px; font-weight:900; color:var(--akzent); }
+.header-sub{ font-size:12px; color:#a0a0c0; }
+
+/* ── Haupt-Layout ── */
+.main{ flex:1; display:flex; overflow:hidden; }
+
+/* ── Bild-Bereich ── */
+.bild-bereich{
+  flex:1; position:relative; overflow:hidden;
+  background:#0a0a1a; display:flex; align-items:center; justify-content:center;
+}
+#originalImg{
+  max-width:100%; max-height:100%;
+  display:block; opacity:0.35;
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  object-fit:contain;
+}
+/* Crop-Vorschau: zeigt nur den ausgewählten Bereich scharf */
+#cropPreview{
+  position:absolute;
+  overflow:hidden;
+  box-shadow:0 0 0 9999px rgba(0,0,0,0.6);
+  border:3px solid var(--akzent);
+  cursor:move;
+}
+#cropPreview img{
+  position:absolute;
+  display:block;
+}
+.placeholder{
+  color:#404060; font-size:16px; font-weight:800;
+  text-align:center; padding:40px; z-index:1;
+}
+
+/* ── Steuerungs-Panel ── */
+.panel{
+  width:300px; flex-shrink:0;
+  background:#16213e; display:flex; flex-direction:column;
+  padding:12px; gap:10px; overflow-y:auto;
+  border-left:2px solid #0f3460;
+}
+
+.section-title{
+  font-size:11px; font-weight:900; color:#7070a0;
+  text-transform:uppercase; letter-spacing:.08em;
+  border-bottom:1px solid #2a2a4a; padding-bottom:4px;
+}
+
+/* Datei-Button */
+.datei-btn{
+  display:flex; align-items:center; justify-content:center;
+  min-height:52px; border-radius:10px;
+  border:2px solid var(--akzent); background:rgba(22,163,74,.15);
+  color:var(--akzent); font-size:15px; font-weight:900;
+  cursor:pointer; gap:8px;
+}
+.datei-btn:hover{ background:rgba(22,163,74,.25); }
+#fileInput{ display:none; }
+
+/* Bild-Auswahl bei mehreren */
+.bild-auswahl{
+  display:flex; flex-wrap:wrap; gap:6px;
+}
+.bild-chip{
+  padding:5px 10px; border-radius:8px; font-size:11px; font-weight:900;
+  border:2px solid #2a2a4a; background:#1a1a3a; color:#a0a0c0;
+  cursor:pointer;
+}
+.bild-chip.aktiv{
+  border-color:var(--akzent); background:rgba(22,163,74,.2); color:#fff;
+}
+
+/* Slider */
+.slider-gruppe{ display:flex; flex-direction:column; gap:4px; }
+.slider-label{
+  display:flex; justify-content:space-between;
+  font-size:13px; font-weight:800;
+}
+.slider-label span{ color:var(--akzent); font-size:13px; font-weight:900; }
+input[type=range]{
+  width:100%; accent-color:var(--akzent); height:6px;
+  cursor:pointer;
+}
+
+/* Vorschau-Box */
+.mini-vorschau{
+  border-radius:10px; overflow:hidden;
+  border:2px solid #2a2a4a;
+  aspect-ratio:16/9;
+  background:#0a0a1a;
+}
+.mini-vorschau img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+/* Ergebnis */
+.ergebnis-box{
+  background:#0a1628; border-radius:10px; padding:10px;
+  border:2px solid #2a3a5a;
+}
+.ergebnis-code{
+  font-family:monospace; font-size:11px; color:#7de8a0;
+  white-space:pre-wrap; word-break:break-all;
+  line-height:1.5;
+}
+
+/* Buttons unten */
+.btn-row{ display:flex; gap:8px; }
+.btn{
+  flex:1; min-height:48px; border-radius:10px;
+  font-size:13px; font-weight:900; cursor:pointer;
+  border:2px solid; display:flex; align-items:center;
+  justify-content:center; gap:6px;
+}
+.btn-kopieren{
+  border-color:#3b82f6; background:rgba(59,130,246,.15); color:#93c5fd;
+}
+.btn-kopieren:hover{ background:rgba(59,130,246,.25); }
+.btn-export{
+  border-color:var(--akzent); background:rgba(22,163,74,.15); color:#86efac;
+}
+.btn-export:hover{ background:rgba(22,163,74,.25); }
+.btn-reset{
+  border-color:#f59e0b; background:rgba(245,158,11,.10); color:#fcd34d;
+  flex:0.5;
+}
+
+.hinweis{ font-size:11px; color:#5060a0; line-height:1.5; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>✂️ Bild-Crop-Editor</h1>
+    <div class="header-sub">Lade eine JS-Bilder-Datei oder ein einzelnes Bild</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Bild-Vorschau -->
+  <div class="bild-bereich" id="bildBereich">
+    <div class="placeholder" id="placeholder">
+      📂 Lade eine Datei um zu beginnen<br><br>
+      <small>schule_liesmal3_bilder.js oder eine PNG/JPG Datei</small>
+    </div>
+    <img id="originalImg" src="" style="display:none">
+    <div id="cropPreview" style="display:none">
+      <img id="cropImg" src="">
+    </div>
+  </div>
+
+  <!-- Steuerungs-Panel -->
+  <div class="panel">
+
+    <!-- Datei laden -->
+    <div class="section-title">📂 Datei laden</div>
+    <label class="datei-btn" for="fileInput">
+      📂 Datei auswählen
+    </label>
+    <input type="file" id="fileInput" accept=".js,.html,.png,.jpg,.jpeg,.webp">
+
+    <!-- Bild-Auswahl -->
+    <div id="bildAuswahlBereich" style="display:none">
+      <div class="section-title">🖼 Bild wählen</div>
+      <div class="bild-auswahl" id="bildAuswahl"></div>
+    </div>
+
+    <!-- Slider -->
+    <div class="section-title">✂️ Ausschnitt anpassen</div>
+
+    <div class="slider-gruppe">
+      <div class="slider-label">Oben wegschneiden <span id="valTop">0%</span></div>
+      <input type="range" id="slTop" min="0" max="40" value="0" step="1">
+    </div>
+    <div class="slider-gruppe">
+      <div class="slider-label">Unten wegschneiden <span id="valBot">0%</span></div>
+      <input type="range" id="slBot" min="0" max="40" value="0" step="1">
+    </div>
+    <div class="slider-gruppe">
+      <div class="slider-label">Links wegschneiden <span id="valLeft">0%</span></div>
+      <input type="range" id="slLeft" min="0" max="40" value="0" step="1">
+    </div>
+    <div class="slider-gruppe">
+      <div class="slider-label">Rechts wegschneiden <span id="valRight">0%</span></div>
+      <input type="range" id="slRight" min="0" max="40" value="0" step="1">
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-reset" onclick="resetSlider()">↺ Reset</button>
+    </div>
+
+    <!-- Mini-Vorschau -->
+    <div class="section-title">👁 Vorschau</div>
+    <div class="mini-vorschau">
+      <canvas id="miniCanvas" width="276" height="155"></canvas>
+    </div>
+
+    <!-- Ergebnis -->
+    <div class="section-title">📋 Werte für Code</div>
+    <div class="ergebnis-box">
+      <div class="ergebnis-code" id="ergebnisCode">— noch kein Bild geladen —</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-kopieren" onclick="kopieren()">📋 Kopieren</button>
+      <button class="btn btn-export" onclick="exportieren()">💾 JPEG speichern</button>
+    </div>
+
+    <div class="hinweis">
+      Tipp: Schieberegler funktionieren auch mit der Maus und der Augensteuerung (Dwell auf + oder −).
+    </div>
+
+  </div>
+</div>
+
+<script>
+var aktBild = null; // { name, src, img }
+var alleBilder = {};
+
+// ── Datei laden ────────────────────────────────────────────────────────────────
+document.getElementById("fileInput").addEventListener("change", function(e){
+  var file = e.target.files[0];
+  if(!file) return;
+  var name = file.name.toLowerCase();
+  var reader = new FileReader();
+
+  if(name.endsWith(".js") || name.endsWith(".html")){
+    reader.onload = function(ev){ ladeJsDatei(ev.target.result); };
+    reader.readAsText(file);
+  } else {
+    // Direkt als Bild
+    reader.onload = function(ev){
+      alleBilder = { "Bild": ev.target.result };
+      zeigeAuswahl();
+      waehleAktBild("Bild", ev.target.result);
+    };
+    reader.readAsDataURL(file);
+  }
+  e.target.value = "";
+});
+
+function ladeJsDatei(text){
+  var gefunden = {};
+  // Matche: "key": "data:image/..."
+  var regex = /"([^"]+)":\s*"(data:image[^"]+)"/g;
+  var m;
+  while((m = regex.exec(text)) !== null){
+    gefunden[m[1]] = m[2];
+  }
+  var anzahl = Object.keys(gefunden).length;
+  if(anzahl === 0){
+    alert("Keine Bilder in der Datei gefunden.\nErwartet: \"key\": \"data:image/...\"");
+    return;
+  }
+  alleBilder = gefunden;
+  zeigeAuswahl();
+  // Erstes Bild automatisch wählen
+  var erster = Object.keys(gefunden)[0];
+  waehleAktBild(erster, gefunden[erster]);
+}
+
+function zeigeAuswahl(){
+  var bereich = document.getElementById("bildAuswahlBereich");
+  var container = document.getElementById("bildAuswahl");
+  container.innerHTML = "";
+  var keys = Object.keys(alleBilder);
+  if(keys.length <= 1){ bereich.style.display = "none"; return; }
+  bereich.style.display = "";
+  keys.forEach(function(k){
+    var chip = document.createElement("button");
+    chip.className = "bild-chip";
+    chip.textContent = k;
+    chip.onclick = function(){ waehleAktBild(k, alleBilder[k]); };
+    container.appendChild(chip);
+  });
+}
+
+function waehleAktBild(name, src){
+  // Chip-Highlighting
+  document.querySelectorAll(".bild-chip").forEach(function(c){
+    c.classList.toggle("aktiv", c.textContent === name);
+  });
+
+  var img = new Image();
+  img.onload = function(){
+    aktBild = { name: name, src: src, img: img };
+    document.getElementById("placeholder").style.display = "none";
+    resetSlider();
+    aktualisiere();
+  };
+  img.src = src;
+}
+
+// ── Slider ─────────────────────────────────────────────────────────────────────
+["slTop","slBot","slLeft","slRight"].forEach(function(id){
+  document.getElementById(id).addEventListener("input", aktualisiere);
+});
+
+function resetSlider(){
+  ["slTop","slBot","slLeft","slRight"].forEach(function(id){
+    document.getElementById(id).value = 0;
+  });
+  aktualisiere();
+}
+
+function getWerte(){
+  return {
+    top:    parseInt(document.getElementById("slTop").value),
+    bot:    parseInt(document.getElementById("slBot").value),
+    left:   parseInt(document.getElementById("slLeft").value),
+    right:  parseInt(document.getElementById("slRight").value)
+  };
+}
+
+// ── Hauptvorschau aktualisieren ────────────────────────────────────────────────
+function aktualisiere(){
+  if(!aktBild) return;
+  var w = getWerte();
+
+  // Labels
+  document.getElementById("valTop").textContent   = w.top   + "%";
+  document.getElementById("valBot").textContent   = w.bot   + "%";
+  document.getElementById("valLeft").textContent  = w.left  + "%";
+  document.getElementById("valRight").textContent = w.right + "%";
+
+  var img = aktBild.img;
+  var iw = img.naturalWidth, ih = img.naturalHeight;
+
+  // Crop in Pixeln
+  var cl = Math.round(iw * w.left   / 100);
+  var ct = Math.round(ih * w.top    / 100);
+  var cr = Math.round(iw * w.right  / 100);
+  var cb = Math.round(ih * w.bot    / 100);
+  var cw = iw - cl - cr;
+  var ch = ih - ct - cb;
+
+  // ── Große Vorschau ────────────────────────────────────────────────────────
+  var bereich = document.getElementById("bildBereich");
+  var bw = bereich.clientWidth, bh = bereich.clientHeight;
+  var scale = Math.min(bw / cw, bh / ch) * 0.92;
+
+  var pw = Math.round(cw * scale), ph = Math.round(ch * scale);
+  var px = Math.round((bw - pw) / 2), py = Math.round((bh - ph) / 2);
+
+  var origImg = document.getElementById("originalImg");
+  origImg.src = aktBild.src;
+  origImg.style.display = "";
+
+  var prev = document.getElementById("cropPreview");
+  var prevImg = document.getElementById("cropImg");
+  prev.style.display = "";
+  prev.style.left   = px + "px";
+  prev.style.top    = py + "px";
+  prev.style.width  = pw + "px";
+  prev.style.height = ph + "px";
+
+  var totalScale = scale;
+  prevImg.src = aktBild.src;
+  prevImg.style.width  = Math.round(iw * totalScale) + "px";
+  prevImg.style.height = Math.round(ih * totalScale) + "px";
+  prevImg.style.left   = -Math.round(cl * totalScale) + "px";
+  prevImg.style.top    = -Math.round(ct * totalScale) + "px";
+
+  // ── Mini-Canvas ────────────────────────────────────────────────────────────
+  var canvas = document.getElementById("miniCanvas");
+  var ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(img, cl, ct, cw, ch, 0, 0, canvas.width, canvas.height);
+
+  // ── Ergebnis-Code ──────────────────────────────────────────────────────────
+  var code = "";
+  if(w.top > 0 || w.bot > 0 || w.left > 0 || w.right > 0){
+    // Als CSS margin-Trick (wie aktuell in schule_jaein)
+    var scaleX = 100 / (100 - w.left - w.right);
+    var scaleY = 100 / (100 - w.top  - w.bot);
+    var mlPct  = -(w.left * scaleX).toFixed(1);
+    var mtPct  = -(w.top  * scaleY).toFixed(1);
+    code  = "/* CSS für img-Tag */\n";
+    code += "width: " + scaleX.toFixed(1) + "%;\n";
+    code += "margin-left: " + mlPct + "%;\n";
+    code += "margin-top: " + mtPct + "%;\n\n";
+    code += "/* Crop-Werte */\n";
+    code += "Oben:   " + w.top   + "%\n";
+    code += "Unten:  " + w.bot   + "%\n";
+    code += "Links:  " + w.left  + "%\n";
+    code += "Rechts: " + w.right + "%";
+  } else {
+    code = "Kein Zuschnitt — Originalbild";
+  }
+  document.getElementById("ergebnisCode").textContent = code;
+}
+
+// ── Kopieren ───────────────────────────────────────────────────────────────────
+function kopieren(){
+  var text = document.getElementById("ergebnisCode").textContent;
+  navigator.clipboard.writeText(text).then(function(){
+    var btn = document.querySelector(".btn-kopieren");
+    btn.textContent = "✅ Kopiert!";
+    setTimeout(function(){ btn.textContent = "📋 Kopieren"; }, 1500);
+  });
+}
+
+// ── JPEG exportieren ───────────────────────────────────────────────────────────
+function exportieren(){
+  if(!aktBild) return;
+  var w = getWerte();
+  var img = aktBild.img;
+  var iw = img.naturalWidth, ih = img.naturalHeight;
+  var cl = Math.round(iw * w.left  / 100);
+  var ct = Math.round(ih * w.top   / 100);
+  var cw = Math.round(iw * (100 - w.left - w.right)  / 100);
+  var ch = Math.round(ih * (100 - w.top  - w.bot)  / 100);
+
+  var canvas = document.createElement("canvas");
+  canvas.width = Math.min(cw, 640);
+  canvas.height = Math.round(ch * (canvas.width / cw));
+  var ctx = canvas.getContext("2d");
+  ctx.drawImage(img, cl, ct, cw, ch, 0, 0, canvas.width, canvas.height);
+
+  var link = document.createElement("a");
+  link.download = aktBild.name + "_crop.jpg";
+  link.href = canvas.toDataURL("image/jpeg", 0.82);
+  link.click();
+}
+
+// Fenster-Größenänderung
+window.addEventListener("resize", aktualisiere);
+</script>
+</body>
+</html>

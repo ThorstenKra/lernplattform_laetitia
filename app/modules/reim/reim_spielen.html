@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia - Reimen</title>
+<style>
+:root{
+  --bg:#fff8f0; --panel:#ffffff;
+  --border:rgba(15,23,42,.14); --shadow:0 10px 26px rgba(15,23,42,.08);
+  --text:#0f172a; --muted:rgba(15,23,42,.60);
+  --akzent:#e85d04; --akzent2:#dc2f02;
+  --akzent-bg:rgba(232,93,4,0.09); --radius:20px;
+  --ja:#16a34a; --nein:#dc2626;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg); color:var(--text);
+  height:100vh; overflow:hidden; display:flex; flex-direction:column;
+}
+
+/* ── Progress-Bar ── */
+.progress-bar-wrap{ height:6px; background:rgba(232,93,4,.15); flex-shrink:0; }
+.progress-bar-fill{ height:6px; background:var(--akzent); transition:width .4s ease; }
+
+/* ── Topbar ── */
+.topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 16px; background:var(--panel);
+  border-bottom:1px solid var(--border); box-shadow:0 2px 8px rgba(15,23,42,.06);
+  flex-shrink:0;
+}
+.topbar-titel{ font-size:18px; font-weight:1000; color:var(--akzent); }
+.topbar-fortschritt{ font-size:13px; font-weight:900; color:var(--muted); }
+
+/* Zurueck-Button unten (Standard) */
+.zurueck-leiste{ padding:10px 16px; flex-shrink:0; }
+a.zurueckBtn{
+  display:flex; align-items:center; justify-content:center;
+  min-height:70px; font-size:18px; font-weight:1000;
+  border-radius:16px; border:2px solid #8b5cf6;
+  background:#ede9fe; color:#4c1d95;
+  text-decoration:none; cursor:pointer; user-select:none;
+  position:relative; transition:none; width:100%;
+}
+a.zurueckBtn:hover, a.zurueckBtn:focus{ background:#ddd6fe; outline:4px solid #8b5cf6; }
+a.zurueckBtn.dwell-active{ transform:scale(1.02) !important; outline:4px solid #8b5cf6 !important; transition:none !important; }
+
+/* ── Main ── */
+.main{
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:16px; gap:14px; overflow:hidden;
+}
+
+/* ── Reim-Karte (Wort / Gedichtzeilen) ── */
+.reim-karte{
+  background:var(--panel); border:2px solid rgba(232,93,4,.30);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:22px 28px; max-width:700px; width:100%; text-align:center;
+}
+.reim-wort{
+  font-size:clamp(28px,5vw,52px); font-weight:1000;
+  color:var(--akzent); letter-spacing:0.03em; margin-bottom:8px;
+}
+.reim-zeile1{
+  font-size:clamp(17px,3vw,26px); font-weight:1000; color:var(--text);
+  margin-bottom:6px; line-height:1.4;
+}
+.reim-zeile2{
+  font-size:clamp(17px,3vw,26px); font-weight:1000; color:var(--akzent);
+  line-height:1.4;
+}
+.reim-luecke{
+  display:inline-block; min-width:120px; border-bottom:3px solid var(--akzent);
+  color:rgba(232,93,4,.35); font-style:italic;
+}
+
+/* Vorlesen-Button */
+.play-btn{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:8px 18px; border-radius:999px;
+  border:2px solid rgba(232,93,4,.30); background:var(--akzent-bg);
+  color:var(--akzent); font-size:14px; font-weight:1000;
+  cursor:pointer; user-select:none; position:relative; margin-top:12px;
+}
+.play-btn:hover{ background:rgba(232,93,4,.18); }
+
+/* Aufgaben-Hinweis */
+.reim-hinweis{
+  font-size:15px; font-weight:900; color:var(--muted); text-align:center;
+  max-width:700px; width:100%;
+}
+
+/* ── R3: Ja/Nein ── */
+.janein-woerter{
+  display:flex; align-items:center; justify-content:center;
+  gap:20px; font-size:clamp(28px,5vw,52px); font-weight:1000;
+  color:var(--text); max-width:700px; width:100%;
+}
+.janein-trenner{ font-size:clamp(20px,3vw,32px); color:var(--muted); font-weight:400; }
+
+/* ── Antwort-Buttons (R1/R2/R4) ── */
+.antwort-grid{
+  display:grid; grid-template-columns:repeat(2,1fr);
+  gap:12px; max-width:700px; width:100%;
+}
+.antwort-btn{
+  display:flex; align-items:center; justify-content:center;
+  min-height:80px; border-radius:18px;
+  border:2px solid rgba(232,93,4,.25); background:var(--akzent-bg);
+  color:var(--akzent); font-size:clamp(16px,2.5vw,22px); font-weight:1000;
+  cursor:pointer; user-select:none; position:relative;
+  text-align:center; padding:12px; transition:none;
+  line-height:1.3;
+}
+.antwort-btn:hover{ background:rgba(232,93,4,.18); }
+.antwort-btn.dwell-active{ transform:scale(1.05) !important; outline:3px solid var(--akzent); transition:none !important; }
+.antwort-btn.is-disabled{ pointer-events:none; opacity:0.35; }
+
+/* ── Ja/Nein-Buttons (R3) ── */
+.janein-grid{
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:14px; max-width:700px; width:100%;
+}
+.janein-btn{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:6px; min-height:100px; border-radius:18px;
+  border:2px solid var(--border); background:var(--panel);
+  font-size:clamp(18px,3vw,28px); font-weight:1000;
+  cursor:pointer; user-select:none; position:relative; transition:none;
+}
+.janein-btn.ja{ border-color:rgba(22,163,74,.35); color:var(--ja); background:rgba(22,163,74,.07); }
+.janein-btn.nein{ border-color:rgba(220,38,38,.35); color:var(--nein); background:rgba(220,38,38,.07); }
+.janein-btn:hover.ja{ background:rgba(22,163,74,.15); }
+.janein-btn:hover.nein{ background:rgba(220,38,38,.15); }
+.janein-btn.dwell-active{ transform:scale(1.05) !important; outline:3px solid currentColor; transition:none !important; }
+.janein-btn.is-disabled{ pointer-events:none; opacity:0.35; }
+.janein-emoji{ font-size:34px; }
+
+/* ── Feedback ── */
+@keyframes correctFlash{
+  0%  { background:rgba(22,163,74,.60); border-color:#16a34a; }
+  50% { background:rgba(22,163,74,.15); }
+  100%{ background:rgba(22,163,74,.60); border-color:#16a34a; }
+}
+.correct-flash{ animation:correctFlash .45s ease forwards !important; }
+.falsch-gewaehlt{ background:rgba(220,38,38,.25) !important; border-color:#dc2626 !important; }
+
+.infoLine{
+  display:none; max-width:700px; width:100%;
+  padding:12px 18px; border-radius:14px;
+  font-size:15px; font-weight:900; text-align:center;
+}
+.infoLine.richtig{ display:block; background:rgba(22,163,74,.15); border:1px solid rgba(22,163,74,.40); color:#166534; }
+.infoLine.falsch { display:block; background:rgba(220,38,38,.12); border:1px solid rgba(220,38,38,.35); color:#991b1b; }
+
+/* ── R4: Reim-Vorschau nach Auswahl ── */
+.reim-vorschau{
+  display:none; max-width:700px; width:100%;
+  padding:14px 20px; border-radius:14px;
+  background:rgba(232,93,4,.08); border:2px solid rgba(232,93,4,.25);
+  text-align:center; font-size:clamp(16px,2.5vw,22px); font-weight:1000;
+  color:var(--text); line-height:1.5;
+}
+.reim-vorschau.sichtbar{ display:block; }
+
+/* ── Abschluss ── */
+.abschluss-screen{
+  display:none; flex-direction:column; align-items:center; justify-content:center;
+  gap:16px; padding:24px; text-align:center; width:100%;
+}
+.abschluss-screen.sichtbar{ display:flex; }
+.abschluss-emoji{ font-size:64px; }
+.abschluss-titel{ font-size:clamp(22px,4vw,34px); font-weight:1000; color:var(--akzent); }
+.abschluss-score{
+  font-size:40px; font-weight:1000; color:var(--akzent);
+  background:var(--akzent-bg); border:2px solid rgba(232,93,4,.25);
+  border-radius:16px; padding:10px 28px;
+}
+.abschluss-sub{ font-size:15px; font-weight:900; color:var(--muted); }
+.abschluss-btn{
+  display:flex; align-items:center; justify-content:center;
+  min-height:60px; min-width:220px; border-radius:16px;
+  border:2px solid var(--akzent); background:var(--akzent); color:#fff;
+  font-size:17px; font-weight:1000; cursor:pointer; user-select:none;
+  position:relative; text-decoration:none;
+}
+.abschluss-btn:hover{ background:var(--akzent2); }
+
+/* ── Dwell-Ring ── */
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  pointer-events:none; z-index:10; width:70px; height:70px;
+}
+.dwell-ring-svg circle{
+  fill:none; stroke:var(--akzent); stroke-width:5;
+  stroke-dasharray:220; stroke-dashoffset:220;
+  transform:rotate(-90deg); transform-origin:35px 35px;
+}
+.janein-btn .dwell-ring-svg circle.ja-circle{ stroke:var(--ja); }
+.janein-btn .dwell-ring-svg circle.nein-circle{ stroke:var(--nein); }
+.dwell-ring-svg circle.animating{ animation:dwellRing var(--dwell-duration,.9s) linear forwards; }
+</style>
+</head>
+<body>
+
+<div class="progress-bar-wrap">
+  <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+</div>
+
+<div class="topbar">
+  <div class="topbar-titel" id="topbarTitel">🎵 Reimen</div>
+  <div class="topbar-fortschritt" id="fortschrittText"></div>
+</div>
+
+<div class="main" id="mainBereich">
+
+  <!-- ── R1/R2/R4: Reim-Karte + 4 Antwort-Buttons ── -->
+  <div id="screenAntwort" style="display:none;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:700px;">
+    <div class="reim-karte">
+      <div class="reim-wort"    id="reimWort"    style="display:none;"></div>
+      <div class="reim-zeile1"  id="reimZeile1"  style="display:none;"></div>
+      <div class="reim-zeile2"  id="reimZeile2"  style="display:none;"></div>
+      <button class="play-btn" id="btnPlay">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70" style="width:36px;height:36px;position:relative;top:0;left:0;transform:none;">
+          <circle cx="35" cy="35" r="30"/>
+        </svg>
+        &#128266; Nochmal hören
+      </button>
+    </div>
+    <div class="reim-hinweis" id="reimHinweis"></div>
+    <div class="reim-vorschau" id="reimVorschau"></div>
+    <div class="infoLine" id="infoLineAntwort"></div>
+    <div class="antwort-grid" id="antwortGrid">
+      <button class="antwort-btn" id="btnA" onclick="antworten('A')">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+        <span id="textA"></span>
+      </button>
+      <button class="antwort-btn" id="btnB" onclick="antworten('B')">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+        <span id="textB"></span>
+      </button>
+      <button class="antwort-btn" id="btnC" onclick="antworten('C')">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+        <span id="textC"></span>
+      </button>
+      <button class="antwort-btn" id="btnD" onclick="antworten('D')">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+        <span id="textD"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── R3: Ja/Nein-Screen ── -->
+  <div id="screenJaNein" style="display:none;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:700px;">
+    <div class="reim-karte">
+      <div class="janein-woerter">
+        <span id="jnWort1"></span>
+        <span class="janein-trenner">—</span>
+        <span id="jnWort2"></span>
+      </div>
+      <button class="play-btn" id="btnPlayJN">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70" style="width:36px;height:36px;position:relative;top:0;left:0;transform:none;">
+          <circle cx="35" cy="35" r="30"/>
+        </svg>
+        &#128266; Nochmal hören
+      </button>
+    </div>
+    <div class="reim-hinweis">Reimen sich diese zwei Worter?</div>
+    <div class="infoLine" id="infoLineJN"></div>
+    <div class="janein-grid">
+      <button class="janein-btn ja" id="btnJa" onclick="antwortenJN(true)">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle class="ja-circle" cx="35" cy="35" r="30"/></svg>
+        <span class="janein-emoji">✅</span>
+        <span>Ja! Reim!</span>
+      </button>
+      <button class="janein-btn nein" id="btnNein" onclick="antwortenJN(false)">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle class="nein-circle" cx="35" cy="35" r="30"/></svg>
+        <span class="janein-emoji">❌</span>
+        <span>Nein!</span>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Zurueck-Button unten (immer sichtbar ausser im Abschluss) -->
+<div class="zurueck-leiste" id="zurueckLeiste">
+  <a class="zurueckBtn" href="./reim.html" id="btnZurueck">
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70" style="width:50px;height:50px;">
+      <circle cx="35" cy="35" r="30" style="stroke:#8b5cf6;"/>
+    </svg>
+    ← Zurueck zu den Modi
+  </a>
+</div>
+
+<!-- ── Abschluss ── -->
+<div class="abschluss-screen" id="abschlussScreen">
+  <div class="abschluss-emoji" id="abschlussEmoji"></div>
+  <div class="abschluss-titel" id="abschlussTitel"></div>
+  <div class="abschluss-score" id="abschlussScore"></div>
+  <div class="abschluss-sub"   id="abschlussSub"></div>
+  <a class="abschluss-btn" href="./reim.html" id="btnAbschluss">
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+    Zurueck zu den Modi
+  </a>
+</div>
+
+<script src="../../core/dwell.js"></script>
+<script src="../../core/error_handler.js"></script>
+<script src="./reim_data.js"></script>
+<script>
+"use strict";
+
+// ── Lob-Texte (Goldstandard aus moduleKit) ───────────────────────────────────
+var LOB_TEXTE = [
+  "Wunderbar!", "Fantastisch!", "Super!", "Toll gemacht!",
+  "Du ueberraschst mich!", "Klasse!", "Sehr gut!", "Bravo!",
+  "Genial!", "Das sitzt!", "Perfekt!", "Grossartig!"
+];
+function zufallsLob(){ return LOB_TEXTE[Math.floor(Math.random()*LOB_TEXTE.length)]; }
+
+// ── Setup ─────────────────────────────────────────────────────────────────────
+var params  = new URLSearchParams(window.location.search);
+var modus   = params.get("modus") || "R1";
+var session = [], index = 0, richtigCount = 0, beantwortet = false;
+var dwellMs = parseInt(localStorage.getItem("laetitia_dwell_ms")) || 900;
+
+// Modus-Titel
+var modusMeta = {
+  R1: { titel:"🔍 Reimpaar finden",    hinweis:"Welches Wort reimt sich?" },
+  R2: { titel:"📜 Gedicht vollenden",  hinweis:"Welches Wort passt ans Ende?" },
+  R3: { titel:"🤔 Reim oder kein Reim?", hinweis:"Reimen sich diese zwei Worter?" },
+  R4: { titel:"✏️ Meinen Reim bauen",  hinweis:"Ich waehle das Reimwort!" }
+};
+document.getElementById("topbarTitel").textContent = (modusMeta[modus]||modusMeta.R1).titel;
+
+// Session aufbauen
+function shuffle(arr){
+  var a = arr.slice();
+  for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; }
+  return a;
+}
+if(window.REIM_DATEN && window.REIM_DATEN[modus]){
+  session = shuffle(window.REIM_DATEN[modus]);
+} else {
+  session = [];
+}
+
+// ── TTS ───────────────────────────────────────────────────────────────────────
+function sprich(text, danach){
+  try{
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = "de-DE"; u.rate = 0.88;
+    var voices = speechSynthesis.getVoices();
+    var de = voices.find(function(v){ return v.name.indexOf("Microsoft") >= 0 && v.lang.startsWith("de"); })
+          || voices.find(function(v){ return v.lang.startsWith("de"); });
+    if(de) u.voice = de;
+    if(window.LaetitiaSprich){
+      window.LaetitiaSprich.wrap(u, danach);
+    } else {
+      if(danach) u.onend = function(){ setTimeout(danach, 300); };
+      speechSynthesis.speak(u);
+    }
+  }catch(e){ if(danach) setTimeout(danach, 400); }
+}
+
+// ── Fortschritt ───────────────────────────────────────────────────────────────
+function aktualisiereProgress(){
+  var pct = session.length > 0 ? Math.round((index/session.length)*100) : 0;
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("fortschrittText").textContent =
+    index < session.length ? (index+1) + " / " + session.length : session.length + " / " + session.length;
+}
+
+// ── Screens ───────────────────────────────────────────────────────────────────
+function zeigeScreen(id){
+  ["screenAntwort","screenJaNein"].forEach(function(sid){
+    var el = document.getElementById(sid);
+    el.style.display = "none";
+  });
+  var s = document.getElementById(id);
+  if(s){ s.style.display = "flex"; }
+}
+
+// ── Haupt-Dispatcher ──────────────────────────────────────────────────────────
+function zeigeAufgabe(){
+  beantwortet = false;
+  if(index >= session.length){ zeigeAbschluss(); return; }
+  aktualisiereProgress();
+  var t = session[index];
+  if(t.modus === "R3"){ zeigeJaNein(t); }
+  else               { zeigeAntwortKarte(t); }
+}
+
+// ── R1 / R2 / R4 ─────────────────────────────────────────────────────────────
+function zeigeAntwortKarte(t){
+  var wortEl   = document.getElementById("reimWort");
+  var z1El     = document.getElementById("reimZeile1");
+  var z2El     = document.getElementById("reimZeile2");
+  var hinweis  = document.getElementById("reimHinweis");
+  var vorschau = document.getElementById("reimVorschau");
+
+  // Felder zuruecksetzen
+  wortEl.style.display  = "none";
+  z1El.style.display    = "none";
+  z2El.style.display    = "none";
+  vorschau.className    = "reim-vorschau";
+  vorschau.textContent  = "";
+  setInfoLine("infoLineAntwort","","");
+
+  // Anzeige je Modus
+  if(t.modus === "R1"){
+    wortEl.textContent = t.wort;
+    wortEl.style.display = "block";
+    hinweis.textContent  = "Welches Wort reimt sich auf: " + t.wort + "?";
+    document.getElementById("btnPlay").dataset.tts = t.tts;
+  }
+  if(t.modus === "R2"){
+    z1El.textContent = t.zeile1;
+    z1El.style.display = "block";
+    z2El.innerHTML = t.zeile2_anfang + ' <span class="reim-luecke">___?</span>';
+    z2El.style.display = "block";
+    hinweis.textContent = "Welches Wort reimt sich ans Ende?";
+    document.getElementById("btnPlay").dataset.tts = t.tts_zeile1 + " " + t.tts_zeile2_anfang;
+  }
+  if(t.modus === "R4"){
+    z1El.textContent = t.zeile1;
+    z1El.style.display = "block";
+    z2El.innerHTML = t.zeile2_anfang + ' <span class="reim-luecke">___?</span>';
+    z2El.style.display = "block";
+    hinweis.textContent = "Ich suche das Reimwort — welches passt?";
+    document.getElementById("btnPlay").dataset.tts = t.tts_zeile1;
+  }
+
+  // Buttons befuellen
+  var btns = ["A","B","C","D"];
+  btns.forEach(function(b){
+    var btn = document.getElementById("btn"+b);
+    document.getElementById("text"+b).textContent = t["antwort_"+b.toLowerCase()];
+    btn.classList.remove("is-disabled","correct-flash","falsch-gewaehlt");
+    delete btn.dataset.pdwell;
+    bindDwellEinzel(btn);
+  });
+
+  // Play-Button Dwell
+  delete document.getElementById("btnPlay").dataset.pdwell;
+  bindDwellEinzel(document.getElementById("btnPlay"));
+  // Zurueck-Button
+  delete document.getElementById("btnZurueck").dataset.pdwell;
+  bindDwellEinzel(document.getElementById("btnZurueck"));
+
+  zeigeScreen("screenAntwort");
+  setTimeout(function(){
+    if(t.modus==="R1") sprich(t.tts);
+    if(t.modus==="R2") sprich(t.tts_zeile1 + " — " + t.tts_zeile2_anfang);
+    if(t.modus==="R4") sprich(t.tts_zeile1);
+  }, 350);
+}
+
+function antworten(buchstabe){
+  if(beantwortet) return;
+  beantwortet = true;
+  var t = session[index];
+  var korrekt = buchstabe === t.richtig;
+  var btnMap = {A:"btnA",B:"btnB",C:"btnC",D:"btnD"};
+
+  // Alle deaktivieren
+  ["A","B","C","D"].forEach(function(b){
+    document.getElementById("btn"+b).classList.add("is-disabled");
+  });
+
+  if(korrekt){
+    richtigCount++;
+    document.getElementById(btnMap[buchstabe]).classList.add("correct-flash");
+    setInfoLine("infoLineAntwort","✓ Richtig! " + t.erklaerung,"richtig");
+
+    // R4: komplettes Gedicht vorlesen
+    if(t.modus === "R4"){
+      var vorschau = document.getElementById("reimVorschau");
+      var z1 = t.zeile1;
+      var gewaehltes = t["antwort_"+buchstabe.toLowerCase()];
+      var z2 = t.zeile2_anfang + " " + gewaehltes + "!";
+      vorschau.textContent = z1 + "\n" + z2;
+      vorschau.className = "reim-vorschau sichtbar";
+      sprich(t["tts_"+buchstabe.toLowerCase()], function(){ setTimeout(function(){ index++; zeigeAufgabe(); }, 400); });
+    } else {
+      sprich(zufallsLob() + " " + t.erklaerung, function(){ setTimeout(function(){ index++; zeigeAufgabe(); }, 400); });
+    }
+  } else {
+    document.getElementById(btnMap[buchstabe]).classList.add("falsch-gewaehlt");
+    document.getElementById(btnMap[t.richtig]).classList.add("correct-flash");
+    var richtigText = t["antwort_"+t.richtig.toLowerCase()];
+    setInfoLine("infoLineAntwort","✗ Das war nicht richtig. " + t.erklaerung,"falsch");
+
+    if(t.modus === "R4"){
+      sprich(t["tts_"+t.richtig.toLowerCase()], function(){ setTimeout(function(){ index++; zeigeAufgabe(); }, 400); });
+    } else {
+      sprich("Das war leider falsch. " + t.erklaerung, function(){ setTimeout(function(){ index++; zeigeAufgabe(); }, 400); });
+    }
+  }
+}
+
+// ── R3: Ja / Nein ─────────────────────────────────────────────────────────────
+function zeigeJaNein(t){
+  document.getElementById("jnWort1").textContent = t.wort1;
+  document.getElementById("jnWort2").textContent = t.wort2;
+  document.getElementById("btnPlayJN").dataset.tts = t.tts;
+  setInfoLine("infoLineJN","","");
+
+  ["btnJa","btnNein"].forEach(function(id){
+    var b = document.getElementById(id);
+    b.classList.remove("is-disabled","correct-flash","falsch-gewaehlt");
+    delete b.dataset.pdwell;
+    bindDwellEinzel(b);
+  });
+  delete document.getElementById("btnPlayJN").dataset.pdwell;
+  bindDwellEinzel(document.getElementById("btnPlayJN"));
+  delete document.getElementById("btnZurueck").dataset.pdwell;
+  bindDwellEinzel(document.getElementById("btnZurueck"));
+
+  zeigeScreen("screenJaNein");
+  setTimeout(function(){ sprich(t.wort1 + " — " + t.wort2); }, 350);
+}
+
+function antwortenJN(jaGewaehlt){
+  if(beantwortet) return;
+  beantwortet = true;
+  var t = session[index];
+  var korrekt = (jaGewaehlt === t.reimt);
+
+  document.getElementById("btnJa").classList.add("is-disabled");
+  document.getElementById("btnNein").classList.add("is-disabled");
+
+  if(korrekt){
+    richtigCount++;
+    var btn = document.getElementById(jaGewaehlt ? "btnJa" : "btnNein");
+    btn.classList.add("correct-flash");
+    setInfoLine("infoLineJN","✓ Richtig! " + t.erklaerung,"richtig");
+    sprich(t.erklaerung);
+  } else {
+    var gewaehltBtn  = document.getElementById(jaGewaehlt ? "btnJa" : "btnNein");
+    var richtigBtn   = document.getElementById(t.reimt ? "btnJa" : "btnNein");
+    gewaehltBtn.classList.add("falsch-gewaehlt");
+    richtigBtn.classList.add("correct-flash");
+    setInfoLine("infoLineJN","✗ " + t.erklaerung,"falsch");
+    sprich(t.erklaerung, function(){ setTimeout(function(){ index++; zeigeAufgabe(); }, 400); });
+  }
+}
+
+// ── Abschluss ─────────────────────────────────────────────────────────────────
+function zeigeAbschluss(){
+  document.getElementById("mainBereich").style.display = "none";
+  document.getElementById("zurueckLeiste").style.display = "none";
+  var sc = document.getElementById("abschlussScreen");
+  sc.classList.add("sichtbar");
+  var pct = session.length > 0 ? Math.round((richtigCount/session.length)*100) : 0;
+  document.getElementById("abschlussScore").textContent =
+    richtigCount + " von " + session.length + " richtig";
+  var e, ti, su;
+  if(pct >= 80){ e="🌟"; ti="Super gemacht!"; su="Du bist ein Reim-Profi!"; }
+  else if(pct >= 60){ e="😊"; ti="Toll!"; su="Du wirst immer besser!"; }
+  else{ e="💪"; ti="Weiter ueben!"; su="Reimen macht Spass — noch einmal!"; }
+  document.getElementById("abschlussEmoji").textContent = e;
+  document.getElementById("abschlussTitel").textContent = ti;
+  document.getElementById("abschlussSub").textContent = su;
+  sprich(ti + " " + richtigCount + " von " + session.length + " richtig.");
+  document.getElementById("progressFill").style.width = "100%";
+  delete document.getElementById("btnAbschluss").dataset.pdwell;
+  bindDwellEinzel(document.getElementById("btnAbschluss"));
+}
+
+// ── Feedback-Helper ───────────────────────────────────────────────────────────
+function setInfoLine(id, text, art){
+  var el = document.getElementById(id);
+  if(!el) return;
+  el.className = "infoLine" + (art ? " "+art : "");
+  el.textContent = text || "";
+  el.style.display = text ? "" : "none";
+}
+
+// ── Play-Buttons ──────────────────────────────────────────────────────────────
+document.getElementById("btnPlay").addEventListener("click", function(){
+  var tts = this.dataset.tts; if(tts) sprich(tts);
+});
+document.getElementById("btnPlayJN").addEventListener("click", function(){
+  var tts = this.dataset.tts; if(tts) sprich(tts);
+});
+
+// ── Dwell ─────────────────────────────────────────────────────────────────────
+var _attachDwell = window.LaetitiaAttachDwell || function(){ return {cancelDwell:function(){}}; };
+var dwellMs    = parseInt(localStorage.getItem("laetitia_dwell_ms"))    || 900;
+var leaveGrace = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
+var _dwellHandle = { cancelDwell: function(){} };
+
+var DWELL_SELECTOR = [
+  ".antwort-btn", ".janein-btn", ".play-btn",
+  "#btnZurueck", "#btnAbschluss", "a.zurueckBtn"
+].join(", ");
+
+function rebindDwell(){
+  if(_dwellHandle && typeof _dwellHandle.cancelDwell === "function") _dwellHandle.cancelDwell();
+  _dwellHandle = _attachDwell(DWELL_SELECTOR, {
+    dwellMs: dwellMs, leaveGrace: leaveGrace,
+    onActivate: function(el){
+      if(el.getAttribute("aria-disabled") === "true") return;
+      if(el.classList.contains("is-disabled")) return;
+      try{ el.click(); }catch(e){}
+    }
+  });
+}
+
+// bindDwellEinzel als Alias fuer Kompatibilitaet mit bestehendem Code
+function bindDwellEinzel(el){ rebindDwell(); }
+
+try{
+  localStorage.setItem("laetitia_return_url_v1", new URL("./modules/reim/reim.html", window.location.href).href);
+}catch(e){}
+rebindDwell();
+
+// Start
+zeigeAufgabe();
+</script>
+</body>
+</html>

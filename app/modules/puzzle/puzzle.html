@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Puzzle</title>
+<style>
+  :root{
+    --bg:#f6f7fb; --panel:#ffffff;
+    --border:rgba(15,23,42,.14);
+    --shadow:0 10px 26px rgba(15,23,42,.08);
+    --text:#0f172a; --muted:rgba(15,23,42,.65);
+    --green:#1db954; --green2:#18a84c;
+    --red:#e24a4a; --gold:#f59e0b;
+    --radius:18px;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    background:var(--bg); color:var(--text);
+    height:100vh; overflow:hidden;
+  }
+
+  .viewport{ height:100vh; display:flex; align-items:center; justify-content:center; padding:10px; }
+  .app{ width:min(1100px,96vw); height:calc(100vh - 20px); display:flex; flex-direction:column; gap:8px; min-height:0; }
+
+  .smallStatus{
+    background:var(--panel); border:1px solid var(--border); border-radius:12px;
+    box-shadow:var(--shadow); padding:6px 10px; font-weight:900; font-size:13px;
+    color:var(--muted); flex:0 0 auto;
+  }
+  .smallStatus strong{ color:var(--text); }
+
+  .panel{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:10px; flex:1 1 auto; min-height:0; overflow:hidden;
+  }
+
+  .screen.hidden{ display:none; }
+  .card{ background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:10px; }
+  .headline{ font-size:22px; font-weight:1000; margin:0; }
+  .sub{ margin:4px 0 0 0; font-size:13px; font-weight:900; color:var(--muted); }
+
+  /* ── Dwell-Ring ─────────────────────────────────────────────────── */
+  @keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+  .dwell-ring-svg{
+    position:absolute; top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    pointer-events:none; z-index:10; width:70px; height:70px;
+  }
+  .dwell-ring-svg circle{
+    fill:none; stroke:var(--green); stroke-width:5;
+    stroke-dasharray:220; stroke-dashoffset:220;
+    transform:rotate(-90deg); transform-origin:35px 35px;
+  }
+  .dwell-ring-svg circle.animating{
+    animation:dwellRing var(--dwell-duration,0.4s) linear forwards;
+  }
+  .dwell-active{
+    outline:4px solid var(--green) !important;
+    box-shadow:0 0 0 5px rgba(29,185,84,.45) !important;
+    transform:scale(1.06) !important;
+    z-index:3; transition:none !important;
+  }
+
+  /* ── Generische Buttons ─────────────────────────────────────────── */
+  button{ font-family:inherit; }
+  a.uibtn, button.uibtn{
+    display:flex; align-items:center; justify-content:center;
+    text-decoration:none; border-radius:14px;
+    border:1px solid rgba(0,0,0,.10); background:var(--green);
+    color:#0b1b10; font-weight:1000; cursor:pointer;
+    user-select:none; position:relative; transition:none;
+  }
+  a.uibtn:hover, button.uibtn:hover, a.uibtn:focus, button.uibtn:focus{
+    background:var(--green2); outline:3px solid rgba(29,185,84,.50); transition:none;
+  }
+  a.navBtn, button.navBtn{ min-height:44px; font-size:15px; padding:6px 14px; flex:1; }
+  button.btnRed{ background:var(--red); color:#fff; border-color:rgba(0,0,0,.10); }
+  button.btnRed:hover{ background:#cf3b3b; }
+
+  /* ── MENÜ ────────────────────────────────────────────────────────── */
+  #screenMenu{ height:100%; display:flex; flex-direction:column; gap:10px; }
+
+  /* Bild-Auswahl */
+  #imgGrid{ display:flex; gap:10px; flex-wrap:wrap; }
+  .imgBtn{
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    padding:10px 14px; border-radius:12px;
+    border:2px solid var(--border); background:rgba(15,23,42,.04);
+    color:var(--text); font-weight:900; font-size:14px;
+    cursor:pointer; position:relative; transition:none; min-height:80px;
+  }
+  .imgBtn:hover, .imgBtn:focus{
+    border-color:var(--green); background:rgba(29,185,84,.08);
+    outline:3px solid rgba(29,185,84,.40); transition:none;
+  }
+  .imgBtn--active{
+    border-color:var(--green); background:rgba(29,185,84,.15);
+    box-shadow:0 0 0 3px rgba(29,185,84,.30);
+  }
+  .imgLabel{ font-size:13px; font-weight:1000; }
+
+  /* Stufen */
+  #stufeGrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:10px; flex:1; align-content:start; }
+  .stufeBtn{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:5px; min-height:90px; padding:12px; border-radius:var(--radius);
+    border:2px solid var(--border); background:var(--panel);
+    color:var(--text); font-weight:1000; cursor:pointer; position:relative;
+    box-shadow:var(--shadow); transition:none;
+  }
+  .stufeBtn:hover, .stufeBtn:focus{
+    border-color:var(--green); background:rgba(29,185,84,.08);
+    transform:scale(1.04); outline:4px solid var(--green); transition:none;
+  }
+  .stufeName{ font-size:18px; font-weight:1000; }
+  .stufeDesc{ font-size:12px; font-weight:900; color:var(--muted); text-align:center; }
+  .menuFooter{ display:flex; gap:10px; margin-top:auto; }
+
+  /* ── SPIEL ───────────────────────────────────────────────────────── */
+  #screenGame{ height:100%; display:flex; flex-direction:column; gap:8px; }
+
+  .gameHeader{ display:flex; gap:10px; align-items:stretch; flex:0 0 auto; }
+  .gameHeaderBox{
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:12px; box-shadow:var(--shadow);
+    padding:6px 12px; font-weight:900; font-size:13px; color:var(--muted);
+    display:flex; align-items:center; gap:6px;
+  }
+  .gameHeaderBox strong{ color:var(--text); font-size:14px; }
+
+  /* Spielbereich: links Referenz + Zielgrid, rechts Teile-Leiste */
+  .gameBody{
+    flex:1; min-height:0; display:grid;
+    grid-template-columns:1fr 180px;
+    gap:8px;
+  }
+
+  /* Linke Seite: Referenz oben, Zielgrid unten */
+  .gameLeft{ display:flex; flex-direction:column; gap:8px; min-height:0; }
+
+  /* Referenzbild */
+  .refCard{
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:12px; box-shadow:var(--shadow);
+    padding:6px 10px; flex:0 0 auto;
+    display:flex; align-items:center; gap:10px;
+  }
+  .refLabel{ font-size:12px; font-weight:900; color:var(--muted); white-space:nowrap; }
+  #refImage{
+    display:grid; gap:2px;
+    height:80px; flex:0 0 auto;
+    border-radius:8px; overflow:hidden;
+  }
+  .refTile{
+    position:relative; display:flex; align-items:center; justify-content:center;
+  }
+  .tileNum{
+    font-size:9px; font-weight:1000; color:rgba(255,255,255,.85);
+    text-shadow:0 0 3px rgba(0,0,0,.8);
+    pointer-events:none; user-select:none;
+    position:absolute; bottom:2px; right:3px;
+  }
+  .tileNum--placed{ color:rgba(255,255,255,.60); }
+
+  /* Zielgrid */
+  .targetCard{
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:12px; box-shadow:var(--shadow);
+    padding:8px; flex:1; min-height:0; overflow:hidden;
+    display:flex; flex-direction:column; gap:6px;
+  }
+  .targetLabel{ font-size:12px; font-weight:900; color:var(--muted); }
+  #targetGrid{
+    display:grid; gap:6px; flex:1; min-height:0;
+  }
+  .targetCell{
+    border-radius:10px; border:2px dashed rgba(29,185,84,.40);
+    background:rgba(29,185,84,.05);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; position:relative; transition:none;
+    min-height:0; min-width:0;
+  }
+  .targetCell:hover, .targetCell:focus{
+    border-color:var(--green); background:rgba(29,185,84,.12);
+    transform:scale(1.03); outline:3px solid rgba(29,185,84,.40);
+    transition:none;
+  }
+  .targetCell--placed{
+    border:2px solid rgba(29,185,84,.50);
+    background:transparent; cursor:default;
+    pointer-events:none;
+  }
+  .targetCell--wrong{
+    border-color:var(--red) !important;
+    background:rgba(226,74,74,.12) !important;
+    animation:wrongFlash .3s ease;
+  }
+  @keyframes wrongFlash{
+    0%,100%{ transform:scale(1); }
+    50%{ transform:scale(0.96); }
+  }
+  .targetNum{
+    font-size:clamp(14px,2.5vw,22px); font-weight:1000;
+    color:rgba(29,185,84,.50); pointer-events:none; user-select:none;
+  }
+
+  /* Rechte Seite: Teile-Leiste */
+  .pieceCard{
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:12px; box-shadow:var(--shadow);
+    padding:8px; display:flex; flex-direction:column; gap:6px;
+    min-height:0; overflow:hidden;
+  }
+  .pieceLabel{ font-size:12px; font-weight:900; color:var(--muted); }
+  #pieceBar{
+    display:flex; flex-direction:column; gap:6px;
+    flex:1; min-height:0; overflow-y:auto;
+  }
+  .pieceBtn{
+    flex-shrink:0; height:52px; border-radius:10px;
+    border:2px solid var(--border); cursor:pointer;
+    position:relative; transition:none; min-width:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .pieceBtn:hover, .pieceBtn:focus{
+    border-color:var(--green); transform:scale(1.04);
+    outline:3px solid rgba(29,185,84,.40); transition:none;
+  }
+  .pieceBtn--selected{
+    border-color:var(--green) !important;
+    box-shadow:0 0 0 4px rgba(29,185,84,.45) !important;
+    transform:scale(1.06) !important;
+  }
+  .piecePlaceholder{
+    flex-shrink:0; height:52px; border-radius:10px;
+    border:2px dashed rgba(29,185,84,.25);
+    background:rgba(29,185,84,.04); opacity:0.5;
+  }
+
+  .gameFooter{ display:flex; gap:10px; flex:0 0 auto; }
+
+  #puzStatus{
+    font-size:12px; font-weight:900; color:var(--muted);
+    text-align:center; padding:2px 0;
+  }
+
+  /* ── END-SCREEN ──────────────────────────────────────────────────── */
+  #screenEnd{
+    height:100%; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:16px;
+  }
+  .endBox{
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:28px 24px; text-align:center; width:min(480px,94%);
+  }
+  #endEmoji{ font-size:68px; margin-bottom:8px; }
+  #endTitle{ font-size:26px; font-weight:1000; margin:0 0 14px 0; }
+  .endStat{ font-size:17px; font-weight:900; color:var(--muted); margin:4px 0; }
+  .endStat strong{ color:var(--text); }
+  .endBtns{
+    display:flex; gap:12px; justify-content:center; margin-top:18px; flex-wrap:wrap;
+  }
+  button.endBtn{
+    min-height:50px; padding:10px 22px; font-size:16px;
+    border-radius:14px; border:1px solid rgba(0,0,0,.10);
+    font-weight:1000; cursor:pointer; position:relative; transition:none;
+  }
+  .endBtnGreen{ background:var(--green); color:#0b1b10; }
+  .endBtnGreen:hover{ background:var(--green2); }
+  .endBtnGrey{ background:rgba(15,23,42,.07); color:var(--text); }
+  .endBtnGrey:hover{ background:rgba(15,23,42,.14); }
+</style>
+</head>
+<body>
+
+<div class="viewport">
+  <div class="app">
+
+    <div class="smallStatus" id="topStatus">
+      <strong>Puzzle</strong> — Lege alle Teile an die richtige Stelle!
+    </div>
+
+    <div class="panel">
+
+      <!-- ══ MENÜ ══════════════════════════════════════════════════ -->
+      <div id="screenMenu" class="screen">
+
+        <div class="card">
+          <div class="headline">🧩 Puzzle</div>
+          <div class="sub">Wähle ein Motiv und eine Schwierigkeitsstufe</div>
+        </div>
+
+        <div class="card">
+          <div style="font-size:13px;font-weight:900;color:var(--muted);margin-bottom:8px;">Motiv:</div>
+          <div id="imgGrid"></div>
+        </div>
+
+        <div class="card" style="flex:1;min-height:0;overflow:hidden;">
+          <div style="font-size:13px;font-weight:900;color:var(--muted);margin-bottom:8px;">Schwierigkeitsstufe:</div>
+          <div id="stufeGrid"></div>
+        </div>
+
+        <div class="menuFooter">
+          <a class="uibtn navBtn" id="btnReturnFromMenu"
+             href="../../index.html"
+             style="background:rgba(15,23,42,.07);color:var(--text);border-color:var(--border);">
+            ← Zurück
+          </a>
+        </div>
+
+      </div>
+
+      <!-- ══ SPIEL ══════════════════════════════════════════════════ -->
+      <div id="screenGame" class="screen hidden">
+
+        <div class="gameHeader">
+          <div class="gameHeaderBox" style="flex:1;">⏱ <strong id="puzTimer">0 s</strong></div>
+          <div class="gameHeaderBox" style="flex:2;"><span id="puzStats">Züge: 0</span></div>
+          <div class="gameHeaderBox" style="flex:3;"><span id="puzStatus">Teil aus der Leiste wählen…</span></div>
+        </div>
+
+        <div class="gameBody">
+
+          <!-- Links: Referenz + Zielgrid -->
+          <div class="gameLeft">
+
+            <div class="refCard">
+              <span class="refLabel">Zielbild:</span>
+              <div id="refImage"></div>
+            </div>
+
+            <div class="targetCard">
+              <div class="targetLabel">Zielfelder — lege die Teile hier ab:</div>
+              <div id="targetGrid"></div>
+            </div>
+
+          </div>
+
+          <!-- Rechts: Teile-Leiste -->
+          <div class="pieceCard">
+            <div class="pieceLabel">Deine Teile:</div>
+            <div id="pieceBar"></div>
+          </div>
+
+        </div>
+
+        <div class="gameFooter">
+          <button class="uibtn navBtn btnRed" id="btnMenu">✕ Menü</button>
+          <button class="uibtn navBtn" id="btnRetry">↺ Nochmal</button>
+        </div>
+
+      </div>
+
+      <!-- ══ END-SCREEN ═════════════════════════════════════════════ -->
+      <div id="screenEnd" class="screen hidden">
+        <div class="endBox">
+          <div id="endEmoji">🎉</div>
+          <div id="endTitle">Puzzle gelöst!</div>
+          <div class="endStat">Stufe: <strong id="endStufe">–</strong></div>
+          <div class="endStat"><strong id="endMoves">–</strong></div>
+          <div class="endStat"><strong id="endTime">–</strong></div>
+          <div class="endBtns">
+            <button class="endBtn endBtnGreen" data-action="RETRY">↺ Nochmal</button>
+            <button class="endBtn endBtnGrey"  data-action="MENU">☰ Menü</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- .panel -->
+  </div><!-- .app -->
+</div><!-- .viewport -->
+
+<script src="../../core/config.js"></script>
+<script src="../../core/storage.js"></script>
+<script src="../../core/return.js"></script>
+<script src="../../core/audioQueue.js"></script>
+<script src="../../core/dwell.js"></script>
+<script src="../../core/error_handler.js"></script>
+<script src="./puzzle_mod.js"></script>
+
+</body>
+</html>

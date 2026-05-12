@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia - Lesen & Verstehen</title>
+<style>
+:root{
+  --bg:#f0fdf4; --panel:#ffffff;
+  --border:rgba(15,23,42,.14); --shadow:0 6px 18px rgba(15,23,42,.07);
+  --text:#0f172a; --muted:rgba(15,23,42,.65);
+  --akzent:#16a34a; --akzent2:#15803d;
+  --akzent-bg:rgba(22,163,74,0.08); --radius:16px;
+  --lila:#8b5cf6; --lila-bg:#ede9fe;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg); color:var(--text);
+  height:100vh; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+.header{
+  background:var(--panel); border-bottom:2px solid var(--akzent);
+  box-shadow:0 2px 8px rgba(15,23,42,.06); flex-shrink:0;
+  padding:10px 16px; display:flex; align-items:center; gap:10px;
+}
+.header-emoji{ font-size:28px; }
+.header-titel{ font-size:20px; font-weight:1000; color:var(--akzent); }
+.header-sub{ font-size:12px; font-weight:800; color:var(--muted); margin-left:auto; }
+
+/* Fortschritt */
+.fortschritt-bar{
+  height:6px; background:rgba(22,163,74,0.15); flex-shrink:0;
+}
+.fortschritt-fill{
+  height:100%; background:var(--akzent);
+  transition:width .4s ease;
+}
+
+.spielfeld{
+  flex:1; overflow-y:hidden; padding:8px 12px;
+  display:flex; flex-direction:column; gap:6px;
+}
+
+/* Textbox */
+.text-card{
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:14px 16px; position:relative; flex-shrink:0;
+}
+.text-titel{
+  font-size:13px; font-weight:1000; color:var(--akzent);
+  margin-bottom:8px; display:flex; align-items:center; gap:8px;
+}
+.text-inhalt{
+  font-size:22px; line-height:1.6; color:var(--text); font-weight:500;
+}
+
+/* Frage */
+.frage-card{
+  background:var(--panel); border:2px solid var(--akzent);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:10px 14px;
+}
+.frage-text{
+  font-size:20px; font-weight:1000; color:var(--text);
+  margin-bottom:8px; line-height:1.3;
+}
+
+/* Antwort-Buttons */
+.antwort-grid{
+  display:flex; flex-direction:column; gap:7px;
+}
+/* Goldstandard: Text links, Bestätigen-Button rechts */
+.antwortZeile{
+  background:var(--panel); border:2px solid var(--border);
+  border-radius:12px; padding:7px 12px;
+  display:flex; align-items:center; gap:10px;
+  position:relative; transition:border-color .2s;
+  box-shadow:var(--shadow);
+}
+.antwortZeile.richtig{ border-color:var(--akzent); background:rgba(22,163,74,.07); }
+.antwortZeile.falsch{ border-color:#dc2626; background:rgba(220,38,38,.06); }
+.antwortZeile.disabled .antwortBtn{ pointer-events:none; opacity:0.4; }
+.antwort-text{
+  flex:1; font-size:18px; font-weight:800; color:var(--text); line-height:1.2;
+}
+.antwortBtn{
+  min-width:64px; min-height:48px; flex-shrink:0;
+  border-radius:12px; border:2px solid var(--akzent);
+  background:var(--akzent-bg); color:var(--akzent2);
+  font-size:16px; font-weight:1000;
+  cursor:pointer; user-select:none;
+  position:relative; display:flex;
+  align-items:center; justify-content:center;
+  transition:none;
+}
+.antwortBtn:hover{ background:rgba(22,163,74,.20); outline:3px solid var(--akzent); }
+.antwortBtn.dwell-active{ transform:scale(1.06) !important; outline:3px solid var(--akzent) !important; transition:none !important; }
+.antwortBtn.disabled{ pointer-events:none; opacity:.4; }
+.antwortBtn .dwell-ring-svg{ width:44px; height:44px; }
+
+@keyframes correctFlash{
+  0%  { background:rgba(22,163,74,.60); border-color:#16a34a; }
+  50% { background:rgba(22,163,74,.15); }
+  100%{ background:rgba(22,163,74,.60); border-color:#16a34a; }
+}
+.correct-flash{ animation:correctFlash .45s ease forwards !important; }
+.falsch-gewaehlt{ background:rgba(220,38,38,.25) !important; border-color:#dc2626 !important; }
+
+/* Info-Zeile */
+.info-zeile{
+  padding:12px 16px; border-radius:12px;
+  font-size:18px; font-weight:800; display:none;
+  border:2px solid transparent; flex-shrink:0;
+}
+.info-zeile.richtig{ display:block; background:rgba(22,163,74,.12); border-color:var(--akzent); color:var(--akzent2); }
+.info-zeile.falsch{ display:block; background:rgba(220,38,38,.10); border-color:#dc2626; color:#991b1b; }
+
+/* Weiter-Button */
+.weiter-btn{
+  display:none; align-items:center; justify-content:center;
+  min-height:58px; font-size:16px; font-weight:1000;
+  border-radius:14px; border:2px solid var(--akzent);
+  background:var(--akzent-bg); color:var(--akzent2);
+  cursor:pointer; user-select:none; position:relative;
+  width:100%;
+}
+.weiter-btn.sichtbar{ display:flex; }
+.weiter-btn.dwell-active{
+  transform:scale(1.02) !important; outline:3px solid var(--akzent) !important;
+}
+
+/* Fertig-Screen */
+.fertig-screen{
+  display:none; flex-direction:column; align-items:center; justify-content:center;
+  gap:14px; padding:24px; text-align:center;
+}
+.fertig-screen.sichtbar{ display:flex; }
+.fertig-emoji{ font-size:64px; }
+.fertig-titel{ font-size:22px; font-weight:1000; color:var(--akzent); }
+.fertig-sub{ font-size:16px; color:var(--muted); }
+.fertig-punkte{ font-size:32px; font-weight:1000; color:var(--akzent2); }
+
+/* Zurück */
+.nav-leiste-unten{
+  display:flex; gap:8px; padding:8px 14px; flex-shrink:0;
+}
+.nav-btn{
+  flex:1; min-height:52px; border-radius:14px;
+  font-size:16px; font-weight:1000;
+  cursor:pointer; user-select:none;
+  position:relative; display:flex;
+  align-items:center; justify-content:center;
+  gap:6px; transition:none; border:2px solid;
+}
+a.nav-btn{ text-decoration:none; }
+.nav-btn-zurueck{
+  background:var(--lila-bg); border-color:var(--lila); color:#4c1d95;
+}
+.nav-btn-zurueck:hover{ background:#ddd6fe; outline:3px solid var(--lila); }
+.nav-btn-zurueck .dwell-ring-svg circle{ stroke:var(--lila); }
+.nav-btn-vorlesen{
+  background:#e0f2fe; border-color:#0891b2; color:#0e7490;
+}
+.nav-btn-vorlesen:hover{ background:#bae6fd; outline:3px solid #0891b2; }
+.nav-btn-vorlesen.spricht{ background:#0891b2; color:#fff; }
+.nav-btn-vorlesen .dwell-ring-svg circle{ stroke:#0891b2; }
+.nav-btn-ueberspringen{
+  background:#fff7ed; border-color:#f59e0b; color:#92400e;
+}
+.nav-btn-ueberspringen:hover{ background:#fef3c7; outline:3px solid #f59e0b; }
+.nav-btn-ueberspringen .dwell-ring-svg circle{ stroke:#f59e0b; }
+.nav-btn.dwell-active{ transform:scale(1.02) !important; outline:3px solid currentColor !important; transition:none !important; }
+
+/* Dwell-Ring */
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  pointer-events:none; z-index:10; width:60px; height:60px;
+}
+.dwell-ring-svg circle{
+  fill:none; stroke:var(--akzent); stroke-width:5;
+  stroke-dasharray:220; stroke-dashoffset:220;
+  transform:rotate(-90deg); transform-origin:35px 35px;
+}
+a.zurueckBtn .dwell-ring-svg circle{ stroke:var(--lila); }
+
+
+.dwell-ring-svg circle.animating{ animation:dwellRing var(--dwell-duration,.9s) linear forwards; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="header-emoji">📖</span>
+  <span class="header-titel" id="headerTitel">Lesen & Verstehen</span>
+  <span class="header-sub" id="headerSub">Lade…</span>
+</div>
+
+<div class="fortschritt-bar"><div class="fortschritt-fill" id="fortschritt" style="width:0%"></div></div>
+
+<div class="spielfeld" id="spielfeld">
+
+  <!-- Text-Karte -->
+  <div class="text-card" id="textCard">
+    <div class="text-titel">
+      <span>📄</span>
+      <span id="textTitel">Titel</span>
+    </div>
+    <div class="text-inhalt" id="textInhalt">…</div>
+
+  </div>
+
+  <!-- Frage-Karte -->
+  <div class="frage-card" id="frageCard">
+    <div class="frage-text" id="frageText">Frage…</div>
+    <div class="antwort-grid" id="antwortGrid"></div>
+  </div>
+
+  <!-- Info + Weiter -->
+  <div class="info-zeile" id="infoZeile"></div>
+  <button class="weiter-btn" id="weiterBtn" onclick="naechsteAufgabe();">
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+    Weiter ➜
+  </button>
+
+
+  <!-- Fertig-Screen -->
+  <div class="fertig-screen" id="fertigScreen">
+    <div class="fertig-emoji">🎉</div>
+    <div class="fertig-titel">Super gemacht!</div>
+    <div class="fertig-punkte" id="fertigPunkte"></div>
+    <div class="fertig-sub">Alle Aufgaben erledigt!</div>
+    <button class="weiter-btn sichtbar" id="nochmalBtn" onclick="nochmal()" style="max-width:260px; margin-top:8px;">
+      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+      🔁 Nochmal
+    </button>
+  </div>
+
+</div>
+
+<div class="nav-leiste-unten">
+  <a class="nav-btn nav-btn-zurueck" id="btnZurueck" href="./schule_sachkunde.html">
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+    ← Zurück
+  </a>
+  <button class="nav-btn nav-btn-vorlesen" id="vorleseBtnNav" onclick="vorlesenText()">
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+    🔊 Vorlesen
+  </button>
+  <button class="nav-btn nav-btn-ueberspringen" id="btnUeberspringen" onclick="ueberspringen()">
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+    → Überspringen
+  </button>
+</div>
+
+<script src="../../core/dwell.js"></script>
+<script src="../../core/error_handler.js"></script>
+<script src="./schule_lesen_bilder.js"></script>
+<script src="./schule_lesen_data.js"></script>
+<script>
+// ── Konfiguration ────────────────────────────────────────────────
+var LOB_TEXTE = [
+  "Fantastisch! Du bist so schlau!",
+  "Wow, richtig! Großartig!",
+  "Super! Das hast du toll gelesen!",
+  "Ja! Genau richtig! Weiter so!",
+  "Wunderbar! Du bist eine echte Leseratte!",
+  "Toll! Das war nicht leicht — und du hast es geschafft!",
+  "Perfekt! Ich bin so stolz auf dich!",
+  "Richtig! Du liest so gut!"
+];
+function zufallsLob(){ return LOB_TEXTE[Math.floor(Math.random()*LOB_TEXTE.length)]; }
+
+// ── URL-Parameter ────────────────────────────────────────────────
+var params  = new URLSearchParams(window.location.search);
+var heft    = params.get("heft")  || "sachkunde_fruehling";
+var thema   = params.get("thema") || null;
+
+// ── Daten laden ──────────────────────────────────────────────────
+var alleAufgaben = (window.SCHULE_LESEN_DATEN || []).filter(function(t){
+  if(t.heft !== heft) return false;
+  if(thema && t.thema !== thema) return false;
+  return true;
+});
+
+if(!alleAufgaben || alleAufgaben.length === 0){
+  if(window.LaetitiaFehler) window.LaetitiaFehler.zeige("Keine Aufgaben gefunden — Datendatei prüfen.");
+}
+
+// Mischen
+function mischen(arr){
+  var a = arr.slice();
+  for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; }
+  return a;
+}
+var aufgaben   = alleAufgaben.slice();
+var aktIndex   = 0;
+var richtigCnt = 0;
+var gesamtCnt  = aufgaben.length;
+var aktAufgabe = null;
+var gesperrt   = false;
+
+// ── Header ───────────────────────────────────────────────────────
+var HEFT_NAMEN = {
+  "sachkunde_fruehling": "Frühling — Texte",
+  "sachkunde_lesekarten": "Frühling — Lesekarten"
+};
+document.getElementById("headerTitel").textContent =
+  HEFT_NAMEN[heft] || "Lesen & Verstehen";
+
+// ── TTS ──────────────────────────────────────────────────────────
+function sprich(text, danach){
+  try{
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = "de-DE";
+    var voices = speechSynthesis.getVoices();
+    var de = voices.find(function(v){ return v.name === "Microsoft Katja Online (Natural) - German (Germany)"; })
+          || voices.find(function(v){ return v.name === "Microsoft Katja - German (Germany)"; })
+          || voices.find(function(v){ return v.name.indexOf("Katja") >= 0; })
+          || voices.find(function(v){ return v.name.indexOf("Microsoft") >= 0 && v.lang.startsWith("de") && v.name.indexOf("Hedda") < 0; })
+          || voices.find(function(v){ return v.name.indexOf("Microsoft") >= 0 && v.lang.startsWith("de"); })
+          || voices.find(function(v){ return v.lang.startsWith("de"); });
+    if(de) u.voice = de;
+    u.rate = 0.90;
+    if(window.LaetitiaSprich){
+      window.LaetitiaSprich.wrap(u, danach);
+    } else {
+      var fired = false;
+      var watchdog = null;
+      function naechster(){
+        if(fired) return; fired = true;
+        if(watchdog) clearTimeout(watchdog);
+        if(danach) setTimeout(danach, 300);
+      }
+      u.onend  = naechster;
+      u.onerror = naechster;
+      watchdog = setTimeout(naechster, Math.max(3000, text.length * 80));
+      speechSynthesis.speak(u);
+    }
+  }catch(e){ if(danach) setTimeout(danach, 400); }
+}
+
+function vorlesenText(){
+  if(!aktAufgabe) return;
+  var btn = document.getElementById("vorleseBtnNav");
+  if(btn){ btn.classList.add("spricht"); btn.innerHTML = '<svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>🔊 Lese vor…'; }
+  sprich(aktAufgabe.text, function(){
+    if(btn){ btn.classList.remove("spricht"); btn.innerHTML = '<svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>🔊 Vorlesen'; }
+    bindeDwell();
+  });
+}
+
+// ── Aufgabe rendern ──────────────────────────────────────────────
+function zeigeAufgabe(){
+  if(aktIndex >= aufgaben.length){ zeigeFertig(); return; }
+  aktAufgabe = aufgaben[aktIndex];
+  gesperrt   = false;
+
+  // Fortschritt
+  var pct = Math.round((aktIndex / gesamtCnt) * 100);
+  document.getElementById("fortschritt").style.width = pct + "%";
+  document.getElementById("headerSub").textContent =
+    (aktIndex+1) + " / " + gesamtCnt;
+
+  // Text + Bild
+  document.getElementById("textTitel").textContent  = aktAufgabe.titel;
+  document.getElementById("textInhalt").textContent = aktAufgabe.text;
+
+  var vorBtn = document.getElementById("vorleseBtnNav");
+  if(vorBtn){ vorBtn.classList.remove("spricht"); vorBtn.innerHTML = '<svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>🔊 Vorlesen'; }
+
+  // Frage
+  document.getElementById("frageText").textContent = aktAufgabe.frage;
+
+  // Antworten mischen (Reihenfolge zufällig)
+  var optionen = [
+    { key:"A", text:aktAufgabe.antwort_a },
+    { key:"B", text:aktAufgabe.antwort_b },
+    { key:"C", text:aktAufgabe.antwort_c }
+  ].filter(function(o){ return !!o.text; });
+  optionen = mischen(optionen);
+
+  var grid = document.getElementById("antwortGrid");
+  grid.innerHTML = "";
+  optionen.forEach(function(opt){
+    var zeile = document.createElement("div");
+    zeile.className = "antwortZeile";
+    zeile.setAttribute("data-key", opt.key);
+    var txt = document.createElement("div");
+    txt.className = "antwort-text";
+    txt.textContent = opt.text;
+    var btn = document.createElement("button");
+    btn.className = "antwortBtn";
+    btn.setAttribute("data-key", opt.key);
+    delete btn.dataset.pdwell;
+    btn.innerHTML = '<svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>✓';
+    btn.addEventListener("click", function(){ pruefeAntwort(opt.key, zeile, btn); });
+    zeile.appendChild(txt);
+    zeile.appendChild(btn);
+    grid.appendChild(zeile);
+  });
+
+  // Info zurücksetzen
+  var info = document.getElementById("infoZeile");
+  info.className = "info-zeile";
+  info.textContent = "";
+  var weiter = document.getElementById("weiterBtn");
+  weiter.className = "weiter-btn";
+  var ub=document.getElementById("btnUeberspringen"); if(ub){ ub.style.display = ""; }
+  document.getElementById("fertigScreen").className = "fertig-screen";
+
+  bindeDwell();
+
+  // Frage vorlesen nach kurzem Delay
+  setTimeout(function(){
+    sprich(aktAufgabe.frage);
+  }, 600);
+}
+
+// ── Antwort prüfen ───────────────────────────────────────────────
+function pruefeAntwort(key, gewaehltZeile, gewaehltBtn){
+  if(gesperrt) return;
+  gesperrt = true;
+
+  var alleZeilen = document.querySelectorAll(".antwortZeile");
+  var alleBtns   = document.querySelectorAll(".antwortBtn");
+  alleZeilen.forEach(function(z){ z.classList.add("disabled"); });
+  alleBtns.forEach(function(b){ b.classList.add("disabled"); });
+
+  var richtigerKey = aktAufgabe.richtig;
+  var info  = document.getElementById("infoZeile");
+  var weiter = document.getElementById("weiterBtn");
+  var ub     = document.getElementById("btnUeberspringen");
+
+  if(key === richtigerKey){
+    richtigCnt++;
+    gewaehltZeile.classList.add("richtig");
+    gewaehltBtn.textContent = "✓";
+    info.className = "info-zeile richtig";
+    info.textContent = "✓ Richtig! " + aktAufgabe.erklaerung;
+    sprich(zufallsLob() + " " + aktAufgabe.erklaerung, function(){
+      weiter.className = "weiter-btn sichtbar";
+      if(ub) ub.style.display = "none";
+      bindeDwell();
+    });
+  } else {
+    gewaehltZeile.classList.add("falsch");
+    gewaehltBtn.textContent = "✗";
+    // Richtige Zeile grün
+    alleZeilen.forEach(function(z){
+      if(z.getAttribute("data-key") === richtigerKey){ z.classList.add("richtig"); }
+    });
+    var richtigText = "";
+    if(richtigerKey==="A") richtigText = aktAufgabe.antwort_a;
+    else if(richtigerKey==="B") richtigText = aktAufgabe.antwort_b;
+    else if(richtigerKey==="C") richtigText = aktAufgabe.antwort_c;
+    info.className = "info-zeile falsch";
+    info.textContent = "✗ Nicht ganz. Richtig ist: " + richtigText + " — " + aktAufgabe.erklaerung;
+    sprich("Das stimmt leider nicht. Richtig ist: " + richtigText + ". " + aktAufgabe.erklaerung, function(){
+      weiter.className = "weiter-btn sichtbar";
+      if(ub) ub.style.display = "none";
+      bindeDwell();
+    });
+  }
+}
+
+// ── Navigation ───────────────────────────────────────────────────
+function ueberspringen(){
+  if(aktIndex >= aufgaben.length - 1){ zeigeFertig(); return; }
+  aktIndex++;
+  zeigeAufgabe();
+}
+
+function naechsteAufgabe(){
+  // KEIN speechSynthesis.cancel() hier — Weiter-Button erscheint erst nach onend
+  aktIndex++;
+  zeigeAufgabe();
+}
+
+function zeigeFertig(){
+  document.getElementById("textCard").style.display = "none";
+  document.getElementById("frageCard").style.display = "none";
+  document.getElementById("infoZeile").style.display = "none";
+  document.getElementById("weiterBtn").style.display = "none";
+  document.getElementById("fertigScreen").className = "fertig-screen sichtbar";
+  document.getElementById("fertigPunkte").textContent =
+    richtigCnt + " von " + gesamtCnt + " richtig";
+  document.getElementById("fortschritt").style.width = "100%";
+  sprich("Super! Du hast alle Aufgaben erledigt! " + richtigCnt + " von " + gesamtCnt + " waren richtig. Toll gemacht!");
+  bindeDwell();
+}
+
+function nochmal(){
+  aktIndex   = 0;
+  richtigCnt = 0;
+  aufgaben   = alleAufgaben.slice();
+  document.getElementById("textCard").style.display = "";
+  document.getElementById("frageCard").style.display = "";
+  zeigeAufgabe();
+}
+
+// ── Dwell ────────────────────────────────────────────────────────
+var dwellCtrl = null;
+function bindeDwell(){
+  if(dwellCtrl) dwellCtrl.cancelDwell();
+  var attach = window.LaetitiaAttachDwell || function(){ return {cancelDwell:function(){}}; };
+  var dwellMs    = parseInt(localStorage.getItem("laetitia_dwell_ms")) || 900;
+  var leaveGrace = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
+  dwellCtrl = attach(".antwortBtn:not(.disabled), #vorleseBtnNav, .weiter-btn.sichtbar, #btnUeberspringen, #nochmalBtn, #btnZurueck", {
+    dwellMs: dwellMs, leaveGrace: leaveGrace,
+    onActivate: function(el){
+      if(el.classList.contains("disabled")) return;
+      try{ el.click(); }catch(e){}
+    }
+  });
+}
+
+// ── Voices laden & starten ───────────────────────────────────────
+try{ localStorage.setItem("laetitia_return_url_v1", new URL("./schule_sachkunde.html", window.location.href).href); }catch(e){}
+
+if(speechSynthesis.getVoices().length > 0){
+  zeigeAufgabe();
+} else {
+  speechSynthesis.addEventListener("voiceschanged", function(){ zeigeAufgabe(); }, {once:true});
+  setTimeout(function(){ if(aktAufgabe===null) zeigeAufgabe(); }, 800);
+}
+</script>
+</body>
+</html>

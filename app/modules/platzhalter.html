@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Kommt bald</title>
+<style>
+:root{
+  --bg:#f6f7fb; --panel:#ffffff;
+  --border:rgba(15,23,42,.14); --shadow:0 10px 26px rgba(15,23,42,.08);
+  --text:#0f172a; --muted:rgba(15,23,42,.65); --radius:18px;
+}
+*{ box-sizing:border-box; }
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg); color:var(--text);
+  height:100vh; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+}
+.app{ width:min(600px,96vw); display:flex; flex-direction:column; gap:14px; padding:16px; }
+.card{
+  background:var(--panel); border:2px dashed var(--border);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:48px 32px; text-align:center;
+}
+.card-emoji{ font-size:72px; margin-bottom:16px; }
+.card-title{ font-size:28px; font-weight:1000; margin:0 0 10px 0; }
+.card-sub{ font-size:17px; font-weight:800; color:var(--muted); margin:0; }
+.statusbar{
+  background:var(--panel); border:1px solid var(--border); border-radius:12px;
+  box-shadow:var(--shadow); padding:8px 14px; font-size:13px; font-weight:900;
+  color:var(--muted); display:flex; align-items:center; justify-content:flex-end;
+}
+a.zurueckBtn{
+  font-size:14px; font-weight:1000; color:var(--text); text-decoration:none;
+  padding:10px 20px; border-radius:12px; border:2px solid var(--border);
+  background:rgba(15,23,42,.06); cursor:pointer; user-select:none; position:relative;
+  min-height:52px; display:flex; align-items:center;
+}
+a.zurueckBtn:hover, a.zurueckBtn:focus{
+  background:rgba(15,23,42,.14); outline:3px solid rgba(15,23,42,.30); transition:none;
+}
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  pointer-events:none; z-index:10; width:70px; height:70px;
+}
+.dwell-ring-svg circle{
+  fill:none; stroke:rgba(15,23,42,.50); stroke-width:5;
+  stroke-dasharray:220; stroke-dashoffset:220;
+  transform:rotate(-90deg); transform-origin:35px 35px;
+}
+.dwell-ring-svg circle.animating{ animation:dwellRing var(--dwell-duration,0.4s) linear forwards; }
+.dwell-active{ transform:scale(1.07) !important; transition:none !important; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="card">
+    <div class="card-emoji">🚧</div>
+    <div class="card-title">Kommt bald!</div>
+    <div class="card-sub">Dieses Modul wird gerade vorbereitet.</div>
+  </div>
+  <div class="statusbar">
+    <a class="zurueckBtn" href="javascript:history.back()" id="btnZurueck">← Zurück</a>
+  </div>
+</div>
+<script src="./core/dwell.js"></script>
+<script>
+var attachDwell = window.LaetitiaAttachDwell || function(){ return {cancelDwell:function(){}}; };
+var dwellMs    = parseInt(localStorage.getItem("laetitia_dwell_ms"))       || 400;
+var leaveGrace = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 100;
+attachDwell("#btnZurueck", {
+  dwellMs: dwellMs, leaveGrace: leaveGrace,
+  onActivate: function(el){ try{ el.click(); }catch(e){} }
+});
+</script>
+</body>
+</html>

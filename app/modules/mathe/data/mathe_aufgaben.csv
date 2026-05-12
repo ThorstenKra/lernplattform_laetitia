@@ -1,0 +1,41 @@
+modul;stufe;seite;text;frage;antwort_a;antwort_b;antwort_c;antwort_d;richtig
+Mathematik;M1_NACHBAR;;Nachbarzahlen – Klasse 1;Setze die fehlende Nachbarzahl ein: 1 – 2 – 3;2;5;4;3;C
+Mathematik;M1_NACHBAR;;Nachbarzahlen – Klasse 1;Setze die fehlende Nachbarzahl ein: 2 – 3 – ___;2;5;4;3;C
+Mathematik;M1_NACHBAR;;Nachbarzahlen – Klasse 1;Setze die fehlende Nachbarzahl ein: 3 – 4 – ___;5;6;4;3;A
+Mathematik;M1_NACHBAR;;Nachbarzahlen – Klasse 1;Setze die fehlende Nachbarzahl ein: 4 – 5 – ___;7;5;4;6;D
+Mathematik;M1_NACHBAR;;Nachbarzahlen – Klasse 1;Setze die fehlende Nachbarzahl ein: 5 – 6 – ___;6;8;7;5;C
+Mathematik;M1_NACHBAR;;Nachbarzahlen – Klasse 1;Setze die fehlende Nachbarzahl ein: 6 – 7 – ___;8;7;6;9;A
+Mathematik;M1_NACHBAR;;Nachbarzahlen – Klasse 1;Setze die fehlende Nachbarzahl ein: 7 – 8 – ___;9;8;7;10;A
+Mathematik;M1_NACHBAR;;Nachbarzahlen – Klasse 1;Setze die fehlende Nachbarzahl ein: 8 – 9 – ___;9;10;11;8;B
+Mathematik;M1_NACHBAR;;Nachbarzahlen – Klasse 1;Setze die fehlende Nachbarzahl ein: ___ – 2 – 3;4;1;2;3;B
+Mathematik;M1_NACHBAR;;Nachbarzahlen – Klasse 1;Setze die fehlende Nachbarzahl ein: ___ – 3 – 4;2;3;1;4;A
+Mathematik;M1_NACHBAR;;Nachbarzahlen – Klasse 1;Setze die fehlende Nachbarzahl ein: ___ – 4 – 5;3;4;2;1;A
+Mathematik;M1_NACHBAR;;Nachbarzahlen – Klasse 1;Setze die fehlende Nachbarzahl ein: ___ – 5 – 6;2;5;4;3;C
+Mathematik;M1_NACHBAR;;Nachbarzahlen – Klasse 1;Setze die fehlende Nachbarzahl ein: ___ – 6 – 7;5;6;4;3;A
+Mathematik;M1_NACHBAR;;Nachbarzahlen – Klasse 1;Setze die fehlende Nachbarzahl ein: ___ – 7 – 8;7;5;4;6;D
+Mathematik;M1_NACHBAR;;Nachbarzahlen – Klasse 1;Setze die fehlende Nachbarzahl ein: ___ – 8 – 9;6;8;7;5;C
+Mathematik;M1_NACHBAR;;Nachbarzahlen – Klasse 1;Setze die fehlende Nachbarzahl ein: ___ – 9 – 10;8;7;6;9;A
+Mathematik;M1_NACHBAR;;Nachbarzahlen – Klasse 1;Setze die fehlende Nachbarzahl ein: 1 – ___ – 3;2;3;1;4;A
+Mathematik;M1_NACHBAR;;Nachbarzahlen – Klasse 1;Setze die fehlende Nachbarzahl ein: 3 – ___ – 5;2;5;4;3;C
+Mathematik;M1_NACHBAR;;Nachbarzahlen – Klasse 1;Setze die fehlende Nachbarzahl ein: 5 – ___ – 7;7;5;4;6;D
+Mathematik;M1_NACHBAR;;Nachbarzahlen – Klasse 1;Setze die fehlende Nachbarzahl ein: 7 – ___ – 9;8;7;6;9;A
+Mathematik;M1_REIHE;;Zahlenreihen – Klasse 1;Welche Zahl gehört in die Lücke? 1 – 2 – 3 – ___ – 5;2;5;3;4;D
+Mathematik;M1_REIHE;;Zahlenreihen – Klasse 1;Welche Zahl gehört in die Lücke? 1 – ___ – 3 – 4 – 5;1;4;3;2;D
+Mathematik;M1_REIHE;;Zahlenreihen – Klasse 1;Welche Zahl gehört in die Lücke? 2 – 3 – ___ – 5 – 6;2;5;3;4;D
+Mathematik;M1_REIHE;;Zahlenreihen – Klasse 1;Welche Zahl gehört in die Lücke? 3 – 4 – 5 – 6 – ___;8;6;5;7;D
+Mathematik;M1_REIHE;;Zahlenreihen – Klasse 1;Welche Zahl gehört in die Lücke? ___ – 5 – 6 – 7 – 8;2;5;3;4;D
+Mathematik;M1_REIHE;;Zahlenreihen – Klasse 1;Welche Zahl gehört in die Lücke? 5 – 6 – ___ – 8 – 9;8;6;5;7;D
+Mathematik;M1_REIHE;;Zahlenreihen – Klasse 1;Welche Zahl gehört in die Lücke? 6 – ___ – 8 – 9 – 10;8;6;5;7;D
+Mathematik;M1_REIHE;;Zahlenreihen – Klasse 1;Welche Zahl gehört in die Lücke? 1 – 3 – ___ – 7 – 9;6;3;5;4;C
+Mathematik;M1_REIHE;;Zahlenreihen – Klasse 1;Welche Zahl gehört in die Lücke? 2 – 4 – 6 – ___ – 10;9;7;6;8;D
+Mathematik;M1_REIHE;;Zahlenreihen – Klasse 1;Welche Zahl gehört in die Lücke? 1 – 2 – 3 – 4 – ___;6;3;5;4;C
+Mathematik;M1_REIHE;;Zahlenreihen – Klasse 1;Welche Zahl gehört in die Lücke? ___ – 3 – 4 – 5 – 6;1;4;3;2;D
+Mathematik;M1_REIHE;;Zahlenreihen – Klasse 1;Welche Zahl gehört in die Lücke? 3 – ___ – 5 – 6 – 7;2;5;3;4;D
+Mathematik;M1_REIHE;;Zahlenreihen – Klasse 1;Welche Zahl gehört in die Lücke? 4 – 5 – 6 – ___ – 8;8;6;5;7;D
+Mathematik;M1_REIHE;;Zahlenreihen – Klasse 1;Welche Zahl gehört in die Lücke? ___ – 6 – 7 – 8 – 9;6;3;5;4;C
+Mathematik;M1_REIHE;;Zahlenreihen – Klasse 1;Welche Zahl gehört in die Lücke? 6 – 7 – 8 – 9 – ___;11;9;8;10;D
+Mathematik;M1_REIHE;;Zahlenreihen – Klasse 1;Welche Zahl gehört in die Lücke? ___ – 3 – 5 – 7 – 9;4;2;1;3;C
+Mathematik;M1_REIHE;;Zahlenreihen – Klasse 1;Welche Zahl gehört in die Lücke? 2 – ___ – 6 – 8 – 10;2;5;3;4;D
+Mathematik;M1_REIHE;;Zahlenreihen – Klasse 1;Welche Zahl gehört in die Lücke? 1 – 2 – ___ – 4 – 5;3;2;4;1;A
+Mathematik;M1_REIHE;;Zahlenreihen – Klasse 1;Welche Zahl gehört in die Lücke? 3 – 4 – 5 – ___ – 7;5;4;7;6;D
+Mathematik;M1_REIHE;;Zahlenreihen – Klasse 1;Welche Zahl gehört in die Lücke? 2 – 4 – 6 – 8 – ___;11;9;8;10;D

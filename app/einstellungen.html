@@ -1,0 +1,897 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Einstellungen</title>
+<style>
+  :root{
+    --bg:#f6f7fb; --panel:#ffffff; --border:rgba(15,23,42,.14);
+    --shadow:0 10px 26px rgba(15,23,42,.08); --text:#0f172a;
+    --muted:rgba(15,23,42,.65); --green:#1db954; --green2:#18a84c;
+    --red:#e24a4a; --radius:18px;
+  }
+  *{ box-sizing:border-box; }
+  body{ margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    background:var(--bg); color:var(--text); min-height:100vh; overflow-y:auto; }
+
+  .viewport{ min-height:100vh; display:flex; align-items:flex-start;
+    justify-content:center; padding:16px; }
+  .app{ width:min(780px,96vw); display:flex; flex-direction:column; gap:12px;
+    padding-bottom:20px; }
+
+  /* Header */
+  .header{ background:var(--panel); border:1px solid var(--border);
+    border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:18px 22px; display:flex; align-items:center; gap:14px; }
+  .header-emoji{ font-size:42px; }
+  .header-title{ font-size:clamp(22px,3vw,30px); font-weight:1000; margin:0; }
+  .header-sub{ font-size:14px; font-weight:800; color:var(--muted); margin:2px 0 0 0; }
+
+  /* Abschnitte */
+  .section{ background:var(--panel); border:1px solid var(--border);
+    border-radius:var(--radius); box-shadow:var(--shadow); padding:18px 20px; }
+  .section-title{ font-size:17px; font-weight:1000; margin:0 0 14px 0;
+    padding-bottom:8px; border-bottom:1px solid var(--border); }
+  .section-title .emoji{ margin-right:8px; }
+
+  /* Einzel-Setting */
+  .setting{ display:flex; flex-direction:column; gap:8px; margin-bottom:18px; }
+  .setting:last-child{ margin-bottom:0; }
+  .setting-label{ font-size:15px; font-weight:1000; }
+  .setting-desc{ font-size:13px; font-weight:800; color:var(--muted);
+    margin-top:-4px; line-height:1.3; }
+
+  /* Slider */
+  .slider-row{ display:flex; align-items:center; gap:14px; }
+  input[type=range]{
+    flex:1; height:8px; border-radius:999px; accent-color:var(--green);
+    cursor:pointer;
+  }
+  .slider-val{
+    min-width:70px; text-align:center;
+    font-size:18px; font-weight:1000; color:var(--green);
+    background:rgba(29,185,84,.10); border:1px solid rgba(29,185,84,.30);
+    border-radius:10px; padding:4px 10px;
+  }
+
+  /* Test-Button */
+  .test-btn{
+    display:inline-flex; align-items:center; justify-content:center;
+    min-height:52px; padding:10px 20px; border-radius:14px;
+    border:1px solid rgba(0,0,0,.10); background:var(--green);
+    color:#0b1b10; font-weight:1000; font-size:16px;
+    cursor:pointer; user-select:none; position:relative;
+    margin-top:4px; width:100%;
+  }
+  .test-btn:hover{ background:var(--green2); }
+  /* Dwell-Ring für Test-Button */
+  @keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+  .dwell-ring-svg{ position:absolute; top:50%; left:50%;
+    transform:translate(-50%,-50%); pointer-events:none; z-index:10;
+    width:64px; height:64px; }
+  .dwell-ring-svg circle{ fill:none; stroke:#1db954; stroke-width:5;
+    stroke-dasharray:220; stroke-dashoffset:220;
+    transform:rotate(-90deg); transform-origin:32px 32px; }
+  .dwell-ring-svg circle.animating{
+    animation:dwellRing var(--dwell-duration,0.6s) linear forwards; }
+  .dwell-active{ outline:4px solid #1db954; transform:scale(1.04); transition:none; }
+
+  /* Feedback-Banner */
+  .feedback{
+    display:none; padding:10px 14px; border-radius:12px;
+    font-size:14px; font-weight:900; margin-top:6px;
+    background:rgba(29,185,84,.15); border:1px solid rgba(29,185,84,.35);
+    color:#0b5c22;
+  }
+  .feedback.show{ display:block; }
+  .feedback.warn{ background:rgba(255,193,7,.18); border-color:rgba(255,193,7,.45); color:#7a5a00; }
+
+  /* Toggle */
+  .toggle-row{ display:flex; align-items:center; gap:14px; }
+  .toggle{
+    position:relative; width:52px; height:28px; flex-shrink:0;
+  }
+  .toggle input{ opacity:0; width:0; height:0; }
+  .toggle-slider{
+    position:absolute; inset:0; border-radius:999px;
+    background:#ccc; cursor:pointer; transition:background .2s;
+  }
+  .toggle-slider:before{
+    content:""; position:absolute;
+    width:22px; height:22px; border-radius:50%;
+    left:3px; top:3px; background:#fff;
+    transition:transform .2s;
+  }
+  .toggle input:checked + .toggle-slider{ background:var(--green); }
+  .toggle input:checked + .toggle-slider:before{ transform:translateX(24px); }
+  .toggle-label{ font-size:15px; font-weight:900; }
+
+  /* Number input */
+  input[type=number]{
+    width:80px; padding:8px 10px; border-radius:10px;
+    border:1px solid var(--border); font-size:16px; font-weight:900;
+    background:var(--panel); color:var(--text); text-align:center;
+  }
+
+  /* Footer Buttons */
+  .footer{ display:flex; gap:10px; }
+  .btn-save{
+    flex:2; min-height:56px; border-radius:14px;
+    border:1px solid rgba(0,0,0,.10); background:var(--green);
+    color:#0b1b10; font-weight:1000; font-size:18px; cursor:pointer;
+  }
+  .btn-save:hover{ background:var(--green2); }
+  .btn-back{
+    flex:1; min-height:56px; border-radius:14px;
+    border:1px solid var(--border); background:rgba(15,23,42,.07);
+    color:var(--text); font-weight:1000; font-size:16px; cursor:pointer;
+  }
+  .btn-back:hover{ background:rgba(15,23,42,.14); }
+  .btn-reset{
+    flex:1; min-height:56px; border-radius:14px;
+    border:1px solid rgba(226,74,74,.35);
+    background:rgba(226,74,74,.08);
+    color:var(--red); font-weight:1000; font-size:14px; cursor:pointer;
+  }
+  .btn-reset:hover{ background:rgba(226,74,74,.18); }
+
+  .save-ok{ display:none; text-align:center; font-size:16px;
+    font-weight:1000; color:#0b5c22; padding:10px 0; }
+  .save-ok.show{ display:block; }
+
+  /* Schnell-Wahl Dwell-Buttons */
+  .quick-dwell{
+    display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:14px;
+  }
+  .qdBtn{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    min-height:80px; border-radius:16px; border:2px solid rgba(29,185,84,.30);
+    background:rgba(29,185,84,.10); color:#0b1b10; font-weight:1000;
+    cursor:pointer; user-select:none; gap:4px; position:relative; transition:none;
+  }
+  .qdBtn:hover, .qdBtn:focus, .qdBtn.dwell-active{
+    background:rgba(29,185,84,.30); border-color:#1db954;
+    outline:4px solid #1db954; transform:scale(1.04); z-index:2;
+  }
+  .qdBtn.qdActive{
+    background:rgba(29,185,84,.35); border-color:#1db954;
+    box-shadow:0 0 0 3px rgba(29,185,84,.40);
+  }
+  .qdBtn .qdLabel{ font-size:18px; font-weight:1000; }
+  .qdBtn .qdMs{ font-size:13px; font-weight:900; color:rgba(11,27,16,.70); }
+  .qdBtn .qdHint{ font-size:11px; font-weight:800; color:rgba(11,27,16,.55); text-align:center; padding:0 6px; }
+
+  /* ── Schultage-Kalender ── */
+  .schul-header{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:12px; gap:8px;
+  }
+  .schul-nav{
+    min-width:44px; min-height:44px; border-radius:10px;
+    border:1px solid var(--border); background:rgba(15,23,42,.06);
+    font-size:20px; font-weight:1000; cursor:pointer; color:var(--text);
+  }
+  .schul-nav:hover{ background:rgba(15,23,42,.14); }
+  .schul-monat-titel{
+    font-size:17px; font-weight:1000; text-align:center; flex:1;
+  }
+  .schul-wochentage{
+    display:grid; grid-template-columns:repeat(7,1fr);
+    gap:3px; margin-bottom:4px;
+  }
+  .schul-wt{
+    text-align:center; font-size:12px; font-weight:1000;
+    color:var(--muted); padding:4px 0;
+  }
+  .schul-grid{
+    display:grid; grid-template-columns:repeat(7,1fr); gap:4px;
+  }
+  .schul-tag{
+    aspect-ratio:1; border-radius:9px; border:2px solid transparent;
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; font-weight:900; cursor:pointer;
+    background:rgba(15,23,42,.05); color:var(--text);
+    user-select:none; transition:none; position:relative;
+  }
+  .schul-tag:hover{ background:rgba(15,23,42,.12); }
+  .schul-tag.schultag{
+    background:rgba(29,185,84,.25); border-color:#1db954; color:#0b5c22;
+  }
+  .schul-tag.schultag:hover{ background:rgba(29,185,84,.40); }
+  .schul-tag.heute{
+    box-shadow:0 0 0 2px #3b82f6;
+  }
+  .schul-tag.vergangen{ opacity:0.45; }
+  .schul-tag.leer{ background:transparent; cursor:default; pointer-events:none; }
+  .schul-tag.wochenende{ color:var(--muted); }
+  .schul-info{
+    margin-top:10px; font-size:13px; font-weight:900; color:var(--muted);
+    text-align:center;
+  }
+  .schul-info strong{ color:#0b5c22; }
+  .schul-bulk{
+    display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;
+  }
+  .schul-bulk-btn{
+    flex:1; min-height:44px; border-radius:10px; font-size:13px; font-weight:1000;
+    border:1px solid var(--border); background:rgba(15,23,42,.06);
+    cursor:pointer; color:var(--text);
+  }
+  .schul-bulk-btn:hover{ background:rgba(15,23,42,.14); }
+  .schul-status-badge{
+    display:inline-block; padding:6px 16px; border-radius:999px;
+    font-size:14px; font-weight:1000; margin-bottom:10px;
+  }
+  .schul-status-badge.schule{
+    background:rgba(29,185,84,.20); border:1px solid rgba(29,185,84,.50);
+    color:#0b5c22;
+  }
+  .schul-status-badge.freizeit{
+    background:rgba(59,130,246,.15); border:1px solid rgba(59,130,246,.40);
+    color:#1e3a6e;
+  }
+</style>
+</head>
+<body>
+<div class="viewport">
+  <div class="app">
+
+    <div class="header">
+      <div class="header-emoji">⚙️</div>
+      <div>
+        <div class="header-title">Einstellungen</div>
+        <div class="header-sub">Augensteuerung, Lerneinstellungen, Anzeige</div>
+      </div>
+    </div>
+
+    <!-- ── Augensteuerung ── -->
+    <div class="section">
+      <div class="section-title"><span class="emoji">👁️</span>Augensteuerung</div>
+
+      <div class="setting">
+        <div class="setting-label">Eingabemodus</div>
+        <div class="setting-desc">
+          <strong>Augensteuerung (Tobii):</strong> Button löst automatisch nach der eingestellten Zeit aus.<br>
+          <strong>Mausbedienung (Test):</strong> Button löst nur per Klick aus — für Tests ohne Tobii.
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px;">
+          <button id="btnModeTobii" onclick="setMode('tobii')"
+            style="flex:1;min-height:60px;border-radius:14px;border:2px solid;font-size:15px;font-weight:1000;cursor:pointer;">
+            👁️ Augensteuerung (Tobii)
+          </button>
+          <button id="btnModeMouse" onclick="setMode('mouse')"
+            style="flex:1;min-height:60px;border-radius:14px;border:2px solid;font-size:15px;font-weight:1000;cursor:pointer;">
+            🖱️ Mausbedienung (Test)
+          </button>
+        </div>
+        <div id="modeInfo" style="margin-top:6px;font-size:13px;font-weight:900;color:var(--muted);"></div>
+      </div>
+
+      <div class="setting">
+        <div class="setting-label">Auslösezeit – Schnellwahl</div>
+        <div class="setting-desc">Wähle einen Wert per Augensteuerung. Aktiver Wert wird grün markiert.</div>
+        <div class="quick-dwell" id="quickDwell">
+          <button class="qdBtn" data-ms="300">
+            <span class="qdLabel">⚡ Sehr schnell</span>
+            <span class="qdMs">300 ms</span>
+            <span class="qdHint">Für geübte Nutzer</span>
+          </button>
+          <button class="qdBtn" data-ms="600">
+            <span class="qdLabel">🚀 Schnell</span>
+            <span class="qdMs">600 ms</span>
+            <span class="qdHint">Empfohlen</span>
+          </button>
+          <button class="qdBtn" data-ms="1000">
+            <span class="qdLabel">👍 Mittel</span>
+            <span class="qdMs">1000 ms</span>
+            <span class="qdHint">1 Sekunde</span>
+          </button>
+          <button class="qdBtn" data-ms="1500">
+            <span class="qdLabel">🐢 Langsam</span>
+            <span class="qdMs">1500 ms</span>
+            <span class="qdHint">Mehr Zeit</span>
+          </button>
+          <button class="qdBtn" data-ms="2000">
+            <span class="qdLabel">🐌 Sehr langsam</span>
+            <span class="qdMs">2000 ms</span>
+            <span class="qdHint">2 Sekunden</span>
+          </button>
+          <button class="qdBtn" data-ms="3000">
+            <span class="qdLabel">⏳ Extra langsam</span>
+            <span class="qdMs">3000 ms</span>
+            <span class="qdHint">3 Sekunden</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="setting">
+        <div class="setting-label">Auslösezeit (Feineinstellung)</div>
+        <div class="setting-desc">Wie lange muss der Blick auf einem Feld bleiben, bis es ausgelöst wird.</div>
+        <div class="slider-row">
+          <input type="range" id="dwellSlider" min="200" max="3000" step="50" value="600">
+          <div class="slider-val" id="dwellVal">600 ms</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:800;color:var(--muted);padding:0 2px;">
+          <span>200 ms (schnell)</span>
+          <span>3000 ms (sehr langsam)</span>
+        </div>
+      </div>
+
+      <div class="setting">
+        <div class="setting-label">Zitter-Toleranz (leaveGrace)</div>
+        <div class="setting-desc">Kurzes Verlassen des Feldes durch Zittern wird ignoriert. Höherer Wert = toleranter bei Zittern, aber weniger präzise beim Wechseln.</div>
+        <div class="slider-row">
+          <input type="range" id="graceSlider" min="0" max="400" step="25" value="100">
+          <div class="slider-val" id="graceVal">100 ms</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:800;color:var(--muted);padding:0 2px;">
+          <span>0 ms (keine Toleranz)</span>
+          <span>400 ms (sehr tolerant)</span>
+        </div>
+      </div>
+
+      <div class="setting">
+        <div class="setting-label">Test-Schaltfläche</div>
+        <div class="setting-desc">Schau auf diesen Button — er löst mit den aktuell eingestellten Werten aus.</div>
+        <button class="test-btn" id="btnDwellTest">👁️ Dwell-Test</button>
+        <div class="feedback" id="testFeedback">✅ Ausgelöst! Dwell funktioniert.</div>
+      </div>
+
+    </div>
+
+    <!-- ── Lerneinstellungen ── -->
+    <div class="section">
+      <div class="section-title"><span class="emoji">📖</span>Lerneinstellungen</div>
+
+      <div class="setting">
+        <div class="setting-label">Antwort-Verzögerung</div>
+        <div class="setting-desc">Nach dem Start einer Aufgabe werden die Antwort-Buttons erst nach dieser Zeit aktiv. Verhindert versehentliche Auslösung.</div>
+        <div class="slider-row">
+          <input type="range" id="delaySlider" min="0" max="8" step="1" value="1">
+          <div class="slider-val" id="delayVal">1 s</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:800;color:var(--muted);padding:0 2px;">
+          <span>0 s (sofort)</span>
+          <span>8 s (lange)</span>
+        </div>
+      </div>
+
+      <div class="setting">
+        <div class="setting-label">Aufgaben pro Session</div>
+        <div class="setting-desc">Wie viele Aufgaben pro Level-Durchgang gestellt werden.</div>
+        <div class="slider-row">
+          <input type="range" id="fragenSlider" min="5" max="20" step="1" value="10">
+          <div class="slider-val" id="fragenVal">10</div>
+        </div>
+      </div>
+
+      <div class="setting">
+        <div class="setting-label">Schwelle für Erfolg</div>
+        <div class="setting-desc">Wie viel Prozent richtige Antworten für ein "Toll gemacht!" und die Freischaltung der Spielewelt.</div>
+        <div class="slider-row">
+          <input type="range" id="schwelleSlider" min="30" max="100" step="5" value="50">
+          <div class="slider-val" id="schwelleVal">50 %</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Fortschritt ── -->
+    <div class="section">
+      <div class="section-title"><span class="emoji">🔄</span>Fortschritt zurücksetzen</div>
+      <div class="setting">
+        <div class="setting-desc">Hier kannst du gespeicherte Fortschritte zurücksetzen. Das löscht falsche Antworten und Spielstände.</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;">
+          <button class="btn-reset" style="flex:1;min-height:48px;" id="btnResetWrong">
+            Falsche Antworten löschen
+          </button>
+          <button class="btn-reset" style="flex:1;min-height:48px;" id="btnResetUnlock">
+            Spielewelt-Sperre zurücksetzen
+          </button>
+        </div>
+        <div class="feedback warn" id="resetFeedback"></div>
+      </div>
+    </div>
+
+    <!-- ── Statistik ── -->
+    <div class="section">
+      <div class="section-title"><span class="emoji">📊</span>Lernstatistik</div>
+      <div class="setting">
+        <div class="setting-desc">Zeigt Fortschritt, schwache Aufgaben, Hilfe-Wörter und Level-Empfehlungen für alle Module.</div>
+        <a class="test-btn" href="./statistik/statistik.html" id="btnStatistik"
+           style="text-decoration:none;margin-top:8px;display:inline-flex;">
+          📊 Statistik öffnen
+        </a>
+      </div>
+    </div>
+
+    <!-- ── Schultage ── -->
+    <div class="section">
+      <div class="section-title"><span class="emoji">🏫</span>Schultage</div>
+      <div class="setting">
+        <div class="setting-desc">
+          Trage hier die Schultage ein. An diesen Tagen wird die Lernwelt
+          zwischen <strong>08:30 und 15:30 Uhr</strong> automatisch in den
+          Schulmodus geschaltet — nur Schule und Musik sind dann verfuegbar.
+        </div>
+
+        <!-- Aktueller Status -->
+        <div id="schulStatusBadge" class="schul-status-badge freizeit" style="margin-top:10px;">
+          🏠 Jetzt: Freizeitmodus
+        </div>
+
+        <!-- Monats-Navigation -->
+        <div class="schul-header">
+          <button class="schul-nav" id="schulPrev">&#8249;</button>
+          <div class="schul-monat-titel" id="schulMonatTitel"></div>
+          <button class="schul-nav" id="schulNext">&#8250;</button>
+        </div>
+
+        <!-- Wochentage-Header -->
+        <div class="schul-wochentage">
+          <div class="schul-wt">Mo</div>
+          <div class="schul-wt">Di</div>
+          <div class="schul-wt">Mi</div>
+          <div class="schul-wt">Do</div>
+          <div class="schul-wt">Fr</div>
+          <div class="schul-wt" style="color:#e24a4a;">Sa</div>
+          <div class="schul-wt" style="color:#e24a4a;">So</div>
+        </div>
+
+        <!-- Kalender-Grid -->
+        <div class="schul-grid" id="schulGrid"></div>
+
+        <!-- Info -->
+        <div class="schul-info" id="schulInfo"></div>
+
+        <!-- Schnell-Aktionen -->
+        <div class="schul-bulk">
+          <button class="schul-bulk-btn" id="schulBtnWoche">
+            📅 Diese Woche (Mo–Fr) als Schultage
+          </button>
+          <button class="schul-bulk-btn" id="schulBtnMonat">
+            📆 Alle Mo–Fr dieses Monats
+          </button>
+          <button class="schul-bulk-btn" id="schulBtnClear" style="color:var(--red);border-color:rgba(226,74,74,.35);background:rgba(226,74,74,.06);">
+            🗑️ Diesen Monat leeren
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Glossar ── -->
+    <div class="section">
+      <div class="section-title"><span class="emoji">📖</span>Glossar</div>
+      <div class="setting">
+        <div class="setting-desc">Wörter aus den Aufgabentexten verwalten — Erklärungen eingeben, Nuvoice-Wortschatz abgleichen.</div>
+        <a class="test-btn" href="./glossar.html" id="btnGlossar"
+           style="text-decoration:none;margin-top:8px;display:inline-flex;">
+          📖 Glossar verwalten
+        </a>
+      </div>
+    </div>
+
+    <!-- ── Footer ── -->
+    <div class="save-ok" id="saveOk">✅ Einstellungen gespeichert!</div>
+
+    <div class="footer">
+      <button class="btn-back" id="btnBack">← Zurück</button>
+      <button class="btn-save" id="btnSave">💾 Speichern</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+"use strict";
+
+// ── Werte laden ────────────────────────────────────────────────────────────
+function getCfg(){
+  try{ return JSON.parse(localStorage.getItem("laetitia_config_v1")||"{}"); }catch{ return {}; }
+}
+function saveCfg(obj){
+  try{ localStorage.setItem("laetitia_config_v1", JSON.stringify(obj)); }catch{}
+}
+
+const cfg = getCfg();
+
+// Default jetzt 400ms statt 600ms
+const dwellMs = parseInt(localStorage.getItem("laetitia_dwell_ms")) || 600;
+const graceMs = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 100;
+
+// ── Eingabemodus ──────────────────────────────────────────────────────────
+function setMode(mode){
+  localStorage.setItem("laetitia_input_mode", mode);
+  updateModeButtons();
+}
+function updateModeButtons(){
+  const mode = localStorage.getItem("laetitia_input_mode") || "tobii";
+  const btnT = document.getElementById("btnModeTobii");
+  const btnM = document.getElementById("btnModeMouse");
+  const info = document.getElementById("modeInfo");
+  // cssText += akkumuliert Styles — stattdessen einzelne Properties setzen
+  if(btnT){
+    const on = mode === "tobii";
+    btnT.style.background  = on ? "var(--green)"            : "rgba(15,23,42,.06)";
+    btnT.style.color       = on ? "#0b1b10"                 : "var(--text)";
+    btnT.style.borderColor = on ? "var(--green)"            : "var(--border)";
+    btnT.style.boxShadow   = on ? "0 0 0 3px rgba(29,185,84,.35)" : "none";
+  }
+  if(btnM){
+    const on = mode === "mouse";
+    btnM.style.background  = on ? "var(--green)"            : "rgba(15,23,42,.06)";
+    btnM.style.color       = on ? "#0b1b10"                 : "var(--text)";
+    btnM.style.borderColor = on ? "var(--green)"            : "var(--border)";
+    btnM.style.boxShadow   = on ? "0 0 0 3px rgba(29,185,84,.35)" : "none";
+  }
+  if(info){
+    info.style.cssText = mode === "tobii"
+      ? "margin-top:8px;font-size:14px;font-weight:900;padding:8px 12px;border-radius:10px;background:rgba(29,185,84,.12);border:1px solid rgba(29,185,84,.35);color:#0b5c22;"
+      : "margin-top:8px;font-size:14px;font-weight:900;padding:8px 12px;border-radius:10px;background:rgba(34,153,255,.10);border:1px solid rgba(34,153,255,.30);color:#0a3d6b;";
+    info.textContent = mode === "tobii"
+      ? "👁️ Aktiv: Augensteuerung — Buttons lösen automatisch nach Verweilzeit aus."
+      : "🖱️ Aktiv: Mausbedienung — Buttons lösen NUR per Klick aus. Kein automatisches Auslösen.";
+  }
+}
+updateModeButtons();
+
+document.getElementById("dwellSlider").value   = dwellMs;
+document.getElementById("graceSlider").value   = graceMs;
+document.getElementById("delaySlider").value   = cfg.delay   ?? 1;
+document.getElementById("fragenSlider").value  = cfg.fragen  ?? 10;
+document.getElementById("schwelleSlider").value= cfg.schwelle?? 50;
+
+// ── Schnell-Wahl Buttons ────────────────────────────────────────────────────
+function updateQuickActive(ms){
+  document.querySelectorAll(".qdBtn").forEach(btn=>{
+    const val = parseInt(btn.dataset.ms);
+    btn.classList.toggle("qdActive", val === ms);
+  });
+}
+updateQuickActive(dwellMs);
+
+// Dwell auf Schnell-Wahl-Buttons
+const QD_DWELL = 1500; // fest 1500ms damit Schnellwahl-Buttons immer erreichbar sind
+let qdTimers = new Map();
+let qdLeaveTimers = new Map();
+
+document.querySelectorAll(".qdBtn").forEach(btn=>{
+  function startQd(){
+    if(qdTimers.has(btn)) return;
+    if(qdLeaveTimers.has(btn)){ clearTimeout(qdLeaveTimers.get(btn)); qdLeaveTimers.delete(btn); }
+    btn.classList.add("dwell-active");
+
+    // Ring-Animation
+    let svg = btn.querySelector(".dwell-ring-svg");
+    if(!svg){
+      svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+      svg.setAttribute("class","dwell-ring-svg"); svg.setAttribute("viewBox","0 0 64 64");
+      const c = document.createElementNS("http://www.w3.org/2000/svg","circle");
+      c.setAttribute("cx","32"); c.setAttribute("cy","32"); c.setAttribute("r","27");
+      svg.appendChild(c); btn.appendChild(svg);
+    }
+    svg.style.setProperty("--dwell-duration",(QD_DWELL/1000)+"s");
+    const circle = svg.querySelector("circle");
+    circle.classList.remove("animating");
+    requestAnimationFrame(()=>requestAnimationFrame(()=>circle.classList.add("animating")));
+
+    const t = setTimeout(()=>{
+      cancelQd(btn);
+      const ms = parseInt(btn.dataset.ms);
+      document.getElementById("dwellSlider").value = ms;
+      document.getElementById("dwellVal").textContent = ms + " ms";
+      updateQuickActive(ms);
+      // Kurzes visuelles Feedback
+      btn.classList.add("qdActive");
+    }, QD_DWELL);
+    qdTimers.set(btn, t);
+  }
+
+  function cancelQd(b){
+    if(qdTimers.has(b)){ clearTimeout(qdTimers.get(b)); qdTimers.delete(b); }
+    b.classList.remove("dwell-active");
+    const svg = b.querySelector(".dwell-ring-svg");
+    if(svg) svg.remove();
+  }
+
+  btn.addEventListener("mouseenter", startQd);
+  btn.addEventListener("focus", startQd);
+  btn.addEventListener("mouseleave", ()=>{
+    const t = setTimeout(()=>cancelQd(btn), graceMs);
+    qdLeaveTimers.set(btn, t);
+  });
+  btn.addEventListener("blur", ()=>cancelQd(btn));
+  btn.addEventListener("click", ()=>{
+    const ms = parseInt(btn.dataset.ms);
+    document.getElementById("dwellSlider").value = ms;
+    document.getElementById("dwellVal").textContent = ms + " ms";
+    updateQuickActive(ms);
+  });
+});
+
+// ── Live-Anzeige ────────────────────────────────────────────────────────────
+function bindSlider(sliderId, valId, format){
+  const s = document.getElementById(sliderId);
+  const v = document.getElementById(valId);
+  v.textContent = format(s.value);
+  s.addEventListener("input", ()=>{
+    v.textContent = format(s.value);
+    // Slider-Bewegung synchronisiert Schnell-Wahl-Markierung
+    if(sliderId === "dwellSlider") updateQuickActive(parseInt(s.value));
+  });
+}
+bindSlider("dwellSlider",   "dwellVal",   v=> v + " ms");
+bindSlider("graceSlider",   "graceVal",   v=> v + " ms");
+bindSlider("delaySlider",   "delayVal",   v=> v + " s");
+bindSlider("fragenSlider",  "fragenVal",  v=> v);
+bindSlider("schwelleSlider","schwelleVal",v=> v + " %");
+
+// ── Dwell-Test-Button ────────────────────────────────────────────────────────
+let testTimer = null, testLeave = null, testTarget = null;
+
+function cancelTest(){
+  if(testTimer){ clearTimeout(testTimer); testTimer = null; }
+  if(testLeave){ clearTimeout(testLeave); testLeave = null; }
+  if(testTarget){
+    testTarget.classList.remove("dwell-active");
+    testTarget.querySelectorAll(".dwell-ring-svg").forEach(s=>s.remove());
+    testTarget = null;
+  }
+}
+
+function startTest(el){
+  if(el === testTarget) return;
+  if(testLeave){ clearTimeout(testLeave); testLeave = null; }
+  cancelTest();
+
+  const dMs = parseInt(document.getElementById("dwellSlider").value) || 600;
+  testTarget = el;
+  el.classList.add("dwell-active");
+
+  const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+  svg.setAttribute("class","dwell-ring-svg"); svg.setAttribute("viewBox","0 0 64 64");
+  const c = document.createElementNS("http://www.w3.org/2000/svg","circle");
+  c.setAttribute("cx","32"); c.setAttribute("cy","32"); c.setAttribute("r","27");
+  svg.appendChild(c); el.appendChild(svg);
+  svg.style.setProperty("--dwell-duration",(dMs/1000)+"s");
+  requestAnimationFrame(()=>requestAnimationFrame(()=>c.classList.add("animating")));
+
+  testTimer = setTimeout(()=>{
+    cancelTest();
+    const fb = document.getElementById("testFeedback");
+    fb.textContent = `✅ Ausgelöst nach ${dMs} ms!`;
+    fb.classList.add("show");
+    setTimeout(()=>fb.classList.remove("show"), 2500);
+  }, dMs);
+}
+
+const btn = document.getElementById("btnDwellTest");
+btn.addEventListener("mouseenter", ()=> startTest(btn));
+btn.addEventListener("mouseleave", ()=>{
+  const gMs = parseInt(document.getElementById("graceSlider").value)||150;
+  if(testLeave){ clearTimeout(testLeave); }
+  testLeave = setTimeout(cancelTest, gMs);
+});
+btn.addEventListener("focus",      ()=> startTest(btn));
+btn.addEventListener("blur",       cancelTest);
+
+// ── Speichern ────────────────────────────────────────────────────────────────
+document.getElementById("btnSave").addEventListener("click", ()=>{
+  const dMs  = parseInt(document.getElementById("dwellSlider").value);
+  const gMs  = parseInt(document.getElementById("graceSlider").value);
+  const delay    = parseInt(document.getElementById("delaySlider").value);
+  const fragen   = parseInt(document.getElementById("fragenSlider").value);
+  const schwelle = parseInt(document.getElementById("schwelleSlider").value);
+
+  // Dwell-spezifische Keys
+  localStorage.setItem("laetitia_dwell_ms",       String(dMs));
+  localStorage.setItem("laetitia_leave_grace_ms",  String(gMs));
+
+  // Lern-Config
+  const neu = { ...getCfg(), delay, fragen, schwelle };
+  saveCfg(neu);
+
+  const ok = document.getElementById("saveOk");
+  ok.classList.add("show");
+  setTimeout(()=>ok.classList.remove("show"), 2500);
+});
+
+// ── Zurücksetzen ──────────────────────────────────────────────────────────────
+document.getElementById("btnResetWrong").addEventListener("click", ()=>{
+  // Alle laetitia_wrong_*-Keys löschen
+  const keys = [];
+  for(let i=0;i<localStorage.length;i++) keys.push(localStorage.key(i));
+  keys.filter(k=>k&&k.startsWith("laetitia_wrong")).forEach(k=>localStorage.removeItem(k));
+  const fb = document.getElementById("resetFeedback");
+  fb.textContent = "✅ Falsche Antworten gelöscht.";
+  fb.classList.add("show");
+  setTimeout(()=>fb.classList.remove("show"), 2500);
+});
+
+document.getElementById("btnResetUnlock").addEventListener("click", ()=>{
+  localStorage.removeItem("laetitia_unlocked_v1");
+  const fb = document.getElementById("resetFeedback");
+  fb.textContent = "✅ Spielewelt-Sperre zurückgesetzt.";
+  fb.classList.add("show");
+  setTimeout(()=>fb.classList.remove("show"), 2500);
+});
+
+// ── Schultage-Kalender ────────────────────────────────────────────────────────
+
+var schulAktuellerMonat = new Date();
+schulAktuellerMonat.setDate(1);
+
+var MONATSNAMEN = ["Januar","Februar","Maerz","April","Mai","Juni",
+                   "Juli","August","September","Oktober","November","Dezember"];
+
+function schulTagKey(y, m, d){
+  return y + "-" + String(m+1).padStart(2,"0") + "-" + String(d).padStart(2,"0");
+}
+
+function schulRenderKalender(){
+  var heute = new Date();
+  var heuteKey = schulTagKey(heute.getFullYear(), heute.getMonth(), heute.getDate());
+  var schultage = (function(){
+    try{ var r=localStorage.getItem("laetitia_schultage_v1"); return r?JSON.parse(r):[]; }catch(e){return [];}
+  })();
+  var schultageSet = new Set(schultage);
+
+  var y = schulAktuellerMonat.getFullYear();
+  var m = schulAktuellerMonat.getMonth();
+
+  document.getElementById("schulMonatTitel").textContent =
+    MONATSNAMEN[m] + " " + y;
+
+  var grid = document.getElementById("schulGrid");
+  grid.innerHTML = "";
+
+  // Erster Wochentag des Monats (Mo=0 ... So=6)
+  var ersterTag = new Date(y, m, 1);
+  var startWt = (ersterTag.getDay() + 6) % 7; // Mo=0
+
+  // Leere Zellen am Anfang
+  for(var i=0; i<startWt; i++){
+    var leer = document.createElement("div");
+    leer.className = "schul-tag leer";
+    grid.appendChild(leer);
+  }
+
+  // Tage des Monats
+  var tageImMonat = new Date(y, m+1, 0).getDate();
+  var anzahlSchultage = 0;
+
+  for(var t=1; t<=tageImMonat; t++){
+    var key = schulTagKey(y, m, t);
+    var wt = (new Date(y, m, t).getDay() + 6) % 7; // Mo=0
+    var istWochenende = wt >= 5;
+    var istHeute = key === heuteKey;
+    var istSchultag = schultageSet.has(key);
+    var istVergangen = new Date(y, m, t) < new Date(heute.getFullYear(), heute.getMonth(), heute.getDate());
+
+    if(istSchultag) anzahlSchultage++;
+
+    var el = document.createElement("div");
+    el.textContent = t;
+    el.className = "schul-tag" +
+      (istSchultag  ? " schultag"   : "") +
+      (istHeute     ? " heute"      : "") +
+      (istVergangen ? " vergangen"  : "") +
+      (istWochenende? " wochenende" : "");
+    el.dataset.key = key;
+
+    (function(tagEl, tagKey){
+      tagEl.addEventListener("click", function(){
+        var tage = (function(){
+          try{ var r=localStorage.getItem("laetitia_schultage_v1"); return r?JSON.parse(r):[]; }catch(e){return [];}
+        })();
+        var idx = tage.indexOf(tagKey);
+        if(idx >= 0){ tage.splice(idx,1); }
+        else { tage.push(tagKey); }
+        try{ localStorage.setItem("laetitia_schultage_v1", JSON.stringify(tage)); }catch(e){}
+        schulRenderKalender();
+        schulUpdateStatus();
+      });
+    })(el, key);
+
+    grid.appendChild(el);
+  }
+
+  // Info-Zeile
+  var info = document.getElementById("schulInfo");
+  info.innerHTML = "<strong>" + anzahlSchultage + " Schultage</strong> in " +
+    MONATSNAMEN[m] + " eingetragen";
+}
+
+function schulUpdateStatus(){
+  // schulprofil.js muss geladen sein — Fallback falls nicht
+  var istSchule = false;
+  if(window.LaetitiaSchulprofil){
+    istSchule = window.LaetitiaSchulprofil.istSchulzeit();
+  }
+  var badge = document.getElementById("schulStatusBadge");
+  if(!badge) return;
+  if(istSchule){
+    badge.className = "schul-status-badge schule";
+    badge.textContent = "🏫 Jetzt: Schulmodus (08:30–15:30)";
+  } else {
+    badge.className = "schul-status-badge freizeit";
+    badge.textContent = "🏠 Jetzt: Freizeitmodus";
+  }
+}
+
+// Navigation
+document.getElementById("schulPrev").addEventListener("click", function(){
+  schulAktuellerMonat.setMonth(schulAktuellerMonat.getMonth()-1);
+  schulRenderKalender();
+});
+document.getElementById("schulNext").addEventListener("click", function(){
+  schulAktuellerMonat.setMonth(schulAktuellerMonat.getMonth()+1);
+  schulRenderKalender();
+});
+
+// Schnell-Aktionen
+document.getElementById("schulBtnWoche").addEventListener("click", function(){
+  var heute = new Date();
+  var wt = (heute.getDay()+6)%7;
+  var montag = new Date(heute);
+  montag.setDate(heute.getDate()-wt);
+  var tage = (function(){
+    try{ var r=localStorage.getItem("laetitia_schultage_v1"); return r?JSON.parse(r):[]; }catch(e){return [];}
+  })();
+  var tageSet = new Set(tage);
+  for(var d=0; d<5; d++){
+    var tag = new Date(montag);
+    tag.setDate(montag.getDate()+d);
+    var key = schulTagKey(tag.getFullYear(), tag.getMonth(), tag.getDate());
+    tageSet.add(key);
+  }
+  try{ localStorage.setItem("laetitia_schultage_v1", JSON.stringify(Array.from(tageSet))); }catch(e){}
+  schulRenderKalender();
+  schulUpdateStatus();
+});
+
+document.getElementById("schulBtnMonat").addEventListener("click", function(){
+  var y = schulAktuellerMonat.getFullYear();
+  var m = schulAktuellerMonat.getMonth();
+  var tageImMonat = new Date(y, m+1, 0).getDate();
+  var tage = (function(){
+    try{ var r=localStorage.getItem("laetitia_schultage_v1"); return r?JSON.parse(r):[]; }catch(e){return [];}
+  })();
+  var tageSet = new Set(tage);
+  for(var t=1; t<=tageImMonat; t++){
+    var wt = (new Date(y,m,t).getDay()+6)%7;
+    if(wt < 5){ // Mo–Fr
+      tageSet.add(schulTagKey(y,m,t));
+    }
+  }
+  try{ localStorage.setItem("laetitia_schultage_v1", JSON.stringify(Array.from(tageSet))); }catch(e){}
+  schulRenderKalender();
+  schulUpdateStatus();
+});
+
+document.getElementById("schulBtnClear").addEventListener("click", function(){
+  var y = schulAktuellerMonat.getFullYear();
+  var m = schulAktuellerMonat.getMonth();
+  var prefix = y + "-" + String(m+1).padStart(2,"0") + "-";
+  var tage = (function(){
+    try{ var r=localStorage.getItem("laetitia_schultage_v1"); return r?JSON.parse(r):[]; }catch(e){return [];}
+  })();
+  tage = tage.filter(function(k){ return !k.startsWith(prefix); });
+  try{ localStorage.setItem("laetitia_schultage_v1", JSON.stringify(tage)); }catch(e){}
+  schulRenderKalender();
+  schulUpdateStatus();
+});
+
+// Init
+schulRenderKalender();
+schulUpdateStatus();
+
+// ── Zurück ────────────────────────────────────────────────────────────────────
+document.getElementById("btnBack").addEventListener("click", ()=>{
+  history.back() || (location.href = "../index.html");
+});
+</script>
+</body>
+</html>

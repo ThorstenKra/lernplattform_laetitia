@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Stempel</title>
+<style>
+:root{
+  --bg:#f6f7fb; --panel:#fff;
+  --border:rgba(15,23,42,.14); --shadow:0 4px 16px rgba(15,23,42,.08);
+  --text:#0f172a; --muted:rgba(15,23,42,.60);
+  --pink:#ec4899; --pink2:#db2777; --radius:16px;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{ font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); height:100vh; overflow:hidden; display:flex; flex-direction:column; }
+.topBar{ flex:0 0 auto; background:var(--panel); border-bottom:1px solid var(--border); padding:8px 12px; display:flex; align-items:center; gap:8px; box-shadow:var(--shadow); }
+.topTitel{ font-size:18px; font-weight:1000; color:var(--pink); flex:1; }
+a.topBtn{ display:flex; align-items:center; justify-content:center; min-height:52px; padding:6px 14px; font-size:14px; font-weight:1000; border-radius:12px; border:1px solid var(--border); background:rgba(15,23,42,.06); color:var(--text); text-decoration:none; cursor:pointer; user-select:none; position:relative; transition:none; white-space:nowrap; }
+a.topBtn:hover, a.topBtn:focus{ background:rgba(15,23,42,.14); outline:3px solid var(--pink); transition:none; }
+a.topBtn.pink{ background:var(--pink); color:#fff; border-color:transparent; }
+a.topBtn.pink:hover, a.topBtn.pink:focus{ background:var(--pink2); }
+a.topBtn.lila{ background:#ede9fe; color:#4c1d95; border:2px solid #8b5cf6; }
+a.topBtn.lila:hover, a.topBtn.lila:focus{ background:#ddd6fe; outline:3px solid #8b5cf6; }
+
+.main{ flex:1; display:grid; grid-template-columns:110px 1fr 130px; gap:0; min-height:0; overflow:hidden; }
+
+/* Linke Spalte: Stempel-Auswahl */
+.stempelPanel{ background:var(--panel); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:6px; gap:3px; overflow:hidden; }
+.panelLabel{ font-size:10px; font-weight:900; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:2px; flex:0 0 auto; text-align:center; }
+a.stempelBtn{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; flex:1; border-radius:10px; border:2px solid var(--border); background:rgba(15,23,42,.04); color:var(--text); text-decoration:none; cursor:pointer; user-select:none; position:relative; transition:none; font-size:10px; font-weight:900; padding:3px; }
+a.stempelBtn:hover, a.stempelBtn:focus{ background:rgba(236,72,153,0.12); outline:3px solid var(--pink); transition:none; }
+a.stempelBtn.gewaehlt{ background:rgba(236,72,153,0.20); border-color:var(--pink); }
+.stempelEmoji{ font-size:26px; }
+
+/* Mitte: Leinwand mit Positions-Grid */
+.leinwandWrap{ display:flex; align-items:center; justify-content:center; background:#fffbf0; overflow:hidden; position:relative; }
+#leinwand{ position:relative; background:#fff; border:2px solid #e5e7eb; border-radius:8px; overflow:hidden; }
+/* Positions-Buttons (unsichtbares Grid über der Leinwand) */
+.posGrid{ position:absolute; top:0; left:0; right:0; bottom:0; display:grid; }
+a.posBtn{ display:block; background:transparent; cursor:pointer; user-select:none; position:relative; transition:none; border:1px dashed transparent; }
+a.posBtn:hover, a.posBtn:focus{ background:rgba(236,72,153,0.08); border-color:rgba(236,72,153,0.30); outline:none; }
+/* Platzierte Stempel */
+.platzierterStempel{ position:absolute; font-size:inherit; pointer-events:none; user-select:none; transform:translate(-50%,-50%); line-height:1; }
+
+/* Rechte Spalte: Größe + Farbe */
+.rechtsPanel{ background:var(--panel); border-left:1px solid var(--border); display:flex; flex-direction:column; padding:6px; gap:6px; overflow:hidden; }
+.groesseLabel{ font-size:10px; font-weight:900; color:var(--muted); text-transform:uppercase; flex:0 0 auto; text-align:center; }
+.groesseButtons{ display:flex; flex-direction:column; gap:4px; flex:0 0 auto; }
+a.groesseBtn{ display:flex; align-items:center; justify-content:center; min-height:44px; border-radius:10px; border:2px solid var(--border); background:rgba(15,23,42,.04); color:var(--text); text-decoration:none; cursor:pointer; user-select:none; position:relative; font-size:13px; font-weight:1000; transition:none; }
+a.groesseBtn:hover, a.groesseBtn:focus{ background:rgba(15,23,42,.14); outline:3px solid var(--pink); transition:none; }
+a.groesseBtn.aktiv{ background:var(--pink); color:#fff; border-color:transparent; }
+.farbLabel{ font-size:10px; font-weight:900; color:var(--muted); text-transform:uppercase; flex:0 0 auto; text-align:center; }
+.farbGrid{ flex:1; display:grid; grid-template-columns:1fr 1fr; gap:4px; align-content:start; overflow:hidden; }
+a.farbBtn{ border-radius:10px; border:3px solid transparent; cursor:pointer; user-select:none; position:relative; transition:none; text-decoration:none; display:block; min-height:52px; }
+a.farbBtn:hover, a.farbBtn:focus{ transform:scale(1.12); outline:3px solid var(--text); transition:none; z-index:2; }
+a.farbBtn.gewaehlt{ border:3px solid var(--text); transform:scale(1.10); box-shadow:0 0 0 2px rgba(0,0,0,0.25); }
+
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none; z-index:10; width:60px; height:60px; }
+.dwell-ring-svg circle{ fill:none; stroke:var(--pink); stroke-width:5; stroke-dasharray:220; stroke-dashoffset:220; transform:rotate(-90deg); transform-origin:30px 30px; }
+.dwell-ring-svg circle.animating{ animation:dwellRing var(--dwell-duration,0.8s) linear forwards; }
+.dwell-active{ background:rgba(236,72,153,0.15) !important; outline:3px solid var(--pink) !important; transition:none !important; }
+a.stempelBtn.dwell-active{ transform:scale(1.08) !important; }
+a.farbBtn.dwell-active{ transform:scale(1.18) !important; }
+
+  /* Zurück-Button unten mittig */
+  .zurueckLeiste{
+    flex:0 0 auto; padding:8px 12px;
+    background:var(--panel, #fff); border-top:1px solid var(--border, rgba(15,23,42,.14));
+  }
+  a.zurueckBtn{
+    display:flex; align-items:center; justify-content:center;
+    min-height:78px; font-size:18px; font-weight:1000; width:100%;
+    border-radius:16px; border:2px solid #8b5cf6;
+    background:#ede9fe; color:#4c1d95;
+    text-decoration:none; cursor:pointer; user-select:none;
+    position:relative; transition:none;
+  }
+  a.zurueckBtn:hover, a.zurueckBtn:focus{
+    background:#ddd6fe; outline:4px solid #8b5cf6; transition:none;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="topBar">
+  <div class="topTitel" id="topTitelText">🌟 Stempel</div>
+  <a class="topBtn" href="#" id="btnUndo">↩ Rückgängig</a>
+  <a class="topBtn" href="#" id="btnReset">🗑 Neu</a>
+  <a class="topBtn pink" href="#" id="btnSpeichern">💾 Speichern</a>
+  
+</div>
+
+<div class="main">
+
+  <!-- Links: Stempel -->
+  <div class="stempelPanel">
+    <div class="panelLabel">Stempel</div>
+    <a class="stempelBtn gewaehlt" href="#" data-stempel="⭐"><span class="stempelEmoji">⭐</span>Stern</a>
+    <a class="stempelBtn" href="#" data-stempel="❤️"><span class="stempelEmoji">❤️</span>Herz</a>
+    <a class="stempelBtn" href="#" data-stempel="🌸"><span class="stempelEmoji">🌸</span>Blume</a>
+    <a class="stempelBtn" href="#" data-stempel="🌈"><span class="stempelEmoji">🌈</span>Regenbogen</a>
+    <a class="stempelBtn" href="#" data-stempel="🦋"><span class="stempelEmoji">🦋</span>Schmetterling</a>
+    <a class="stempelBtn" href="#" data-stempel="🌙"><span class="stempelEmoji">🌙</span>Mond</a>
+    <a class="stempelBtn" href="#" data-stempel="☀️"><span class="stempelEmoji">☀️</span>Sonne</a>
+    <a class="stempelBtn" href="#" data-stempel="🐱"><span class="stempelEmoji">🐱</span>Katze</a>
+    <a class="stempelBtn" href="#" data-stempel="🐦"><span class="stempelEmoji">🐦</span>Vogel</a>
+    <a class="stempelBtn" href="#" data-stempel="🏰"><span class="stempelEmoji">🏰</span>Schloss</a>
+    <a class="stempelBtn" href="#" data-stempel="🌟"><span class="stempelEmoji">🌟</span>Funkel</a>
+    <a class="stempelBtn" href="#" data-stempel="🍀"><span class="stempelEmoji">🍀</span>Klee</a>
+  </div>
+
+  <!-- Mitte: Leinwand -->
+  <div class="leinwandWrap" id="leinwandWrap">
+    <div id="leinwand">
+      <div class="posGrid" id="posGrid"></div>
+    </div>
+  </div>
+
+  <!-- Rechts: Größe + Hintergrundfarbe -->
+  <div class="rechtsPanel">
+    <div class="groesseLabel">Größe</div>
+    <div class="groesseButtons">
+      <a class="groesseBtn" href="#" data-groesse="small">Klein</a>
+      <a class="groesseBtn aktiv" href="#" data-groesse="medium">Mittel</a>
+      <a class="groesseBtn" href="#" data-groesse="large">Groß</a>
+    </div>
+    <div class="farbLabel">Hintergrund</div>
+    <div class="farbGrid" id="farbGrid"></div>
+  </div>
+
+</div>
+
+<script src="../../core/dwell.js"></script>
+<script src="../../core/error_handler.js"></script>
+<script>
+(function(){
+"use strict";
+
+var HINTERGRUNDFARBEN = [
+  "#ffffff","#fffbf0","#fef9c3","#fce7f3","#ede9fe","#dbeafe",
+  "#dcfce7","#ffedd5","#f1f5f9","#fde68a","#bfdbfe","#bbf7d0"
+];
+
+var GROESSEN = { small: "28px", medium: "42px", large: "60px" };
+var RASTER = 5; // 5x5 Positionen
+
+var state = {
+  aktiverStempel: "⭐",
+  aktiveFarbe: "#ffffff",
+  aktiveGroesse: "medium",
+  platziert: [],    // [{stempel, row, col, groesse}]
+  hintergrund: "#ffffff"
+};
+
+// ── Leinwand aufbauen ────────────────────────────────────────────────────────
+function baueLeinwand(){
+  var wrap = document.getElementById("leinwandWrap");
+  var leinwand = document.getElementById("leinwand");
+  var posGrid  = document.getElementById("posGrid");
+
+  var maxW = wrap.clientWidth  - 24;
+  var maxH = wrap.clientHeight - 24;
+  var size = Math.min(maxW, maxH);
+
+  leinwand.style.width  = size + "px";
+  leinwand.style.height = size + "px";
+  leinwand.style.background = state.hintergrund;
+
+  posGrid.style.gridTemplateColumns = "repeat(" + RASTER + ", 1fr)";
+  posGrid.style.gridTemplateRows    = "repeat(" + RASTER + ", 1fr)";
+  posGrid.innerHTML = "";
+
+  for(var row = 0; row < RASTER; row++){
+    for(var col = 0; col < RASTER; col++){
+      var a = document.createElement("a");
+      a.href = "#";
+      a.className = "posBtn";
+      a.setAttribute("data-row", row);
+      a.setAttribute("data-col", col);
+      (function(r, c){
+        a.addEventListener("click", function(ev){
+          ev.preventDefault();
+          platziere(r, c);
+        });
+      })(row, col);
+      posGrid.appendChild(a);
+    }
+  }
+
+  // Gespeicherte Stempel neu zeichnen
+  renderAllStempel();
+  rebindDwell();
+}
+
+function platziere(row, col){
+  // Stempel platzieren
+  var eintrag = { stempel: state.aktiverStempel, row: row, col: col, groesse: state.aktiveGroesse };
+  state.platziert.push(eintrag);
+  renderStempel(eintrag, state.platziert.length - 1);
+  rebindDwell();
+}
+
+function renderAllStempel(){
+  // Alle alten Stempel-Divs entfernen
+  var leinwand = document.getElementById("leinwand");
+  leinwand.querySelectorAll(".platzierterStempel").forEach(function(el){ el.remove(); });
+  state.platziert.forEach(function(e, i){ renderStempel(e, i); });
+}
+
+function renderStempel(e, idx){
+  var leinwand = document.getElementById("leinwand");
+  var size = parseFloat(leinwand.style.width) || 400;
+  var zellGroesse = size / RASTER;
+
+  var div = document.createElement("div");
+  div.className = "platzierterStempel";
+  div.textContent = e.stempel;
+  div.style.fontSize = GROESSEN[e.groesse] || "42px";
+  div.style.left = (e.col * zellGroesse + zellGroesse / 2) + "px";
+  div.style.top  = (e.row * zellGroesse + zellGroesse / 2) + "px";
+  div.setAttribute("data-idx", idx);
+  leinwand.appendChild(div);
+}
+
+// ── Farbpalette Hintergrund ──────────────────────────────────────────────────
+function baueFarben(){
+  var grid = document.getElementById("farbGrid");
+  HINTERGRUNDFARBEN.forEach(function(farbe){
+    var a = document.createElement("a");
+    a.href = "#";
+    a.className = "farbBtn" + (farbe === state.hintergrund ? " gewaehlt" : "");
+    a.style.background = farbe;
+    if(farbe === "#ffffff") a.style.border = "3px solid #ccc";
+    a.setAttribute("data-farbe", farbe);
+    a.addEventListener("click", function(ev){
+      ev.preventDefault();
+      state.hintergrund = farbe;
+      document.getElementById("leinwand").style.background = farbe;
+      grid.querySelectorAll(".farbBtn").forEach(function(b){
+        b.classList.toggle("gewaehlt", b.getAttribute("data-farbe") === farbe);
+      });
+    });
+    grid.appendChild(a);
+  });
+}
+
+// ── Speichern ────────────────────────────────────────────────────────────────
+function speichern(){
+  try{
+    localStorage.setItem("laetitia_stempel", JSON.stringify({
+      platziert: state.platziert,
+      hintergrund: state.hintergrund
+    }));
+    zeigeStatus("Gespeichert! ✅");
+  }catch(e){}
+}
+function laden(){
+  try{
+    var d = JSON.parse(localStorage.getItem("laetitia_stempel") || "null");
+    if(d){ state.platziert = d.platziert || []; state.hintergrund = d.hintergrund || "#ffffff"; }
+  }catch(e){}
+}
+
+function zeigeStatus(msg){
+  var el = document.getElementById("topTitelText");
+  if(el){ el.textContent = msg; setTimeout(function(){ el.textContent = "🌟 Stempel"; }, 2000); }
+}
+
+// ── Dwell ────────────────────────────────────────────────────────────────────
+var _dh = null;
+function rebindDwell(){
+  var att = window.LaetitiaAttachDwell || function(){ return { cancelDwell: function(){} }; };
+  if(_dh) _dh.cancelDwell();
+  var ms = Math.min(parseInt(localStorage.getItem("laetitia_dwell_ms")) || 700, 700);
+  var lg = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 100;
+  _dh = att("a.stempelBtn, a.posBtn, a.groesseBtn, a.farbBtn, a.topBtn, #btnZurueck",{
+    dwellMs: ms, leaveGrace: lg,
+    onActivate: function(el){ try{ el.click(); }catch(e){} }
+  });
+}
+
+// ── Buttons ──────────────────────────────────────────────────────────────────
+document.querySelectorAll(".stempelBtn").forEach(function(btn){
+  btn.addEventListener("click", function(ev){
+    ev.preventDefault();
+    state.aktiverStempel = btn.getAttribute("data-stempel");
+    document.querySelectorAll(".stempelBtn").forEach(function(b){ b.classList.remove("gewaehlt"); });
+    btn.classList.add("gewaehlt");
+  });
+});
+
+document.querySelectorAll(".groesseBtn").forEach(function(btn){
+  btn.addEventListener("click", function(ev){
+    ev.preventDefault();
+    state.aktiveGroesse = btn.getAttribute("data-groesse");
+    document.querySelectorAll(".groesseBtn").forEach(function(b){ b.classList.remove("aktiv"); });
+    btn.classList.add("aktiv");
+  });
+});
+
+document.getElementById("btnUndo").addEventListener("click", function(ev){
+  ev.preventDefault();
+  if(!state.platziert.length) return;
+  state.platziert.pop();
+  renderAllStempel();
+  rebindDwell();
+});
+
+document.getElementById("btnReset").addEventListener("click", function(ev){
+  ev.preventDefault();
+  state.platziert = [];
+  renderAllStempel();
+  rebindDwell();
+});
+
+document.getElementById("btnSpeichern").addEventListener("click", function(ev){ ev.preventDefault(); speichern(); });
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+laden();
+baueFarben();
+baueLeinwand();
+
+})();
+</script>
+
+<div class="zurueckLeiste"><a class="zurueckBtn" href="./malen.html" id="btnZurueck">← Zurück</a></div>
+</body>
+</html>

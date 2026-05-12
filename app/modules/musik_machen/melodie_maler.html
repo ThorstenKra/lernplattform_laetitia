@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Melodie-Maler</title>
+<style>
+:root{
+  --bg:#0d0f1a; --panel:#1a1d2e; --panel2:#22263a;
+  --border:rgba(255,255,255,.10); --shadow:0 8px 24px rgba(0,0,0,.4);
+  --text:#f0f4ff; --muted:rgba(240,244,255,.50);
+  --akzent:#a78bfa; --radius:14px;
+}
+*{ box-sizing:border-box; }
+body{ margin:0; font-family:system-ui,Arial; background:var(--bg); color:var(--text);
+  height:100vh; overflow:hidden; user-select:none; }
+.app{ height:100vh; display:flex; flex-direction:column; padding:10px; gap:8px; }
+
+/* Header */
+.header{ display:flex; align-items:center; gap:10px; flex:0 0 auto; }
+.title{ flex:1; text-align:center; font-size:18px; font-weight:1000; color:var(--akzent); }
+
+/* Controls */
+.controls{ display:flex; align-items:center; gap:8px; flex:0 0 auto;
+  background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:8px 12px; }
+.tempoLabel{ font-size:13px; font-weight:900; color:var(--muted); }
+.tempoVal{ font-size:15px; font-weight:1000; color:#facc15; min-width:56px; }
+.btn{
+  min-height:60px; border-radius:12px; border:2px solid var(--border);
+  background:var(--panel2); color:var(--text); font-size:15px; font-weight:900;
+  cursor:pointer; padding:8px 16px; transition:none;
+  display:flex; align-items:center; justify-content:center; gap:6px;
+}
+.btn.dwell-active, .btn:hover{
+  outline:3px solid var(--akzent); background:rgba(167,139,250,.20); transform:scale(1.04);
+}
+.btn.play-btn{ min-width:110px; background:rgba(74,222,128,.12); border-color:rgba(74,222,128,.45); color:#4ade80; }
+.btn.play-btn.active{ background:rgba(251,146,60,.12); border-color:rgba(251,146,60,.45); color:#fb923c; }
+.btn.clear-btn{ background:rgba(248,113,113,.10); border-color:rgba(248,113,113,.35); color:#fca5a5; }
+.btn.tempo-btn{ min-width:52px; }
+
+/* Farb-Palette */
+.palette{ display:flex; align-items:center; gap:6px; flex:0 0 auto;
+  background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:8px 12px; }
+.palette-label{ font-size:13px; font-weight:900; color:var(--muted); margin-right:2px; }
+.pBtn{
+  width:44px; height:44px; border-radius:10px; border:3px solid transparent;
+  cursor:pointer; transition:none; flex:0 0 auto;
+}
+.pBtn.selected{ border-color:#fff; transform:scale(1.18); box-shadow:0 0 12px rgba(255,255,255,.4); }
+.pBtn.dwell-active{ border-color:#fff !important; transform:scale(1.22) !important; filter:brightness(1.4); }
+.eraser-btn{
+  width:44px; height:44px; border-radius:10px; border:2px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.08); color:var(--text); font-size:18px;
+  cursor:pointer; display:flex; align-items:center; justify-content:center; transition:none;
+}
+.eraser-btn.selected{ border-color:#fff; box-shadow:0 0 10px rgba(255,255,255,.3); }
+.eraser-btn.dwell-active{ border-color:#fff !important; transform:scale(1.15) !important; }
+
+/* Notenraster */
+.gridOuter{ flex:1 1 auto; min-height:0; display:flex; gap:0; background:var(--panel);
+  border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+
+/* Tonhöhen-Labels links */
+.noteLabels{ flex:0 0 52px; display:flex; flex-direction:column-reverse;
+  border-right:1px solid var(--border); padding:4px 0; }
+.noteLabel{ flex:1; display:flex; align-items:center; justify-content:flex-end;
+  padding-right:8px; font-size:11px; font-weight:900; color:var(--muted); white-space:nowrap; }
+
+/* Raster */
+.gridWrap{ flex:1 1 auto; overflow:hidden; display:flex; flex-direction:column-reverse; padding:4px; gap:3px; }
+.gridRow{ flex:1 1 auto; display:grid; gap:3px; }
+/* grid-template-columns per JS gesetzt */
+
+.cell{
+  border-radius:6px; border:1px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.04); cursor:pointer;
+  position:relative; transition:none;
+  min-height:10px;
+}
+.cell.on{ border-color:transparent; box-shadow:0 0 8px var(--cell-color); }
+.cell.current-col{ outline:2px solid rgba(255,255,255,.55) !important; }
+.cell.dwell-active{
+  outline:3px solid rgba(255,255,255,.85) !important;
+  filter:brightness(1.5) !important;
+  transform:scale(1.06);
+}
+
+/* Statusbar */
+.statusbar{ display:flex; align-items:center; gap:8px; flex:0 0 auto;
+  background:var(--panel); border:1px solid var(--border); border-radius:12px;
+  padding:8px 14px; }
+.zurueckBtn{ display:flex; align-items:center; justify-content:center;
+  min-height:64px; flex:1; font-size:17px; font-weight:1000; border-radius:14px;
+  border:2px solid #8b5cf6; background:rgba(139,92,246,.15); color:#c4b5fd;
+  cursor:pointer; }
+.zurueckBtn:hover{ background:rgba(139,92,246,.30); outline:4px solid #8b5cf6; }
+.zurueckBtn.dwell-active{ transform:scale(1.04) !important; outline:4px solid var(--akzent) !important; }
+
+/* Beispiel-Vorlagen */
+.vorlBtn{
+  min-height:60px; min-width:90px; border-radius:12px; border:2px solid rgba(167,139,250,.35);
+  background:rgba(167,139,250,.10); color:#c4b5fd; font-size:13px; font-weight:900;
+  cursor:pointer; padding:6px 12px; display:flex; flex-direction:column; align-items:center; gap:2px;
+}
+.vorlBtn:hover, .vorlBtn.dwell-active{
+  background:rgba(167,139,250,.25); outline:3px solid var(--akzent); transform:scale(1.04);
+}
+.vorl-emoji{ font-size:20px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <button class="btn" id="btnBack" style="min-width:80px;">← Start</button>
+    <div class="title">🎨 Melodie-Maler</div>
+    <div style="min-width:80px;"></div>
+  </div>
+
+  <!-- Farb-Palette -->
+  <div class="palette">
+    <span class="palette-label">Farbe:</span>
+    <div id="paletteWrap"></div>
+    <button class="eraser-btn selected" id="btnEraser" title="Radiergummi">🧹</button>
+  </div>
+
+  <!-- Tempo + Play -->
+  <div class="controls">
+    <span class="tempoLabel">Tempo:</span>
+    <span class="tempoVal" id="tempoVal">80 BPM</span>
+    <button class="btn tempo-btn" id="btnTempoDown">−</button>
+    <button class="btn tempo-btn" id="btnTempoUp">＋</button>
+    <div style="flex:1;"></div>
+    <button class="btn" id="btnVorl1"><span class="vorl-emoji">🌈</span> Bogen</button>
+    <button class="btn" id="btnVorl2"><span class="vorl-emoji">🌊</span> Welle</button>
+    <button class="btn" id="btnVorl3"><span class="vorl-emoji">⭐</span> Treppe</button>
+    <button class="btn clear-btn" id="btnClear">🗑 Leer</button>
+    <button class="btn play-btn" id="btnPlay">▶ Start</button>
+  </div>
+
+  <!-- Raster -->
+  <div class="gridOuter">
+    <div class="noteLabels" id="noteLabels"></div>
+    <div class="gridWrap" id="gridWrap"></div>
+  </div>
+
+  <div class="statusbar">
+    <button class="zurueckBtn" id="btnZurueck">← Zurück</button>
+  </div>
+
+</div>
+<script>
+"use strict";
+
+// ── Konfiguration ──────────────────────────────────────────────────────────────
+var COLS = 16; // Zeit-Achse (Spalten)
+
+// Tonhöhen (Pentatonik C-Dur, 8 Zeilen — tiefste Zeile unten)
+var NOTES = [
+  { label:"Do",  freq:523.25 },
+  { label:"Re",  freq:587.33 },
+  { label:"Mi",  freq:659.25 },
+  { label:"Fa",  freq:698.46 },
+  { label:"Sol", freq:784.00 },
+  { label:"La",  freq:880.00 },
+  { label:"Si",  freq:987.77 },
+  { label:"Do'", freq:1046.50}
+];
+var ROWS = NOTES.length; // 8
+
+// Farben (eine pro Zeile + Radiergummi)
+var FARBEN = [
+  { hex:"#ef4444", name:"Rot"   },
+  { hex:"#f97316", name:"Orange"},
+  { hex:"#eab308", name:"Gelb"  },
+  { hex:"#22c55e", name:"Grün"  },
+  { hex:"#06b6d4", name:"Cyan"  },
+  { hex:"#3b82f6", name:"Blau"  },
+  { hex:"#8b5cf6", name:"Lila"  },
+  { hex:"#ec4899", name:"Pink"  }
+];
+
+// Zustand: grid[row][col] = farbHex | null
+var grid = [];
+for(var r=0;r<ROWS;r++){
+  grid.push([]);
+  for(var c=0;c<COLS;c++) grid[r].push(null);
+}
+
+var aktiveFarbe = null; // null = Radiergummi
+var bpm = 80;
+var playing = false;
+var currentCol = -1;
+var intervalId = null;
+var audioCtx = null;
+var dwellMs = parseInt(localStorage.getItem("laetitia_dwell_ms")) || 900;
+
+// ── Audio ──────────────────────────────────────────────────────────────────────
+function getCtx(){
+  if(!audioCtx){
+    try{ audioCtx = new(window.AudioContext||window.webkitAudioContext)(); }catch(e){}
+  }
+  if(audioCtx && audioCtx.state==="suspended") audioCtx.resume();
+  return audioCtx;
+}
+
+function spieleNote(freq, farbe){
+  var ctx = getCtx();
+  if(!ctx) return;
+  var t = ctx.currentTime;
+
+  var osc  = ctx.createOscillator();
+  var gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.type = "triangle";
+  osc.frequency.setValueAtTime(freq, t);
+  gain.gain.setValueAtTime(0.0, t);
+  gain.gain.linearRampToValueAtTime(0.45, t+0.01);
+  gain.gain.exponentialRampToValueAtTime(0.001, t+0.45);
+  osc.start(t);
+  osc.stop(t+0.5);
+}
+
+// ── Sequencer ──────────────────────────────────────────────────────────────────
+function tick(){
+  currentCol = (currentCol + 1) % COLS;
+  updateColHighlight();
+
+  var ctx = getCtx();
+  for(var r=0; r<ROWS; r++){
+    var farbe = grid[r][currentCol];
+    if(farbe){
+      spieleNote(NOTES[r].freq, farbe);
+    }
+  }
+}
+
+function updateColHighlight(){
+  document.querySelectorAll(".cell.current-col").forEach(function(el){
+    el.classList.remove("current-col");
+  });
+  document.querySelectorAll(".cell[data-col='"+currentCol+"']").forEach(function(el){
+    el.classList.add("current-col");
+  });
+}
+
+function startPlay(){
+  if(playing) return;
+  getCtx();
+  playing = true;
+  currentCol = -1;
+  var ms = Math.round(60000 / bpm / 4);
+  intervalId = setInterval(tick, ms);
+  document.getElementById("btnPlay").textContent = "⏹ Stop";
+  document.getElementById("btnPlay").classList.add("active");
+}
+function stopPlay(){
+  if(!playing) return;
+  playing = false;
+  clearInterval(intervalId);
+  intervalId = null;
+  currentCol = -1;
+  updateColHighlight();
+  document.getElementById("btnPlay").textContent = "▶ Start";
+  document.getElementById("btnPlay").classList.remove("active");
+}
+
+// ── Raster bauen ───────────────────────────────────────────────────────────────
+var cellEls = []; // cellEls[row][col]
+
+function buildGrid(){
+  var wrap = document.getElementById("gridWrap");
+  var labWrap = document.getElementById("noteLabels");
+  wrap.innerHTML = "";
+  labWrap.innerHTML = "";
+  cellEls = [];
+
+  for(var r=0; r<ROWS; r++){
+    cellEls.push([]);
+
+    // Label
+    var lab = document.createElement("div");
+    lab.className = "noteLabel";
+    lab.textContent = NOTES[r].label;
+    labWrap.appendChild(lab);
+
+    // Zeile
+    var rowEl = document.createElement("div");
+    rowEl.className = "gridRow";
+    rowEl.style.gridTemplateColumns = "repeat("+COLS+", 1fr)";
+
+    for(var c=0; c<COLS; c++){
+      (function(row, col){
+        var cell = document.createElement("div");
+        cell.className = "cell";
+        cell.setAttribute("data-row", row);
+        cell.setAttribute("data-col", col);
+
+        function mal(){
+          if(aktiveFarbe){
+            // Malen
+            grid[row][col] = aktiveFarbe;
+            cell.style.background = aktiveFarbe;
+            cell.style.setProperty("--cell-color", aktiveFarbe);
+            cell.classList.add("on");
+          } else {
+            // Radiergummi
+            grid[row][col] = null;
+            cell.style.background = "";
+            cell.classList.remove("on");
+          }
+        }
+
+        cell.addEventListener("click", function(){
+          mal();
+          // Vorschau-Ton beim Malen
+          if(aktiveFarbe) spieleNote(NOTES[row].freq, aktiveFarbe);
+        });
+
+        // Dwell
+        var timer = null;
+        function start(){
+          if(timer) return;
+          cell.classList.add("dwell-active");
+          timer = setTimeout(function(){
+            timer = null;
+            cell.classList.remove("dwell-active");
+            mal();
+            if(aktiveFarbe) spieleNote(NOTES[row].freq, aktiveFarbe);
+          }, dwellMs);
+        }
+        function stop(){
+          if(timer){ clearTimeout(timer); timer=null; }
+          cell.classList.remove("dwell-active");
+        }
+        cell.addEventListener("pointerenter", start);
+        cell.addEventListener("pointerleave", stop);
+        cell.addEventListener("mouseenter", start);
+        cell.addEventListener("mouseleave", stop);
+
+        rowEl.appendChild(cell);
+        cellEls[row].push(cell);
+      })(r, c);
+    }
+    wrap.appendChild(rowEl);
+  }
+}
+
+function updateGridUI(){
+  for(var r=0; r<ROWS; r++){
+    for(var c=0; c<COLS; c++){
+      var farbe = grid[r][c];
+      var cell = cellEls[r][c];
+      if(!cell) continue;
+      if(farbe){
+        cell.style.background = farbe;
+        cell.style.setProperty("--cell-color", farbe);
+        cell.classList.add("on");
+      } else {
+        cell.style.background = "";
+        cell.classList.remove("on");
+      }
+    }
+  }
+}
+
+// ── Farb-Palette bauen ─────────────────────────────────────────────────────────
+function buildPalette(){
+  var wrap = document.getElementById("paletteWrap");
+  wrap.style.display = "flex";
+  wrap.style.gap = "6px";
+  wrap.style.alignItems = "center";
+  FARBEN.forEach(function(f, i){
+    var btn = document.createElement("button");
+    btn.className = "pBtn";
+    btn.style.background = f.hex;
+    btn.title = f.name;
+
+    function waehle(){
+      aktiveFarbe = f.hex;
+      document.querySelectorAll(".pBtn").forEach(function(b){ b.classList.remove("selected"); });
+      document.getElementById("btnEraser").classList.remove("selected");
+      btn.classList.add("selected");
+    }
+
+    btn.addEventListener("click", waehle);
+    // Dwell
+    var timer = null;
+    function start(){ if(timer) return; btn.classList.add("dwell-active"); timer = setTimeout(function(){ timer=null; btn.click(); }, dwellMs); }
+    function stop(){ if(timer){ clearTimeout(timer); timer=null; } btn.classList.remove("dwell-active"); }
+    btn.addEventListener("pointerenter", start);
+    btn.addEventListener("pointerleave", stop);
+    btn.addEventListener("mouseenter", start);
+    btn.addEventListener("mouseleave", stop);
+    btn.addEventListener("click", stop);
+
+    wrap.appendChild(btn);
+  });
+}
+
+// Radiergummi
+(function(){
+  var btn = document.getElementById("btnEraser");
+  btn.addEventListener("click", function(){
+    aktiveFarbe = null;
+    document.querySelectorAll(".pBtn").forEach(function(b){ b.classList.remove("selected"); });
+    btn.classList.add("selected");
+  });
+  var timer = null;
+  function start(){ if(timer) return; btn.classList.add("dwell-active"); timer = setTimeout(function(){ timer=null; btn.click(); }, dwellMs); }
+  function stop(){ if(timer){ clearTimeout(timer); timer=null; } btn.classList.remove("dwell-active"); }
+  btn.addEventListener("pointerenter", start);
+  btn.addEventListener("pointerleave", stop);
+  btn.addEventListener("mouseenter", start);
+  btn.addEventListener("mouseleave", stop);
+  btn.addEventListener("click", stop);
+})();
+
+// ── Vorlagen ───────────────────────────────────────────────────────────────────
+// Zeilen: 0=Do(tief) ... 7=Do'(hoch), Spalten 0–15
+var VORLAGEN = {
+  bogen: function(){
+    // Melodie steigt auf, dann ab — Regenbogen-Kurve
+    var kurve = [0,1,2,3,4,5,6,7,7,6,5,4,3,2,1,0];
+    for(var r=0;r<ROWS;r++) for(var c=0;c<COLS;c++) grid[r][c]=null;
+    kurve.forEach(function(row, col){
+      grid[row][col] = FARBEN[row].hex;
+    });
+  },
+  welle: function(){
+    // Sinus-artige Welle
+    for(var r=0;r<ROWS;r++) for(var c=0;c<COLS;c++) grid[r][c]=null;
+    var sinus = [3,4,5,6,7,6,5,4,3,2,1,0,1,2,3,4];
+    sinus.forEach(function(row, col){
+      grid[row][col] = FARBEN[row].hex;
+    });
+  },
+  treppe: function(){
+    // Aufsteigende Stufen: 2 Noten pro Zeile
+    for(var r=0;r<ROWS;r++) for(var c=0;c<COLS;c++) grid[r][c]=null;
+    var stufen = [0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7];
+    stufen.forEach(function(row, col){
+      grid[row][col] = FARBEN[row].hex;
+    });
+  }
+};
+
+function ladeVorlage(name){
+  stopPlay();
+  VORLAGEN[name]();
+  updateGridUI();
+  startPlay();
+}
+
+// ── Buttons binden ─────────────────────────────────────────────────────────────
+function bindBtn(id, fn){
+  var el = document.getElementById(id);
+  if(!el) return;
+  var timer = null;
+  function start(){ if(timer) return; el.classList.add("dwell-active"); timer = setTimeout(function(){ timer=null; fn(); }, dwellMs); }
+  function stop(){ if(timer){ clearTimeout(timer); timer=null; } el.classList.remove("dwell-active"); }
+  el.addEventListener("click", fn);
+  el.addEventListener("pointerenter", start);
+  el.addEventListener("pointerleave", stop);
+  el.addEventListener("mouseenter", start);
+  el.addEventListener("mouseleave", stop);
+}
+
+bindBtn("btnPlay", function(){ if(playing) stopPlay(); else startPlay(); });
+bindBtn("btnClear", function(){
+  stopPlay();
+  for(var r=0;r<ROWS;r++) for(var c=0;c<COLS;c++) grid[r][c]=null;
+  updateGridUI();
+});
+bindBtn("btnTempoDown", function(){
+  bpm = Math.max(40,bpm-10);
+  document.getElementById("tempoVal").textContent = bpm+" BPM";
+  if(playing){ stopPlay(); startPlay(); }
+});
+bindBtn("btnTempoUp", function(){
+  bpm = Math.min(200,bpm+10);
+  document.getElementById("tempoVal").textContent = bpm+" BPM";
+  if(playing){ stopPlay(); startPlay(); }
+});
+bindBtn("btnVorl1", function(){ ladeVorlage("bogen"); });
+bindBtn("btnVorl2", function(){ ladeVorlage("welle"); });
+bindBtn("btnVorl3", function(){ ladeVorlage("treppe"); });
+
+// Zurück
+var returnUrl = localStorage.getItem("laetitia_return_url_musik") ||
+  new URL("./musik_machen.html", window.location.href).href;
+bindBtn("btnZurueck", function(){ stopPlay(); location.href = returnUrl; });
+document.getElementById("btnBack").addEventListener("click", function(){ stopPlay(); location.href = returnUrl; });
+(function(){
+  var el = document.getElementById("btnBack");
+  var timer = null;
+  function start(){ if(timer) return; el.classList.add("dwell-active"); timer = setTimeout(function(){ timer=null; el.click(); }, dwellMs); }
+  function stop(){ if(timer){ clearTimeout(timer); timer=null; } el.classList.remove("dwell-active"); }
+  el.addEventListener("pointerenter", start);
+  el.addEventListener("pointerleave", stop);
+  el.addEventListener("mouseenter", start);
+  el.addEventListener("mouseleave", stop);
+})();
+
+// AudioContext aufwecken
+document.addEventListener("pointerdown", function w(){ getCtx(); document.removeEventListener("pointerdown",w); },{once:true});
+document.addEventListener("click",       function w(){ getCtx(); document.removeEventListener("click",w);       },{once:true});
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+buildPalette();
+buildGrid();
+// Erste Farbe vorwählen
+document.querySelector(".pBtn").click();
+</script>
+<script src="../../core/error_handler.js"></script>
+</body>
+</html>

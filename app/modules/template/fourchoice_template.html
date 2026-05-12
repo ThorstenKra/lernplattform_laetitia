@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Modul</title>
+
+<!-- DESIGN:
+     Du kannst für jedes Modul das bestehende Design übernehmen.
+     Dieses Template ist bewusst "neutral", damit du es später mit eurem Design ersetzt.
+-->
+<style>
+  /* Minimal, bitte später durch euer Modul-Design ersetzen */
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#f6f7fb;height:100vh;overflow:hidden}
+  .viewport{height:100vh;display:flex;align-items:center;justify-content:center;padding:10px}
+  .app{width:min(1100px,96vw);height:calc(100vh - 20px);display:flex;flex-direction:column;gap:8px;min-height:0}
+  .smallStatus{background:#fff;border:1px solid rgba(15,23,42,.14);border-radius:12px;padding:6px 10px;font-weight:900;font-size:13px;color:rgba(15,23,42,.65)}
+  .panel{background:#fff;border:1px solid rgba(15,23,42,.14);border-radius:18px;padding:10px;flex:1 1 auto;min-height:0;overflow:hidden}
+  .screen.hidden{display:none}
+  a.uibtn{display:flex;align-items:center;justify-content:center;text-decoration:none;border-radius:16px;border:1px solid rgba(0,0,0,0.10);background:#1db954;color:#0b1b10;font-weight:1000}
+  .levelGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  a.levelBtn{min-height:74px;padding:12px;justify-content:flex-start}
+  .lvl{font-size:24px;font-weight:1000}
+  .desc{font-size:13px;font-weight:900;color:rgba(11,27,16,.82);margin-top:4px}
+  .taskWrap{height:100%;display:grid;grid-template-rows:auto 1fr auto;grid-template-columns:1fr 1fr;gap:8px;min-height:0}
+  .taskRight{display:flex;flex-direction:column;gap:6px}
+  .ansRow{display:flex;align-items:center;gap:12px;flex:1}
+  .ansTxt{flex:1;font-weight:700}
+  a.ansBtn{width:60px;height:60px;border-radius:14px;background:rgba(29,185,84,0.18);border:2px solid rgba(29,185,84,0.35);display:flex;align-items:center;justify-content:center;font-weight:1000}
+  a.pickBtn[aria-disabled="true"]{pointer-events:none;opacity:.35}
+  .bar{height:7px;border-radius:999px;background:rgba(15,23,42,.08);overflow:hidden}
+  .barFill{height:100%;width:0%;background:#1db954;border-radius:999px}
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);align-items:center;justify-content:center;z-index:200;padding:16px}
+  .overlay.show{display:flex}
+  .overlayBox{background:#fff;border-radius:24px;padding:28px 24px;width:min(560px,94vw);text-align:center}
+  .overlayUnlock{display:none;margin:12px 0;padding:10px;border-radius:14px;background:rgba(29,185,84,.15);border:1px solid rgba(29,185,84,.45);font-weight:900}
+  .overlayUnlock.show{display:block}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlayAbschluss">
+  <div class="overlayBox">
+    <div style="font-size:64px" id="overlayEmoji">🎉</div>
+    <div style="font-size:28px;font-weight:1000" id="overlayTitle">Toll gemacht!</div>
+    <div style="font-size:18px;font-weight:900;color:rgba(15,23,42,.65)" id="overlayScore"></div>
+    <div class="overlayUnlock" id="overlayUnlock">🎮 Freigeschaltet!</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px">
+      <a class="uibtn" href="#" data-action="OVL_REPEAT" style="min-height:48px;padding:10px 22px">Nochmal</a>
+      <a class="uibtn" id="btnReturnFromOverlay" href="../../index.html" style="min-height:48px;padding:10px 22px;background:rgba(15,23,42,.08);color:#0f172a">Zur Gesamtübersicht</a>
+    </div>
+  </div>
+</div>
+
+<div class="viewport">
+  <div class="app">
+    <div class="smallStatus" id="topStatus"><strong>Status:</strong> Lade…</div>
+    <div class="panel">
+
+      <div id="screenMenu" class="screen hidden">
+        <div style="margin-bottom:10px">
+          <div style="font-size:24px;font-weight:1000" id="moduleTitle">📘 Modul</div>
+          <div style="font-size:14px;font-weight:900;color:rgba(15,23,42,.65)" id="moduleSub">Wähle eine Lektion</div>
+        </div>
+
+        <div class="levelGrid" id="gridLevels"></div>
+
+        <div style="margin-top:10px">
+          <a class="uibtn" href="#" id="btnWrong" style="min-height:52px;background:rgba(15,23,42,.06);color:#0f172a">Nur falsche Antworten wiederholen</a>
+          <div style="margin-top:8px;font-size:13px;font-weight:900;color:rgba(15,23,42,.65)" id="savedLine">Gespeicherte falsche Antworten: 0</div>
+        </div>
+
+        <a class="uibtn" id="btnReturnFromMenu" href="../../index.html" style="margin-top:10px;min-height:52px;background:rgba(15,23,42,.06);color:#0f172a">← Zur Gesamtübersicht</a>
+      </div>
+
+      <div id="screenTask" class="screen taskWrap hidden">
+        <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="background:#fff;border:1px solid rgba(15,23,42,.14);border-radius:12px;padding:6px 10px">
+            <div style="font-size:13px;font-weight:900;color:rgba(15,23,42,.65)" id="progressLabel">Fortschritt: –</div>
+            <div class="bar"><div class="barFill" id="barFill"></div></div>
+          </div>
+          <div style="background:#fff;border:1px solid rgba(15,23,42,.14);border-radius:12px;padding:6px 10px">
+            <div style="font-size:13px;font-weight:900;color:rgba(15,23,42,.65)" id="correctLabel">Richtig gesamt: –</div>
+            <div class="bar"><div class="barFill" id="correctFill" style="background:#1aa34a"></div></div>
+          </div>
+        </div>
+
+        <div style="padding:10px;border:1px solid rgba(15,23,42,.14);border-radius:14px" id="text">–</div>
+        <div style="padding:10px;border:1px solid rgba(15,23,42,.14);border-radius:14px" id="frage">–</div>
+
+        <div class="taskRight">
+          <div class="ansRow"><span class="ansTxt" id="read1txt">–</span><a class="uibtn ansBtn pickBtn" href="#" data-answer="A" id="pick1">1</a></div>
+          <div class="ansRow"><span class="ansTxt" id="read2txt">–</span><a class="uibtn ansBtn pickBtn" href="#" data-answer="B" id="pick2">2</a></div>
+          <div class="ansRow"><span class="ansTxt" id="read3txt">–</span><a class="uibtn ansBtn pickBtn" href="#" data-answer="C" id="pick3">3</a></div>
+          <div class="ansRow"><span class="ansTxt" id="read4txt">–</span><a class="uibtn ansBtn pickBtn" href="#" data-answer="D" id="pick4">4</a></div>
+        </div>
+
+        <div style="grid-column:1/-1;display:flex;gap:10px;justify-content:space-between">
+          <a class="uibtn" href="#" id="btnNext" aria-disabled="true" style="pointer-events:none;opacity:0.45;flex:2;min-height:52px">Weiter ›</a>
+          <a class="uibtn" href="#" id="btnHome" style="flex:1;min-height:52px;background:#e24a4a;color:#fff">Beenden</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="../../core/dwell.js"></script>
+<script src="../../core/config.js"></script>
+<script src="../../core/storage.js"></script>
+<script src="../../core/return.js"></script>
+<script src="../../core/csv.js"></script>
+<script src="../../core/dataLoader.js"></script>
+<script src="../../core/audioQueue.js"></script>
+<script src="../../core/moduleKit.js"></script>
+
+<!-- Dein Modul-Script: z.B. mathe.module.js -->
+</body>
+</html>

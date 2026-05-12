@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Hörspiele</title>
+
+<style>
+  :root{
+    --bg:#f6f7fb; --panel:#ffffff;
+    --border:rgba(15,23,42,.14);
+    --shadow:0 10px 26px rgba(15,23,42,.08);
+    --text:#0f172a; --muted:rgba(15,23,42,.65);
+    --green:#1db954; --green2:#18a84c;
+    --red:#e24a4a; --red2:#cf3b3b;
+    --radius:18px;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    background:var(--bg); color:var(--text);
+    height:100vh; overflow:hidden;
+  }
+
+  .viewport{ height:100vh; display:flex; align-items:center; justify-content:center; padding:10px; }
+  .app{ width:min(1100px,96vw); height:calc(100vh - 20px); display:flex; flex-direction:column; gap:8px; min-height:0; }
+
+  .smallStatus{
+    background:var(--panel); border:1px solid var(--border); border-radius:12px;
+    box-shadow:var(--shadow); padding:6px 10px; font-weight:900; font-size:13px;
+    color:var(--muted); flex:0 0 auto;
+  }
+  .smallStatus strong{ color:var(--text); }
+
+  .panel{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:8px; flex:1 1 auto; min-height:0; overflow:hidden;
+    display:flex; flex-direction:column;
+  }
+
+  .screen.hidden{ display:none !important; }
+
+  /* ── Dwell-Ring ── */
+  @keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+  .dwell-active{ transform:scale(1.06); outline:4px solid #1db954; box-shadow:0 0 0 5px rgba(29,185,84,0.45); transition:none; }
+  .dwell-ring-svg{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none; z-index:10; width:70px; height:70px; }
+  .dwell-ring-svg circle{ fill:none; stroke:#1db954; stroke-width:5; stroke-dasharray:220; stroke-dashoffset:220; transform:rotate(-90deg); transform-origin:35px 35px; }
+  .dwell-ring-svg circle.animating{ animation:dwellRing var(--dwell-duration,0.6s) linear forwards; }
+
+  /* ── Buttons allgemein ── */
+  a.uibtn, button.uibtn{
+    display:flex; align-items:center; justify-content:center; text-decoration:none;
+    border-radius:16px; border:1px solid rgba(0,0,0,0.10); background:var(--green);
+    color:#0b1b10; font-weight:1000; user-select:none; cursor:pointer; position:relative;
+    -webkit-tap-highlight-color:transparent;
+  }
+  a.uibtn:hover, a.uibtn:focus, button.uibtn:hover, button.uibtn:focus{
+    background:var(--green2); outline:3px solid rgba(29,185,84,0.50); outline-offset:2px; transition:none; z-index:2;
+  }
+  a.uibtn.rot{ background:var(--red); color:#fff; }
+  a.uibtn.rot:hover, a.uibtn.rot:focus{ background:var(--red2); }
+  a.uibtn.grau{ background:rgba(15,23,42,.07); color:var(--text); border-color:var(--border); }
+  a.uibtn.grau:hover, a.uibtn.grau:focus{ background:rgba(15,23,42,.14); }
+
+  /* ── SCREEN 1: Bücherliste ── */
+  #screenBuecher{ flex:1; display:flex; flex-direction:column; gap:10px; min-height:0; }
+  .screenHeader{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex:0 0 auto; }
+  .screenTitel{ font-size:24px; font-weight:1000; }
+  #buchGrid{
+    flex:1; overflow:hidden; display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
+    align-content:start;
+    gap:12px; min-height:0; padding:2px;
+  }
+  a.buchBtn{
+    display:flex; align-items:center; gap:0;
+    background:var(--panel); border:2px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow); text-decoration:none; color:var(--text);
+    height:110px; padding:0; overflow:hidden; transition:none;
+  }
+  a.buchBtn:hover, a.buchBtn:focus{
+    transform:scale(1.03); outline:4px solid #1db954;
+    box-shadow:0 0 0 5px rgba(29,185,84,0.45); transition:none; z-index:2;
+  }
+  .buchCover{
+    width:85px; min-width:85px; height:110px; object-fit:cover;
+    border-radius:calc(var(--radius) - 2px) 0 0 calc(var(--radius) - 2px);
+    flex-shrink:0;
+  }
+  .buchInfo{ flex:1; padding:12px 14px; display:flex; flex-direction:column; justify-content:space-between; }
+  .buchTitel{ font-size:17px; font-weight:1000; line-height:1.2; }
+  .buchUntertitel{ font-size:12px; font-weight:900; color:var(--muted); margin-top:2px; }
+  .buchMeta{ font-size:12px; font-weight:900; color:var(--muted); margin-top:4px; }
+  .fortschrittShell{ height:6px; border-radius:999px; background:rgba(15,23,42,.1); overflow:hidden; margin-top:6px; }
+  .fortschrittFill{ height:100%; background:var(--green); border-radius:999px; transition:width .4s; }
+
+  /* ── SCREEN 2: Resume-Dialog ── */
+  #screenResume{
+    flex:1; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:16px; padding:20px;
+  }
+  .resumeBox{
+    background:var(--panel); border:2px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:28px 24px; width:min(560px,100%); text-align:center;
+  }
+  .resumeEmoji{ font-size:56px; margin-bottom:8px; }
+  .resumeTitel{ font-size:24px; font-weight:1000; margin:0 0 6px 0; }
+  .resumeInfo{ font-size:15px; font-weight:900; color:var(--muted); margin:0 0 24px 0; }
+  .resumeBtns{ display:flex; flex-direction:column; gap:10px; }
+  a.resumeBtn{ min-height:68px; font-size:17px; font-weight:1000; padding:12px 20px; }
+
+  /* ── SCREEN 3: Player ── */
+  #screenPlayer{
+    flex:1; display:grid;
+    grid-template-rows:auto 1fr;
+    grid-template-columns:1fr 2fr;
+    gap:10px; min-height:0;
+  }
+  .playerHeader{
+    grid-column:1 / -1;
+    display:flex; align-items:center; gap:12px;
+  }
+  .playerTitelBlock{ flex:1; }
+  .playerTitelText{ font-size:20px; font-weight:1000; }
+  .playerKapitelName{ font-size:14px; font-weight:900; color:var(--muted); margin-top:2px; }
+
+  /* Linke Spalte: Cover + Steuerung */
+  .playerLinks{
+    display:flex; flex-direction:column; gap:8px; min-height:0;
+  }
+  .playerCoverWrap{
+    flex:0 0 auto;
+    background:rgba(15,23,42,.04); border-radius:14px; overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+    max-height:180px;
+  }
+  #playerCover{ width:100%; max-height:180px; object-fit:cover; display:block; }
+
+  /* Fortschrittsbalken */
+  .audioFortschrittWrap{ flex:0 0 auto; }
+  #audioFortschrittShell{
+    height:14px; border-radius:999px; background:rgba(15,23,42,.10);
+    overflow:hidden; cursor:pointer; position:relative;
+  }
+  #audioFortschrittFill{ height:100%; width:0%; background:var(--green); border-radius:999px; transition:width .3s; }
+  #audioZeit{ font-size:12px; font-weight:900; color:var(--muted); text-align:right; margin-top:4px; }
+
+  /* Player-Buttons */
+  .playerButtons{
+    display:grid; grid-template-columns:1fr 1fr 2fr 1fr 1fr;
+    gap:8px; flex:0 0 auto;
+  }
+  a.playerBtn{
+    display:flex; align-items:center; justify-content:center;
+    min-height:78px; font-size:22px; font-weight:1000;
+    border-radius:14px; border:1px solid rgba(0,0,0,0.10);
+    background:rgba(29,185,84,0.15); border-color:rgba(29,185,84,0.35);
+    color:#0b1b10; text-decoration:none; cursor:pointer; user-select:none; position:relative;
+    transition:none;
+  }
+  a.playerBtn:hover, a.playerBtn:focus{
+    transform:scale(1.08); outline:4px solid #1db954;
+    background:rgba(29,185,84,0.40) !important; transition:none; z-index:2;
+  }
+  #btnPlayPause{ font-size:32px; background:var(--green) !important; color:#0b1b10; }
+  #btnPlayPause:hover, #btnPlayPause:focus{ background:var(--green2) !important; }
+
+  /* Geschwindigkeit */
+  .speedButtons{ display:flex; gap:8px; flex:0 0 auto; }
+  a.speedBtn{
+    flex:1; min-height:44px; font-size:13px; font-weight:1000;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:10px; border:1px solid var(--border);
+    background:rgba(15,23,42,.06); color:var(--text);
+    text-decoration:none; cursor:pointer; user-select:none; position:relative;
+    transition:none;
+  }
+  a.speedBtn.speedAktiv{ background:var(--green); color:#0b1b10; border-color:rgba(0,0,0,0.10); }
+  a.speedBtn:hover, a.speedBtn:focus{ background:rgba(15,23,42,.14); transition:none; }
+  a.speedBtn.speedAktiv:hover, a.speedBtn.speedAktiv:focus{ background:var(--green2); }
+
+  /* Rechte Spalte: Kapitel-Liste */
+  .playerRechts{
+    display:flex; flex-direction:column; gap:6px; min-height:0; overflow:hidden;
+  }
+  .kapitelHeader{
+    display:flex; align-items:center; justify-content:space-between; flex:0 0 auto;
+  }
+  .kapitelLabel{ font-size:13px; font-weight:900; color:var(--muted); }
+  .kapitelSeite{ font-size:12px; font-weight:900; color:var(--muted); }
+  #kapitelListe{
+    flex:1; overflow:hidden; display:flex; flex-direction:column; gap:5px;
+  }
+  /* Jede Kapitel-Zeile: Nummer-Button + Titeltext nebeneinander */
+  .kapitelZeile{
+    display:flex; gap:6px; align-items:stretch;
+    flex:1 1 0; min-height:0; max-height:72px;
+  }
+  /* Nummer-Button: schmal, grün, wird per Dwell ausgelöst */
+  a.kapitelNr{
+    flex:0 0 54px; display:flex; align-items:center; justify-content:center;
+    font-size:17px; font-weight:1000;
+    border-radius:12px; border:1px solid rgba(0,0,0,0.10);
+    background:rgba(29,185,84,0.15); border-color:rgba(29,185,84,0.35);
+    color:#0b1b10; text-decoration:none; cursor:pointer; user-select:none;
+    position:relative; transition:none;
+  }
+  a.kapitelNr:hover, a.kapitelNr:focus{
+    background:rgba(29,185,84,0.50); outline:3px solid #1db954; transition:none; z-index:2;
+  }
+  a.kapitelNr.kapitelAktiv{
+    background:var(--green); border-color:rgba(0,0,0,0.10); color:#0b1b10;
+  }
+  /* Titeltext: breite Anzeige, KEIN Button, kein Dwell */
+  .kapitelTitelText{
+    flex:1; display:flex; align-items:center; padding:0 12px;
+    font-size:13px; font-weight:900; color:var(--text);
+    background:rgba(15,23,42,.04); border:1px solid var(--border);
+    border-radius:12px; line-height:1.3;
+    user-select:none; pointer-events:none;
+  }
+  .kapitelTitelText.kapitelAktiv{
+    background:rgba(29,185,84,0.10); border-color:rgba(29,185,84,0.35); color:#0b1b10;
+  }
+  /* Paginierung */
+  .kapitelPager{
+    display:flex; gap:8px; flex:0 0 auto;
+  }
+  a.pagerBtn{
+    flex:1; min-height:40px; font-size:15px; font-weight:1000;
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    border-radius:12px; border:1px solid rgba(0,0,0,0.10);
+    background:var(--green); color:#0b1b10;
+    text-decoration:none; cursor:pointer; user-select:none; position:relative;
+    transition:none;
+  }
+  a.pagerBtn:hover, a.pagerBtn:focus{
+    background:var(--green2); outline:4px solid rgba(29,185,84,0.50); transition:none;
+  }
+  a.pagerBtn[aria-disabled="true"]{
+    opacity:0.3; pointer-events:none;
+  }
+
+  /* Footer */
+  .playerFooter{
+    grid-column:1 / -1;
+    display:flex; gap:12px;
+  }
+  a.navBtn{ min-height:68px; font-size:16px; font-weight:1000; padding:10px; flex:1; text-decoration:none; }
+
+  @media(max-width:700px){
+    #screenPlayer{ grid-template-columns:1fr; }
+  }
+
+  /* Zurueck-Buttons helllila */
+  #btnReturnMain, #btnReturnAlben,
+  #btnReturnTitel, #btnZurueck, a.zurueckBtn {
+    background:#ede9fe !important; color:#4c1d95 !important;
+    border:2px solid #8b5cf6 !important;
+    min-height:58px !important; font-size:16px !important;
+    font-weight:1000 !important;
+  }
+  #btnReturnMain:hover, #btnReturnMain:focus,
+  #btnReturnBuecher:hover:focus,
+  #btnReturnAlben:hover, #btnReturnAlben:focus,
+  #btnReturnTitel:hover, #btnReturnTitel:focus,
+  #btnZurueck:hover, #btnZurueck:focus,
+  a.zurueckBtn:hover, a.zurueckBtn:focus {
+    background:#ddd6fe !important; outline:4px solid #8b5cf6 !important;
+  }
+
+
+  /* Zurück-Button unten mittig */
+  .zurueckLeiste{
+    flex:0 0 auto; padding:4px 12px;
+    background:var(--panel); border-top:1px solid var(--border);
+    display:flex; justify-content:center;
+  }
+  a.zurueckBtn{
+    display:flex; align-items:center; justify-content:center;
+    min-height:58px; font-size:16px; font-weight:1000;
+    width:min(340px, 100%);
+    border-radius:16px; border:2px solid #8b5cf6;
+    background:#ede9fe; color:#4c1d95;
+    text-decoration:none; cursor:pointer; user-select:none;
+    position:relative; transition:none;
+  }
+  a.zurueckBtn:hover, a.zurueckBtn:focus{
+    background:#ddd6fe; outline:4px solid #8b5cf6; transition:none;
+  }
+
+
+  /* Lautstärke-Leiste */
+  .lautstärkeLeiste{ display:flex; gap:8px; flex:0 0 auto; align-items:center; }
+  a.volBtn{
+    flex:1; min-height:58px; font-size:20px; font-weight:1000;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:14px; border:1px solid var(--border);
+    background:rgba(15,23,42,.06); color:var(--text);
+    text-decoration:none; cursor:pointer; user-select:none; position:relative; transition:none;
+  }
+  a.volBtn:hover, a.volBtn:focus{ background:rgba(15,23,42,.18); outline:3px solid rgba(29,185,84,0.50); transition:none; }
+  .volAnzeige{
+    flex:1; min-height:44px; display:flex; align-items:center; justify-content:center;
+    font-size:15px; font-weight:1000; color:var(--text);
+    background:rgba(15,23,42,.04); border:1px solid var(--border);
+    border-radius:10px; pointer-events:none; user-select:none;
+  }
+</style>
+</head>
+<body>
+
+<div class="viewport">
+  <div class="app">
+
+    <div class="panel">
+
+      <!-- ══ SCREEN 1: Bücherliste ══ -->
+      <div id="screenBuecher" class="screen hidden">
+        <div class="screenHeader">
+          <div class="screenTitel">🎧 Hörspiele</div>
+          
+        </div>
+        <div id="buchGrid"></div>
+      </div>
+
+      <!-- ══ SCREEN 2: Wiedereinstieg-Dialog ══ -->
+      <div id="screenResume" class="screen hidden">
+        <div class="resumeBox">
+          <div class="resumeEmoji">🎧</div>
+          <div class="resumeTitel" id="resumeTitel">Hörspiel</div>
+          <div class="resumeInfo" id="resumeInfo">Willkommen zurück!</div>
+          <div class="resumeBtns">
+            <a class="uibtn resumeBtn" href="#" id="btnResumeContinue">
+              ▶ Weitermachen (an der letzten Stelle)
+            </a>
+            <a class="uibtn resumeBtn grau" href="#" id="btnResumeBegin">
+              ⏮ Von vorne anfangen
+            </a>
+            <a class="uibtn resumeBtn grau" href="#" id="btnResumeChoose">
+              📋 Anderes Kapitel wählen
+            </a>
+          </div>
+        </div>
+        <a class="uibtn grau" href="#" id="btnResumeClose"
+           style="min-height:52px;padding:10px 18px;font-size:14px;"
+           onclick="document.getElementById('screenResume').classList.add('hidden');
+                    document.getElementById('screenBuecher').classList.remove('hidden');">
+          ← Zurück zur Auswahl
+        </a>
+      </div>
+
+      <!-- ══ SCREEN 3: Player ══ -->
+      <div id="screenPlayer" class="screen hidden">
+
+        <div class="playerHeader">
+          <div class="playerTitelBlock">
+            <div class="playerTitelText" id="playerTitel">Hörspiel</div>
+            <div class="playerKapitelName" id="playerKapitelName"></div>
+          </div>
+        </div>
+
+        <!-- Linke Spalte -->
+        <div class="playerLinks">
+
+          <div class="playerCoverWrap">
+            <img id="playerCover" src="" alt="Cover">
+          </div>
+
+          <!-- Fortschrittsbalken (klickbar) -->
+          <div class="audioFortschrittWrap">
+            <div id="audioFortschrittShell">
+              <div id="audioFortschrittFill"></div>
+            </div>
+            <div id="audioZeit">0:00 / 0:00</div>
+          </div>
+
+          <!-- Haupt-Buttons -->
+          <div class="playerButtons">
+            <a class="playerBtn uibtn" href="#" id="btnZurueckKapitel" title="Vorheriges Kapitel">⏮</a>
+            <a class="playerBtn uibtn" href="#" id="btnZurueck30" title="30s zurück">⏪</a>
+            <a class="playerBtn uibtn" href="#" id="btnPlayPause">▶</a>
+            <a class="playerBtn uibtn" href="#" id="btnVor30" title="30s vor">⏩</a>
+            <a class="playerBtn uibtn" href="#" id="btnWeiterKapitel" title="Nächstes Kapitel">⏭</a>
+          </div>
+
+          <!-- Geschwindigkeit -->
+          <div class="speedButtons">
+            <a class="speedBtn uibtn" href="#" id="btnSpeed8">0.8×</a>
+            <a class="speedBtn uibtn speedAktiv" href="#" id="btnSpeed10">1.0×</a>
+            <a class="speedBtn uibtn" href="#" id="btnSpeed12">1.2×</a>
+          </div>
+
+          <div class="lautstärkeLeiste">
+            <a class="volBtn uibtn" href="#" id="btnVolMinus">🔉 −</a>
+            <div class="volAnzeige" id="volAnzeige">🔊 60%</div>
+            <a class="volBtn uibtn" href="#" id="btnVolPlus">+ 🔊</a>
+          </div>
+
+        </div>
+
+        <!-- Rechte Spalte: Kapitel-Liste -->
+        <div class="playerRechts">
+          <div class="kapitelHeader">
+            <div class="kapitelLabel">Kapitel</div>
+            <div class="kapitelSeite" id="kapitelSeiteAnzeige"></div>
+          </div>
+          <div id="kapitelListe"></div>
+          <div class="kapitelPager">
+            <a class="pagerBtn" href="#" id="btnKapitelZurueck">–</a>
+            <a class="pagerBtn" href="#" id="btnKapitelWeiter">–</a>
+          </div>
+        </div>
+
+      </div><!-- /screenPlayer -->
+
+    </div><!-- /panel -->
+
+    <div class="zurueckLeiste"><a class="zurueckBtn" href="../../entertainment.html" id="btnReturnMain">← Zurück</a></div>
+
+  </div><!-- /app -->
+</div><!-- /viewport -->
+
+<!-- Core-Scripts -->
+<script src="../../core/config.js"></script>
+<script src="../../core/storage.js"></script>
+<script src="../../core/return.js"></script>
+<script src="../../core/dataRegistry.js"></script>
+<script src="../../core/dwell.js"></script>
+<script src="../../core/error_handler.js"></script>
+
+<!-- Hörspiel-Daten (eine Zeile pro Buch) -->
+<script src="./buecher/Das Dschungelbuch/info.js"></script>
+<script src="./buecher/Der Kleine Prinz_ Der Planet der Dornen/info.js"></script>
+<script src="./buecher/Der Tätowierte Hund/info.js"></script>
+<script src="./buecher/Hans Im Glück/info.js"></script>
+<script src="./buecher/Das Doppelte Lottchen/info.js"></script>
+<script src="./buecher/Der Kleine Prinz 2/info.js"></script>
+<script src="./buecher/Johannes Evangelium/info.js"></script>
+<script src="./buecher/Pünktchen Und Anton/info.js"></script>
+<script src="./buecher/Ritter Rost - Der Babysitter/info.js"></script>
+<script src="./buecher/Das Fliegende Kamel/info.js"></script>
+<script src="./buecher/JAguar und NEINguar/info.js"></script>
+<script src="./buecher/Schwaenke Und Anekdoten Vom Hodscha Nasredin/info.js"></script>
+
+<!-- Modul-Logik -->
+<script src="../../core/geraete.js"></script>
+<script src="./hoerbuch_mod.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia</title>
+<style>
+:root{
+  --bg:#f6f7fb; --panel:#ffffff;
+  --border:rgba(15,23,42,.14);
+  --shadow:0 10px 26px rgba(15,23,42,.08);
+  --text:#0f172a; --muted:rgba(15,23,42,.65);
+  --radius:18px;
+  --lernen:#3b82f6;    --lernen-bg:rgba(59,130,246,0.08);
+  --spiele:#8b5cf6;    --spiele-bg:rgba(139,92,246,0.08);
+  --entertain:#f59e0b; --entertain-bg:rgba(245,158,11,0.08);
+  --kreativ:#ec4899;   --kreativ-bg:rgba(236,72,153,0.08);
+  --glaube:#7c3aed;    --glaube-bg:rgba(124,58,237,0.08);
+  --quassel:#0ea5e9;   --quassel-bg:rgba(14,165,233,0.08);
+  --schule:#16a34a;    --schule-bg:rgba(22,163,74,0.08);
+}
+*{ box-sizing:border-box; }
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg); color:var(--text);
+  height:100vh; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+}
+.app{ width:min(900px,96vw); display:flex; flex-direction:column; gap:14px; padding:16px; }
+.greeting{
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:22px 26px; text-align:center;
+}
+.greeting-emoji{ font-size:56px; margin-bottom:8px; }
+.greeting-title{ font-size:clamp(28px,5vw,42px); font-weight:1000; margin:0 0 8px 0; }
+.greeting-sub{ font-size:clamp(16px,3vw,22px); font-weight:800; color:var(--muted); margin:0; }
+.kategorieGrid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+a.katBtn{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:10px; min-height:140px; padding:20px 16px;
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  text-decoration:none; font-weight:1000;
+  user-select:none; cursor:pointer; position:relative; transition:none;
+  border:3px solid transparent;
+}
+a.katBtn:hover, a.katBtn:focus{ transform:scale(1.04); transition:none; }
+a.katBtn.is-disabled{ pointer-events:none; opacity:0.45; }
+a.katBtn.lernen   { background:var(--lernen-bg);    border-color:var(--lernen);    color:var(--lernen); }
+a.katBtn.spiele   { background:var(--spiele-bg);    border-color:var(--spiele);    color:var(--spiele); }
+a.katBtn.entertain{ background:var(--entertain-bg); border-color:var(--entertain); color:var(--entertain); }
+a.katBtn.kreativ  { background:var(--kreativ-bg);   border-color:var(--kreativ);   color:var(--kreativ); }
+a.katBtn.glaube   { background:var(--glaube-bg);   border-color:var(--glaube);    color:var(--glaube); }
+a.katBtn.quassel  { background:var(--quassel-bg);  border-color:var(--quassel);   color:var(--quassel); }
+a.katBtn.schule   { background:var(--schule-bg);   border-color:var(--schule);    color:var(--schule); }
+a.katBtn.lernen:hover,    a.katBtn.lernen:focus   { background:rgba(59,130,246,0.16); outline:4px solid var(--lernen); }
+a.katBtn.spiele:hover,    a.katBtn.spiele:focus   { background:rgba(139,92,246,0.16); outline:4px solid var(--spiele); }
+a.katBtn.entertain:hover, a.katBtn.entertain:focus{ background:rgba(245,158,11,0.16); outline:4px solid var(--entertain); }
+a.katBtn.kreativ:hover,   a.katBtn.kreativ:focus  { background:rgba(236,72,153,0.16); outline:4px solid var(--kreativ); }
+a.katBtn.glaube:hover,    a.katBtn.glaube:focus   { background:rgba(124,58,237,0.16); outline:4px solid var(--glaube); }
+a.katBtn.quassel:hover,   a.katBtn.quassel:focus  { background:rgba(14,165,233,0.16);  outline:4px solid var(--quassel); }
+a.katBtn.schule:hover,    a.katBtn.schule:focus   { background:rgba(22,163,74,0.16);   outline:4px solid var(--schule); }
+.kat-emoji{ font-size:48px; }
+.kat-label{ font-size:22px; font-weight:1000; }
+.kat-sub{ font-size:13px; font-weight:900; opacity:0.75; text-align:center; }
+.statusbar{
+  background:var(--panel); border:1px solid var(--border); border-radius:12px;
+  box-shadow:var(--shadow); padding:8px 14px; font-size:13px; font-weight:900;
+  color:var(--muted); display:flex; align-items:center; justify-content:space-between; gap:10px;
+}
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  pointer-events:none; z-index:10; width:70px; height:70px;
+}
+.dwell-ring-svg circle{
+  fill:none; stroke-width:5; stroke-dasharray:220; stroke-dashoffset:220;
+  transform:rotate(-90deg); transform-origin:35px 35px;
+}
+.dwell-ring-svg circle.animating{ animation:dwellRing var(--dwell-duration,0.4s) linear forwards; }
+.dwell-active{ transform:scale(1.07) !important; transition:none !important; }
+a.katBtn.lernen    .dwell-ring-svg circle{ stroke:var(--lernen); }
+a.katBtn.spiele    .dwell-ring-svg circle{ stroke:var(--spiele); }
+a.katBtn.entertain .dwell-ring-svg circle{ stroke:var(--entertain); }
+a.katBtn.kreativ   .dwell-ring-svg circle{ stroke:var(--kreativ); }
+a.katBtn.glaube    .dwell-ring-svg circle{ stroke:var(--glaube); }
+a.katBtn.quassel   .dwell-ring-svg circle{ stroke:var(--quassel); }
+a.katBtn.schule    .dwell-ring-svg circle{ stroke:var(--schule); }
+
+/* Schulmodus */
+a.katBtn.schul-gesperrt{
+  opacity:0.45; pointer-events:none; filter:grayscale(0.5);
+  position:relative;
+}
+a.katBtn.schul-gesperrt::after{
+  content:"🏫"; position:absolute; top:8px; right:10px;
+  font-size:18px; opacity:0.8;
+}
+
+/* ── Audio-Auswahl-Dialog ─────────────────────────────────────────────────── */
+.audio-dialog-overlay{
+  position:fixed; inset:0; background:rgba(15,23,42,0.82);
+  display:flex; align-items:center; justify-content:center;
+  z-index:9999;
+}
+.audio-dialog{
+  background:#fff; border-radius:24px; padding:36px 32px;
+  box-shadow:0 24px 60px rgba(15,23,42,0.22);
+  text-align:center; max-width:480px; width:90vw;
+}
+.audio-dialog h2{ font-size:26px; font-weight:1000; margin:0 0 10px 0; color:#0f172a; }
+.audio-dialog p{ font-size:16px; color:#475569; margin:0 0 28px 0; }
+.audio-dialog-btns{ display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+.audio-btn{
+  flex:1; min-width:140px; padding:20px 16px; border-radius:18px;
+  border:3px solid transparent; font-size:18px; font-weight:1000;
+  cursor:pointer; display:flex; flex-direction:column; align-items:center;
+  gap:8px; transition:none; position:relative;
+}
+.audio-btn.jbl  { background:rgba(59,130,246,0.08); border-color:#3b82f6; color:#3b82f6; }
+.audio-btn.intern{ background:rgba(22,163,74,0.08);  border-color:#16a34a; color:#16a34a; }
+.audio-btn:hover, .audio-btn:focus{ outline:4px solid currentColor; transform:scale(1.04); }
+.audio-btn .audio-btn-emoji{ font-size:36px; }
+.audio-hinweis{
+  margin-top:16px; padding:12px 16px; border-radius:12px;
+  background:rgba(245,158,11,0.1); border:2px solid #f59e0b;
+  color:#92400e; font-size:14px; font-weight:800; display:none;
+}
+</style>
+</head>
+<body>
+
+<div class="audio-dialog-overlay" id="audioDialog" style="display:none">
+  <div class="audio-dialog">
+    <h2>🔊 Audio-Ausgabe</h2>
+    <p>Wo soll der Ton ausgegeben werden?</p>
+    <div class="audio-dialog-btns">
+      <button class="audio-btn jbl" id="audioBtnJbl" onclick="audioWaehlen('jbl')">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70" style="position:relative;top:0;left:0;transform:none;width:0;height:0"></svg>
+        <span class="audio-btn-emoji">📢</span>
+        JBL Clip 5
+      </button>
+      <button class="audio-btn intern" id="audioBtnIntern" onclick="audioWaehlen('intern')">
+        <span class="audio-btn-emoji">🔈</span>
+        Geraet-Lautsprecher
+      </button>
+    </div>
+    <div class="audio-hinweis" id="audioHinweis"></div>
+  </div>
+</div>
+
+<div class="app">
+  <div class="greeting">
+    <div class="greeting-emoji">👋</div>
+    <div class="greeting-title">Hallo, Laetitia!</div>
+    <div class="greeting-sub">Was möchtest du heute machen?</div>
+  </div>
+  <div class="kategorieGrid" id="kategorieGrid">
+    <a class="katBtn lernen" href="./lernen.html" id="btnLernen">
+      <div class="kat-emoji">🎓</div>
+      <div class="kat-label">Lernen</div>
+      <div class="kat-sub">Deutsch · Lesen · Mathe</div>
+    </a>
+    <a class="katBtn spiele" href="./spielewelt.html" id="btnSpiele">
+      <div class="kat-emoji">🎮</div>
+      <div class="kat-label">Spielewelt</div>
+      <div class="kat-sub">Memory · Puzzle · Schach</div>
+    </a>
+    <a class="katBtn entertain" href="./entertainment.html" id="btnEntertain">
+      <div class="kat-emoji">🎭</div>
+      <div class="kat-label">Entertainment</div>
+      <div class="kat-sub">Hörbücher · Musik · Fotos</div>
+    </a>
+    <a class="katBtn kreativ" href="./kreativitaet.html" id="btnKreativ">
+      <div class="kat-emoji">🎨</div>
+      <div class="kat-label">Kreativität</div>
+      <div class="kat-sub">Schreiben · Malen</div>
+    </a>
+    <a class="katBtn glaube" href="./glaube.html" id="btnGlaube">
+      <div class="kat-emoji">✝️</div>
+      <div class="kat-label">Glaube</div>
+      <div class="kat-sub">Psalmen · Lieder · Gebete</div>
+    </a>
+    <a class="katBtn schule" href="./modules/schule/schule.html" id="btnSchule">
+      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+      <div class="kat-emoji">🏫</div>
+      <div class="kat-label">Schule</div>
+      <div class="kat-sub">Lesen · Mathe · Aufgaben</div>
+    </a>
+    <a class="katBtn quassel" href="#" id="btnQuassel">
+      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+      <div class="kat-emoji">💬</div>
+      <div class="kat-label">Quasselkiste</div>
+      <div class="kat-sub">Zurück zur Kommunikation</div>
+    </a>
+  </div>
+  <div class="statusbar">
+    <span id="statustext">Bereit.</span>
+    <a href="./einstellungen.html"
+       style="font-size:11px;font-weight:900;color:var(--muted);text-decoration:none;
+              padding:4px 10px;border-radius:999px;border:1px solid var(--border);
+              background:rgba(15,23,42,.04);white-space:nowrap;flex-shrink:0;"
+       id="btnEinstellungen">⚙️ Einstellungen</a>
+  </div>
+</div>
+<script src="./core/schulprofil.js"></script>
+<script src="./core/geraete.js"></script>
+<script src="./core/dwell.js"></script>
+<script src="./core/error_handler.js"></script>
+<script>
+var attachDwell = window.LaetitiaAttachDwell || function(){ return {cancelDwell:function(){}}; };
+if(!localStorage.getItem("laetitia_welcome_spoken")){
+  window.addEventListener("load", function(){
+    setTimeout(function(){
+      try{
+        var u = new SpeechSynthesisUtterance("Hallo Laetitia! Was moechten wir heute machen?");
+        var voices = speechSynthesis.getVoices();
+        var de = (voices||[]).find(function(v){ return (v.lang||"").toLowerCase().startsWith("de"); });
+        if(de) u.voice = de;
+        speechSynthesis.speak(u);
+        localStorage.setItem("laetitia_welcome_spoken","1");
+      }catch(e){}
+    },500);
+  });
+}
+try{ localStorage.setItem("laetitia_return_url_v1","./index.html"); }catch(e){}
+// Dwell-Zeit vorbelegen falls noch nie gesetzt (erstes Starten)
+if(!localStorage.getItem("laetitia_dwell_ms")){
+  localStorage.setItem("laetitia_dwell_ms", "2000");
+}
+if(!localStorage.getItem("laetitia_leave_grace_ms")){
+  localStorage.setItem("laetitia_leave_grace_ms", "150");
+}
+var cfg = (function(){ try{ return JSON.parse(localStorage.getItem("laetitia_config_v1")||"{}"); }catch(e){ return {}; } })();
+var delaySeconds = Number.isFinite(parseInt(cfg.delay)) ? parseInt(cfg.delay) : 4;
+var delayEnabled = (cfg.togDelay !== false);
+var DELAY_MS = Math.max(0, delaySeconds) * 1000;
+var grid = document.getElementById("kategorieGrid");
+var statusEl = document.getElementById("statustext");
+var dwellMs    = parseInt(localStorage.getItem("laetitia_dwell_ms")) || 2000;
+var leaveGrace = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 100;
+function setEnabled(enabled){
+  grid.querySelectorAll("a.katBtn").forEach(function(a){
+    if(enabled){ a.classList.remove("is-disabled"); } else { a.classList.add("is-disabled"); }
+  });
+}
+function bindDwell(){
+  attachDwell("a.katBtn:not(.is-disabled), #btnEinstellungen", {
+    dwellMs: dwellMs, leaveGrace: leaveGrace,
+    onActivate: function(el){
+      if(el.getAttribute("aria-disabled")==="true") return;
+      if(el.classList.contains("is-disabled")) return;
+      try{ el.click(); }catch(e){}
+    }
+  });
+}
+bindDwell(); // Keine Startverzoegerung auf der Startseite
+
+// ── Schulmodus ───────────────────────────────────────────────────────────────
+(function(){
+  var sp = window.LaetitiaSchulprofil;
+  if(!sp || !sp.istSchulzeit()) return;
+
+  // Schulmodus aktiv — gesperrte Module ausgrauen + Dwell deaktivieren
+  var gesperrt = sp.SCHULMODUS_GESPERRT || [];
+  gesperrt.forEach(function(klasse){
+    var btn = document.querySelector("a.katBtn." + klasse);
+    if(!btn) return;
+    btn.classList.add("schul-gesperrt");
+    // Dwell komplett blockieren
+    btn.addEventListener("pointerenter", function(e){ e.stopImmediatePropagation(); }, true);
+    btn.addEventListener("mouseenter",   function(e){ e.stopImmediatePropagation(); }, true);
+    btn.addEventListener("click",        function(e){ e.preventDefault(); e.stopImmediatePropagation(); }, true);
+  });
+
+  // TTS-Hinweis beim ersten Aufrufen im Schulmodus
+  var schluessel = "laetitia_schulmodus_hinweis_" + (new Date().toISOString().slice(0,10));
+  if(!localStorage.getItem(schluessel)){
+    localStorage.setItem(schluessel, "1");
+    setTimeout(function(){
+      try{
+        var u = new SpeechSynthesisUtterance("Schulmodus aktiv. Einige Bereiche sind heute Nachmittag verfuegbar.");
+        var voices = speechSynthesis.getVoices();
+        var de = (voices||[]).find(function(v){ return (v.lang||"").toLowerCase().startsWith("de"); });
+        if(de) u.voice = de;
+        speechSynthesis.speak(u);
+      }catch(e){}
+    }, 1500);
+  }
+})();
+
+// Quasselkiste-Button: Signal an lokalen Mini-Server senden
+// lernwelt_starten.exe hat einen HTTP-Listener auf localhost:9999 gestartet.
+// Sobald der Listener eine Anfrage empfängt → Edge beenden → NuVoice starten.
+// Quasselkiste-Button: Audio zurueck auf intern + Signal an listener
+document.getElementById("btnQuassel").addEventListener("click", function(e){
+  e.preventDefault();
+  if(window.LaetitiaGeraete) window.LaetitiaGeraete.internZurueck();
+  setTimeout(function(){
+    fetch("http://localhost:9999/zurueck", { mode: "no-cors" })
+      .catch(function(){});
+  }, 300);
+});
+
+// ── Audio-Dialog ─────────────────────────────────────────────────────────────
+function audioDialogZeigen(){
+  var dlg = document.getElementById("audioDialog");
+  if(dlg) dlg.style.display = "flex";
+  // Dwell auf die zwei Buttons
+  var att = window.LaetitiaAttachDwell || function(){};
+  att(".audio-btn", {
+    dwellMs: dwellMs, leaveGrace: leaveGrace,
+    onActivate: function(el){ try{ el.click(); }catch(e){} }
+  });
+}
+
+function audioWaehlen(geraet){
+  var hinweis = document.getElementById("audioHinweis");
+  var dlg     = document.getElementById("audioDialog");
+  if(!window.LaetitiaGeraete){ if(dlg) dlg.style.display="none"; return; }
+  if(geraet === "intern"){
+    window.LaetitiaGeraete.audioUmschalten("intern", function(){});
+    if(dlg) dlg.style.display = "none";
+    return;
+  }
+  // JBL: erst pruefen ob verfuegbar
+  hinweis.style.display = "block";
+  hinweis.textContent = "Verbinde mit JBL Clip 5...";
+  window.LaetitiaGeraete.jblPruefen(function(verfuegbar){
+    if(!verfuegbar){
+      hinweis.style.display = "block";
+      hinweis.textContent = "JBL Clip 5 nicht gefunden. Starte mit Geraet-Lautsprecher.";
+      window.LaetitiaGeraete.audioUmschalten("intern", function(){});
+      setTimeout(function(){ if(dlg) dlg.style.display="none"; }, 2500);
+      return;
+    }
+    window.LaetitiaGeraete.audioUmschalten("jbl", function(ok, fehler){
+      if(ok){
+        hinweis.style.display = "none";
+        if(dlg) dlg.style.display = "none";
+      } else {
+        hinweis.textContent = "Umschaltung fehlgeschlagen: " + (fehler||"unbekannt") + ". Starte mit Geraet-Lautsprecher.";
+        window.LaetitiaGeraete.audioUmschalten("intern", function(){});
+        setTimeout(function(){ if(dlg) dlg.style.display="none"; }, 2500);
+      }
+    });
+  });
+}
+
+// Dialog nur anzeigen wenn Listener erreichbar (Tobii-Geraet)
+// Auf Geraeten ohne Listener (z.B. Asus ExpertBook): intern sofort setzen
+window.addEventListener("load", function(){
+  setTimeout(function(){
+    if(!window.LaetitiaGeraete){
+      return;
+    }
+    window.LaetitiaGeraete.listenerPruefen(function(erreichbar){
+      if(!erreichbar){
+        localStorage.setItem("laetitia_audio_geraet", "intern");
+        return;
+      }
+      audioDialogZeigen();
+    }, 500);
+  }, 600);
+});
+</script>
+</body>
+</html>

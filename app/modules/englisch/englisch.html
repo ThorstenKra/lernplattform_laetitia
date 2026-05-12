@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Englisch</title>
+<style>
+:root{
+  --bg:#fdf4ff; --panel:#ffffff;
+  --border:rgba(15,23,42,.14); --shadow:0 10px 26px rgba(15,23,42,.08);
+  --text:#0f172a; --muted:rgba(15,23,42,.60);
+  --akzent:#7c3aed; --akzent2:#6d28d9;
+  --akzent-bg:rgba(124,58,237,0.08); --radius:20px;
+  --en:#1d4ed8; --en-bg:rgba(29,78,216,0.08);
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{ font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); height:100vh; overflow:hidden; display:flex; flex-direction:column; }
+.progress-bar-wrap{ height:6px; background:rgba(124,58,237,.15); flex-shrink:0; }
+.progress-bar-fill{ height:6px; background:var(--akzent); transition:width .4s ease; }
+
+.topbar{ display:flex; align-items:center; justify-content:space-between; padding:10px 16px; background:var(--panel); border-bottom:1px solid var(--border); box-shadow:0 2px 8px rgba(15,23,42,.06); flex-shrink:0; }
+.topbar-titel{ font-size:18px; font-weight:1000; color:var(--akzent); }
+.topbar-fortschritt{ font-size:13px; font-weight:900; color:var(--muted); }
+
+/* Zurueck-Button unten (Standard) */
+.zurueck-leiste{ padding:10px 16px; flex-shrink:0; }
+a.zurueckBtn{
+  display:flex; align-items:center; justify-content:center;
+  min-height:70px; font-size:18px; font-weight:1000;
+  border-radius:16px; border:2px solid #8b5cf6;
+  background:#ede9fe; color:#4c1d95;
+  text-decoration:none; cursor:pointer; user-select:none;
+  position:relative; transition:none; width:100%;
+}
+a.zurueckBtn:hover, a.zurueckBtn:focus{ background:#ddd6fe; outline:4px solid #8b5cf6; }
+a.zurueckBtn.dwell-active{ transform:scale(1.02) !important; outline:4px solid #8b5cf6 !important; transition:none !important; }
+
+.main{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:16px; gap:14px; overflow:hidden; }
+
+/* ── Stufen-Auswahl ── */
+.stufen-wrap{ max-width:700px; width:100%; display:flex; flex-direction:column; gap:12px; }
+.stufen-titel{ font-size:18px; font-weight:1000; color:var(--akzent); text-align:center; }
+.stufen-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.stufe-btn{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; min-height:120px; border-radius:18px; border:2px solid var(--border); background:var(--panel); box-shadow:var(--shadow); cursor:pointer; user-select:none; position:relative; padding:16px 12px; text-align:center; transition:none; }
+.stufe-btn:hover{ background:var(--akzent-bg); outline:3px solid var(--akzent); }
+.stufe-btn.dwell-active{ transform:scale(1.05) !important; outline:3px solid var(--akzent); transition:none !important; }
+.stufe-emoji{ font-size:34px; }
+.stufe-label{ font-size:15px; font-weight:1000; color:var(--akzent); }
+.stufe-sub{ font-size:11px; font-weight:900; color:var(--muted); }
+.stufe-count{ font-size:11px; font-weight:1000; padding:3px 8px; border-radius:999px; background:var(--akzent-bg); border:1px solid rgba(124,58,237,.25); color:var(--akzent); }
+
+/* ── Englisch-Karte ── */
+.en-karte{ background:var(--panel); border:2px solid rgba(29,78,216,.30); border-radius:var(--radius); box-shadow:var(--shadow); padding:24px 28px; max-width:700px; width:100%; text-align:center; }
+
+/* Grosses englisches Wort/Satz */
+.en-text{ font-size:clamp(22px,4vw,38px); font-weight:1000; color:var(--en); margin-bottom:10px; letter-spacing:0.02em; }
+
+/* Vorlesen-Button */
+.play-btn{ display:inline-flex; align-items:center; gap:8px; padding:8px 18px; border-radius:999px; border:2px solid rgba(29,78,216,.30); background:var(--en-bg); color:var(--en); font-size:14px; font-weight:1000; cursor:pointer; user-select:none; position:relative; margin-bottom:4px; }
+.play-btn:hover{ background:rgba(29,78,216,.15); }
+.play-btn.dwell-active{ transform:scale(1.05) !important; outline:2px solid var(--en); transition:none !important; }
+
+.en-aufgabe{ font-size:15px; font-weight:900; color:var(--muted); }
+
+/* ── Emoji-Antworten (E1/E2) ── */
+.emoji-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; max-width:700px; width:100%; }
+.emoji-btn{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; min-height:110px; border-radius:var(--radius); border:2px solid var(--border); background:var(--panel); box-shadow:var(--shadow); cursor:pointer; user-select:none; position:relative; transition:none; }
+.emoji-btn:hover{ background:var(--akzent-bg); }
+.emoji-btn.dwell-active{ transform:scale(1.06) !important; outline:3px solid var(--akzent); transition:none !important; }
+.emoji-btn.is-disabled{ pointer-events:none; opacity:0.35; }
+.emoji-gross{ font-size:clamp(40px,8vw,64px); }
+.emoji-label{ font-size:14px; font-weight:1000; color:var(--en); letter-spacing:0.05em; }
+
+/* ── Wort-Antworten (E3) ── */
+.wort-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; max-width:700px; width:100%; }
+.wort-btn{ display:flex; align-items:center; justify-content:center; min-height:72px; border-radius:16px; border:2px solid rgba(29,78,216,.25); background:var(--en-bg); color:var(--en); font-size:clamp(15px,2.5vw,20px); font-weight:1000; cursor:pointer; user-select:none; position:relative; text-align:center; padding:8px; transition:none; }
+.wort-btn:hover{ background:rgba(29,78,216,.15); }
+.wort-btn.dwell-active{ transform:scale(1.05) !important; outline:3px solid var(--en); transition:none !important; }
+.wort-btn.is-disabled{ pointer-events:none; opacity:0.35; }
+
+/* ── Feedback ── */
+@keyframes correctFlash{ 0%{background:rgba(22,163,74,.60);border-color:#16a34a;} 50%{background:rgba(22,163,74,.15);} 100%{background:rgba(22,163,74,.60);border-color:#16a34a;} }
+.correct-flash{ animation:correctFlash .45s ease forwards !important; }
+.falsch-gewaehlt{ background:rgba(220,38,38,.25) !important; border-color:#dc2626 !important; }
+
+.infoLine{ display:none; max-width:700px; width:100%; padding:12px 18px; border-radius:14px; font-size:15px; font-weight:900; text-align:center; }
+.infoLine.richtig{ display:block; background:rgba(22,163,74,.15); border:1px solid rgba(22,163,74,.40); color:#166534; }
+.infoLine.falsch{ display:block; background:rgba(220,38,38,.12); border:1px solid rgba(220,38,38,.35); color:#991b1b; }
+
+/* ── Abschluss ── */
+.abschluss{ display:none; flex-direction:column; align-items:center; justify-content:center; gap:16px; padding:24px; text-align:center; max-width:600px; width:100%; }
+.abschluss.sichtbar{ display:flex; }
+.abschluss-emoji{ font-size:64px; }
+.abschluss-titel{ font-size:clamp(22px,4vw,34px); font-weight:1000; color:var(--akzent); }
+.abschluss-score{ font-size:40px; font-weight:1000; color:var(--akzent); background:var(--akzent-bg); border:2px solid rgba(124,58,237,.25); border-radius:16px; padding:10px 28px; }
+.abschluss-sub{ font-size:15px; font-weight:900; color:var(--muted); }
+.abschluss-btn{ display:flex; align-items:center; justify-content:center; min-height:60px; min-width:200px; border-radius:16px; border:2px solid var(--akzent); background:var(--akzent); color:#fff; font-size:17px; font-weight:1000; cursor:pointer; user-select:none; position:relative; text-decoration:none; }
+.abschluss-btn:hover{ background:var(--akzent2); }
+
+/* ── Dwell-Ring ── */
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none; z-index:10; width:70px; height:70px; }
+.dwell-ring-svg circle{ fill:none; stroke:var(--akzent); stroke-width:5; stroke-dasharray:220; stroke-dashoffset:220; transform:rotate(-90deg); transform-origin:35px 35px; }
+.emoji-btn .dwell-ring-svg circle{ stroke:var(--akzent); }
+.wort-btn  .dwell-ring-svg circle{ stroke:var(--en); }
+.dwell-ring-svg circle.animating{ animation:dwellRing var(--dwell-duration,.9s) linear forwards; }
+</style>
+</head>
+<body>
+
+<div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+
+<div class="topbar">
+  <div class="topbar-titel">🇬🇧 Englisch</div>
+  <div class="topbar-fortschritt" id="fortschrittText"></div>
+</div>
+
+<div class="main" id="mainBereich">
+
+  <!-- Screen 1: Stufen-Auswahl -->
+  <div id="screenStufen" class="stufen-wrap">
+    <div class="stufen-titel">Welche Übung möchtest du machen?</div>
+    <div class="stufen-grid" id="stufenGrid"></div>
+  </div>
+
+  <!-- Screen 2: Aufgabe E1/E2 (Emoji-Paar) -->
+  <div id="screenEmoji" style="display:none;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:700px;">
+    <div class="en-karte">
+      <div class="en-text" id="enText"></div>
+      <button class="play-btn" id="btnPlay">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70" style="width:40px;height:40px;position:relative;top:0;left:0;transform:none;">
+          <circle cx="35" cy="35" r="30"/>
+        </svg>
+        🔊 Nochmal hören
+      </button>
+    </div>
+    <div class="en-aufgabe" id="enAufgabe">Was bedeutet das?</div>
+    <div class="infoLine" id="infoLineEmoji"></div>
+    <div class="emoji-row" id="emojiRow">
+      <button class="emoji-btn" id="btnEmoji0" onclick="antwortenEmoji(0)">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+        <span class="emoji-gross" id="emoji0"></span>
+        <span class="emoji-label" id="label0"></span>
+      </button>
+      <button class="emoji-btn" id="btnEmoji1" onclick="antwortenEmoji(1)">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+        <span class="emoji-gross" id="emoji1"></span>
+        <span class="emoji-label" id="label1"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Screen 3: Aufgabe E3 (Wort einsetzen) -->
+  <div id="screenWort" style="display:none;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:700px;">
+    <div class="en-karte">
+      <div class="en-text" id="wortText"></div>
+      <button class="play-btn" id="btnPlayWort">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70" style="width:40px;height:40px;position:relative;top:0;left:0;transform:none;">
+          <circle cx="35" cy="35" r="30"/>
+        </svg>
+        🔊 Nochmal hören
+      </button>
+    </div>
+    <div class="infoLine" id="infoLineWort"></div>
+    <div class="wort-row" id="wortRow">
+      <button class="wort-btn" id="btnW0" onclick="antwortenWort('A')">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+        <span id="wortA"></span>
+      </button>
+      <button class="wort-btn" id="btnW1" onclick="antwortenWort('B')">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+        <span id="wortB"></span>
+      </button>
+      <button class="wort-btn" id="btnW2" onclick="antwortenWort('C')">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+        <span id="wortC"></span>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Zurueck-Button unten (immer sichtbar ausser im Abschluss) -->
+<div class="zurueck-leiste" id="zurueckLeiste">
+  <a class="zurueckBtn" href="../../lernen.html" id="btnZurueck">
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70" style="width:50px;height:50px;">
+      <circle cx="35" cy="35" r="30" style="stroke:#8b5cf6;"/>
+    </svg>
+    ← Zurueck zum Lernen
+  </a>
+</div>
+
+<!-- Abschluss -->
+<div class="abschluss" id="abschlussScreen">
+  <div class="abschluss-emoji" id="abschlussEmoji">🌟</div>
+  <div class="abschluss-titel" id="abschlussTitel">Super!</div>
+  <div class="abschluss-score" id="abschlussScore"></div>
+  <div class="abschluss-sub" id="abschlussSub"></div>
+  <a class="abschluss-btn" href="../../lernen.html" id="btnAbschluss">← Zurueck</a>
+</div>
+
+<script src="../../core/dwell.js"></script>
+<script src="../../core/error_handler.js"></script>
+<script src="./englisch_data.js"></script>
+<script>
+"use strict";
+
+// ── Daten laden ───────────────────────────────────────────────────────────────
+var alleAufgaben = [];
+(function(){
+  var api = window.LaetitiaDataRegistryApi;
+  if(api && typeof api.get === "function") alleAufgaben = api.get("englisch") || [];
+  if(!alleAufgaben.length) alleAufgaben = window.LaetitiaEnglischAufgaben || [];
+})();
+
+var SESSION = 8;
+var session = [], index = 0, richtigCount = 0, beantwortet = false;
+var aktStufe = "";
+var dwellMs = parseInt(localStorage.getItem("laetitia_dwell_ms")) || 900;
+
+// ── TTS — englisch mit britischer/amerikanischer Stimme ───────────────────────
+function sprichEN(text, danach){
+  try{
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-GB";
+    var voices = speechSynthesis.getVoices();
+    // Bevorzuge Microsoft-Stimmen (Edge TTS) mit en-GB, dann en-US, dann beliebig en
+    var en = voices.find(function(v){ return v.name.indexOf("Microsoft") >= 0 && v.lang === "en-GB"; })
+          || voices.find(function(v){ return v.name.indexOf("Microsoft") >= 0 && v.lang.startsWith("en-"); })
+          || voices.find(function(v){ return v.lang === "en-GB"; })
+          || voices.find(function(v){ return v.lang.startsWith("en-"); });
+    if(en) u.voice = en;
+    u.rate = 0.82;
+    if(window.LaetitiaSprich){
+      window.LaetitiaSprich.wrap(u, danach);
+    } else {
+      if(danach) u.onend = function(){ setTimeout(danach, 200); };
+      speechSynthesis.speak(u);
+    }
+  }catch(e){ if(danach) setTimeout(danach, 300); }
+}
+
+function sprichDE(text){
+  try{
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = "de-DE";
+    var voices = speechSynthesis.getVoices();
+    var de = voices.find(function(v){ return v.lang.startsWith("de"); });
+    if(de) u.voice = de;
+    u.rate = 0.90;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+function sprichMitOnend_DE(text, danach){
+  try{
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = "de-DE"; u.rate = 0.90;
+    var voices = speechSynthesis.getVoices();
+    var de = voices.find(function(v){ return v.name.indexOf("Microsoft") >= 0 && v.lang.startsWith("de"); })
+          || voices.find(function(v){ return v.lang.startsWith("de"); });
+    if(de) u.voice = de;
+    if(window.LaetitiaSprich){
+      window.LaetitiaSprich.wrap(u, danach);
+    } else {
+      if(danach) u.onend = function(){ setTimeout(danach, 200); };
+      speechSynthesis.speak(u);
+    }
+  }catch(e){ if(danach) setTimeout(danach, 300); }
+}
+
+// ── Screen-Steuerung ──────────────────────────────────────────────────────────
+function zeigeScreen(id){
+  ["screenStufen","screenEmoji","screenWort"].forEach(function(s){
+    var el = document.getElementById(s);
+    if(el) el.style.display = (s===id) ? "flex" : "none";
+  });
+}
+
+// ── Stufen-Auswahl ────────────────────────────────────────────────────────────
+var STUFEN_META = {
+  "E1":{ emoji:"🔤", label:"Stufe 1", sub:"Wörter hören", farbe:"var(--akzent)" },
+  "E2":{ emoji:"🗣️", label:"Stufe 2", sub:"Sätze verstehen", farbe:"var(--en)" },
+  "E3":{ emoji:"✍️", label:"Stufe 3", sub:"Sätze bauen", farbe:"var(--akzent2)" }
+};
+
+function aufbauenStufenAuswahl(){
+  var grid = document.getElementById("stufenGrid");
+  grid.innerHTML = "";
+  ["E1","E2","E3"].forEach(function(code){
+    var meta = STUFEN_META[code];
+    var count = alleAufgaben.filter(function(t){ return t.stufe===code; }).length;
+    var btn = document.createElement("div");
+    btn.className = "stufe-btn";
+    btn.innerHTML =
+      '<svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>'+
+      '<div class="stufe-emoji">'+meta.emoji+'</div>'+
+      '<div class="stufe-label">'+meta.label+'</div>'+
+      '<div class="stufe-sub">'+meta.sub+'</div>'+
+      '<div class="stufe-count">'+count+' Aufgaben</div>';
+    btn.addEventListener("click", function(){ starteStufe(code); });
+    bindDwellEinzel(btn);
+    grid.appendChild(btn);
+  });
+  zeigeScreen("screenStufen");
+  document.getElementById("fortschrittText").textContent = "";
+}
+
+// ── Stufe starten ─────────────────────────────────────────────────────────────
+function mischen(arr){ var a=arr.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+
+function starteStufe(code){
+  aktStufe = code;
+  var gefiltert = alleAufgaben.filter(function(t){ return t.stufe===code; });
+  session = mischen(gefiltert).slice(0, SESSION);
+  index = 0; richtigCount = 0;
+  document.getElementById("fortschrittText").textContent = STUFEN_META[code].label;
+  zeigeAufgabe();
+}
+
+// ── Aufgabe anzeigen ──────────────────────────────────────────────────────────
+function zeigeAufgabe(){
+  if(index >= session.length){ zeigeAbschluss(); return; }
+  var t = session[index];
+  beantwortet = false;
+
+  document.getElementById("progressFill").style.width = Math.round((index/session.length)*100)+"%";
+
+  if(t.stufe === "E1" || t.stufe === "E2"){
+    zeigeEmojiAufgabe(t);
+  } else {
+    zeigeWortAufgabe(t);
+  }
+}
+
+// ── E1/E2: Emoji-Paar ─────────────────────────────────────────────────────────
+function zeigeEmojiAufgabe(t){
+  document.getElementById("enText").textContent = t.text;
+  document.getElementById("enAufgabe").textContent = t.stufe==="E1"
+    ? "Welches Bild passt?"
+    : "Was passiert hier?";
+
+  // Zufaellig tauschen
+  var richtigLinks = Math.random() > 0.5;
+  var slots = richtigLinks
+    ? [{ emoji:t.emoji_richtig, label:t.label_richtig, korrekt:true  },
+       { emoji:t.emoji_falsch,  label:t.label_falsch,  korrekt:false }]
+    : [{ emoji:t.emoji_falsch,  label:t.label_falsch,  korrekt:false },
+       { emoji:t.emoji_richtig, label:t.label_richtig, korrekt:true  }];
+
+  for(var i=0;i<2;i++){
+    document.getElementById("emoji"+i).textContent   = slots[i].emoji;
+    document.getElementById("label"+i).textContent   = slots[i].label;
+    document.getElementById("btnEmoji"+i).dataset.korrekt = slots[i].korrekt ? "1" : "0";
+    var b = document.getElementById("btnEmoji"+i);
+    b.classList.remove("is-disabled","correct-flash","falsch-gewaehlt");
+    delete b.dataset.pdwell;
+    bindDwellEinzel(b);
+  }
+
+  setInfoLine("infoLineEmoji","","");
+  document.getElementById("btnPlay").dataset.tts = t.tts_en;
+  delete document.getElementById("btnPlay").dataset.pdwell;
+  bindDwellEinzel(document.getElementById("btnPlay"));
+  delete document.getElementById("btnZurueck").dataset.pdwell;
+  bindDwellEinzel(document.getElementById("btnZurueck"));
+
+  zeigeScreen("screenEmoji");
+  setTimeout(function(){ sprichEN(t.tts_en); }, 400);
+}
+
+function antwortenEmoji(idx){
+  if(beantwortet) return;
+  beantwortet = true;
+  var t = session[index];
+  var korrekt = document.getElementById("btnEmoji"+idx).dataset.korrekt === "1";
+
+  document.getElementById("btnEmoji0").classList.add("is-disabled");
+  document.getElementById("btnEmoji1").classList.add("is-disabled");
+
+  if(korrekt){
+    richtigCount++;
+    document.getElementById("btnEmoji"+idx).classList.add("correct-flash");
+    setInfoLine("infoLineEmoji","✓ Correct! — "+t.erklaerung_de,"richtig");
+    sprichEN("Correct! Well done!", function(){ sprichMitOnend_DE(t.erklaerung_de, function(){ setTimeout(function(){ index++; zeigeAufgabe(); }, 600); }); });
+  } else {
+    document.getElementById("btnEmoji"+idx).classList.add("falsch-gewaehlt");
+    // Richtigen Button finden und flashen
+    var richtigIdx = document.getElementById("btnEmoji0").dataset.korrekt==="1" ? 0 : 1;
+    document.getElementById("btnEmoji"+richtigIdx).classList.add("correct-flash");
+    setInfoLine("infoLineEmoji","✗ Das war: "+t.emoji_richtig+" "+t.label_richtig+" — "+t.erklaerung_de,"falsch");
+    sprichEN("Not quite. The answer is: "+t.label_richtig+". "+t.erklaerung_de, function(){ setTimeout(function(){ index++; zeigeAufgabe(); }, 600); });
+  }
+}
+
+// ── E3: Wort einsetzen ────────────────────────────────────────────────────────
+function zeigeWortAufgabe(t){
+  document.getElementById("wortText").textContent = t.text;
+  document.getElementById("wortA").textContent = t.antwort_a;
+  document.getElementById("wortB").textContent = t.antwort_b;
+  document.getElementById("wortC").textContent = t.antwort_c;
+
+  ["btnW0","btnW1","btnW2"].forEach(function(id){
+    var b=document.getElementById(id);
+    b.classList.remove("is-disabled","correct-flash","falsch-gewaehlt");
+    delete b.dataset.pdwell;
+    bindDwellEinzel(b);
+  });
+
+  setInfoLine("infoLineWort","","");
+  document.getElementById("btnPlayWort").dataset.tts = t.tts_en;
+  delete document.getElementById("btnPlayWort").dataset.pdwell;
+  bindDwellEinzel(document.getElementById("btnPlayWort"));
+  delete document.getElementById("btnZurueck").dataset.pdwell;
+  bindDwellEinzel(document.getElementById("btnZurueck"));
+
+  zeigeScreen("screenWort");
+  setTimeout(function(){ sprichEN(t.tts_en); }, 400);
+}
+
+function antwortenWort(buchstabe){
+  if(beantwortet) return;
+  beantwortet = true;
+  var t = session[index];
+  var korrekt = buchstabe === t.richtig;
+  var btnMap = {A:"btnW0", B:"btnW1", C:"btnW2"};
+
+  ["btnW0","btnW1","btnW2"].forEach(function(id){ document.getElementById(id).classList.add("is-disabled"); });
+
+  if(korrekt){
+    richtigCount++;
+    document.getElementById(btnMap[buchstabe]).classList.add("correct-flash");
+    setInfoLine("infoLineWort","✓ Correct! — "+t.erklaerung_de,"richtig");
+    sprichEN(t.tts_komplett, function(){ sprichDE(t.erklaerung_de); });
+  } else {
+    document.getElementById(btnMap[buchstabe]).classList.add("falsch-gewaehlt");
+    document.getElementById(btnMap[t.richtig]).classList.add("correct-flash");
+    var richtigAntwort = t["antwort_"+t.richtig.toLowerCase()];
+    setInfoLine("infoLineWort","✗ Richtig wäre: "+richtigAntwort+" — "+t.erklaerung_de,"falsch");
+    sprichEN(t.tts_komplett, function(){ sprichMitOnend_DE(t.erklaerung_de, function(){ setTimeout(function(){ index++; zeigeAufgabe(); }, 600); }); });
+  }
+}
+
+// ── Feedback-Helfer ───────────────────────────────────────────────────────────
+function setInfoLine(id, text, art){
+  var el = document.getElementById(id);
+  if(!el) return;
+  el.className = "infoLine"+(art?" "+art:"");
+  el.textContent = text||"";
+  el.style.display = text?"":"none";
+}
+
+// ── Abschluss ─────────────────────────────────────────────────────────────────
+function zeigeAbschluss(){
+  document.getElementById("mainBereich").style.display="none";
+  document.getElementById("zurueckLeiste").style.display="none";
+  var sc=document.getElementById("abschlussScreen"); sc.classList.add("sichtbar");
+  var pct=Math.round((richtigCount/session.length)*100);
+  document.getElementById("abschlussScore").textContent=richtigCount+" von "+session.length+" richtig";
+  var e,ti,su;
+  if(pct>=80){e="🌟";ti="Amazing!";su="Du lernst Englisch super schnell!";}
+  else if(pct>=60){e="😊";ti="Good job!";su="Immer besser! Keep going!";}
+  else{e="💪";ti="Keep trying!";su="Jede Übung macht dich besser!";}
+  document.getElementById("abschlussEmoji").textContent=e;
+  document.getElementById("abschlussTitel").textContent=ti;
+  document.getElementById("abschlussSub").textContent=su;
+  sprichEN(ti+" "+richtigCount+" out of "+session.length+" correct.");
+  delete document.getElementById("btnAbschluss").dataset.pdwell;
+  bindDwellEinzel(document.getElementById("btnAbschluss"));
+  document.getElementById("progressFill").style.width="100%";
+}
+
+// ── Play-Buttons ──────────────────────────────────────────────────────────────
+document.getElementById("btnPlay").addEventListener("click", function(){
+  var tts = this.dataset.tts;
+  if(tts) sprichEN(tts);
+});
+document.getElementById("btnPlayWort").addEventListener("click", function(){
+  var tts = this.dataset.tts;
+  if(tts) sprichEN(tts);
+});
+
+// ── Dwell ─────────────────────────────────────────────────────────────────────
+var _attachDwell = window.LaetitiaAttachDwell || function(){ return {cancelDwell:function(){}}; };
+var dwellMs    = parseInt(localStorage.getItem("laetitia_dwell_ms"))    || 900;
+var leaveGrace = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
+var _dwellHandle = { cancelDwell: function(){} };
+
+var DWELL_SELECTOR = [
+  ".stufe-btn", ".emoji-btn", ".wort-btn",
+  ".play-btn", "#btnZurueck", "#btnAbschluss", "a.zurueckBtn"
+].join(", ");
+
+function rebindDwell(){
+  if(_dwellHandle && typeof _dwellHandle.cancelDwell === "function") _dwellHandle.cancelDwell();
+  _dwellHandle = _attachDwell(DWELL_SELECTOR, {
+    dwellMs: dwellMs, leaveGrace: leaveGrace,
+    onActivate: function(el){
+      if(el.getAttribute("aria-disabled") === "true") return;
+      if(el.classList.contains("is-disabled")) return;
+      try{ el.click(); }catch(e){}
+    }
+  });
+}
+
+// bindDwellEinzel als Alias fuer Kompatibilitaet mit bestehendem Code
+function bindDwellEinzel(el){ rebindDwell(); }
+
+try{ localStorage.setItem("laetitia_return_url_v1", new URL("../../lernen.html", window.location.href).href); }catch(e){}
+rebindDwell();
+
+aufbauenStufenAuswahl();
+</script>
+</body>
+</html>

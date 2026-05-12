@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia - Reimen</title>
+<style>
+:root{
+  --bg:#fff8f0; --panel:#ffffff;
+  --border:rgba(15,23,42,.14); --shadow:0 10px 26px rgba(15,23,42,.08);
+  --text:#0f172a; --muted:rgba(15,23,42,.60);
+  --akzent:#e85d04; --akzent2:#dc2f02;
+  --akzent-bg:rgba(232,93,4,0.09); --radius:20px;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg); color:var(--text);
+  height:100vh; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+}
+.app{ width:min(860px,96vw); display:flex; flex-direction:column; gap:14px; padding:16px; }
+
+/* ── Header ── */
+.header{
+  background:var(--panel); border:2px solid var(--akzent);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:20px 24px; text-align:center;
+}
+.header-emoji{ font-size:52px; margin-bottom:6px; }
+.header-titel{ font-size:clamp(26px,5vw,40px); font-weight:1000; color:var(--akzent); margin:0 0 6px; }
+.header-sub{ font-size:clamp(15px,2.5vw,20px); font-weight:800; color:var(--muted); }
+
+/* ── Modus-Grid ── */
+.modus-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+
+a.modBtn{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:10px; min-height:130px; padding:18px 14px;
+  background:var(--panel); border:2px solid var(--border);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  text-decoration:none; color:var(--text); font-weight:1000;
+  user-select:none; cursor:pointer; position:relative; transition:none;
+}
+a.modBtn:hover, a.modBtn:focus{
+  transform:scale(1.03); outline:4px solid var(--akzent);
+  background:var(--akzent-bg);
+}
+.mod-emoji{ font-size:40px; }
+.mod-label{ font-size:17px; font-weight:1000; color:var(--akzent); text-align:center; }
+.mod-sub{ font-size:13px; font-weight:800; color:var(--muted); text-align:center; }
+.mod-count{ font-size:12px; font-weight:1000; padding:3px 10px; border-radius:999px;
+  background:var(--akzent-bg); border:1px solid rgba(232,93,4,.25); color:var(--akzent); }
+
+/* ── Zurueck ── */
+.zurueck-wrap{ display:flex; }
+a.zurueckBtn{
+  display:flex; align-items:center; justify-content:center;
+  min-height:70px; font-size:18px; font-weight:1000;
+  border-radius:16px; border:2px solid #8b5cf6;
+  background:#ede9fe; color:#4c1d95;
+  text-decoration:none; cursor:pointer; user-select:none;
+  position:relative; transition:none; width:100%;
+}
+a.zurueckBtn:hover, a.zurueckBtn:focus{ background:#ddd6fe; outline:4px solid #8b5cf6; }
+
+/* ── Dwell-Ring ── */
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  pointer-events:none; z-index:10; width:70px; height:70px;
+}
+.dwell-ring-svg circle{
+  fill:none; stroke:var(--akzent); stroke-width:5;
+  stroke-dasharray:220; stroke-dashoffset:220;
+  transform:rotate(-90deg); transform-origin:35px 35px;
+}
+.dwell-ring-svg circle.animating{ animation:dwellRing var(--dwell-duration,.9s) linear forwards; }
+.dwell-active{
+  transform:scale(1.06) !important; outline:4px solid var(--akzent) !important;
+  box-shadow:0 0 0 5px rgba(0,0,0,0.12) !important; transition:none !important;
+}
+a.zurueckBtn.dwell-active{ outline-color:#8b5cf6 !important; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="header-emoji">🎵</div>
+    <div class="header-titel">Reimen</div>
+    <div class="header-sub">Woerter klingen — Reime springen!</div>
+  </div>
+
+  <div class="modus-grid">
+
+    <a class="modBtn" href="./reim_spielen.html?modus=R1" id="btnR1">
+      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+      <span class="mod-emoji">🔍</span>
+      <span class="mod-label">Reimpaar finden</span>
+      <span class="mod-sub">Welches Wort reimt sich?</span>
+      <span class="mod-count">15 Aufgaben</span>
+    </a>
+
+    <a class="modBtn" href="./reim_spielen.html?modus=R2" id="btnR2">
+      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+      <span class="mod-emoji">📜</span>
+      <span class="mod-label">Gedicht vollenden</span>
+      <span class="mod-sub">Welches Wort fehlt am Ende?</span>
+      <span class="mod-count">9 Aufgaben</span>
+    </a>
+
+    <a class="modBtn" href="./reim_spielen.html?modus=R3" id="btnR3">
+      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+      <span class="mod-emoji">🤔</span>
+      <span class="mod-label">Reim oder kein Reim?</span>
+      <span class="mod-sub">Ja oder Nein — reimt sich das?</span>
+      <span class="mod-count">16 Aufgaben</span>
+    </a>
+
+    <a class="modBtn" href="./reim_spielen.html?modus=R4" id="btnR4">
+      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+      <span class="mod-emoji">✏️</span>
+      <span class="mod-label">Meinen Reim bauen</span>
+      <span class="mod-sub">Ich waehle das Reimwort!</span>
+      <span class="mod-count">7 Aufgaben</span>
+    </a>
+
+  </div>
+
+  <div class="zurueck-wrap">
+    <a class="zurueckBtn" href="../../lernen.html" id="btnZurueck">
+      <svg class="dwell-ring-svg" viewBox="0 0 70 70" style="width:50px;height:50px;">
+        <circle cx="35" cy="35" r="30" style="stroke:#8b5cf6;"/>
+      </svg>
+      ← Zurueck zum Lernen
+    </a>
+  </div>
+
+</div>
+<script src="../../core/dwell.js"></script>
+<script>
+// Return-URL setzen
+try{
+  localStorage.setItem("laetitia_return_url_v1", new URL("./modules/reim/reim.html", window.location.href).href);
+}catch(e){}
+
+var attachDwell = window.LaetitiaAttachDwell || function(){ return {cancelDwell:function(){}}; };
+var dwellMs    = parseInt(localStorage.getItem("laetitia_dwell_ms"))    || 900;
+var leaveGrace = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
+
+attachDwell("a.modBtn, #btnZurueck", {
+  dwellMs: dwellMs, leaveGrace: leaveGrace,
+  onActivate: function(el){
+    if(el.getAttribute("aria-disabled") === "true") return;
+    if(el.classList.contains("is-disabled")) return;
+    try{ el.click(); }catch(e){}
+  }
+});
+</script>
+</body>
+</html>

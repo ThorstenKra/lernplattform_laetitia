@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Kleckse</title>
+<style>
+:root{
+  --bg:#f6f7fb; --panel:#fff;
+  --border:rgba(15,23,42,.14); --shadow:0 4px 16px rgba(15,23,42,.08);
+  --text:#0f172a; --muted:rgba(15,23,42,.60);
+  --pink:#ec4899; --pink2:#db2777;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{ font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); height:100vh; overflow:hidden; display:flex; flex-direction:column; }
+.topBar{ flex:0 0 auto; background:var(--panel); border-bottom:1px solid var(--border); padding:8px 12px; display:flex; align-items:center; gap:8px; box-shadow:var(--shadow); }
+.topTitel{ font-size:18px; font-weight:1000; color:var(--pink); flex:1; }
+a.topBtn{ display:flex; align-items:center; justify-content:center; min-height:52px; padding:6px 14px; font-size:14px; font-weight:1000; border-radius:12px; border:1px solid var(--border); background:rgba(15,23,42,.06); color:var(--text); text-decoration:none; cursor:pointer; user-select:none; position:relative; transition:none; white-space:nowrap; }
+a.topBtn:hover, a.topBtn:focus{ background:rgba(15,23,42,.14); outline:3px solid var(--pink); transition:none; }
+a.topBtn.pink{ background:var(--pink); color:#fff; border-color:transparent; }
+a.topBtn.pink:hover, a.topBtn.pink:focus{ background:var(--pink2); }
+a.topBtn.lila{ background:#ede9fe; color:#4c1d95; border:2px solid #8b5cf6; }
+a.topBtn.lila:hover, a.topBtn.lila:focus{ background:#ddd6fe; outline:3px solid #8b5cf6; }
+a.topBtn.aktiv{ background:var(--pink); color:#fff; border-color:transparent; }
+
+.main{ flex:1; display:grid; grid-template-columns:80px 1fr 130px; gap:0; min-height:0; overflow:hidden; }
+
+/* Linke Spalte: Pinsel-Größen */
+.linksPanel{ background:var(--panel); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:6px; gap:4px; overflow:hidden; }
+.panelLabel{ font-size:10px; font-weight:900; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; text-align:center; flex:0 0 auto; margin-bottom:2px; }
+a.groesseBtn{ display:flex; align-items:center; justify-content:center; flex:1; border-radius:10px; border:2px solid var(--border); background:rgba(15,23,42,.04); color:var(--text); text-decoration:none; cursor:pointer; user-select:none; position:relative; transition:none; }
+a.groesseBtn:hover, a.groesseBtn:focus{ background:rgba(236,72,153,0.10); outline:3px solid var(--pink); transition:none; }
+a.groesseBtn.aktiv{ background:rgba(236,72,153,0.18); border-color:var(--pink); }
+.pinselDot{ border-radius:50%; background:var(--pink); pointer-events:none; }
+
+/* Mitte: Leinwand als SVG */
+.leinwandWrap{ display:flex; align-items:center; justify-content:center; background:#fff; overflow:hidden; position:relative; }
+#leinwand{ border:1px solid #e5e7eb; border-radius:8px; cursor:crosshair; }
+
+/* Klecks-Zellen (unsichtbares Hover-Raster) */
+.zellenGrid{ position:absolute; display:grid; pointer-events:none; }
+a.zelle{ display:block; background:transparent; cursor:pointer; user-select:none; position:relative; transition:none; border-radius:50%; pointer-events:all; }
+a.zelle:hover{ background:rgba(236,72,153,0.08); }
+
+/* Rechte Spalte: Farben */
+.rechtsPanel{ background:var(--panel); border-left:1px solid var(--border); display:flex; flex-direction:column; padding:6px 4px; gap:4px; overflow:hidden; }
+.farbGrid{ flex:1; display:grid; grid-template-columns:1fr 1fr; gap:3px; align-content:start; overflow:hidden; }
+a.farbBtn{ border-radius:10px; border:3px solid transparent; cursor:pointer; user-select:none; position:relative; transition:none; text-decoration:none; display:block; min-height:52px; }
+a.farbBtn:hover, a.farbBtn:focus{ transform:scale(1.12); outline:3px solid var(--text); transition:none; z-index:2; }
+a.farbBtn.gewaehlt{ border:3px solid var(--text); transform:scale(1.10); box-shadow:0 0 0 2px rgba(0,0,0,0.25); }
+a.radierer{ display:flex; align-items:center; justify-content:center; min-height:38px; border-radius:8px; border:2px solid var(--border); background:rgba(15,23,42,.06); color:var(--text); text-decoration:none; cursor:pointer; user-select:none; position:relative; font-size:16px; flex:0 0 auto; transition:none; }
+a.radierer:hover, a.radierer:focus{ background:rgba(15,23,42,.14); outline:3px solid var(--pink); transition:none; }
+a.radierer.aktiv{ background:#fca5a5; border-color:#ef4444; }
+
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none; z-index:10; width:50px; height:50px; }
+.dwell-ring-svg circle{ fill:none; stroke:var(--pink); stroke-width:5; stroke-dasharray:220; stroke-dashoffset:220; transform:rotate(-90deg); transform-origin:25px 25px; }
+.dwell-ring-svg circle.animating{ animation:dwellRing var(--dwell-duration,0.8s) linear forwards; }
+.dwell-active{ background:rgba(236,72,153,0.20) !important; outline:2px solid var(--pink) !important; transition:none !important; }
+a.farbBtn.dwell-active{ transform:scale(1.18) !important; filter:none !important; }
+
+  /* Zurück-Button unten mittig */
+  .zurueckLeiste{
+    flex:0 0 auto; padding:8px 12px;
+    background:var(--panel, #fff); border-top:1px solid var(--border, rgba(15,23,42,.14));
+  }
+  a.zurueckBtn{
+    display:flex; align-items:center; justify-content:center;
+    min-height:78px; font-size:18px; font-weight:1000; width:100%;
+    border-radius:16px; border:2px solid #8b5cf6;
+    background:#ede9fe; color:#4c1d95;
+    text-decoration:none; cursor:pointer; user-select:none;
+    position:relative; transition:none;
+  }
+  a.zurueckBtn:hover, a.zurueckBtn:focus{
+    background:#ddd6fe; outline:4px solid #8b5cf6; transition:none;
+  }
+
+</style>
+</head>
+<body>
+<div class="topBar">
+  <div class="topTitel" id="topTitelText">🖌️ Kleckse</div>
+  <a class="topBtn" href="#" id="btnUndo">↩</a>
+  <a class="topBtn" href="#" id="btnReset">🗑</a>
+  <a class="topBtn pink" href="#" id="btnSpeichern">💾</a>
+  
+</div>
+<div class="main">
+  <div class="linksPanel">
+    <div class="panelLabel">Größe</div>
+    <a class="groesseBtn" href="#" data-groesse="8"><div class="pinselDot" style="width:8px;height:8px;"></div></a>
+    <a class="groesseBtn" href="#" data-groesse="14"><div class="pinselDot" style="width:14px;height:14px;"></div></a>
+    <a class="groesseBtn aktiv" href="#" data-groesse="22"><div class="pinselDot" style="width:22px;height:22px;"></div></a>
+    <a class="groesseBtn" href="#" data-groesse="32"><div class="pinselDot" style="width:32px;height:32px;"></div></a>
+    <a class="groesseBtn" href="#" data-groesse="46"><div class="pinselDot" style="width:46px;height:46px;"></div></a>
+  </div>
+  <div class="leinwandWrap" id="leinwandWrap">
+    <svg id="leinwand" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="zellenGrid" id="zellenGrid"></div>
+  </div>
+  <div class="rechtsPanel">
+    <div class="panelLabel">🎨</div>
+    <a class="radierer" href="#" id="btnRadierer">⬜</a>
+    <div class="farbGrid" id="farbGrid"></div>
+  </div>
+</div>
+<script src="../../core/dwell.js"></script>
+<script src="../../core/error_handler.js"></script>
+<script>
+(function(){
+"use strict";
+var FARBEN=["#1a1a2e","#ef4444","#f97316","#fbbf24","#22c55e","#3b82f6","#8b5cf6","#ec4899","#06b6d4","#86efac","#fde68a","#ffffff","#92400e","#6b7280","#fca5a5","#93c5fd","#bbf7d0","#ddd6fe"];
+var ZELLENGROESSE = 40; // px pro Hover-Zelle
+var state={ farbe:"#ec4899", groesse:22, radierer:false, kleckse:[], leinwandSize:400 };
+
+function zeigeStatus(msg){ var el=document.getElementById("topTitelText"); if(el){el.textContent=msg;setTimeout(function(){el.textContent="🖌️ Kleckse";},2000);} }
+
+function baueLeinwand(){
+  var wrap=document.getElementById("leinwandWrap");
+  var size=Math.min(wrap.clientWidth-16, wrap.clientHeight-16);
+  state.leinwandSize=size;
+  var svg=document.getElementById("leinwand");
+  svg.setAttribute("width",size); svg.setAttribute("height",size);
+  svg.setAttribute("viewBox","0 0 "+size+" "+size);
+  svg.style.background="#fff";
+
+  // Zellen-Grid aufbauen
+  var grid=document.getElementById("zellenGrid");
+  var lw=document.getElementById("leinwandWrap");
+  var svgRect={left:(lw.clientWidth-size)/2, top:(lw.clientHeight-size)/2, width:size, height:size};
+  grid.style.left=svgRect.left+"px"; grid.style.top=svgRect.top+"px";
+  grid.style.width=size+"px"; grid.style.height=size+"px";
+  var cols=Math.floor(size/ZELLENGROESSE);
+  var rows=Math.floor(size/ZELLENGROESSE);
+  grid.style.gridTemplateColumns="repeat("+cols+","+ZELLENGROESSE+"px)";
+  grid.style.gridTemplateRows="repeat("+rows+","+ZELLENGROESSE+"px)";
+  grid.innerHTML="";
+  for(var r=0;r<rows;r++){
+    for(var c=0;c<cols;c++){
+      var a=document.createElement("a");
+      a.href="#"; a.className="zelle";
+      a.style.width=ZELLENGROESSE+"px"; a.style.height=ZELLENGROESSE+"px";
+      var cx=(c+0.5)*ZELLENGROESSE; var cy=(r+0.5)*ZELLENGROESSE;
+      (function(x,y){ a.addEventListener("click",function(ev){ ev.preventDefault(); setzeKlecks(x,y); }); })(cx,cy);
+      grid.appendChild(a);
+    }
+  }
+  renderAlleKleckse();
+  rebindDwell();
+}
+
+function setzeKlecks(x,y){
+  if(state.radierer){
+    // Alle Kleckse entfernen die diesen Punkt treffen
+    state.kleckse=state.kleckse.filter(function(k){ return Math.hypot(k.x-x,k.y-y)>k.r*0.8; });
+  } else {
+    state.kleckse.push({x:x,y:y,r:state.groesse,f:state.farbe});
+  }
+  renderAlleKleckse();
+}
+
+function renderAlleKleckse(){
+  var svg=document.getElementById("leinwand");
+  svg.innerHTML="";
+  var bg=document.createElementNS("http://www.w3.org/2000/svg","rect");
+  bg.setAttribute("width",state.leinwandSize); bg.setAttribute("height",state.leinwandSize); bg.setAttribute("fill","#fff");
+  svg.appendChild(bg);
+  state.kleckse.forEach(function(k){
+    var c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("cx",k.x); c.setAttribute("cy",k.y); c.setAttribute("r",k.r);
+    c.setAttribute("fill",k.f); c.setAttribute("opacity","0.85");
+    svg.appendChild(c);
+  });
+}
+
+function baueFarben(){
+  var grid=document.getElementById("farbGrid");
+  FARBEN.forEach(function(farbe){
+    var a=document.createElement("a");
+    a.href="#"; a.className="farbBtn"+(farbe===state.farbe?" gewaehlt":"");
+    a.style.background=farbe;
+    if(farbe==="#ffffff")a.style.border="3px solid #ccc";
+    a.setAttribute("data-farbe",farbe);
+    a.addEventListener("click",function(ev){
+      ev.preventDefault(); state.farbe=farbe; state.radierer=false;
+      document.getElementById("btnRadierer").classList.remove("aktiv");
+      grid.querySelectorAll(".farbBtn").forEach(function(b){b.classList.toggle("gewaehlt",b.getAttribute("data-farbe")===farbe);});
+    });
+    grid.appendChild(a);
+  });
+}
+
+var _dh=null;
+function rebindDwell(){
+  var att=window.LaetitiaAttachDwell||function(){return{cancelDwell:function(){}};};
+  if(_dh)_dh.cancelDwell();
+  var ms=Math.min(parseInt(localStorage.getItem("laetitia_dwell_ms")) || 700, 700);
+  var lg=parseInt(localStorage.getItem("laetitia_leave_grace_ms"))||100;
+  _dh=att("a.zelle, a.farbBtn, a.groesseBtn, a.topBtn, a.radierer, #btnZurueck",{
+    dwellMs:ms, leaveGrace:lg, onActivate:function(el){try{el.click();}catch(e){}}
+  });
+}
+
+document.querySelectorAll(".groesseBtn").forEach(function(btn){
+  btn.addEventListener("click",function(ev){
+    ev.preventDefault(); state.groesse=parseInt(btn.getAttribute("data-groesse"));
+    document.querySelectorAll(".groesseBtn").forEach(function(b){b.classList.remove("aktiv");});
+    btn.classList.add("aktiv");
+  });
+});
+document.getElementById("btnRadierer").addEventListener("click",function(ev){
+  ev.preventDefault(); state.radierer=!state.radierer;
+  this.classList.toggle("aktiv",state.radierer);
+  if(state.radierer)document.querySelectorAll(".farbBtn").forEach(function(b){b.classList.remove("gewaehlt");});
+});
+document.getElementById("btnUndo").addEventListener("click",function(ev){
+  ev.preventDefault(); if(state.kleckse.length){state.kleckse.pop(); renderAlleKleckse();}
+});
+document.getElementById("btnReset").addEventListener("click",function(ev){
+  ev.preventDefault(); state.kleckse=[]; renderAlleKleckse();
+});
+document.getElementById("btnSpeichern").addEventListener("click",function(ev){
+  ev.preventDefault();
+  try{ localStorage.setItem("laetitia_kleckse",JSON.stringify(state.kleckse)); zeigeStatus("Gespeichert! ✅"); }catch(e){}
+});
+
+// Gespeichertes laden
+try{ var d=JSON.parse(localStorage.getItem("laetitia_kleckse")||"null"); if(d)state.kleckse=d; }catch(e){}
+
+baueFarben();
+baueLeinwand();
+})();
+</script>
+
+<div class="zurueckLeiste"><a class="zurueckBtn" href="./malen.html" id="btnZurueck">← Zurück</a></div>
+</body>
+</html>

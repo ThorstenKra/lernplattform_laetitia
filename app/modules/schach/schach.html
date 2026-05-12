@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Schach lernen</title>
+<style>
+:root{
+  --bg:#f6f7fb;
+  --panel:#ffffff;
+  --border:rgba(15,23,42,.14);
+  --shadow:0 10px 26px rgba(15,23,42,.08);
+  --text:#0f172a;
+  --muted:rgba(15,23,42,.65);
+  --green:#1db954;
+  --green2:#18a84c;
+  --gold:#f59e0b;
+  --radius:18px;
+}
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg); color:var(--text);
+  height:100vh; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+
+.app{
+  width:min(900px,96vw); margin:0 auto;
+  flex:1; min-height:0;
+  display:flex; flex-direction:column; gap:14px; padding:16px;
+}
+
+/* Header */
+.greeting{
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:18px 22px; text-align:center;
+}
+.greeting-emoji{ font-size:48px; margin-bottom:6px; }
+.greeting-title{ font-size:clamp(24px,4vw,36px); font-weight:1000; margin:0 0 4px 0; }
+.greeting-sub{ font-size:clamp(15px,2.5vw,20px); font-weight:800; color:var(--muted); margin:0; }
+
+/* Fortschrittsbalken */
+.progressCard{
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:14px; box-shadow:var(--shadow);
+  padding:10px 14px; display:flex; align-items:center; gap:12px;
+}
+.progressLabel{ font-size:13px; font-weight:900; color:var(--muted); white-space:nowrap; }
+.progressBar{ flex:1; height:10px; border-radius:999px; background:rgba(15,23,42,.08); overflow:hidden; }
+.progressFill{ height:100%; background:var(--green); border-radius:999px; transition:width .4s ease; }
+.progressStars{ font-size:14px; font-weight:1000; color:var(--gold); white-space:nowrap; }
+
+/* Figuren-Grid */
+.figGrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(130px,1fr));
+  gap:12px;
+}
+
+a.figBtn{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:6px; min-height:110px; padding:14px 10px;
+  background:var(--panel); border:2px solid var(--border);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  text-decoration:none; color:var(--text); font-weight:1000;
+  user-select:none; -webkit-tap-highlight-color:transparent;
+  cursor:pointer; position:relative; transition:none;
+}
+a.figBtn:hover, a.figBtn:focus{
+  transform:scale(1.05);
+  outline:4px solid var(--green);
+  background:rgba(29,185,84,.08);
+  transition:none;
+}
+a.figBtn.locked{
+  pointer-events:none; opacity:0.45; cursor:default;
+}
+
+.fig-symbol{ font-size:38px; line-height:1; }
+.fig-name{ font-size:15px; font-weight:1000; text-align:center; }
+.fig-desc{ font-size:11px; font-weight:900; color:var(--muted); text-align:center; line-height:1.3; }
+
+/* Badges */
+.fig-badge{
+  position:absolute; top:8px; right:8px;
+  padding:4px 8px; border-radius:999px;
+  font-size:11px; font-weight:1000;
+  border:1px solid var(--border);
+}
+.fig-badge.ready  { background:rgba(29,185,84,.16);  border-color:rgba(29,185,84,.40);  color:#0b5c22; }
+.fig-badge.done   { background:rgba(245,158,11,.18); border-color:rgba(245,158,11,.45); color:#7a4a00; }
+.fig-badge.soon   { background:rgba(99,102,241,.12); border-color:rgba(99,102,241,.30); color:#2a2e86; }
+.fig-badge.locked { background:rgba(226,74,74,.12);  border-color:rgba(226,74,74,.30);  color:#7a1212; }
+
+/* Sterne unter Figur */
+.fig-stars{ font-size:13px; color:var(--gold); letter-spacing:1px; min-height:18px; }
+
+/* Statusleiste */
+.statusbar{
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:12px; box-shadow:var(--shadow);
+  padding:8px 14px; font-size:13px; font-weight:900; color:var(--muted);
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+}
+
+/* Dwell Ring */
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none; z-index:10; width:70px; height:70px;
+}
+.dwell-ring-svg circle{
+  fill:none; stroke:var(--green); stroke-width:5;
+  stroke-dasharray:220; stroke-dashoffset:220;
+  transform:rotate(-90deg); transform-origin:35px 35px;
+}
+.dwell-ring-svg circle.animating{
+  animation:dwellRing var(--dwell-duration,0.4s) linear forwards;
+}
+.dwell-active{
+  transform:scale(1.07) !important;
+  outline:4px solid var(--green) !important;
+  box-shadow:0 0 0 5px rgba(29,185,84,.45) !important;
+  transition:none !important;
+}
+
+/* Zurück-Leiste Goldstandard */
+.zurueck-leiste{ padding:8px 12px; flex-shrink:0; width:min(900px,96vw); margin:0 auto; }
+a.zurueckBtn{
+  display:flex; align-items:center; justify-content:center;
+  min-height:72px; font-size:20px; font-weight:1000;
+  border-radius:16px; border:2px solid #8b5cf6;
+  background:#ede9fe; color:#4c1d95;
+  text-decoration:none; cursor:pointer; user-select:none;
+  position:relative; transition:none; width:100%;
+}
+a.zurueckBtn:hover, a.zurueckBtn:focus{ background:#ddd6fe; outline:3px solid #8b5cf6; }
+a.zurueckBtn.dwell-active{ transform:scale(1.02) !important; outline:3px solid #8b5cf6 !important; }
+a.zurueckBtn .dwell-ring-svg circle{ stroke:#8b5cf6; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="greeting">
+    <div class="greeting-emoji">♟️</div>
+    <div class="greeting-title">Schach lernen</div>
+    <div class="greeting-sub">Lerne jede Figur Schritt für Schritt</div>
+  </div>
+
+  <div class="progressCard">
+    <span class="progressLabel">Fortschritt:</span>
+    <div class="progressBar"><div class="progressFill" id="progressFill" style="width:0%"></div></div>
+    <span class="progressStars" id="progressStars">⭐ 0</span>
+  </div>
+
+  <div class="figGrid" id="figGrid">
+
+    <!-- König — bereit -->
+    <a class="figBtn" id="btnKoenig" href="./koenig/koenig.html">
+      <div class="fig-symbol">♔</div>
+      <div class="fig-name">König</div>
+      <div class="fig-desc">Bewegen · Hindernisse · Gegner</div>
+      <div class="fig-stars" id="starsKoenig"></div>
+      <span class="fig-badge ready">bereit</span>
+    </a>
+
+    <!-- Turm — bereit -->
+    <a class="figBtn" id="btnTurm" href="./turm/turm.html">
+      <div class="fig-symbol">♖</div>
+      <div class="fig-name">Turm</div>
+      <div class="fig-desc">Geraden · Linien</div>
+      <div class="fig-stars" id="starsTurm"></div>
+      <span class="fig-badge ready">bereit</span>
+    </a>
+
+    <!-- Läufer — bereit -->
+    <a class="figBtn" id="btnLaeufer" href="./laeufer/laeufer.html">
+      <div class="fig-symbol">♗</div>
+      <div class="fig-name">Läufer</div>
+      <div class="fig-desc">Diagonalen</div>
+      <div class="fig-stars" id="starsLaeufer"></div>
+      <span class="fig-badge ready">bereit</span>
+    </a>
+
+    <!-- Springer — bereit -->
+    <a class="figBtn" id="btnSpringer" href="./springer/springer.html">
+      <div class="fig-symbol">♘</div>
+      <div class="fig-name">Springer</div>
+      <div class="fig-desc">L-Züge · Sprünge</div>
+      <div class="fig-stars" id="starsSpringer"></div>
+      <span class="fig-badge ready">bereit</span>
+    </a>
+
+    <!-- Dame — bereit -->
+    <a class="figBtn" id="btnDame" href="./dame/dame.html">
+      <div class="fig-symbol">♕</div>
+      <div class="fig-name">Dame</div>
+      <div class="fig-desc">Alles kombiniert</div>
+      <div class="fig-stars" id="starsDame"></div>
+      <span class="fig-badge ready">bereit</span>
+    </a>
+
+    <!-- Bauer — bereit -->
+    <a class="figBtn" id="btnBauer" href="./bauer/bauer.html">
+      <div class="fig-symbol">♙</div>
+      <div class="fig-name">Bauer</div>
+      <div class="fig-desc">Startdoppelzug · schräg schlagen</div>
+      <div class="fig-stars" id="starsBauer"></div>
+      <span class="fig-badge ready">bereit</span>
+    </a>
+
+  </div>
+
+  <div class="statusbar">
+    <span id="statustext">Fange mit dem König an!</span>
+  </div>
+
+</div>
+
+<div class="zurueck-leiste">
+  <a class="zurueckBtn" href="../../spielewelt.html" id="btnZurueck">
+    ← Zurück zur Spielewelt
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#8b5cf6"/></svg>
+  </a>
+</div>
+
+<script src="../../core/dwell.js"></script>
+<script src="../../core/error_handler.js"></script>
+<script>
+// dwell.js geladen als <script src>
+var attachDwell = window.LaetitiaAttachDwell || function(){ return {cancelDwell:function(){}}; };
+
+// ── Fortschritt aus König-Modul laden ─────────────────────────────────────
+function loadKoenigState(){
+  try{ const raw = localStorage.getItem("koenig_v2"); return raw ? JSON.parse(raw) : null; }catch{ return null; }
+}
+function loadTurmState(){
+  try{ const raw = localStorage.getItem("turm_v1"); return raw ? JSON.parse(raw) : null; }catch{ return null; }
+}
+function loadBauerState(){
+  try{ const raw = localStorage.getItem("bauer_v1"); return raw ? JSON.parse(raw) : null; }catch{ return null; }
+}
+function loadDameState(){
+  try{ const raw = localStorage.getItem("dame_v1"); return raw ? JSON.parse(raw) : null; }catch{ return null; }
+}
+function loadSpringerState(){
+  try{ const raw = localStorage.getItem("springer_v1"); return raw ? JSON.parse(raw) : null; }catch{ return null; }
+}
+function loadLaeuferState(){
+  try{ const raw = localStorage.getItem("laeufer_v1"); return raw ? JSON.parse(raw) : null; }catch{ return null; }
+}
+
+function updateProgress(){
+  const sk = loadKoenigState();
+  const st = loadTurmState();
+  const sl = loadLaeuferState();
+  const sb = loadBauerState();
+  const sd = loadDameState();
+  const ss = loadSpringerState();
+
+  const kStars     = sk ? (sk.stars||0) : 0;
+  const kCompleted = sk ? Object.keys(sk.completed||{}).length : 0;
+  const kTotal     = 14;
+  const tStars     = st ? (st.stars||0) : 0;
+  const tCompleted = st ? Object.keys(st.completed||{}).length : 0;
+  const tTotal     = 15;
+  const lStars     = sl ? (sl.stars||0) : 0;
+  const lCompleted = sl ? Object.keys(sl.completed||{}).length : 0;
+  const lTotal     = 15;
+  const bStars     = sb ? (sb.stars||0) : 0;
+  const bCompleted = sb ? Object.keys(sb.completed||{}).length : 0;
+  const bTotal     = 15;
+  const dStars     = sd ? (sd.stars||0) : 0;
+  const dCompleted = sd ? Object.keys(sd.completed||{}).length : 0;
+  const dTotal     = 15;
+  const sStars     = ss ? (ss.stars||0) : 0;
+  const sCompleted = ss ? Object.keys(ss.completed||{}).length : 0;
+  const sTotal     = 15;
+
+  // Gesamt-Sterne
+  document.getElementById("progressStars").textContent = "⭐ " + (kStars + tStars + lStars + sStars + dStars + bStars);
+
+  // Balken: König + Turm + Läufer je 1/6 des Gesamtbalkens
+  const pct = Math.round(
+    ((kCompleted/kTotal) + (tCompleted/tTotal) + (lCompleted/lTotal) + (sCompleted/sTotal) + (dCompleted/dTotal) + (bCompleted/bTotal)) * (100/6)
+  );
+  document.getElementById("progressFill").style.width = Math.min(pct, 100) + "%";
+
+  // König-Sterne
+  const skEl = document.getElementById("starsKoenig");
+  if(skEl){ skEl.textContent = "⭐".repeat(Math.min(kStars,3)) + "☆".repeat(Math.max(0,3-Math.min(kStars,3))); }
+  if(kCompleted >= kTotal){
+    const b = document.querySelector("#btnKoenig .fig-badge");
+    if(b){ b.textContent = "✓ fertig"; b.className = "fig-badge done"; }
+  }
+
+  // Turm-Sterne
+  const stEl = document.getElementById("starsTurm");
+  if(stEl){ stEl.textContent = "⭐".repeat(Math.min(tStars,3)) + "☆".repeat(Math.max(0,3-Math.min(tStars,3))); }
+  if(tCompleted >= tTotal){
+    const b = document.querySelector("#btnTurm .fig-badge");
+    if(b){ b.textContent = "✓ fertig"; b.className = "fig-badge done"; }
+  }
+
+  // Läufer-Sterne
+  const slEl = document.getElementById("starsLaeufer");
+  if(slEl){ slEl.textContent = "⭐".repeat(Math.min(lStars,3)) + "☆".repeat(Math.max(0,3-Math.min(lStars,3))); }
+  if(lCompleted >= lTotal){
+    const b = document.querySelector("#btnLaeufer .fig-badge");
+    if(b){ b.textContent = "✓ fertig"; b.className = "fig-badge done"; }
+  }
+
+  // Dame-Sterne
+  const sdEl = document.getElementById("starsDame");
+  if(sdEl){ sdEl.textContent = "⭐".repeat(Math.min(dStars,3)) + "☆".repeat(Math.max(0,3-Math.min(dStars,3))); }
+  if(dCompleted >= dTotal){
+    const b = document.querySelector("#btnDame .fig-badge");
+    if(b){ b.textContent = "✓ fertig"; b.className = "fig-badge done"; }
+  }
+
+  // Bauer-Sterne
+  const sbEl = document.getElementById("starsBauer");
+  if(sbEl){ sbEl.textContent = "⭐".repeat(Math.min(bStars,3)) + "☆".repeat(Math.max(0,3-Math.min(bStars,3))); }
+  if(bCompleted >= bTotal){
+    const b = document.querySelector("#btnBauer .fig-badge");
+    if(b){ b.textContent = "✓ fertig"; b.className = "fig-badge done"; }
+  }
+
+  // Springer-Sterne
+  const ssEl = document.getElementById("starsSpringer");
+  if(ssEl){ ssEl.textContent = "⭐".repeat(Math.min(sStars,3)) + "☆".repeat(Math.max(0,3-Math.min(sStars,3))); }
+  if(sCompleted >= sTotal){
+    const b = document.querySelector("#btnSpringer .fig-badge");
+    if(b){ b.textContent = "✓ fertig"; b.className = "fig-badge done"; }
+  }
+}
+
+updateProgress();
+
+// ── Return-URL für Untermodule setzen ────────────────────────────────────
+// König und Turm lesen laetitia_return_url_v1 um zurückzuspringen.
+// schach.html muss sich selbst als Ziel eintragen bevor ein Modul geöffnet wird.
+try{
+  var eigeneUrl = new URL(window.location.href).href;
+  localStorage.setItem("laetitia_return_url_v1", eigeneUrl);
+}catch(e){}
+
+// ── Dwell binden ──────────────────────────────────────────────────────────
+const dwellMs    = parseInt(localStorage.getItem("laetitia_dwell_ms"))       || 900;
+const leaveGrace = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
+
+// Direkt pointerenter binden (wie Eierjagd) — funktioniert auf Tobii Accent
+document.querySelectorAll("a.figBtn:not(.locked), #btnZurueck").forEach(function(el){
+  var timer = null;
+
+  function start(){
+    if(timer) return;
+    el.classList.add("dwell-active");
+    timer = setTimeout(function(){
+      timer = null;
+      try{ el.click(); }catch(e){}
+    }, dwellMs);
+  }
+  function stop(){
+    if(timer){ clearTimeout(timer); timer = null; }
+    el.classList.remove("dwell-active");
+  }
+
+  el.addEventListener("pointerenter", start);
+  el.addEventListener("pointerleave", stop);
+  el.addEventListener("click",        stop);
+  // Desktop-Fallback
+  el.addEventListener("mouseenter", start);
+  el.addEventListener("mouseleave", stop);
+});
+</script>
+
+</body>
+</html>

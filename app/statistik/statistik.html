@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Statistik</title>
+<style>
+  :root{
+    --bg:#f6f7fb;
+    --panel:#ffffff;
+    --border:rgba(15,23,42,.14);
+    --shadow:0 10px 26px rgba(15,23,42,.08);
+    --text:#0f172a;
+    --muted:rgba(15,23,42,.65);
+    --green:#1db954;
+    --green2:#18a84c;
+    --red:#e24a4a;
+    --ok:#1aa34a;
+    --warn:#e6a817;
+    --radius:18px;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    background:var(--bg); color:var(--text);
+    min-height:100vh; overflow-y:auto; padding:16px;
+  }
+
+  .app{ width:min(860px,98vw); margin:0 auto; display:flex; flex-direction:column; gap:14px; padding-bottom:24px; }
+
+  /* ── Header ── */
+  .header{
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:18px 22px; display:flex; align-items:center; gap:14px;
+  }
+  .header-emoji{ font-size:40px; }
+  .header-title{ font-size:clamp(20px,3vw,28px); font-weight:1000; }
+  .header-sub{ font-size:13px; font-weight:800; color:var(--muted); margin-top:2px; }
+  .header-back{
+    margin-left:auto; min-height:48px; padding:10px 20px;
+    border-radius:14px; border:1px solid var(--border);
+    background:rgba(15,23,42,.07); color:var(--text);
+    font-weight:1000; font-size:15px; cursor:pointer; white-space:nowrap;
+    text-decoration:none; display:inline-flex; align-items:center;
+  }
+  .header-back:hover{ background:rgba(15,23,42,.14); }
+
+  /* ── Modul-Tabs ── */
+  .tabs{
+    display:flex; gap:8px; flex-wrap:wrap;
+  }
+  .tab{
+    padding:10px 20px; border-radius:12px; border:2px solid var(--border);
+    background:var(--panel); font-size:15px; font-weight:1000;
+    cursor:pointer; transition:all .15s;
+  }
+  .tab:hover{ border-color:var(--green); }
+  .tab.active{
+    background:var(--green); border-color:var(--green);
+    color:#0b1b10;
+  }
+
+  /* ── Section ── */
+  .section{
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:18px 20px;
+  }
+  .section-title{
+    font-size:16px; font-weight:1000; margin-bottom:14px;
+    padding-bottom:8px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:8px;
+  }
+
+  /* ── Gesamtfortschritt-Balken ── */
+  .modul-row{
+    display:flex; align-items:center; gap:12px; margin-bottom:10px;
+  }
+  .modul-row:last-child{ margin-bottom:0; }
+  .modul-label{ font-size:14px; font-weight:1000; min-width:80px; }
+  .bar-track{
+    flex:1; height:22px; background:rgba(15,23,42,.08);
+    border-radius:999px; overflow:hidden; position:relative;
+  }
+  .bar-richtig{
+    height:100%; border-radius:999px;
+    background:var(--green); transition:width .4s;
+    display:flex; align-items:center; justify-content:flex-end; padding-right:6px;
+  }
+  .bar-label{
+    font-size:11px; font-weight:1000; color:#fff;
+    white-space:nowrap; text-shadow:0 1px 2px rgba(0,0,0,.3);
+  }
+  .modul-pct{
+    font-size:13px; font-weight:1000; min-width:42px; text-align:right;
+    color:var(--green);
+  }
+  .modul-sessions{
+    font-size:12px; font-weight:800; color:var(--muted); min-width:80px; text-align:right;
+  }
+
+  /* ── Schwache Aufgaben ── */
+  .aufgabe-row{
+    display:flex; align-items:flex-start; gap:10px;
+    padding:10px 0; border-bottom:1px solid rgba(15,23,42,.07);
+  }
+  .aufgabe-row:last-child{ border-bottom:none; }
+  .aufgabe-badge{
+    min-width:48px; height:32px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:1000; color:#fff; flex-shrink:0;
+  }
+  .aufgabe-badge.rot{ background:var(--red); }
+  .aufgabe-badge.warn{ background:var(--warn); }
+  .aufgabe-id{
+    font-size:13px; font-weight:900; color:var(--muted);
+    line-height:1.3; flex:1; word-break:break-word;
+  }
+  .aufgabe-id strong{ display:block; color:var(--text); font-size:14px; margin-bottom:2px; }
+  .aufgabe-meta{ font-size:12px; font-weight:800; color:var(--muted); white-space:nowrap; }
+
+  /* ── Hilfe-Wörter ── */
+  .wort-chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .wort-chip{
+    padding:6px 14px; border-radius:999px;
+    background:rgba(29,185,84,.12); border:1px solid rgba(29,185,84,.3);
+    font-size:14px; font-weight:1000; color:#0b5c22; display:flex; gap:6px; align-items:center;
+  }
+  .wort-chip .cnt{
+    background:var(--green); color:#fff;
+    border-radius:999px; font-size:11px;
+    padding:1px 7px; font-weight:1000;
+  }
+
+  /* ── Level-Empfehlungen ── */
+  .empfehlung-row{
+    display:flex; align-items:center; gap:10px;
+    padding:8px 0; border-bottom:1px solid rgba(15,23,42,.07);
+  }
+  .empfehlung-row:last-child{ border-bottom:none; }
+  .empf-badge{
+    background:rgba(29,185,84,.15); border:1px solid rgba(29,185,84,.35);
+    color:#0b5c22; border-radius:10px; padding:4px 12px;
+    font-size:13px; font-weight:1000;
+  }
+  .empf-text{ font-size:14px; font-weight:900; flex:1; }
+  .empf-sessions{ font-size:12px; font-weight:800; color:var(--muted); }
+
+  /* ── Muster-Warnung ── */
+  .muster-box{
+    border-radius:12px; padding:14px 16px;
+    display:flex; gap:12px; align-items:flex-start;
+  }
+  .muster-box.warn{
+    background:rgba(230,168,23,.12); border:1px solid rgba(230,168,23,.4);
+  }
+  .muster-box.ok{
+    background:rgba(29,185,84,.10); border:1px solid rgba(29,185,84,.3);
+  }
+  .muster-icon{ font-size:26px; flex-shrink:0; }
+  .muster-title{ font-size:15px; font-weight:1000; margin-bottom:4px; }
+  .muster-desc{ font-size:13px; font-weight:800; color:var(--muted); line-height:1.4; }
+
+  /* ── Leer-Zustand ── */
+  .empty{
+    text-align:center; padding:24px 16px;
+    color:var(--muted); font-size:14px; font-weight:900;
+  }
+  .empty .empty-icon{ font-size:36px; display:block; margin-bottom:8px; }
+
+  /* ── Statistik löschen ── */
+  .btn-danger{
+    padding:10px 22px; border-radius:12px;
+    border:1px solid rgba(226,74,74,.35);
+    background:rgba(226,74,74,.08); color:var(--red);
+    font-weight:1000; font-size:14px; cursor:pointer;
+  }
+  .btn-danger:hover{ background:rgba(226,74,74,.18); }
+  .feedback-ok{
+    display:none; padding:8px 14px; border-radius:10px;
+    background:rgba(29,185,84,.12); border:1px solid rgba(29,185,84,.3);
+    color:#0b5c22; font-size:13px; font-weight:900; margin-top:10px;
+  }
+  .feedback-ok.show{ display:block; }
+
+  /* ── Gesamt-Zahlen ── */
+  .kpi-row{ display:flex; gap:10px; flex-wrap:wrap; }
+  .kpi{
+    flex:1; min-width:120px; background:rgba(15,23,42,.04);
+    border:1px solid var(--border); border-radius:14px;
+    padding:12px 14px; text-align:center;
+  }
+  .kpi-val{ font-size:28px; font-weight:1000; color:var(--green); }
+  .kpi-lbl{ font-size:12px; font-weight:900; color:var(--muted); margin-top:2px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ── Header ── -->
+  <div class="header">
+    <div class="header-emoji">📊</div>
+    <div>
+      <div class="header-title">Lernstatistik</div>
+      <div class="header-sub" id="headerSub">Wird geladen…</div>
+    </div>
+    <a class="header-back" href="../einstellungen.html">← Zurück</a>
+  </div>
+
+  <!-- ── Modul-Tabs ── -->
+  <div class="tabs" id="tabRow">
+    <button class="tab active" data-modul="alle">Alle Module</button>
+    <button class="tab" data-modul="deutsch">📖 Deutsch</button>
+    <button class="tab" data-modul="lesen">🔊 Lesen</button>
+    <button class="tab" data-modul="mathe">🔢 Mathe</button>
+  </div>
+
+  <!-- ── KPI-Übersicht ── -->
+  <div class="section">
+    <div class="section-title">📈 Gesamtübersicht</div>
+    <div class="kpi-row" id="kpiRow">
+      <div class="kpi"><div class="kpi-val" id="kpiSessions">–</div><div class="kpi-lbl">Sessions</div></div>
+      <div class="kpi"><div class="kpi-val" id="kpiAufgaben">–</div><div class="kpi-lbl">Aufgaben</div></div>
+      <div class="kpi"><div class="kpi-val" id="kpiRichtig">–</div><div class="kpi-lbl">Richtig</div></div>
+      <div class="kpi"><div class="kpi-val" id="kpiQuote">–</div><div class="kpi-lbl">Trefferquote</div></div>
+    </div>
+  </div>
+
+  <!-- ── Fortschritt pro Modul ── -->
+  <div class="section" id="sectionFortschritt">
+    <div class="section-title">📊 Richtig/Falsch pro Modul</div>
+    <div id="fortschrittContent"></div>
+  </div>
+
+  <!-- ── Schwache Aufgaben ── -->
+  <div class="section">
+    <div class="section-title">⚠️ Schwache Aufgaben <span style="font-size:12px;font-weight:800;color:var(--muted);">(Fehlerrate ≥ 50%, min. 2 Versuche)</span></div>
+    <div id="schwachContent"></div>
+  </div>
+
+  <!-- ── Hilfe-Wörter ── -->
+  <div class="section">
+    <div class="section-title">🔍 Häufig nachgeschlagene Wörter</div>
+    <div id="hilfeContent"></div>
+  </div>
+
+  <!-- ── Level-Empfehlungen ── -->
+  <div class="section">
+    <div class="section-title">🎯 Level-Empfehlungen <span style="font-size:12px;font-weight:800;color:var(--muted);">(3× ohne Fehler gespielt)</span></div>
+    <div id="empfehlungContent"></div>
+  </div>
+
+  <!-- ── Muster-Warnung ── -->
+  <div class="section">
+    <div class="section-title">🔁 Muster-Erkennung <span style="font-size:12px;font-weight:800;color:var(--muted);">(immer gleicher Button?)</span></div>
+    <div id="musterContent"></div>
+  </div>
+
+  <!-- ── Verwaltung ── -->
+  <div class="section">
+    <div class="section-title">🗑️ Statistik zurücksetzen</div>
+    <div style="font-size:13px;font-weight:800;color:var(--muted);margin-bottom:12px;">
+      Löscht alle gespeicherten Statistik-Daten unwiderruflich. Lernfortschritt (falsche Antworten, Spielewelt) bleibt erhalten.
+    </div>
+    <button class="btn-danger" id="btnClear">🗑️ Alle Statistik-Daten löschen</button>
+    <div class="feedback-ok" id="clearFeedback">✅ Statistik-Daten gelöscht.</div>
+  </div>
+
+</div>
+
+<script src="../core/stats.js"></script>
+<script>
+"use strict";
+
+// ── Aktueller Modul-Filter ───────────────────────────────────────────────────
+let aktivesModul = "alle";
+
+// ── Hilfsfunktionen ──────────────────────────────────────────────────────────
+function $(id){ return document.getElementById(id); }
+
+function escHtml(s){
+  return String(s||"")
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// Aufgaben-ID parsen: "A2|1|Textanfang…|Frage…"
+function parseAufgabeId(id){
+  const parts = id.split("|");
+  return {
+    stufe: parts[0] || "?",
+    seite: parts[1] || "?",
+    text:  (parts[2] || "").slice(0, 60) + ((parts[2]||"").length > 60 ? "…" : ""),
+    frage: (parts[3] || "").slice(0, 80)
+  };
+}
+
+// Modul aus Aufgaben-ID ableiten (Prefix A/L/M)
+function modulAusId(id){
+  const stufe = (id.split("|")[0]||"").toUpperCase();
+  if(stufe.startsWith("A")) return "deutsch";
+  if(stufe.startsWith("L")) return "lesen";
+  if(stufe.startsWith("M")) return "mathe";
+  return "?";
+}
+
+function modulLabel(m){
+  return {deutsch:"📖 Deutsch", lesen:"🔊 Lesen", mathe:"🔢 Mathe"}[m] || m;
+}
+
+function msFormatieren(ms){
+  if(ms == null) return "–";
+  if(ms < 1000) return ms + " ms";
+  return (ms/1000).toFixed(1) + " s";
+}
+
+// ── Daten berechnen ──────────────────────────────────────────────────────────
+function getFilteredSessions(modul){
+  const stats = window.LaetitiaStats ? window.LaetitiaStats.getStats() : {sessions:[]};
+  if(!modul || modul === "alle") return stats.sessions;
+  return stats.sessions.filter(s => s.modul === modul);
+}
+
+function berechneKPIs(sessions){
+  let aufgaben = 0, richtig = 0;
+  for(const s of sessions){
+    for(const a of s.aufgaben){
+      if(a.richtig !== null){ aufgaben++; if(a.richtig) richtig++; }
+    }
+  }
+  return {
+    sessions: sessions.length,
+    aufgaben,
+    richtig,
+    quote: aufgaben > 0 ? Math.round((richtig/aufgaben)*100) : null
+  };
+}
+
+function berechneFortschrittProModul(sessions){
+  const module = ["deutsch","lesen","mathe"];
+  const result = [];
+  for(const m of module){
+    const ms = sessions.filter(s => s.modul === m);
+    if(!ms.length) continue;
+    let richtig = 0, gesamt = 0;
+    for(const s of ms) for(const a of s.aufgaben){
+      if(a.richtig !== null){ gesamt++; if(a.richtig) richtig++; }
+    }
+    result.push({ modul: m, richtig, gesamt, sessions: ms.length });
+  }
+  return result;
+}
+
+// ── Render-Funktionen ────────────────────────────────────────────────────────
+
+function renderKPIs(sessions){
+  const k = berechneKPIs(sessions);
+  $("kpiSessions").textContent = k.sessions;
+  $("kpiAufgaben").textContent = k.aufgaben;
+  $("kpiRichtig").textContent  = k.richtig;
+  $("kpiQuote").textContent    = k.quote !== null ? k.quote + "%" : "–";
+}
+
+function renderFortschritt(sessions, modul){
+  const el = $("fortschrittContent");
+  const sf = $("sectionFortschritt");
+
+  if(modul !== "alle"){
+    // Einzelmodul: kompakten Balken anzeigen
+    sf.style.display = "";
+    let richtig = 0, gesamt = 0;
+    for(const s of sessions) for(const a of s.aufgaben){
+      if(a.richtig !== null){ gesamt++; if(a.richtig) richtig++; }
+    }
+    if(!gesamt){
+      el.innerHTML = `<div class="empty"><span class="empty-icon">📭</span>Noch keine Daten für dieses Modul.</div>`;
+      return;
+    }
+    const pct = Math.round((richtig/gesamt)*100);
+    el.innerHTML = `
+      <div class="modul-row">
+        <div class="modul-label">${escHtml(modulLabel(modul))}</div>
+        <div class="bar-track">
+          <div class="bar-richtig" style="width:${pct}%">
+            ${pct > 12 ? `<span class="bar-label">${richtig} richtig</span>` : ""}
+          </div>
+        </div>
+        <div class="modul-pct">${pct}%</div>
+        <div class="modul-sessions">${sessions.length} Sessions</div>
+      </div>`;
+    return;
+  }
+
+  // Alle Module
+  const rows = berechneFortschrittProModul(sessions);
+  if(!rows.length){
+    el.innerHTML = `<div class="empty"><span class="empty-icon">📭</span>Noch keine Statistik-Daten vorhanden.</div>`;
+    return;
+  }
+  el.innerHTML = rows.map(r => {
+    const pct = r.gesamt > 0 ? Math.round((r.richtig/r.gesamt)*100) : 0;
+    return `<div class="modul-row">
+      <div class="modul-label">${escHtml(modulLabel(r.modul))}</div>
+      <div class="bar-track">
+        <div class="bar-richtig" style="width:${pct}%">
+          ${pct > 12 ? `<span class="bar-label">${r.richtig} richtig</span>` : ""}
+        </div>
+      </div>
+      <div class="modul-pct">${pct}%</div>
+      <div class="modul-sessions">${r.sessions} Sessions</div>
+    </div>`;
+  }).join("");
+}
+
+function renderSchwach(modul){
+  const el = $("schwachContent");
+  if(!window.LaetitiaStats){ el.innerHTML = `<div class="empty">Stats nicht verfügbar.</div>`; return; }
+
+  const m = modul === "alle" ? null : modul;
+  const liste = window.LaetitiaStats.schwacheAufgaben(m);
+
+  if(!liste.length){
+    el.innerHTML = `<div class="empty"><span class="empty-icon">✅</span>Keine schwachen Aufgaben – weiter so!</div>`;
+    return;
+  }
+
+  el.innerHTML = liste.slice(0, 15).map(a => {
+    const p = parseAufgabeId(a.id);
+    const cl = a.fehlerRate >= 75 ? "rot" : "warn";
+    return `<div class="aufgabe-row">
+      <div class="aufgabe-badge ${cl}">${a.fehlerRate}%</div>
+      <div class="aufgabe-id">
+        <strong>${escHtml(p.stufe)} · Seite ${escHtml(p.seite)}</strong>
+        ${escHtml(p.frage || p.text)}
+      </div>
+      <div class="aufgabe-meta">${a.gesamt}× · ⌀ ${msFormatieren(a.avgMs)}</div>
+    </div>`;
+  }).join("");
+}
+
+function renderHilfe(modul){
+  const el = $("hilfeContent");
+  if(!window.LaetitiaStats){ el.innerHTML = `<div class="empty">Stats nicht verfügbar.</div>`; return; }
+
+  const m = modul === "alle" ? null : modul;
+  const liste = window.LaetitiaStats.hilfeWortRanking(m);
+
+  if(!liste.length){
+    el.innerHTML = `<div class="empty"><span class="empty-icon">📖</span>Noch keine Hilfe-Wörter nachgeschlagen.</div>`;
+    return;
+  }
+
+  el.innerHTML = `<div class="wort-chips">` +
+    liste.slice(0, 20).map(w =>
+      `<div class="wort-chip">${escHtml(w.wort)}<span class="cnt">${w.anzahl}×</span></div>`
+    ).join("") +
+    `</div>`;
+}
+
+function renderEmpfehlungen(modul){
+  const el = $("empfehlungContent");
+  if(!window.LaetitiaStats){ el.innerHTML = `<div class="empty">Stats nicht verfügbar.</div>`; return; }
+
+  const m = modul === "alle" ? null : modul;
+  const liste = window.LaetitiaStats.levelEmpfehlungen(m);
+
+  if(!liste.length){
+    el.innerHTML = `<div class="empty"><span class="empty-icon">🎯</span>Noch kein Level 3× fehlerfrei gespielt.</div>`;
+    return;
+  }
+
+  el.innerHTML = liste.map(e =>
+    `<div class="empfehlung-row">
+      <div class="empf-badge">${escHtml(e.modul)} ${escHtml(e.stufe)}</div>
+      <div class="empf-text">Bereit für nächstes Level</div>
+      <div class="empf-sessions">${e.allesRichtig}× fehlerfrei / ${e.sessions} Sessions</div>
+    </div>`
+  ).join("");
+}
+
+function renderMuster(modul){
+  const el = $("musterContent");
+  if(!window.LaetitiaStats){ el.innerHTML = `<div class="empty">Stats nicht verfügbar.</div>`; return; }
+
+  const module = modul === "alle"
+    ? ["deutsch","lesen","mathe"]
+    : [modul];
+
+  const warnungen = [];
+  for(const m of module){
+    const w = window.LaetitiaStats.musterWarnung(m, 10);
+    if(w) warnungen.push({ modul: m, ...w });
+  }
+
+  if(!warnungen.length){
+    el.innerHTML = `<div class="muster-box ok">
+      <div class="muster-icon">✅</div>
+      <div>
+        <div class="muster-title">Kein Muster erkannt</div>
+        <div class="muster-desc">Die Antwort-Buttons werden abwechslungsreich genutzt.</div>
+      </div>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = warnungen.map(w =>
+    `<div class="muster-box warn" style="margin-bottom:8px;">
+      <div class="muster-icon">⚠️</div>
+      <div>
+        <div class="muster-title">${escHtml(modulLabel(w.modul))}: Muster-Verdacht</div>
+        <div class="muster-desc">${escHtml(w.warnung)}<br>
+        Insgesamt ${w.gesamt} Antworten ausgewertet.</div>
+      </div>
+    </div>`
+  ).join("");
+}
+
+// ── Alles rendern ────────────────────────────────────────────────────────────
+function render(modul){
+  const sessions = getFilteredSessions(modul);
+  const stats    = window.LaetitiaStats ? window.LaetitiaStats.getStats() : {sessions:[]};
+  const total    = stats.sessions.length;
+
+  $("headerSub").textContent = `${total} Sessions gesamt · Stand: ${new Date().toLocaleDateString("de-DE")}`;
+
+  renderKPIs(sessions);
+  renderFortschritt(sessions, modul);
+  renderSchwach(modul);
+  renderHilfe(modul);
+  renderEmpfehlungen(modul);
+  renderMuster(modul);
+}
+
+// ── Tabs ─────────────────────────────────────────────────────────────────────
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    aktivesModul = tab.dataset.modul;
+    render(aktivesModul);
+  });
+});
+
+// ── Statistik löschen ────────────────────────────────────────────────────────
+$("btnClear").addEventListener("click", () => {
+  if(!confirm("Wirklich alle Statistik-Daten löschen? Das kann nicht rückgängig gemacht werden.")) return;
+  if(window.LaetitiaStats) window.LaetitiaStats.clearStats();
+  const fb = $("clearFeedback");
+  fb.classList.add("show");
+  setTimeout(() => fb.classList.remove("show"), 3000);
+  render(aktivesModul);
+});
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+render(aktivesModul);
+</script>
+</body>
+</html>

@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Schule Mathe</title>
+<style>
+:root{
+  --bg:#eff6ff; --panel:#ffffff;
+  --border:rgba(15,23,42,.14); --shadow:0 10px 26px rgba(15,23,42,.08);
+  --text:#0f172a; --muted:rgba(15,23,42,.60);
+  --akzent:#2563eb; --akzent2:#1d4ed8; --radius:20px;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{ font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); height:100vh; overflow:hidden; display:flex; flex-direction:column; }
+.progress-bar-wrap{ height:6px; background:rgba(37,99,235,.15); flex-shrink:0; }
+.progress-bar-fill{ height:6px; background:var(--akzent); transition:width .3s ease; }
+.topbar{ display:flex; align-items:center; justify-content:space-between; padding:10px 16px; background:var(--panel); border-bottom:1px solid var(--border); box-shadow:0 2px 8px rgba(15,23,42,.06); flex-shrink:0; }
+.topbar-titel{ font-size:18px; font-weight:1000; color:var(--akzent); }
+.topbar-fortschritt{ font-size:13px; font-weight:900; color:var(--muted); }
+
+.main{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:16px; gap:14px; overflow:hidden; }
+
+/* Stufen-Auswahl */
+.stufen-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px; max-width:700px; width:100%; }
+.stufe-btn{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; min-height:90px; border-radius:16px; border:2px solid rgba(37,99,235,.25); background:rgba(37,99,235,.07); cursor:pointer; user-select:none; position:relative; font-weight:1000; padding:12px; }
+.stufe-btn:hover{ background:rgba(37,99,235,.15); }
+.stufe-btn.dwell-active{ transform:scale(1.05) !important; outline:3px solid var(--akzent); transition:none !important; }
+.stufe-btn-code{ font-size:12px; font-weight:1000; color:var(--akzent); text-transform:uppercase; }
+.stufe-btn-titel{ font-size:15px; font-weight:1000; text-align:center; }
+.stufe-btn-sub{ font-size:11px; font-weight:900; color:var(--muted); text-align:center; }
+
+/* Aufgabe */
+.aufgabe-karte{ background:var(--panel); border:2px solid rgba(37,99,235,.25); border-radius:var(--radius); box-shadow:var(--shadow); padding:28px 32px; max-width:700px; width:100%; text-align:center; }
+.aufgabe-text{ font-size:clamp(22px,4vw,38px); font-weight:1000; color:var(--text); margin-bottom:12px; }
+.aufgabe-frage{ font-size:16px; font-weight:900; color:var(--muted); }
+.seiten-info{ font-size:12px; font-weight:900; color:var(--muted); text-align:center; }
+
+.infoLine{ display:none; max-width:700px; width:100%; padding:12px 18px; border-radius:14px; font-size:15px; font-weight:900; text-align:center; }
+.infoLine.richtig{ display:block; background:rgba(22,163,74,.15); border:1px solid rgba(22,163,74,.40); color:#166534; }
+.infoLine.falsch{ display:block; background:rgba(220,38,38,.12); border:1px solid rgba(220,38,38,.35); color:#991b1b; }
+
+.antwort-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; max-width:700px; width:100%; }
+.antwort-btn{ display:flex; align-items:center; justify-content:center; min-height:72px; border-radius:16px; padding:12px; border:2px solid rgba(37,99,235,.25); background:rgba(37,99,235,.07); color:var(--text); font-size:clamp(16px,3vw,22px); font-weight:1000; cursor:pointer; user-select:none; position:relative; text-align:center; transition:none; }
+.antwort-btn:hover{ background:rgba(37,99,235,.15); }
+.antwort-btn.dwell-active{ transform:scale(1.05) !important; outline:3px solid var(--akzent); transition:none !important; }
+.antwort-btn.is-disabled{ pointer-events:none; opacity:0.35; }
+@keyframes correctFlash{ 0%{background:rgba(22,163,74,.60);border-color:#16a34a;} 50%{background:rgba(22,163,74,.15);} 100%{background:rgba(22,163,74,.60);border-color:#16a34a;} }
+.antwort-btn.correct-flash{ animation:correctFlash .45s ease forwards; }
+
+.antwort-btn.falsch-gewaehlt{ background:rgba(220,38,38,.25) !important; border-color:#dc2626 !important; }
+
+/* Nav-Leiste unten (Goldstandard: alle Buttons in einer Zeile) */
+.nav-leiste-unten{ display:flex; gap:8px; padding:8px 12px; flex-shrink:0; }
+.nav-btn{
+  flex:1; min-height:70px; border-radius:16px;
+  font-size:17px; font-weight:1000;
+  cursor:pointer; user-select:none; position:relative;
+  display:flex; align-items:center; justify-content:center;
+  gap:6px; transition:none; border:2px solid; text-decoration:none;
+}
+a.nav-btn{ color:inherit; }
+.nav-btn-zurueck{ background:#ede9fe; border-color:#8b5cf6; color:#4c1d95; }
+.nav-btn-zurueck:hover{ background:#ddd6fe; outline:3px solid #8b5cf6; }
+.nav-btn-zurueck .dwell-ring-svg circle{ stroke:#8b5cf6; }
+.nav-btn-weiter{ background:#dcfce7; border-color:#16a34a; color:#166534; display:none; }
+.nav-btn-weiter.sichtbar{ display:flex; }
+.nav-btn-weiter:hover{ background:#bbf7d0; outline:3px solid #16a34a; }
+.nav-btn-weiter .dwell-ring-svg circle{ stroke:#16a34a; }
+.nav-btn-ueberspringen{ background:#fff7ed; border-color:#f97316; color:#9a3412; }
+.nav-btn-ueberspringen:hover{ background:#ffedd5; outline:3px solid #f97316; }
+.nav-btn-ueberspringen .dwell-ring-svg circle{ stroke:#f97316; }
+.nav-btn.dwell-active{ transform:scale(1.02) !important; outline:3px solid currentColor !important; transition:none !important; }
+
+/* Abschluss */
+.abschluss{ display:none; flex-direction:column; align-items:center; justify-content:center; gap:16px; padding:24px; text-align:center; max-width:600px; width:100%; }
+.abschluss.sichtbar{ display:flex; }
+.abschluss-emoji{ font-size:64px; }
+.abschluss-titel{ font-size:clamp(22px,4vw,34px); font-weight:1000; color:var(--akzent); }
+.abschluss-score{ font-size:40px; font-weight:1000; color:var(--akzent); background:rgba(37,99,235,.10); border:2px solid rgba(37,99,235,.25); border-radius:16px; padding:10px 28px; }
+.abschluss-sub{ font-size:15px; font-weight:900; color:var(--muted); }
+.abschluss-btn{ display:flex; align-items:center; justify-content:center; min-height:60px; min-width:200px; border-radius:16px; border:2px solid var(--akzent); background:var(--akzent); color:#fff; font-size:17px; font-weight:1000; cursor:pointer; user-select:none; position:relative; text-decoration:none; }
+
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none; z-index:10; width:70px; height:70px; }
+.dwell-ring-svg circle{ fill:none; stroke:var(--akzent); stroke-width:5; stroke-dasharray:220; stroke-dashoffset:220; transform:rotate(-90deg); transform-origin:35px 35px; }
+.dwell-ring-svg circle.animating{ animation:dwellRing var(--dwell-duration,.9s) linear forwards; }
+
+
+</style>
+</head>
+<body>
+
+<div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+<div class="topbar">
+  <div class="topbar-titel">🔢 Mathe — Nase vorn!</div>
+  <div class="topbar-fortschritt" id="fortschrittText"></div>
+</div>
+
+<div class="main" id="mainBereich">
+
+  <!-- Stufen-Auswahl -->
+  <div id="screenStufen" style="width:100%;max-width:700px;">
+    <div style="font-size:16px;font-weight:1000;color:var(--akzent);text-align:center;margin-bottom:12px;">Welches Thema möchtest du üben?</div>
+    <div class="stufen-grid" id="stufenGrid"></div>
+  </div>
+
+  <!-- Aufgabe -->
+  <div id="screenAufgabe" style="display:none;width:100%;max-width:700px;flex-direction:column;gap:12px;align-items:center;">
+    <div class="aufgabe-karte">
+      <div class="aufgabe-text" id="aufgabeText"></div>
+      <div class="aufgabe-frage" id="aufgabeFrage"></div>
+    </div>
+    <div class="seiten-info" id="seitenInfo"></div>
+    <div class="infoLine" id="infoLine"></div>
+    <div class="antwort-row">
+      <button class="antwort-btn" id="btnA" onclick="antworten('A')">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+        <span id="labelA"></span>
+      </button>
+      <button class="antwort-btn" id="btnB" onclick="antworten('B')">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+        <span id="labelB"></span>
+      </button>
+      <button class="antwort-btn" id="btnC" onclick="antworten('C')">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+        <span id="labelC"></span>
+      </button>
+      <button class="antwort-btn" id="btnD" onclick="antworten('D')">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+        <span id="labelD"></span>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<div class="abschluss" id="abschlussScreen">
+  <div class="abschluss-emoji" id="abschlussEmoji">🎉</div>
+  <div class="abschluss-titel" id="abschlussTitel">Super!</div>
+  <div class="abschluss-score" id="abschlussScore"></div>
+  <div class="abschluss-sub" id="abschlussSub"></div>
+  <a class="abschluss-btn" href="./schule.html" id="btnAbschluss">← Zurueck</a>
+</div>
+
+<div class="nav-leiste-unten" id="navLeiste">
+  <a class="nav-btn nav-btn-zurueck" href="./schule_deutsch.html" id="btnZurueck">
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+    ← Zurück
+  </a>
+  <button class="nav-btn nav-btn-weiter" id="weiterBtn" onclick="naechsteAufgabe()">
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+    Weiter ✅
+  </button>
+  <button class="nav-btn nav-btn-ueberspringen" id="btnUeberspringen" onclick="ueberspringen()">
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+    → Überspringen
+  </button>
+</div>
+
+<script src="../../core/dwell.js"></script>
+<script src="../../core/error_handler.js"></script>
+<script src="./schule_mathe_data.js"></script>
+<script>
+"use strict";
+
+// ── Lob-Texte (Goldstandard aus moduleKit) ───────────────────────────────────
+var LOB_TEXTE = [
+  "Wunderbar!", "Fantastisch!", "Super!", "Toll gemacht!",
+  "Du überraschst mich!", "Klasse!", "Sehr gut!", "Bravo!",
+  "Genial!", "Das sitzt!", "Perfekt!", "Großartig!"
+];
+function zufallsLob(){ return LOB_TEXTE[Math.floor(Math.random()*LOB_TEXTE.length)]; }
+
+// Zahlen als TTS-Antwort korrekt vorlesen (verhindert "Dritter" statt "Drei")
+function ttsAntwort(s){
+  if(/^\d+$/.test((s||"").trim())){
+    return "die Zahl " + s;
+  }
+  return s;
+}
+
+
+var alleAufgaben = [];
+(function(){
+  var api = window.LaetitiaDataRegistryApi;
+  if(api && typeof api.get === "function") alleAufgaben = api.get("schule_mathe") || [];
+  if(!alleAufgaben.length) alleAufgaben = window.LaetitiaSchuleMatheAufgaben || [];
+})();
+
+var STUFEN = [
+  { code:"SMA1", titel:"Rechnen mit der 10", sub:"Seiten 7 + 23", emoji:"🔟" },
+  { code:"SMA2", titel:"Grosse und kleine Aufgaben", sub:"Seiten 8 + 24", emoji:"📏" },
+  { code:"SMA3", titel:"Verdoppeln + Halbieren", sub:"Seiten 13 + 15", emoji:"✌️" },
+  { code:"SMA4", titel:"Fast verdoppeln", sub:"Seite 14", emoji:"➕" },
+  { code:"SMA5", titel:"Tauschaufgaben", sub:"Seiten 9 + 16", emoji:"🔄" },
+  { code:"SMA6", titel:"+9 / +11 / -9 / -11", sub:"Seiten 12 + 28", emoji:"9️⃣" }
+];
+
+var session = [], index = 0, richtigCount = 0, beantwortet = false;
+var dwellMs = parseInt(localStorage.getItem("laetitia_dwell_ms")) || 900;
+var aktStufe = "";
+
+function mischen(arr){ var a=arr.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+
+// URL-Parameter lesen
+(function(){
+  try{
+    var params = new URLSearchParams(window.location.search);
+    var s = params.get("stufe");
+    if(s) aktStufe = s;
+    // Seiten-Filter aus Chronologie
+    var nurSeite = params.get("seite");
+    var nurHeft  = params.get("heft");
+    if(nurSeite || nurHeft){
+      alleAufgaben = alleAufgaben.filter(function(t){
+        var seiteOk = !nurSeite || String(t.seite)===nurSeite;
+        var heftOk  = !nurHeft  || t.heft===nurHeft;
+        return seiteOk && heftOk;
+      });
+    }
+  }catch(e){}
+})();
+
+function aufbauenStufen(){
+  var grid = document.getElementById("stufenGrid");
+  grid.innerHTML = "";
+  STUFEN.forEach(function(s){
+    var count = alleAufgaben.filter(function(t){ return t.stufe===s.code; }).length;
+    if(!count) return;
+    var btn = document.createElement("div");
+    btn.className = "stufe-btn";
+    btn.innerHTML =
+      '<svg class="dwell-ring-svg" viewBox="0 0 60 60"><circle cx="30" cy="30" r="25"/></svg>'+
+      '<div class="stufe-btn-code">'+s.code+'</div>'+
+      '<div class="stufe-btn-emoji">'+s.emoji+'</div>'+
+      '<div class="stufe-btn-titel">'+s.titel+'</div>'+
+      '<div class="stufe-btn-sub">'+s.sub+' · '+count+' Aufgaben</div>';
+    btn.addEventListener("click", function(){ starteStufe(s.code, s.titel); });
+    bindDwellEinzel(btn);
+    grid.appendChild(btn);
+  });
+  document.getElementById("screenStufen").style.display = "block";
+  document.getElementById("screenAufgabe").style.display = "none";
+}
+
+function starteStufe(code, titel){
+  aktStufe = code;
+  var gefiltert = alleAufgaben.filter(function(t){ return t.stufe===code; });
+  session = gefiltert.slice();
+  index = 0; richtigCount = 0;
+  document.getElementById("screenStufen").style.display = "none";
+  document.getElementById("screenAufgabe").style.display = "flex";
+  document.getElementById("fortschrittText").textContent = titel;
+  zeigeAufgabe();
+}
+
+function zeigeAufgabe(){
+  if(index >= session.length){ zeigeAbschluss(); return; }
+  var t = session[index];
+  beantwortet = false;
+
+  document.getElementById("progressFill").style.width = Math.round((index/session.length)*100)+"%";
+  document.getElementById("aufgabeText").textContent = t.text;
+  document.getElementById("aufgabeFrage").textContent = t.frage || "Was ist das Ergebnis?";
+  document.getElementById("seitenInfo").textContent = t.seite ? "Nase vorn! — Seite "+t.seite : "";
+  document.getElementById("labelA").textContent = t.antwort_a;
+  document.getElementById("labelB").textContent = t.antwort_b;
+  document.getElementById("labelC").textContent = t.antwort_c;
+  document.getElementById("labelD").textContent = t.antwort_d || "";
+  document.getElementById("btnD").style.display = t.antwort_d ? "" : "none";
+
+  setInfoLine("","");
+  ["btnA","btnB","btnC","btnD","btnZurueck"].forEach(function(id){
+    var b=document.getElementById(id); if(b){ b.classList.remove("is-disabled","correct-flash","falsch-gewaehlt"); delete b.dataset.pdwell; bindDwellEinzel(b); }
+  });
+  var weiter = document.getElementById("weiterBtn");
+  if(weiter) weiter.className = "nav-btn nav-btn-weiter";
+
+  setTimeout(function(){
+    var ttsText = (t.text||"").replace(/(\d)\./g,"$1").replace(/\?/g,"").replace(/=/g," gleich ").replace(/\+/g," plus ").replace(/\-/g," minus ").trim();
+    sprich(ttsText + ". " + (t.frage||""));
+  }, 300);
+}
+
+function antworten(buchstabe){
+  if(beantwortet) return;
+  beantwortet = true;
+  var t = session[index];
+  var korrekt = buchstabe === t.richtig;
+  ["btnA","btnB","btnC","btnD"].forEach(function(id){ var b=document.getElementById(id); if(b) b.classList.add("is-disabled"); });
+
+  var gewaehlt = document.getElementById("btn"+buchstabe);
+  if(korrekt){
+    richtigCount++;
+    if(gewaehlt) gewaehlt.classList.add("correct-flash");
+    var erkl = t.erklaerung || "";
+    setInfoLine("✓ Richtig!"+(erkl?" "+erkl:""), "richtig");
+    sprich(erkl?zufallsLob()+" "+erkl:zufallsLob(), function(){
+      var weiter = document.getElementById("weiterBtn");
+      if(weiter){ weiter.className = "nav-btn nav-btn-weiter sichtbar"; rebindDwell(); }
+    });
+  } else {
+    if(gewaehlt) gewaehlt.classList.add("falsch-gewaehlt");
+    var richtigBtn = document.getElementById("btn"+t.richtig);
+    if(richtigBtn) richtigBtn.classList.add("correct-flash");
+    var richtigLabel = t["antwort_"+t.richtig.toLowerCase()] || "";
+    var erkl2 = t.erklaerung || "";
+    setInfoLine("✗ Falsch. Richtig wäre: "+richtigLabel+(erkl2?" — "+erkl2:""), "falsch");
+    sprich("Das ist leider falsch. Richtig ist: "+ttsAntwort(richtigLabel)+(erkl2?". "+erkl2:""), function(){
+      var weiter = document.getElementById("weiterBtn");
+      if(weiter){ weiter.className = "nav-btn nav-btn-weiter sichtbar"; rebindDwell(); }
+    });
+  }
+  
+}
+
+function setInfoLine(text, art){
+  var el=document.getElementById("infoLine"); if(!el) return;
+  el.className="infoLine"+(art?" "+art:""); el.textContent=text||""; el.style.display=text?"":"none";
+}
+
+function zeigeAbschluss(){
+  document.getElementById("mainBereich").style.display="none";
+  var zl=document.getElementById("navLeiste"); if(zl) zl.style.display="none";
+  var sc=document.getElementById("abschlussScreen"); sc.classList.add("sichtbar");
+  var pct=Math.round((richtigCount/session.length)*100);
+  document.getElementById("abschlussScore").textContent=richtigCount+" von "+session.length+" richtig";
+  document.getElementById("abschlussEmoji").textContent=pct>=80?"🌟":pct>=60?"😊":"💪";
+  document.getElementById("abschlussTitel").textContent=pct>=80?"Mathe-Meisterin!":pct>=60?"Gut gerechnet!":"Weiter so!";
+  document.getElementById("abschlussSub").textContent="Thema: "+aktStufe;
+  sprich(pct>=80?"Fantastisch!":"Gut gemacht! "+richtigCount+" von "+session.length+" richtig.");
+  delete document.getElementById("btnAbschluss").dataset.pdwell;
+  bindDwellEinzel(document.getElementById("btnAbschluss"));
+  document.getElementById("progressFill").style.width="100%";
+}
+
+function ueberspringen(){
+  if(index >= session.length - 1){ zeigeAbschluss(); return; }
+  index++;
+  zeigeAufgabe();
+}
+
+function naechsteAufgabe(){
+  index++;
+  zeigeAufgabe();
+}
+
+function sprich(text, danach){
+  try{
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = "de-DE"; u.rate = 0.92;
+    var voices = speechSynthesis.getVoices();
+    // Katja bevorzugen (natürliche weibliche Stimme), dann andere Microsoft-Stimmen
+    var de = voices.find(function(v){ return v.name === "Microsoft Katja Online (Natural) - German (Germany)"; })
+          || voices.find(function(v){ return v.name === "Microsoft Katja - German (Germany)"; })
+          || voices.find(function(v){ return v.name.indexOf("Katja") >= 0; })
+          || voices.find(function(v){ return v.name.indexOf("Microsoft") >= 0 && v.lang.startsWith("de") && v.name.indexOf("Hedda") < 0; })
+          || voices.find(function(v){ return v.name.indexOf("Microsoft") >= 0 && v.lang.startsWith("de"); })
+          || voices.find(function(v){ return v.lang.startsWith("de"); });
+    if(de) u.voice = de;
+    if(window.LaetitiaSprich){
+      window.LaetitiaSprich.wrap(u, danach);
+    } else {
+      // Kurzer Delay nach cancel() damit Edge den Anfang nicht verschluckt
+      setTimeout(function(){
+        var fired = false; var watchdog = null;
+        function naechster(){
+          if(fired) return; fired = true;
+          if(watchdog) clearTimeout(watchdog);
+          if(danach) setTimeout(danach, 300);
+        }
+        u.onend = naechster; u.onerror = naechster;
+        watchdog = setTimeout(naechster, Math.max(3000, text.length * 80));
+        speechSynthesis.speak(u);
+      }, 120);
+    }
+  }catch(e){ if(danach) setTimeout(danach, 400); }
+}
+
+// ── Dwell (Regel 7: LaetitiaAttachDwell) ─────────────────────────────────────
+var _attachDwell = window.LaetitiaAttachDwell || function(){ return {cancelDwell:function(){}}; };
+var dwellMs    = parseInt(localStorage.getItem("laetitia_dwell_ms"))    || 900;
+var leaveGrace = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
+var _dwellHandle = { cancelDwell: function(){} };
+
+var DWELL_SELECTOR = "#btnA, #btnB, #btnC, #btnD, #weiterBtn.sichtbar, #btnUeberspringen, #btnZurueck, #btnAbschluss";
+
+function rebindDwell(){
+  if(_dwellHandle && typeof _dwellHandle.cancelDwell === "function") _dwellHandle.cancelDwell();
+  _dwellHandle = _attachDwell(DWELL_SELECTOR, {
+    dwellMs: dwellMs, leaveGrace: leaveGrace,
+    onActivate: function(el){
+      if(el.getAttribute("aria-disabled") === "true") return;
+      if(el.classList.contains("is-disabled")) return;
+      try{ el.click(); }catch(e){}
+    }
+  });
+}
+function bindDwellEinzel(el){ rebindDwell(); }
+
+try{ localStorage.setItem("laetitia_return_url_v1", new URL("./schule_mathe_uebersicht.html", window.location.href).href); }catch(e){}
+bindDwellEinzel(document.getElementById("btnZurueck"));
+
+function _start(){
+  if(aktStufe){
+    var stufenInfo = STUFEN.find(function(s){ return s.code===aktStufe; });
+    starteStufe(aktStufe, stufenInfo ? stufenInfo.titel : aktStufe);
+  } else {
+    aufbauenStufen();
+  }
+}
+if(speechSynthesis.getVoices().length > 0){
+  _start();
+} else {
+  speechSynthesis.addEventListener("voiceschanged", function(){ _start(); }, {once:true});
+  setTimeout(function(){ _start(); }, 800);
+}
+</script>
+</body>
+</html>

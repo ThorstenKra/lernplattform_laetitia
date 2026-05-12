@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Lesen</title>
+
+<style>
+  :root{
+    --bg:#f6f7fb;
+    --panel:#ffffff;
+    --border:rgba(15,23,42,.14);
+    --shadow:0 10px 26px rgba(15,23,42,.08);
+    --text:#0f172a;
+    --muted:rgba(15,23,42,.65);
+    --green:#1db954;
+    --green2:#18a84c;
+    --red:#e24a4a;
+    --red2:#cf3b3b;
+    --ok:#1aa34a;
+    --radius:18px;
+    --navWidth: 24%;
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    font-family: system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height:100vh;
+    overflow:hidden;
+  }
+
+  .viewport{ height:100vh; display:flex; align-items:center; justify-content:center; padding:10px; }
+  .app{ width:min(1100px,96vw); height:calc(100vh - 20px); display:flex; flex-direction:column; gap:8px; min-height:0; }
+
+  .smallStatus{
+    background:var(--panel); border:1px solid var(--border); border-radius:12px;
+    box-shadow:var(--shadow); padding:6px 10px; font-weight:900; font-size:13px;
+    color:var(--muted); line-height:1.1;
+  }
+  .smallStatus strong{ color:var(--text); }
+
+  .panel{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:10px; flex:1 1 auto; min-height:0; overflow:hidden;
+  }
+
+  .screen.hidden{ display:none; }
+  .card{ background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:8px; }
+  .headline{ font-size:24px; font-weight:1000; margin:0; }
+  .sub{ margin:6px 0 0 0; font-size:14px; font-weight:900; color:var(--muted); line-height:1.25; }
+
+  a.uibtn, button.uibtn{
+    display:flex; align-items:center; justify-content:center; text-decoration:none;
+    border-radius:16px; border:1px solid rgba(0,0,0,0.10); background:var(--green);
+    color:#0b1b10; font-weight:1000; user-select:none; -webkit-tap-highlight-color:transparent;
+  }
+
+  a.uibtn:hover, button.uibtn:hover,
+  a.uibtn:focus, button.uibtn:focus{
+    background:var(--green2);
+    outline: 3px solid rgba(29,185,84,0.50);
+    outline-offset: 2px;
+    transition: none;
+    z-index: 2;
+    position: relative;
+  }
+
+  @keyframes dwellRing {
+    from { stroke-dashoffset: 220; }
+    to   { stroke-dashoffset: 0; }
+  }
+
+  a.uibtn.dwell-active, button.uibtn.dwell-active {
+    transform: scale(1.06);
+    box-shadow: 0 0 0 5px rgba(29,185,84,0.55), 0 8px 22px rgba(0,0,0,0.18);
+    outline: 4px solid #1db954;
+    outline-offset: 3px;
+    transition: none;
+  }
+
+  .dwell-ring-svg {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 10;
+    width: 70px; height: 70px;
+  }
+  .dwell-ring-svg circle {
+    fill: none;
+    stroke: #1db954;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-dasharray: 220;
+    stroke-dashoffset: 220;
+    transform: rotate(-90deg);
+    transform-origin: 35px 35px;
+  }
+  .dwell-ring-svg circle.animating {
+    animation: dwellRing var(--dwell-duration,0.6s) linear forwards;
+  }
+
+  .levelWrap{ display:grid; gap:10px; }
+  .levelGrid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  a.levelBtn{ min-height:74px; padding:12px; justify-content:flex-start; transition:none; }
+  a.levelBtn:hover, a.levelBtn:focus{
+    transform: scale(1.06);
+    box-shadow: 0 0 0 5px rgba(29,185,84,0.50), 0 8px 22px rgba(0,0,0,0.15);
+    outline: 4px solid #1db954;
+    outline-offset: 2px;
+    background: var(--green2) !important;
+    transition: none;
+    z-index: 2;
+    position: relative;
+  }
+  .lvl{ font-size:24px; font-weight:1000; }
+  .desc{ font-size:13px; font-weight:900; color:rgba(11,27,16,.82); margin-top:4px; }
+
+  a.repeatBtn{
+    min-height:52px; background:rgba(15,23,42,.06); border:1px solid var(--border);
+    color:var(--text); font-size:15px;
+  }
+  a.repeatBtn:hover, a.repeatBtn:focus{
+    background:rgba(15,23,42,.18);
+    transform: scale(1.04);
+    box-shadow: 0 0 0 4px rgba(15,23,42,0.20);
+    outline: 3px solid rgba(15,23,42,0.40);
+    transition: none;
+  }
+  .savedLine{ margin-top:8px; font-size:13px; font-weight:900; color:var(--muted); }
+
+  .taskWrap{
+    height:100%;
+    display:grid;
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: 3fr 2fr;
+    gap:8px;
+    min-height:0;
+  }
+  .taskHeader{
+    grid-column: 1 / -1;
+    display:grid; grid-template-columns:1fr 1fr; gap:8px;
+  }
+  .taskLeft{
+    grid-column: 1;
+    display:flex; flex-direction:column; gap:8px; min-height:0; overflow:hidden;
+  }
+  .taskRight{
+    grid-column: 2;
+    display:flex; flex-direction:column; gap:3px; min-height:0;
+  }
+  .taskFooter{
+    grid-column: 1 / -1;
+    display:flex; justify-content:space-between; gap:10px;
+  }
+  .progressShell{
+    background:var(--panel); border:1px solid var(--border); border-radius:12px;
+    box-shadow:var(--shadow); padding:6px 10px;
+  }
+  .progressLabel{ font-size:13px; font-weight:900; color:var(--muted); margin:0 0 4px 0; line-height:1.1; }
+  .bar{ height:7px; border-radius:999px; background:rgba(15,23,42,.08); overflow:hidden; }
+  .barFill{ height:100%; width:0%; background:var(--green); border-radius:999px; transition:width .4s ease; }
+  .barFill.okBar{ background:var(--ok); }
+
+  .textCard{ position:relative; padding:0; overflow:hidden; flex:1; min-height:0; }
+  .ttsOverlay{ position:absolute; top:8px; right:8px; display:flex; gap:8px; z-index:2; }
+  a.ttsBtn{
+    min-height:30px; padding:0 10px; font-size:13px;
+    background:rgba(15,23,42,.06); border:1px solid var(--border);
+    color:var(--text); border-radius:999px;
+  }
+  a.ttsBtn:hover{ background:rgba(15,23,42,.10); }
+
+  .textBlock{
+    font-size:clamp(18px, 2vw, 24px); font-weight:900; line-height:1.55;
+    white-space:normal; word-break:break-word;
+    background:#fff7c2; border:2px solid rgba(245, 215, 110, 0.95);
+    border-radius:14px; padding:14px;
+    color:#0b2e18;
+    height:100%; overflow:hidden;
+    font-size:clamp(14px, 1.6vw, 20px);
+  }
+  .questionCard{ padding:6px; }
+  .questionBlock{ font-size:clamp(18px, 2vw, 22px); font-weight:900; line-height:1.2;
+    word-break:break-word; color:rgba(15,23,42,.92);
+    background:#fff7c2; border:2px solid rgba(245, 215, 110, 0.85);
+    border-radius:14px; padding:10px;
+  }
+  .textBlock, .questionBlock{ pointer-events:none; }
+
+  a.ansBtn.correct-flash{
+    background:rgba(29,185,84,0.55) !important;
+    border-color:rgba(29,185,84,0.90) !important;
+    box-shadow: 0 0 0 6px rgba(29,185,84,0.40);
+  }
+
+  a.pickBtn{ transition:none; }
+  a.pickBtn[aria-disabled="true"]{
+    pointer-events:none; opacity:0.35;
+    background:rgba(29,185,84,0.25); color:rgba(15,23,42,.55);
+  }
+
+  .ansRow{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex:1;
+    min-height:0;
+  }
+  .ansTxt{
+    flex:1;
+    font-size:clamp(15px, 1.7vw, 20px);
+    font-weight:900;
+    line-height:1.3;
+    color:#0f172a;
+    padding:4px 2px;
+    word-break:break-word;
+    pointer-events:none;
+    user-select:none;
+  }
+  a.ansBtn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    width:100px;
+    height:48px;
+    font-size:clamp(16px,1.8vw,22px);
+    font-weight:1000;
+    border-radius:14px;
+    background:rgba(29,185,84,0.18);
+    border:2px solid rgba(29,185,84,0.35);
+    color:#0b1b10;
+    transition:none;
+    position:relative;
+  }
+  a.ansBtn:hover, a.ansBtn:focus{
+    transform: scale(1.08);
+    box-shadow: 0 0 0 6px rgba(29,185,84,0.60), 0 6px 20px rgba(0,0,0,0.15);
+    outline: 4px solid #1db954;
+    background: rgba(29,185,84,0.45) !important;
+    transition: none;
+    z-index: 3;
+    position: relative;
+  }
+
+  .infoLine{ font-size:11px; font-weight:900; color:var(--muted); padding:0 2px; display:none; }
+
+  a.navBtn{ min-height:44px; font-size:15px; font-weight:1000; padding:6px 10px; width:var(--navWidth); }
+  #btnNext{ background:var(--green); color:#0b1b10; border-color:rgba(0,0,0,0.10); font-size:18px; }
+  #btnHome{ background:var(--red); color:#fff; border-color:rgba(0,0,0,0.10); }
+  #btnHome:hover, #btnHome:focus{
+    background:var(--red2);
+    transform: scale(1.06);
+    box-shadow: 0 0 0 4px rgba(220,38,38,0.40);
+    outline: 3px solid #dc2626;
+    transition: none;
+  }
+
+  a.helpBtn{
+    background:#ffb15a;
+    color:#3b1f00;
+    border-color:rgba(0,0,0,0.10);
+  }
+  a.helpBtn:hover, a.helpBtn:focus{
+    background:#ffa042;
+    transform: scale(1.06);
+    box-shadow: 0 0 0 4px rgba(255,161,67,0.45);
+    outline: 3px solid rgba(255,161,67,0.85);
+    transition:none;
+  }
+
+  .lobBanner{
+    display:none;
+    position:fixed; top:50%; left:50%;
+    transform:translate(-50%,-60%) scale(0.8);
+    background:var(--green); color:#0b1b10;
+    font-size:clamp(28px,5vw,52px); font-weight:1000;
+    padding:18px 36px; border-radius:24px;
+    box-shadow:0 20px 60px rgba(0,0,0,.22);
+    z-index:100; text-align:center; pointer-events:none;
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1), opacity .18s ease;
+    opacity:0;
+  }
+  .lobBanner.show{ display:block; transform:translate(-50%,-60%) scale(1); opacity:1; }
+
+  .overlay{
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,.55); align-items:center;
+    justify-content:center; z-index:200; padding:16px;
+  }
+  .overlay.show{ display:flex; }
+  .overlayBox{
+    background:#fff; border-radius:24px; padding:28px 24px;
+    width:min(560px,94vw); box-shadow:0 24px 70px rgba(0,0,0,.25); text-align:center;
+  }
+  .overlayEmoji{ font-size:64px; margin-bottom:8px; }
+  .overlayTitle{ font-size:28px; font-weight:1000; margin:0 0 8px 0; }
+  .overlayScore{ font-size:18px; font-weight:900; color:var(--muted); margin:0 0 18px 0; }
+  .overlayUnlock{
+    background:rgba(29,185,84,.15); border:1px solid rgba(29,185,84,.45);
+    border-radius:14px; padding:10px 14px; font-size:15px; font-weight:900;
+    color:#0b5c22; margin-bottom:18px; display:none;
+  }
+  .overlayUnlock.show{ display:block; }
+  .overlayBtns{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  a.overlayBtn{ min-height:48px; padding:10px 22px; font-size:16px; }
+  a.overlayBtnHome{
+    background:rgba(15,23,42,.08); color:var(--text); border:1px solid var(--border);
+    border-radius:16px; display:flex; align-items:center; justify-content:center;
+    text-decoration:none; font-weight:1000; font-size:16px; padding:10px 22px; min-height:48px;
+  }
+
+  @media (max-width:760px){
+    .taskWrap{ grid-template-columns:1fr; }
+    .taskHeader{ grid-template-columns:1fr; }
+    :root{ --navWidth:45%; }
+  }
+
+  /* Zurueck-Buttons helllila (btnReturnFromMenu, btnReturnFromOverlay) */
+  #btnReturnFromMenu, #btnReturnFromOverlay {
+    background:#ede9fe !important; color:#4c1d95 !important;
+    border:2px solid #8b5cf6 !important;
+    min-height:78px !important; font-size:18px !important;
+    font-weight:1000 !important;
+  }
+  #btnReturnFromMenu:hover, #btnReturnFromMenu:focus,
+  #btnReturnFromOverlay:hover, #btnReturnFromOverlay:focus {
+    background:#ddd6fe !important; outline:4px solid #8b5cf6 !important;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="lobBanner" id="lobBanner"></div>
+
+<div class="overlay" id="overlayAbschluss">
+  <div class="overlayBox">
+    <div class="overlayEmoji" id="overlayEmoji">🎉</div>
+    <div class="overlayTitle" id="overlayTitle">Toll gemacht!</div>
+    <div class="overlayScore" id="overlayScore"></div>
+    <div class="overlayUnlock" id="overlayUnlock">🎮 Super! Die Spielewelt ist jetzt freigeschaltet!</div>
+    <div class="overlayBtns">
+      <a class="uibtn overlayBtn" href="#" data-action="OVL_REPEAT">Nochmal</a>
+      <a class="overlayBtnHome" id="btnReturnFromOverlay" href="../../index.html">Zur Gesamtübersicht</a>
+    </div>
+  </div>
+</div>
+
+<div class="viewport">
+  <div class="app">
+    <div class="panel">
+
+      <!-- MENÜ -->
+      <div id="screenMenu" class="screen levelWrap hidden">
+        <div class="card">
+          <div class="headline" id="moduleTitle">🔊 Lesen</div>
+          <div class="sub" id="moduleSub">Wähle eine Lektion</div>
+        </div>
+        <div class="card">
+          <div class="levelGrid" id="gridLevels">
+            <a class="uibtn levelBtn" href="#" data-level="L1"><div><div class="lvl">L1</div><div class="desc" id="descL1">sehr einfach (3 Sätze)</div></div></a>
+            <a class="uibtn levelBtn" href="#" data-level="L2"><div><div class="lvl">L2</div><div class="desc" id="descL2">einfach (4 Sätze)</div></div></a>
+            <a class="uibtn levelBtn" href="#" data-level="L3"><div><div class="lvl">L3</div><div class="desc" id="descL3">mittel (5 Sätze)</div></div></a>
+            <a class="uibtn levelBtn" href="#" data-level="L4"><div><div class="lvl">L4</div><div class="desc" id="descL4">anspruchsvoll (6 Sätze)</div></div></a>
+            <a class="uibtn levelBtn" href="#" data-level="L5"><div><div class="lvl">L5</div><div class="desc" id="descL5">Aufbau 1 (7 Sätze)</div></div></a>
+            <a class="uibtn levelBtn" href="#" data-level="L6"><div><div class="lvl">L6</div><div class="desc" id="descL6">Aufbau 2 (8 Sätze)</div></div></a>
+            <a class="uibtn levelBtn" href="#" data-level="L7"><div><div class="lvl">L7</div><div class="desc" id="descL7">Transfer 1 (9 Sätze)</div></div></a>
+            <a class="uibtn levelBtn" href="#" data-level="L8"><div><div class="lvl">L8</div><div class="desc" id="descL8">Transfer 2 (10 Sätze)</div></div></a>
+          </div>
+        </div>
+        <div>
+          <a class="uibtn repeatBtn" href="#" id="btnWrong">Nur falsche Antworten wiederholen</a>
+          <div class="savedLine" id="savedLine">Gespeicherte falsche Antworten: 0</div>
+        </div>
+        <a class="uibtn" id="btnReturnFromMenu" href="../../index.html"
+           style="margin-top:8px; min-height:68px; font-size:18px;">← Zur Gesamtübersicht</a>
+      </div>
+
+      <!-- AUFGABE -->
+      <div id="screenTask" class="screen taskWrap hidden">
+        <div class="taskHeader">
+          <div class="progressShell">
+            <div class="progressLabel" id="progressLabel">Fortschritt: –</div>
+            <div class="bar"><div class="barFill" id="barFill"></div></div>
+          </div>
+          <div class="progressShell">
+            <div class="progressLabel" id="correctLabel">Richtig gesamt: –</div>
+            <div class="bar"><div class="barFill okBar" id="correctFill"></div></div>
+          </div>
+        </div>
+
+        <div class="taskLeft">
+          <div class="card textCard">
+            <div class="textBlock" id="text">–</div>
+            <div class="ttsOverlay" id="ttsOverlay">
+              <a class="uibtn ttsBtn" href="#" id="btnSpeakText">🔊 Vorlesen</a>
+              <a class="uibtn ttsBtn" href="#" id="btnSpeakStop">⏹ Stopp</a>
+            </div>
+          </div>
+          <div class="card questionCard">
+            <div class="questionBlock" id="frage">–</div>
+          </div>
+        </div>
+
+        <div class="taskRight">
+          <div class="ansRow"><span class="ansTxt" id="read1txt">–</span><a class="uibtn pickBtn ansBtn" href="#" data-answer="A" id="pick1">1</a></div>
+          <div class="ansRow"><span class="ansTxt" id="read2txt">–</span><a class="uibtn pickBtn ansBtn" href="#" data-answer="B" id="pick2">2</a></div>
+          <div class="ansRow"><span class="ansTxt" id="read3txt">–</span><a class="uibtn pickBtn ansBtn" href="#" data-answer="C" id="pick3">3</a></div>
+          <div class="ansRow"><span class="ansTxt" id="read4txt">–</span><a class="uibtn pickBtn ansBtn" href="#" data-answer="D" id="pick4">4</a></div>
+        </div>
+
+        <div class="taskFooter">
+          <div class="infoLine" id="infoLine">–</div>
+          <a class="uibtn navBtn" href="#" id="btnNext" aria-disabled="true" style="pointer-events:none;opacity:0.45;flex:1;">Weiter ›</a>
+          <a class="uibtn navBtn helpBtn" href="#" id="btnHelp" style="flex:1;">Hilfe</a>
+          <a class="uibtn navBtn" href="#" id="btnHome" style="flex:1;">Beenden</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="../../core/config.js"></script>
+<script src="../../core/storage.js"></script>
+<script src="../../core/return.js"></script>
+<script src="../../core/dataRegistry.js"></script>
+<script src="../../core/audioQueue.js"></script>
+<script src="../../core/stats.js"></script>
+<script src="./data/lesen_data.js"></script>
+<script src="../../core/dwell.js"></script>
+<script src="../../core/error_handler.js"></script>
+<script src="./lesen_mod.js"></script>
+
+</body>
+</html>

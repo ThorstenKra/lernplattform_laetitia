@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Glossar-Verwaltung</title>
+<style>
+:root{
+  --bg:#f6f7fb; --panel:#fff; --border:rgba(15,23,42,.14);
+  --shadow:0 10px 26px rgba(15,23,42,.08); --text:#0f172a;
+  --muted:rgba(15,23,42,.60); --green:#1db954; --green2:#18a84c;
+  --red:#e24a4a; --gold:#f59e0b; --radius:16px;
+}
+*{ box-sizing:border-box; }
+body{ margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg); color:var(--text); min-height:100vh; }
+
+.viewport{ padding:14px; max-width:1100px; margin:0 auto; }
+
+/* Header */
+.header{ background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:16px 20px; margin-bottom:12px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.header-left{ display:flex; align-items:center; gap:12px; }
+.header-emoji{ font-size:36px; }
+.header-title{ font-size:22px; font-weight:1000; margin:0; }
+.header-sub{ font-size:13px; font-weight:900; color:var(--muted); margin:2px 0 0; }
+.header-stats{ font-size:13px; font-weight:900; color:var(--muted); text-align:right; }
+.header-stats span{ display:block; }
+.stat-ok{ color:#0b5c22; }
+.stat-missing{ color:#7a1212; }
+.stat-unknown{ color:#7a5a00; }
+
+/* Toolbar */
+.toolbar{ background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:10px 14px; margin-bottom:12px;
+  display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.toolbar input[type=text]{
+  flex:1; min-width:180px; padding:8px 12px; border-radius:10px;
+  border:1px solid var(--border); font-size:14px; font-weight:900;
+  background:var(--bg); color:var(--text); }
+.toolbar select{
+  padding:8px 12px; border-radius:10px; border:1px solid var(--border);
+  font-size:14px; font-weight:900; background:var(--bg); color:var(--text); }
+.tbBtn{
+  padding:8px 14px; border-radius:10px; border:1px solid var(--border);
+  background:var(--panel); color:var(--text); font-size:13px; font-weight:900;
+  cursor:pointer; white-space:nowrap; position:relative; transition:none; }
+.tbBtn:hover{ background:rgba(29,185,84,.10); border-color:var(--green); }
+.tbBtn.primary{ background:var(--green); color:#0b1b10; border-color:transparent; }
+.tbBtn.primary:hover{ background:var(--green2); }
+
+/* Nuvoice Upload Zone */
+.uploadZone{ background:rgba(29,185,84,.06); border:2px dashed rgba(29,185,84,.40);
+  border-radius:var(--radius); padding:14px 18px; margin-bottom:12px;
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.uploadZone.hidden{ display:none; }
+.uploadLabel{ font-size:14px; font-weight:900; }
+.uploadLabel span{ color:var(--muted); font-weight:800; }
+#nuvoiceFile{ display:none; }
+.uploadBtn{ padding:8px 14px; border-radius:10px; background:var(--green);
+  color:#0b1b10; border:none; font-size:13px; font-weight:1000;
+  cursor:pointer; }
+.uploadResult{ font-size:13px; font-weight:900; color:var(--green); }
+
+/* Tabelle */
+.tableWrap{ background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+table{ width:100%; border-collapse:collapse; }
+thead{ background:rgba(15,23,42,.04); }
+th{ padding:10px 12px; text-align:left; font-size:12px; font-weight:1000;
+  color:var(--muted); border-bottom:1px solid var(--border); white-space:nowrap; }
+td{ padding:9px 12px; border-bottom:1px solid rgba(15,23,42,.06);
+  font-size:14px; vertical-align:middle; }
+tr:last-child td{ border-bottom:none; }
+tr:hover td{ background:rgba(29,185,84,.04); }
+
+.word-cell{ font-weight:1000; font-size:15px; }
+.freq-cell{ color:var(--muted); font-size:12px; font-weight:900; white-space:nowrap; }
+
+.erklaerung-input{
+  width:100%; padding:6px 8px; border-radius:8px;
+  border:1px solid var(--border); font-size:13px; font-weight:900;
+  background:var(--bg); color:var(--text); font-family:inherit; }
+.erklaerung-input:focus{ outline:2px solid var(--green); border-color:var(--green); }
+.erklaerung-input.filled{ background:rgba(29,185,84,.06); border-color:rgba(29,185,84,.35); }
+
+/* Nuvoice Status */
+.nuv-badge{
+  display:inline-flex; align-items:center; gap:4px;
+  padding:4px 8px; border-radius:999px; font-size:11px; font-weight:1000;
+  border:1px solid; white-space:nowrap; cursor:pointer;
+  user-select:none; transition:none; }
+.nuv-badge:hover{ transform:scale(1.05); }
+.nuv-yes { background:rgba(29,185,84,.14); border-color:rgba(29,185,84,.40); color:#0b5c22; }
+.nuv-no  { background:rgba(226,74,74,.12); border-color:rgba(226,74,74,.35); color:#7a1212; }
+.nuv-null{ background:rgba(245,158,11,.12); border-color:rgba(245,158,11,.35); color:#7a4a00; }
+
+/* Action-Buttons pro Zeile */
+.rowBtn{
+  padding:5px 10px; border-radius:8px; border:1px solid var(--border);
+  background:transparent; color:var(--text); font-size:12px; font-weight:900;
+  cursor:pointer; transition:none; }
+.rowBtn:hover{ background:rgba(29,185,84,.10); border-color:var(--green); }
+.rowBtn.speak{ color:#2299ff; border-color:rgba(34,153,255,.30); }
+.rowBtn.speak:hover{ background:rgba(34,153,255,.08); }
+
+/* Footer */
+.footer{ margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; }
+.footBtn{
+  padding:12px 20px; border-radius:12px; border:1px solid rgba(0,0,0,.10);
+  font-size:15px; font-weight:1000; cursor:pointer; transition:none; }
+.footBtn.save{ background:var(--green); color:#0b1b10; }
+.footBtn.save:hover{ background:var(--green2); }
+.footBtn.back{
+  background:#ede9fe; color:#4c1d95;
+  border-color:#8b5cf6; min-height:72px; font-size:20px;
+}
+.footBtn.back:hover{ background:#ddd6fe; outline:3px solid #8b5cf6; }
+.footBtn.export{ background:rgba(34,153,255,.10); color:#1a5fa8;
+  border-color:rgba(34,153,255,.30); }
+.footBtn.export:hover{ background:rgba(34,153,255,.18); }
+
+.saveMsg{ display:none; padding:10px 14px; border-radius:10px;
+  background:rgba(29,185,84,.14); border:1px solid rgba(29,185,84,.35);
+  color:#0b5c22; font-size:14px; font-weight:900; margin-top:10px; }
+.saveMsg.show{ display:block; }
+
+/* Dwell Ring */
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{ position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%); pointer-events:none; z-index:10;
+  width:56px; height:56px; }
+.dwell-ring-svg circle{ fill:none; stroke:var(--green); stroke-width:5;
+  stroke-dasharray:220; stroke-dashoffset:220;
+  transform:rotate(-90deg); transform-origin:28px 28px; }
+.dwell-ring-svg circle.animating{
+  animation:dwellRing var(--dwell-duration,0.6s) linear forwards; }
+.dwell-active{ outline:3px solid var(--green) !important;
+  transform:scale(1.04) !important; transition:none !important; }
+
+/* Pager */
+.pager{ display:flex; gap:8px; align-items:center; padding:10px 14px;
+  border-top:1px solid var(--border); flex-wrap:wrap; }
+.pager span{ font-size:13px; font-weight:900; color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="viewport">
+
+  <div class="header">
+    <div class="header-left">
+      <div class="header-emoji">📖</div>
+      <div>
+        <div class="header-title">Glossar-Verwaltung</div>
+        <div class="header-sub">Wörter aus Deutsch & Lesen — Erklärungen und Nuvoice-Abgleich</div>
+      </div>
+    </div>
+    <div class="header-stats">
+      <span>Gesamt: <strong id="statTotal">–</strong></span>
+      <span class="stat-ok">✅ Mit Erklärung: <strong id="statFilled">–</strong></span>
+      <span class="stat-missing">❌ Ohne Erklärung: <strong id="statEmpty">–</strong></span>
+      <span class="stat-unknown">⚠ Nuvoice ungeprüft: <strong id="statNuv">–</strong></span>
+    </div>
+  </div>
+
+  <!-- Nuvoice Upload -->
+  <div class="uploadZone" id="uploadZone">
+    <div>
+      <div class="uploadLabel">📂 Nuvoice-Wortschatz importieren
+        <span>— Textdatei mit einem Wort pro Zeile (aus Nuvoice exportieren)</span>
+      </div>
+      <div class="uploadResult" id="uploadResult"></div>
+    </div>
+    <input type="file" id="nuvoiceFile" accept=".txt,.csv,.wsp">
+    <button class="uploadBtn" onclick="document.getElementById('nuvoiceFile').click()">
+      Datei wählen
+    </button>
+    <button class="tbBtn" onclick="toggleUpload()">▲ Schließen</button>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <input type="text" id="searchInput" placeholder="🔍 Wort suchen…" oninput="renderTable()">
+    <select id="filterSel" onchange="renderTable()">
+      <option value="all">Alle Wörter</option>
+      <option value="empty">Ohne Erklärung</option>
+      <option value="filled">Mit Erklärung</option>
+      <option value="nuv_no">Nicht in Nuvoice</option>
+      <option value="nuv_null">Nuvoice ungeprüft</option>
+      <option value="nuv_yes">In Nuvoice</option>
+    </select>
+    <button class="tbBtn" onclick="toggleUpload()">📂 Nuvoice importieren</button>
+    <button class="tbBtn primary" onclick="speakAll()">🔊 Alle vorlesen</button>
+    <span style="font-size:13px;font-weight:900;color:var(--muted)" id="countLabel"></span>
+  </div>
+
+  <!-- Tabelle -->
+  <div class="tableWrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:40px">#</th>
+          <th>Wort</th>
+          <th style="width:60px">Häufig.</th>
+          <th>Erklärung (kindgerecht)</th>
+          <th style="width:130px">Nuvoice</th>
+          <th style="width:100px">Aktionen</th>
+        </tr>
+      </thead>
+      <tbody id="glossarBody"></tbody>
+    </table>
+    <div class="pager" id="pager"></div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <button class="footBtn back" onclick="history.back()">← Zurück</button>
+    <button class="footBtn save" onclick="saveGlossar()">💾 Speichern</button>
+    <button class="footBtn export" onclick="exportGlossar()">⬇ Als Datei exportieren</button>
+  </div>
+  <div class="saveMsg" id="saveMsg">✅ Glossar gespeichert!</div>
+
+</div>
+
+<script src="../core/dwell.js"></script>
+<script src="../core/glossar.js"></script>
+<script>
+"use strict";
+
+const STORAGE_KEY = "laetitia_glossar_v1";
+const PAGE_SIZE   = 50;
+let currentPage   = 0;
+let filteredWords = [];
+
+// ── Glossar laden ────────────────────────────────────────────────────────────
+// Priorität: localStorage → window.LaetitiaGlossar (glossar.js)
+let glossar = {};
+
+function loadGlossar(){
+  // 1. localStorage (gespeicherte Änderungen)
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) glossar = JSON.parse(raw);
+  }catch{}
+
+  // 2. glossar.js als Basis-Vorlage (neue Wörter die noch nicht im localStorage sind)
+  if(window.LaetitiaGlossar){
+    Object.entries(window.LaetitiaGlossar).forEach(([w, data]) => {
+      if(!glossar[w]){
+        glossar[w] = { ...data };
+      }
+    });
+  }
+}
+
+function saveGlossar(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(glossar));
+    const msg = document.getElementById("saveMsg");
+    msg.classList.add("show");
+    setTimeout(()=> msg.classList.remove("show"), 2500);
+    updateStats();
+  }catch(e){ alert("Fehler beim Speichern: " + e.message); }
+}
+
+// ── Statistiken ──────────────────────────────────────────────────────────────
+function updateStats(){
+  const all    = Object.keys(glossar).length;
+  const filled = Object.values(glossar).filter(v => v.erklaerung && v.erklaerung.trim()).length;
+  const nuvNull = Object.values(glossar).filter(v => v.nuvoice === null).length;
+  document.getElementById("statTotal").textContent  = all;
+  document.getElementById("statFilled").textContent = filled;
+  document.getElementById("statEmpty").textContent  = all - filled;
+  document.getElementById("statNuv").textContent    = nuvNull;
+}
+
+// ── Tabelle rendern ───────────────────────────────────────────────────────────
+function getFiltered(){
+  const search = (document.getElementById("searchInput")?.value || "").toLowerCase().trim();
+  const filter = document.getElementById("filterSel")?.value || "all";
+
+  return Object.entries(glossar).filter(([w, data]) => {
+    if(search && !w.toLowerCase().includes(search)) return false;
+    if(filter === "empty"    && (data.erklaerung && data.erklaerung.trim())) return false;
+    if(filter === "filled"   && !(data.erklaerung && data.erklaerung.trim())) return false;
+    if(filter === "nuv_no"   && data.nuvoice !== false) return false;
+    if(filter === "nuv_null" && data.nuvoice !== null)  return false;
+    if(filter === "nuv_yes"  && data.nuvoice !== true)  return false;
+    return true;
+  });
+}
+
+function renderTable(){
+  filteredWords = getFiltered();
+  const total   = filteredWords.length;
+  const start   = currentPage * PAGE_SIZE;
+  const page    = filteredWords.slice(start, start + PAGE_SIZE);
+
+  document.getElementById("countLabel").textContent =
+    `${total} Wörter${total !== Object.keys(glossar).length ? " (gefiltert)" : ""}`;
+
+  const tbody = document.getElementById("glossarBody");
+  tbody.innerHTML = "";
+
+  page.forEach(([w, data], i) => {
+    const globalIdx = start + i + 1;
+    const hasFill = data.erklaerung && data.erklaerung.trim();
+    const nuvClass = data.nuvoice === true ? "nuv-yes" : data.nuvoice === false ? "nuv-no" : "nuv-null";
+    const nuvText  = data.nuvoice === true ? "✅ vorhanden" : data.nuvoice === false ? "❌ fehlt" : "⚠ ungeprüft";
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="freq-cell">${globalIdx}</td>
+      <td class="word-cell">${w}
+        <span style="font-size:10px;color:var(--muted);font-weight:800">
+          ${data.freq ? " ·"+data.freq+"×" : ""}
+        </span>
+      </td>
+      <td class="freq-cell">${data.freq || ""}</td>
+      <td>
+        <input class="erklaerung-input ${hasFill ? "filled" : ""}"
+          type="text" value="${escHtml(data.erklaerung || "")}"
+          placeholder="Erklärung eingeben…"
+          data-word="${escAttr(w)}"
+          oninput="onErklaerung(this)">
+      </td>
+      <td>
+        <span class="nuv-badge ${nuvClass}" onclick="cycleNuvoice('${escAttr(w)}')"
+          title="Klick zum Umschalten">
+          ${nuvText}
+        </span>
+      </td>
+      <td style="display:flex;gap:4px;flex-wrap:wrap">
+        <button class="rowBtn speak" onclick="speakWord('${escAttr(w)}')">🔊</button>
+        <button class="rowBtn" onclick="speakErklaerung('${escAttr(w)}')">📖</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+
+  // Pager
+  const pager = document.getElementById("pager");
+  const pages = Math.ceil(total / PAGE_SIZE);
+  pager.innerHTML = "";
+  if(pages > 1){
+    pager.innerHTML = `<span>Seite ${currentPage+1} von ${pages}</span>`;
+    for(let p=0; p<pages; p++){
+      const btn = document.createElement("button");
+      btn.className = "rowBtn" + (p===currentPage?" "+" dwell-active":"");
+      btn.style.cssText = p===currentPage ? "background:var(--green);color:#0b1b10;" : "";
+      btn.textContent = p+1;
+      btn.onclick = ()=>{ currentPage=p; renderTable(); };
+      pager.appendChild(btn);
+    }
+  }
+}
+
+function escHtml(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function escAttr(s){ return (s||"").replace(/'/g,"\\'"); }
+
+// ── Event-Handler ─────────────────────────────────────────────────────────────
+function onErklaerung(input){
+  const w = input.dataset.word;
+  if(!glossar[w]) return;
+  glossar[w].erklaerung = input.value;
+  input.classList.toggle("filled", !!(input.value.trim()));
+}
+
+function cycleNuvoice(w){
+  if(!glossar[w]) return;
+  const cur = glossar[w].nuvoice;
+  glossar[w].nuvoice = cur === null ? true : cur === true ? false : null;
+  renderTable();
+  updateStats();
+}
+
+// ── TTS ──────────────────────────────────────────────────────────────────────
+function speak(text, rate){
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    const voices = speechSynthesis.getVoices();
+    const de = voices.find(v => (v.lang||"").toLowerCase().startsWith("de"));
+    if(de) u.voice = de;
+    u.rate  = rate || 0.90;
+    u.pitch = 1.0;
+    speechSynthesis.speak(u);
+  }catch(e){ console.warn("TTS Fehler:", e); }
+}
+
+function speakWord(w){ speak(w, 0.75); }
+
+function speakErklaerung(w){
+  const data = glossar[w];
+  if(!data) return;
+  if(data.erklaerung && data.erklaerung.trim()){
+    speak(w + ". " + data.erklaerung, 0.85);
+  } else {
+    speak(w + " — keine Erklärung vorhanden.", 0.85);
+  }
+}
+
+function speakAll(){
+  const words = filteredWords.slice(0, 10); // max 10 auf einmal
+  if(!words.length) return;
+  let i = 0;
+  function next(){
+    if(i >= words.length) return;
+    const [w, data] = words[i++];
+    const text = data.erklaerung ? `${w}: ${data.erklaerung}` : w;
+    try{
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      const voices = speechSynthesis.getVoices();
+      const de = voices.find(v => (v.lang||"").toLowerCase().startsWith("de"));
+      if(de) u.voice = de;
+      u.rate = 0.85;
+      u.onend = next;
+      speechSynthesis.speak(u);
+    }catch{}
+  }
+  next();
+}
+
+// ── Nuvoice-Import ────────────────────────────────────────────────────────────
+function toggleUpload(){
+  const z = document.getElementById("uploadZone");
+  z.classList.toggle("hidden");
+}
+
+document.getElementById("nuvoiceFile").addEventListener("change", function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    const text = ev.target.result;
+    // Ein Wort pro Zeile, Leerzeilen ignorieren
+    const nuvoiceWords = new Set(
+      text.split(/\r?\n/)
+        .map(l => l.trim().toLowerCase())
+        .filter(l => l.length > 0)
+    );
+
+    let matched = 0, notFound = 0;
+    Object.keys(glossar).forEach(w => {
+      if(nuvoiceWords.has(w.toLowerCase())){
+        glossar[w].nuvoice = true; matched++;
+      } else {
+        glossar[w].nuvoice = false; notFound++;
+      }
+    });
+
+    document.getElementById("uploadResult").textContent =
+      `✅ Importiert: ${nuvoiceWords.size} Wörter. Abgeglichen: ${matched} vorhanden, ${notFound} fehlen im Nuvoice-Wortschatz.`;
+    renderTable();
+    updateStats();
+  };
+  reader.readAsText(file, "utf-8");
+});
+
+// ── Export ────────────────────────────────────────────────────────────────────
+function exportGlossar(){
+  // Als glossar.js-Datei exportieren
+  let out = "// app/core/glossar.js\n";
+  out += "// Glossar für Laetitia Lernsystem\n";
+  out += "// Exportiert: " + new Date().toLocaleDateString("de-DE") + "\n\n";
+  out += "(function(){\n\"use strict\";\n\n";
+  out += "window.LaetitiaGlossar = {\n\n";
+
+  Object.entries(glossar).forEach(([w, data]) => {
+    const erk  = (data.erklaerung || "").replace(/"/g, '\\"');
+    const nuv  = data.nuvoice === true ? "true" : data.nuvoice === false ? "false" : "null";
+    const freq = data.freq ? `  // ${data.freq}x\n` : "";
+    out += `${freq}  "${w}": { erklaerung: "${erk}", nuvoice: ${nuv} },\n`;
+  });
+
+  out += "\n};\n\n})();\n";
+
+  const blob = new Blob([out], {type:"text/javascript"});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = "glossar.js";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+loadGlossar();
+updateStats();
+renderTable();
+try{ speechSynthesis.getVoices(); }catch{}
+</script>
+<script src="../../core/error_handler.js"></script>
+</body>
+</html>

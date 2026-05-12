@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Musik</title>
+
+<style>
+  :root{
+    --bg:#f6f7fb; --panel:#ffffff;
+    --border:rgba(15,23,42,.14);
+    --shadow:0 10px 26px rgba(15,23,42,.08);
+    --text:#0f172a; --muted:rgba(15,23,42,.65);
+    --green:#1db954; --green2:#18a84c;
+    --red:#e24a4a; --red2:#cf3b3b;
+    --gold:#f5a623;
+    --radius:18px;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    background:var(--bg); color:var(--text);
+    height:100vh; overflow:hidden;
+  }
+
+  .viewport{ height:100vh; display:flex; align-items:center; justify-content:center; padding:10px; }
+  .app{ width:min(1100px,96vw); height:calc(100vh - 20px); display:flex; flex-direction:column; gap:8px; min-height:0; }
+
+
+
+  .panel{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:8px; flex:1 1 auto; min-height:0; overflow:hidden;
+    display:flex; flex-direction:column;
+  }
+
+  .screen.hidden{ display:none !important; }
+
+  /* Dwell-Ring */
+  @keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+  .dwell-active{ transform:scale(1.06); outline:4px solid #1db954; box-shadow:0 0 0 5px rgba(29,185,84,0.45); transition:none; }
+  .dwell-ring-svg{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none; z-index:10; width:70px; height:70px; }
+  .dwell-ring-svg circle{ fill:none; stroke:#1db954; stroke-width:5; stroke-dasharray:220; stroke-dashoffset:220; transform:rotate(-90deg); transform-origin:35px 35px; }
+  .dwell-ring-svg circle.animating{ animation:dwellRing var(--dwell-duration,0.6s) linear forwards; }
+
+  /* Buttons allgemein */
+  a.uibtn, button.uibtn{
+    display:flex; align-items:center; justify-content:center; text-decoration:none;
+    border-radius:16px; border:1px solid rgba(0,0,0,0.10); background:var(--green);
+    color:#0b1b10; font-weight:1000; user-select:none; cursor:pointer; position:relative;
+    -webkit-tap-highlight-color:transparent;
+  }
+  a.uibtn:hover, a.uibtn:focus, button.uibtn:hover, button.uibtn:focus{
+    background:var(--green2); outline:3px solid rgba(29,185,84,0.50); outline-offset:2px; transition:none; z-index:2;
+  }
+  a.uibtn.grau{ background:rgba(15,23,42,.07); color:var(--text); border-color:var(--border); }
+  a.uibtn.grau:hover, a.uibtn.grau:focus{ background:rgba(15,23,42,.14); }
+
+  /* ── SCREEN 1: Album-Übersicht ── */
+  #screenAlben{ flex:1; display:flex; flex-direction:column; gap:10px; min-height:0; }
+  .screenHeader{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex:0 0 auto; }
+  .screenTitel{ font-size:24px; font-weight:1000; }
+
+  /* Tab-Leiste: Alben / A-Z */
+  .tabBar{ display:flex; gap:8px; flex:0 0 auto; }
+  a.tabBtn{
+    flex:1; min-height:52px; font-size:14px; font-weight:1000;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:12px; border:1px solid var(--border);
+    background:rgba(15,23,42,.06); color:var(--text);
+    text-decoration:none; cursor:pointer; user-select:none; position:relative; transition:none;
+  }
+  a.tabBtn.tabAktiv{ background:var(--green); color:#0b1b10; border-color:rgba(0,0,0,0.10); }
+  a.tabBtn:hover, a.tabBtn:focus{ background:rgba(15,23,42,.14); outline:3px solid rgba(29,185,84,0.50); transition:none; }
+  a.tabBtn.tabAktiv:hover, a.tabBtn.tabAktiv:focus{ background:var(--green2); }
+
+  /* Album-Grid */
+  #albumGrid{
+    flex:1; overflow:hidden; display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(280px,1fr));
+    align-content:start; gap:12px; min-height:0; padding:2px;
+  }
+  a.albumBtn{
+    display:flex; align-items:center; gap:0;
+    background:var(--panel); border:2px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow); text-decoration:none; color:var(--text);
+    height:90px; padding:0; overflow:hidden; transition:none; cursor:pointer; position:relative;
+  }
+  a.albumBtn:hover, a.albumBtn:focus{
+    transform:scale(1.03); outline:4px solid #1db954;
+    box-shadow:0 0 0 5px rgba(29,185,84,0.45); transition:none; z-index:2;
+  }
+  .albumCover{
+    width:75px; min-width:75px; height:90px; object-fit:cover;
+    border-radius:calc(var(--radius) - 2px) 0 0 calc(var(--radius) - 2px); flex-shrink:0;
+  }
+  .albumCoverPlaceholder{
+    width:75px; min-width:75px; height:90px; flex-shrink:0;
+    background:rgba(29,185,84,0.15); display:flex; align-items:center; justify-content:center;
+    font-size:36px; border-radius:calc(var(--radius) - 2px) 0 0 calc(var(--radius) - 2px);
+  }
+  .albumInfo{ flex:1; padding:8px 12px; display:flex; flex-direction:column; justify-content:space-between; }
+  .albumTitel{ font-size:14px; font-weight:1000; line-height:1.2; }
+  .albumKuenstler{ font-size:11px; font-weight:900; color:var(--muted); margin-top:2px; }
+  .albumMeta{ font-size:11px; font-weight:900; color:var(--muted); margin-top:4px; }
+
+  /* ── SCREEN 2: Titel-Liste ── */
+  #screenTitel{ flex:1; display:flex; flex-direction:column; gap:8px; min-height:0; }
+  .titelHeader{ display:flex; align-items:center; justify-content:space-between; flex:0 0 auto; }
+  .titelLabel{ font-size:13px; font-weight:900; color:var(--muted); }
+  .titelSeite{ font-size:12px; font-weight:900; color:var(--muted); }
+  #titelListe{ flex:1; overflow:hidden; display:flex; flex-direction:column; gap:5px; }
+
+  /* Jede Titel-Zeile */
+  .titelZeile{ display:flex; gap:6px; align-items:stretch; flex:1 1 0; min-height:0; max-height:72px; }
+  a.titelNr{
+    flex:0 0 80px; display:flex; align-items:center; justify-content:center;
+    font-size:17px; font-weight:1000; border-radius:12px;
+    border:1px solid rgba(0,0,0,0.10);
+    background:rgba(29,185,84,0.15); border-color:rgba(29,185,84,0.35);
+    color:#0b1b10; text-decoration:none; cursor:pointer; user-select:none;
+    position:relative; transition:none;
+  }
+  a.titelNr:hover, a.titelNr:focus{
+    background:rgba(29,185,84,0.50); outline:3px solid #1db954; transition:none; z-index:2;
+  }
+  a.titelNr.titelAktiv{ background:var(--green); border-color:rgba(0,0,0,0.10); }
+
+  .titelInfo{
+    flex:1; display:flex; align-items:center; padding:0 12px;
+    background:rgba(15,23,42,.04); border:1px solid var(--border);
+    border-radius:12px; min-width:0; pointer-events:none; user-select:none;
+  }
+  .titelInfo.titelAktiv{ background:rgba(29,185,84,0.10); border-color:rgba(29,185,84,0.35); }
+  .titelName{ font-size:13px; font-weight:900; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .titelAlbum{ font-size:11px; font-weight:900; color:var(--muted); white-space:nowrap; margin-left:8px; }
+
+  /* Favoriten-Stern in der Zeile */
+  a.sternBtn{
+    flex:0 0 54px; display:flex; align-items:center; justify-content:center;
+    font-size:22px; border-radius:12px; border:1px solid var(--border);
+    background:rgba(15,23,42,.04); text-decoration:none; cursor:pointer;
+    user-select:none; position:relative; transition:none;
+  }
+  a.sternBtn:hover, a.sternBtn:focus{ background:rgba(245,166,35,0.20); outline:3px solid var(--gold); transition:none; }
+  a.sternBtn.sternAktiv{ background:rgba(245,166,35,0.25); border-color:rgba(245,166,35,0.60); }
+
+  /* Paginierung */
+  .titelPager{ display:flex; gap:8px; flex:0 0 auto; }
+  a.pagerBtn{
+    flex:1; min-height:52px; font-size:16px; font-weight:1000;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:12px; border:1px solid rgba(0,0,0,0.10);
+    background:var(--green); color:#0b1b10;
+    text-decoration:none; cursor:pointer; user-select:none; position:relative; transition:none;
+  }
+  a.pagerBtn:hover, a.pagerBtn:focus{ background:var(--green2); outline:4px solid rgba(29,185,84,0.50); transition:none; }
+  a.pagerBtn[aria-disabled="true"]{ opacity:0.3; pointer-events:none; }
+
+  /* ── SCREEN 3: Player ── */
+  #screenPlayer{
+    flex:1; display:grid;
+    grid-template-rows:auto 1fr;
+    grid-template-columns:1fr 2fr;
+    gap:10px; min-height:0;
+  }
+  .playerHeader{ grid-column:1 / -1; display:flex; align-items:center; gap:12px; }
+  .playerTitelBlock{ flex:1; }
+  .playerTitelText{ font-size:20px; font-weight:1000; }
+  .playerUntertitel{ font-size:14px; font-weight:900; color:var(--muted); margin-top:2px; }
+
+  .playerLinks{ display:flex; flex-direction:column; gap:8px; min-height:0; }
+  .playerCoverWrap{
+    flex:0 0 auto; background:rgba(15,23,42,.04); border-radius:14px; overflow:hidden;
+    display:flex; align-items:center; justify-content:center; max-height:180px;
+  }
+  #playerCover{ width:100%; max-height:180px; object-fit:cover; display:block; }
+  .playerCoverPlaceholder{
+    width:100%; height:140px; background:rgba(29,185,84,0.15);
+    display:flex; align-items:center; justify-content:center; font-size:48px;
+  }
+
+  /* Fortschrittsbalken */
+  .audioFortschrittWrap{ flex:0 0 auto; }
+  #audioFortschrittShell{
+    height:14px; border-radius:999px; background:rgba(15,23,42,.10);
+    overflow:hidden; cursor:pointer; position:relative;
+  }
+  #audioFortschrittFill{ height:100%; width:0%; background:var(--green); border-radius:999px; transition:width .3s; }
+  #audioZeit{ font-size:12px; font-weight:900; color:var(--muted); text-align:right; margin-top:4px; }
+
+  /* Player-Buttons */
+  .playerButtons{ display:grid; grid-template-columns:1fr 1fr 1fr 2fr 1fr 1fr 1fr; gap:8px; flex:0 0 auto; }
+  a.playerBtn{
+    display:flex; align-items:center; justify-content:center;
+    min-height:66px; font-size:20px; font-weight:1000;
+    border-radius:14px; border:1px solid rgba(0,0,0,0.10);
+    background:rgba(29,185,84,0.15); border-color:rgba(29,185,84,0.35);
+    color:#0b1b10; text-decoration:none; cursor:pointer; user-select:none; position:relative; transition:none;
+  }
+  a.playerBtn:hover, a.playerBtn:focus{
+    transform:scale(1.08); outline:4px solid #1db954;
+    background:rgba(29,185,84,0.40) !important; transition:none; z-index:2;
+  }
+  #btnPlayPause{ font-size:32px; background:var(--green) !important; color:#0b1b10; }
+  #btnPlayPause:hover, #btnPlayPause:focus{ background:var(--green2) !important; }
+  #btnShuffle.shuffleAktiv{ background:rgba(29,185,84,0.50) !important; outline:3px solid #1db954; }
+  #btnSternPlayer.sternAktiv{ background:rgba(245,166,35,0.35) !important; border-color:rgba(245,166,35,0.60); }
+
+  /* Geschwindigkeit */
+  .speedButtons{ display:flex; gap:8px; flex:0 0 auto; }
+  a.speedBtn{
+    flex:1; min-height:44px; font-size:13px; font-weight:1000;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:10px; border:1px solid var(--border);
+    background:rgba(15,23,42,.06); color:var(--text);
+    text-decoration:none; cursor:pointer; user-select:none; position:relative; transition:none;
+  }
+  a.speedBtn.speedAktiv{ background:var(--green); color:#0b1b10; border-color:rgba(0,0,0,0.10); }
+  a.speedBtn:hover, a.speedBtn:focus{ background:rgba(15,23,42,.14); transition:none; }
+  a.speedBtn.speedAktiv:hover, a.speedBtn.speedAktiv:focus{ background:var(--green2); }
+
+
+  /* Lautstärke-Leiste */
+  .lautstärkeLeiste{ display:flex; gap:8px; flex:0 0 auto; align-items:center; }
+  a.volBtn{
+    flex:1; min-height:58px; font-size:20px; font-weight:1000;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:14px; border:1px solid var(--border);
+    background:rgba(15,23,42,.06); color:var(--text);
+    text-decoration:none; cursor:pointer; user-select:none; position:relative; transition:none;
+  }
+  a.volBtn:hover, a.volBtn:focus{ background:rgba(15,23,42,.18); outline:3px solid rgba(29,185,84,0.50); transition:none; }
+  .volAnzeige{
+    flex:1; min-height:44px; display:flex; align-items:center; justify-content:center;
+    font-size:15px; font-weight:1000; color:var(--text);
+    background:rgba(15,23,42,.04); border:1px solid var(--border);
+    border-radius:10px; pointer-events:none; user-select:none;
+  }
+  /* Rechte Spalte: Titel-Liste im Player */
+  .playerRechts{ display:flex; flex-direction:column; gap:6px; min-height:0; overflow:hidden; }
+  #playerTitelListe{ flex:1; overflow:hidden; display:flex; flex-direction:column; gap:5px; }
+
+  /* Footer */
+  .playerFooter{ grid-column:1 / -1; display:flex; gap:12px; }
+  a.navBtn{ min-height:68px; font-size:16px; font-weight:1000; padding:10px; flex:1; text-decoration:none; }
+
+  @media(max-width:700px){
+    #screenPlayer{ grid-template-columns:1fr; }
+  }
+
+  /* Zurueck-Buttons helllila */
+  #btnReturnMain, #btnReturnBuecher, #btnReturnAlben,
+  #btnReturnTitel, #btnZurueck, a.zurueckBtn {
+    background:#ede9fe !important; color:#4c1d95 !important;
+    border:2px solid #8b5cf6 !important;
+    min-height:44px !important; font-size:14px !important;
+    font-weight:1000 !important;
+  }
+  #btnReturnMain:hover, #btnReturnMain:focus,
+  #btnReturnBuecher:hover, #btnReturnBuecher:focus,
+  #btnReturnAlben:hover, #btnReturnAlben:focus,
+  #btnReturnTitel:hover, #btnReturnTitel:focus,
+  #btnZurueck:hover, #btnZurueck:focus,
+  a.zurueckBtn:hover, a.zurueckBtn:focus {
+    background:#ddd6fe !important; outline:4px solid #8b5cf6 !important;
+  }
+
+
+  /* Zurück-Button unten mittig */
+  .zurueckLeiste{
+    flex:0 0 auto; padding:3px 12px;
+    background:var(--panel); border-top:1px solid var(--border);
+    display:flex; justify-content:center;
+  }
+  a.zurueckBtn{
+    display:flex; align-items:center; justify-content:center;
+    min-height:44px; font-size:14px; font-weight:1000;
+    width:min(280px, 100%);
+    border-radius:12px; border:2px solid #8b5cf6;
+    background:#ede9fe; color:#4c1d95;
+    text-decoration:none; cursor:pointer; user-select:none;
+    position:relative; transition:none;
+  }
+  a.zurueckBtn:hover, a.zurueckBtn:focus{
+    background:#ddd6fe; outline:4px solid #8b5cf6; transition:none;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="viewport">
+  <div class="app">
+
+
+    <div class="panel">
+
+      <!-- ══ SCREEN 1: Album-Übersicht ══ -->
+      <div id="screenAlben" class="screen hidden">
+        <div class="screenHeader">
+          <div class="screenTitel">🎵 Musik</div>
+          
+        </div>
+        <div class="tabBar">
+          <a class="tabBtn uibtn tabAktiv" href="#" id="tabAlben">🎵 Alben</a>
+          <a class="tabBtn uibtn" href="#" id="tabAZ">🔤 A – Z</a>
+          <a class="tabBtn uibtn" href="#" id="tabFavoriten">⭐ Favoriten</a>
+        </div>
+        <div id="albumGrid"></div>
+      </div>
+
+      <!-- ══ SCREEN 2: Titel-Liste ══ -->
+      <div id="screenTitel" class="screen hidden">
+        <div class="screenHeader">
+          <div>
+            <div class="screenTitel" id="titelScreenTitel">Album</div>
+            <div style="font-size:13px;font-weight:900;color:var(--muted);" id="titelScreenUnter"></div>
+          </div>
+
+        </div>
+        <div class="titelHeader">
+          <div class="titelLabel" id="titelLabel">Titel</div>
+          <div class="titelSeite" id="titelSeiteAnzeige"></div>
+        </div>
+        <div id="titelListe"></div>
+        <div class="titelPager">
+          <a class="pagerBtn" href="#" id="btnTitelZurueck">–</a>
+          <a class="pagerBtn" href="#" id="btnTitelWeiter">–</a>
+        </div>
+      </div>
+
+      <!-- ══ SCREEN 3: Player ══ -->
+      <div id="screenPlayer" class="screen hidden">
+
+        <div class="playerHeader">
+          <div class="playerTitelBlock">
+            <div class="playerTitelText" id="playerTitelText">Titel</div>
+            <div class="playerUntertitel" id="playerUntertitel"></div>
+          </div>
+
+        </div>
+
+        <!-- Linke Spalte -->
+        <div class="playerLinks">
+          <div class="playerCoverWrap" id="playerCoverWrap">
+            <img id="playerCover" src="" alt="Cover" style="display:none;">
+            <div class="playerCoverPlaceholder" id="playerCoverPlaceholder">🎵</div>
+          </div>
+
+          <div class="audioFortschrittWrap">
+            <div id="audioFortschrittShell">
+              <div id="audioFortschrittFill"></div>
+            </div>
+            <div id="audioZeit">0:00 / 0:00</div>
+          </div>
+
+          <div class="playerButtons">
+            <a class="playerBtn uibtn" href="#" id="btnZurueckTitel" title="Vorheriger Titel">⏮</a>
+            <a class="playerBtn uibtn" href="#" id="btnZurueck10" title="10s zurück">⏪</a>
+            <a class="playerBtn uibtn" href="#" id="btnShuffle" title="Shuffle">🔀</a>
+            <a class="playerBtn uibtn" href="#" id="btnPlayPause">▶</a>
+            <a class="playerBtn uibtn" href="#" id="btnVor10" title="10s vor">⏩</a>
+            <a class="playerBtn uibtn" href="#" id="btnWeiterTitel" title="Nächster Titel">⏭</a>
+            <a class="playerBtn uibtn" href="#" id="btnSternPlayer" title="Favorit" style="font-size:24px;">☆</a>
+          </div>
+
+          <div class="speedButtons">
+            <a class="speedBtn uibtn" href="#" id="btnSpeed8">0.8×</a>
+            <a class="speedBtn uibtn speedAktiv" href="#" id="btnSpeed10">1.0×</a>
+            <a class="speedBtn uibtn" href="#" id="btnSpeed12">1.2×</a>
+          </div>
+
+          <div class="lautstärkeLeiste">
+            <a class="volBtn uibtn" href="#" id="btnVolMinus">🔉 −</a>
+            <div class="volAnzeige" id="volAnzeige">🔊 60%</div>
+            <a class="volBtn uibtn" href="#" id="btnVolPlus">+ 🔊</a>
+          </div>
+
+          <div class="titelPager">
+            <a class="pagerBtn" href="#" id="btnPlayerZurueck">–</a>
+            <a class="pagerBtn" href="#" id="btnPlayerWeiter">–</a>
+          </div>
+        </div>
+
+        <!-- Rechte Spalte: Titel-Liste -->
+        <div class="playerRechts">
+          <div id="playerTitelListe"></div>
+        </div>
+
+      </div><!-- /screenPlayer -->
+
+    </div><!-- /panel -->
+    <div class="zurueckLeiste"><a class="zurueckBtn" href="../../entertainment.html" id="btnReturnMain">← Zurück</a></div>
+
+  </div><!-- /app -->
+</div><!-- /viewport -->
+
+<!-- Core-Scripts -->
+<script src="../../core/config.js"></script>
+<script src="../../core/storage.js"></script>
+<script src="../../core/return.js"></script>
+<script src="../../core/dataRegistry.js"></script>
+<script src="../../core/dwell.js"></script>
+<script src="../../core/error_handler.js"></script>
+
+<!-- Musik-Alben (eine Zeile pro Album) -->
+<script src="./alben/sonido cosmico/info.js"></script>
+<script src="./alben/Abba/info.js"></script>
+<script src="./alben/Nena/info.js"></script>
+<script src="./alben/Regenballade/info.js"></script>
+<script src="./alben/Best of Angelo Branduardi/info.js"></script>
+<script src="./alben/Fetenhits - Die Deutsche 1/info.js"></script>
+<script src="./alben/Spiegelbild/info.js"></script>
+<script src="./alben/Willkommen in meinem Leben/info.js"></script>
+
+<!-- Modul-Logik -->
+<script src="../../core/geraete.js"></script>
+<script src="./musik_mod.js"></script>
+
+</body>
+</html>

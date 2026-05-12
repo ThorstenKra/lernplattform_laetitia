@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia - Sachkunde</title>
+<style>
+:root{
+  --bg:#f0fdf4; --panel:#ffffff;
+  --border:rgba(15,23,42,.14); --shadow:0 6px 18px rgba(15,23,42,.07);
+  --text:#0f172a; --muted:rgba(15,23,42,.65);
+  --akzent:#16a34a; --akzent2:#15803d;
+  --akzent-bg:rgba(22,163,74,0.08); --radius:18px;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg); color:var(--text);
+  height:100vh; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+.header{
+  background:var(--panel); border-bottom:2px solid var(--akzent);
+  box-shadow:0 2px 8px rgba(15,23,42,.06); flex-shrink:0;
+  padding:10px 20px; display:flex; align-items:center; gap:8px;
+}
+.header-emoji{ font-size:30px; }
+.header-titel{ font-size:22px; font-weight:1000; color:var(--akzent); }
+.header-sub{ font-size:14px; font-weight:800; color:var(--muted); margin-left:auto; }
+.scroll-bereich{
+  flex:1; overflow-y:auto; padding:12px 16px;
+  display:flex; flex-direction:column; gap:12px;
+}
+.scroll-bereich{ overflow-y:hidden; }
+.abschnitt{
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--radius); box-shadow:var(--shadow); padding:14px 16px;
+  display:flex; flex-direction:column; flex:1; min-height:0;
+}
+.abschnitt-titel{
+  font-size:17px; font-weight:1000; color:var(--muted);
+  margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border);
+}
+.btn-grid{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:12px; flex:1;
+}
+a.modBtn{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:10px; padding:16px;
+  background:var(--panel); border:3px solid var(--border);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  text-decoration:none; color:var(--text); font-weight:1000;
+  user-select:none; cursor:pointer; position:relative; transition:none;
+  min-height:0;
+}
+a.modBtn:hover, a.modBtn:focus{
+  transform:scale(1.04); outline:4px solid var(--akzent); background:var(--akzent-bg);
+}
+a.modBtn.dwell-active{
+  transform:scale(1.05) !important; outline:4px solid var(--akzent) !important;
+  background:var(--akzent-bg) !important; transition:none !important;
+}
+.mod-emoji{ font-size:44px; }
+.mod-label{ font-size:18px; text-align:center; font-weight:1000; line-height:1.3; }
+.mod-count{ font-size:14px; color:var(--muted); font-weight:800; }
+.zurueck-leiste{ padding:10px 16px; flex-shrink:0; }
+a.zurueckBtn{
+  display:flex; align-items:center; justify-content:center;
+  min-height:76px; font-size:22px; font-weight:1000;
+  border-radius:var(--radius); border:3px solid #8b5cf6;
+  background:#ede9fe; color:#4c1d95;
+  text-decoration:none; cursor:pointer; user-select:none;
+  position:relative; transition:none; width:100%;
+}
+a.zurueckBtn:hover{ background:#ddd6fe; outline:4px solid #8b5cf6; }
+a.zurueckBtn.dwell-active{
+  transform:scale(1.02) !important; outline:4px solid #8b5cf6 !important;
+}
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  pointer-events:none; z-index:10; width:70px; height:70px;
+}
+.dwell-ring-svg circle{
+  fill:none; stroke:var(--akzent); stroke-width:5;
+  stroke-dasharray:220; stroke-dashoffset:220;
+  transform:rotate(-90deg); transform-origin:35px 35px;
+}
+a.zurueckBtn .dwell-ring-svg circle{ stroke:#8b5cf6; }
+.dwell-ring-svg circle.animating{ animation:dwellRing var(--dwell-duration,.9s) linear forwards; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="header-emoji">🌿</span>
+  <span class="header-titel">Sachkunde</span>
+  <span class="header-sub">Lesen &amp; Verstehen</span>
+</div>
+
+<div class="scroll-bereich">
+
+  <div class="abschnitt">
+    <div class="abschnitt-titel">🌸 Frühling — Lange Texte</div>
+    <div class="btn-grid">
+      <a class="modBtn" href="./schule_lesen.html?heft=sachkunde_fruehling">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+        <div class="mod-emoji">📖</div>
+        <div class="mod-label">Alle Texte</div>
+        <div class="mod-count">20 Aufgaben</div>
+      </a>
+      <a class="modBtn" href="./schule_lesen.html?heft=sachkunde_fruehling&thema=fruehling">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+        <div class="mod-emoji">🌱</div>
+        <div class="mod-label">Natur &amp; Pflanzen</div>
+        <div class="mod-count">14 Aufgaben</div>
+      </a>
+      <a class="modBtn" href="./schule_lesen.html?heft=sachkunde_fruehling&thema=tiere">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+        <div class="mod-emoji">🦔</div>
+        <div class="mod-label">Tiere</div>
+        <div class="mod-count">6 Aufgaben</div>
+      </a>
+      <a class="modBtn" href="./schule_lesen.html?heft=sachkunde_fruehling&thema=kochen">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+        <div class="mod-emoji">🍦</div>
+        <div class="mod-label">Kochen &amp; Rezept</div>
+        <div class="mod-count">2 Aufgaben</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="abschnitt">
+    <div class="abschnitt-titel">🌸 Frühling — Lesekärtchen</div>
+    <div class="btn-grid">
+      <a class="modBtn" href="./schule_lesen.html?heft=sachkunde_lesekarten">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+        <div class="mod-emoji">🃏</div>
+        <div class="mod-label">Alle Kärtchen</div>
+        <div class="mod-count">8 Aufgaben</div>
+      </a>
+      <a class="modBtn" href="./schule_lesen.html?heft=sachkunde_lesekarten&thema=blumen">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+        <div class="mod-emoji">🌷</div>
+        <div class="mod-label">Blumen</div>
+        <div class="mod-count">5 Aufgaben</div>
+      </a>
+      <a class="modBtn" href="./schule_lesen.html?heft=sachkunde_lesekarten&thema=baeume">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+        <div class="mod-emoji">🌳</div>
+        <div class="mod-label">Bäume</div>
+        <div class="mod-count">2 Aufgaben</div>
+      </a>
+      <a class="modBtn" href="./schule_lesen.html?heft=sachkunde_lesekarten&thema=wiese">
+        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+        <div class="mod-emoji">🍀</div>
+        <div class="mod-label">Die Wiese</div>
+        <div class="mod-count">1 Aufgabe</div>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<div class="zurueck-leiste">
+  <a class="zurueckBtn" href="./schule.html" id="btnZurueck">
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+    ← Zurück zur Schule
+  </a>
+
+</div>
+
+<script src="../../core/dwell.js"></script>
+<script src="../../core/error_handler.js"></script>
+<script>
+try{ localStorage.setItem("laetitia_return_url_v1", new URL("./schule_sachkunde.html", window.location.href).href); }catch(e){}
+var attachDwell = window.LaetitiaAttachDwell || function(){ return {cancelDwell:function(){}}; };
+var dwellMs    = parseInt(localStorage.getItem("laetitia_dwell_ms"))    || 900;
+var leaveGrace = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
+attachDwell("a.modBtn, a.zurueckBtn", {
+  dwellMs: dwellMs, leaveGrace: leaveGrace,
+  onActivate: function(el){
+    try{ el.click(); }catch(e){}
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Gesichter</title>
+<style>
+:root{
+  --bg:#f6f7fb; --panel:#fff;
+  --border:rgba(15,23,42,.14); --shadow:0 4px 16px rgba(15,23,42,.08);
+  --text:#0f172a; --muted:rgba(15,23,42,.60);
+  --pink:#ec4899; --pink2:#db2777;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{ font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); height:100vh; overflow:hidden; display:flex; flex-direction:column; }
+.topBar{ flex:0 0 auto; background:var(--panel); border-bottom:1px solid var(--border); padding:8px 12px; display:flex; align-items:center; gap:8px; box-shadow:var(--shadow); }
+.topTitel{ font-size:18px; font-weight:1000; color:var(--pink); flex:1; }
+a.topBtn{ display:flex; align-items:center; justify-content:center; min-height:52px; padding:6px 14px; font-size:14px; font-weight:1000; border-radius:12px; border:1px solid var(--border); background:rgba(15,23,42,.06); color:var(--text); text-decoration:none; cursor:pointer; user-select:none; position:relative; transition:none; white-space:nowrap; }
+a.topBtn:hover, a.topBtn:focus{ background:rgba(15,23,42,.14); outline:3px solid var(--pink); transition:none; }
+a.topBtn.pink{ background:var(--pink); color:#fff; border-color:transparent; }
+a.topBtn.pink:hover{ background:var(--pink2); }
+a.topBtn.lila{ background:#ede9fe; color:#4c1d95; border:2px solid #8b5cf6; }
+a.topBtn.lila:hover{ background:#ddd6fe; outline:3px solid #8b5cf6; }
+
+.main{ flex:1; display:grid; grid-template-columns:105px 1fr 130px; gap:0; min-height:0; overflow:hidden; }
+
+/* Linke Spalte: Kategorien + Optionen */
+.linksPanel{ background:var(--panel); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:5px; gap:3px; overflow:hidden; }
+.panelLabel{ font-size:10px; font-weight:900; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; text-align:center; flex:0 0 auto; margin-bottom:1px; }
+a.katBtn{ display:flex; align-items:center; justify-content:center; gap:4px; min-height:38px; border-radius:8px; border:1px solid var(--border); background:rgba(15,23,42,.04); color:var(--text); text-decoration:none; cursor:pointer; user-select:none; position:relative; transition:none; font-size:11px; font-weight:900; flex:0 0 auto; }
+a.katBtn:hover, a.katBtn:focus{ background:rgba(236,72,153,0.10); outline:2px solid var(--pink); transition:none; }
+a.katBtn.aktiv{ background:rgba(236,72,153,0.18); border-color:var(--pink); color:var(--pink); }
+.teilerLinie{ height:1px; background:var(--border); flex:0 0 auto; margin:2px 0; }
+.optionenListe{ flex:1; display:flex; flex-direction:column; gap:3px; overflow:hidden; }
+a.optionBtn{ display:flex; align-items:center; justify-content:center; flex:1; border-radius:8px; border:1px solid var(--border); background:rgba(15,23,42,.04); color:var(--text); text-decoration:none; cursor:pointer; user-select:none; position:relative; transition:none; font-size:18px; }
+a.optionBtn:hover, a.optionBtn:focus{ background:rgba(236,72,153,0.12); outline:2px solid var(--pink); transform:scale(1.05); transition:none; }
+a.optionBtn.aktiv{ background:rgba(236,72,153,0.20); border-color:var(--pink); }
+
+/* Mitte: Gesicht */
+.gesichtWrap{ display:flex; align-items:center; justify-content:center; background:#fff9f0; overflow:hidden; }
+#gesichtSvg{ filter:drop-shadow(0 6px 20px rgba(0,0,0,0.12)); }
+.gesichtTeil{ cursor:pointer; transition:none; }
+.gesichtTeil:hover{ filter:brightness(0.88); }
+@keyframes teilPop{ 0%{transform:scale(1)} 50%{transform:scale(1.06)} 100%{transform:scale(1)} }
+.gesichtTeil.popping{ animation:teilPop 0.2s ease; transform-origin:center; }
+/* Dekorations-Elemente */
+.dekoEl{ pointer-events:none; user-select:none; }
+
+/* Rechte Spalte: Farben */
+.rechtsPanel{ background:var(--panel); border-left:1px solid var(--border); display:flex; flex-direction:column; padding:5px 4px; gap:4px; overflow:hidden; }
+.farbGrid{ flex:1; display:grid; grid-template-columns:1fr 1fr; gap:3px; align-content:start; overflow:hidden; }
+a.farbBtn{ border-radius:10px; border:3px solid transparent; cursor:pointer; user-select:none; position:relative; transition:none; text-decoration:none; display:block; min-height:52px; }
+a.farbBtn:hover, a.farbBtn:focus{ transform:scale(1.12); outline:3px solid var(--text); transition:none; z-index:2; }
+a.farbBtn.gewaehlt{ border:3px solid var(--text); transform:scale(1.10); box-shadow:0 0 0 2px rgba(0,0,0,0.25); }
+
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none; z-index:10; width:55px; height:55px; }
+.dwell-ring-svg circle{ fill:none; stroke:var(--pink); stroke-width:5; stroke-dasharray:220; stroke-dashoffset:220; transform:rotate(-90deg); transform-origin:27px 27px; }
+.dwell-ring-svg circle.animating{ animation:dwellRing var(--dwell-duration,0.8s) linear forwards; }
+.dwell-active{ filter:brightness(0.85) !important; outline:3px solid var(--pink) !important; transition:none !important; }
+a.farbBtn.dwell-active{ transform:scale(1.18) !important; }
+
+  /* Zurück-Button unten mittig */
+  .zurueckLeiste{
+    flex:0 0 auto; padding:8px 12px;
+    background:var(--panel, #fff); border-top:1px solid var(--border, rgba(15,23,42,.14));
+  }
+  a.zurueckBtn{
+    display:flex; align-items:center; justify-content:center;
+    min-height:78px; font-size:18px; font-weight:1000; width:100%;
+    border-radius:16px; border:2px solid #8b5cf6;
+    background:#ede9fe; color:#4c1d95;
+    text-decoration:none; cursor:pointer; user-select:none;
+    position:relative; transition:none;
+  }
+  a.zurueckBtn:hover, a.zurueckBtn:focus{
+    background:#ddd6fe; outline:4px solid #8b5cf6; transition:none;
+  }
+
+</style>
+</head>
+<body>
+<div class="topBar">
+  <div class="topTitel" id="topTitelText">🎭 Gesichter</div>
+  <a class="topBtn" href="#" id="btnUndo">↩</a>
+  <a class="topBtn" href="#" id="btnReset">🗑</a>
+  <a class="topBtn pink" href="#" id="btnSpeichern">💾</a>
+  
+</div>
+<div class="main">
+  <div class="linksPanel">
+    <div class="panelLabel">Kategorie</div>
+    <a class="katBtn aktiv" href="#" data-kat="augen">👁️ Augen</a>
+    <a class="katBtn" href="#" data-kat="mund">👄 Mund</a>
+    <a class="katBtn" href="#" data-kat="haar">💇 Haar</a>
+    <a class="katBtn" href="#" data-kat="deko">✨ Deko</a>
+    <div class="teilerLinie"></div>
+    <div class="panelLabel">Optionen</div>
+    <div class="optionenListe" id="optionenListe"></div>
+  </div>
+  <div class="gesichtWrap" id="gesichtWrap">
+    <svg id="gesichtSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 480"></svg>
+  </div>
+  <div class="rechtsPanel">
+    <div class="panelLabel">🎨</div>
+    <div class="farbGrid" id="farbGrid"></div>
+  </div>
+</div>
+<script src="../../core/dwell.js"></script>
+<script src="../../core/error_handler.js"></script>
+<script>
+(function(){
+"use strict";
+
+var FARBEN_HAUT=["#fde68a","#f97316","#92400e","#fbbf24","#fca5a5","#e5e7eb"];
+var FARBEN_ALL=["#ec4899","#ef4444","#f97316","#fbbf24","#22c55e","#3b82f6","#8b5cf6","#1a1a2e","#ffffff","#92400e","#fde68a","#fca5a5","#86efac","#93c5fd","#ddd6fe","#6b7280","#e5e7eb","#06b6d4"];
+
+var OPTIONEN = {
+  augen:[
+    {id:"au1", emoji:"😐", label:"Normal",    pfad:"M130,185 Q150,170 170,185 Q150,200 130,185 Z|M230,185 Q250,170 270,185 Q250,200 230,185 Z", farbe:"#1a1a2e"},
+    {id:"au2", emoji:"😊", label:"Fröhlich",  pfad:"M128,182 Q150,165 172,182|M228,182 Q250,165 272,182", farbe:"#1a1a2e"},
+    {id:"au3", emoji:"😴", label:"Schläfrig", pfad:"M130,188 Q150,180 170,188 Q150,195 130,188 Z|M230,188 Q250,180 270,188 Q250,195 230,188 Z", farbe:"#1a1a2e"},
+    {id:"au4", emoji:"🌟", label:"Stern",     pfad:"M150,175 L153,185 L163,185 L155,192 L158,202 L150,196 L142,202 L145,192 L137,185 L147,185 Z|M250,175 L253,185 L263,185 L255,192 L258,202 L250,196 L242,202 L245,192 L237,185 L247,185 Z", farbe:"#fbbf24"}
+  ],
+  mund:[
+    {id:"mu1", emoji:"😊", label:"Lächeln",   pfad:"M150,270 Q200,300 250,270", farbe:"#ef4444"},
+    {id:"mu2", emoji:"😁", label:"Grinsen",   pfad:"M140,265 Q200,305 260,265 Q200,280 140,265 Z", farbe:"#ef4444"},
+    {id:"mu3", emoji:"😮", label:"Staunen",   pfad:"M175,260 Q200,285 225,260 Q225,280 200,285 Q175,280 175,260 Z", farbe:"#ef4444"},
+    {id:"mu4", emoji:"😘", label:"Kuss",      pfad:"M185,265 Q200,278 215,265 Z|M197,252 Q200,245 203,252 Q203,260 200,262 Q197,260 197,252 Z", farbe:"#ec4899"}
+  ],
+  haar:[
+    {id:"ha1", emoji:"👱", label:"Kurz",      pfad:"M80,160 Q120,80 200,70 Q280,80 320,160 Q300,120 200,110 Q100,120 80,160 Z", farbe:"#fbbf24"},
+    {id:"ha2", emoji:"👩", label:"Lang",      pfad:"M80,160 Q60,250 70,340 Q90,380 100,380 Q90,280 85,200 Q120,80 200,70 Q280,80 315,200 Q310,280 300,380 Q310,380 330,340 Q340,250 320,160 Q290,80 200,70 Q110,80 80,160 Z", farbe:"#92400e"},
+    {id:"ha3", emoji:"🧑", label:"Gelockt",   pfad:"M80,165 Q90,100 130,80 Q160,65 200,63 Q240,65 270,80 Q310,100 320,165 Q300,110 260,95 Q240,88 200,87 Q160,88 140,95 Q100,110 80,165 Z|M70,170 Q65,140 75,155 Z|M330,170 Q335,140 325,155 Z", farbe:"#1a1a2e"},
+    {id:"ha4", emoji:"👴", label:"Keins",     pfad:"", farbe:"#e5e7eb"}
+  ],
+  deko:[
+    {id:"de1", emoji:"👑", label:"Krone",     pfad:"M120,75 L140,45 L160,68 L180,38 L200,60 L220,38 L240,68 L260,45 L280,75 L120,75 Z", farbe:"#fbbf24"},
+    {id:"de2", emoji:"🎀", label:"Schleife",  pfad:"M160,55 Q180,42 200,55 Q180,68 160,55 Z|M200,55 Q220,42 240,55 Q220,68 200,55 Z|M198,52 L202,52 L202,58 L198,58 Z", farbe:"#ec4899"},
+    {id:"de3", emoji:"🌸", label:"Blume",     pfad:"M200,50 Q208,42 216,50 Q208,58 200,50 Z|M190,58 Q182,50 190,42 Q198,50 190,58 Z|M210,58 Q218,50 210,42 Q202,50 210,58 Z|M200,68 Q192,76 200,68 Q208,76 200,68 Z|M204,54 Q200,58 196,54 Q200,50 204,54 Z", farbe:"#ec4899"},
+    {id:"de4", emoji:"🕶️", label:"Brille",   pfad:"M118,188 Q150,168 182,188 Q150,208 118,188 Z|M218,188 Q250,168 282,188 Q250,208 218,188 Z|M182,188 L218,188", farbe:"#1a1a2e"}
+  ]
+};
+
+var state={
+  farbe:"#ec4899",
+  aktivKat:"augen",
+  aktivOption:"au1",
+  gewaehlt:{augen:"au1", mund:"mu1", haar:"ha1", deko:null},
+  farben:{}, // {teil-id: farbe}
+  history:[]
+};
+
+function zeigeStatus(msg){var el=document.getElementById("topTitelText");if(el){el.textContent=msg;setTimeout(function(){el.textContent="🎭 Gesichter";},2000);}}
+
+function ladeSpeicherstand(){
+  try{
+    var d=JSON.parse(localStorage.getItem("laetitia_gesichter")||"null");
+    if(d){state.gewaehlt=d.gewaehlt||state.gewaehlt;state.farben=d.farben||{};}
+  }catch(e){}
+}
+function speichern(){
+  try{localStorage.setItem("laetitia_gesichter",JSON.stringify({gewaehlt:state.gewaehlt,farben:state.farben}));zeigeStatus("Gespeichert! ✅");}catch(e){}
+}
+
+function zeichneGesicht(){
+  var svg=document.getElementById("gesichtSvg");
+  var wrap=document.getElementById("gesichtWrap");
+  var size=Math.min(wrap.clientWidth-16,wrap.clientHeight-16);
+  svg.setAttribute("width",size); svg.setAttribute("height",size);
+  svg.innerHTML="";
+
+  // Hintergrund
+  var bg=document.createElementNS("http://www.w3.org/2000/svg","rect");
+  bg.setAttribute("width","400"); bg.setAttribute("height","480"); bg.setAttribute("fill","#fff9f0");
+  svg.appendChild(bg);
+
+  // Hals
+  var hals=document.createElementNS("http://www.w3.org/2000/svg","rect");
+  hals.setAttribute("x","168"); hals.setAttribute("y","370"); hals.setAttribute("width","64"); hals.setAttribute("height","80");
+  hals.setAttribute("fill",state.farben["haut"]||"#fde68a"); hals.setAttribute("class","gesichtTeil");
+  hals.setAttribute("id","teil_haut2");
+  hals.addEventListener("click",function(){faerbeTeil("haut2","haut",this);});
+  svg.appendChild(hals);
+
+  // Gesicht (Oval)
+  var gesicht=document.createElementNS("http://www.w3.org/2000/svg","ellipse");
+  gesicht.setAttribute("cx","200"); gesicht.setAttribute("cy","230"); gesicht.setAttribute("rx","120"); gesicht.setAttribute("ry","150");
+  gesicht.setAttribute("fill",state.farben["haut"]||"#fde68a"); gesicht.setAttribute("class","gesichtTeil");
+  gesicht.setAttribute("id","teil_haut");
+  gesicht.addEventListener("click",function(){faerbeTeil("haut","haut",this);});
+  svg.appendChild(gesicht);
+
+  // Haar
+  var haarOpt=findOption("haar");
+  if(haarOpt&&haarOpt.pfad){
+    haarOpt.pfad.split("|").forEach(function(d,i){
+      var p=document.createElementNS("http://www.w3.org/2000/svg","path");
+      p.setAttribute("d",d); p.setAttribute("fill",state.farben["haar"]||haarOpt.farbe);
+      p.setAttribute("class","gesichtTeil"); p.setAttribute("id","teil_haar_"+i);
+      p.addEventListener("click",function(){faerbeTeil("haar","haar",this);});
+      svg.appendChild(p);
+    });
+  }
+
+  // Wangen
+  ["M148,248 Q162,238 170,252 Q162,262 148,252 Z","M230,248 Q238,238 252,252 Q244,262 230,252 Z"].forEach(function(d,i){
+    var p=document.createElementNS("http://www.w3.org/2000/svg","path");
+    p.setAttribute("d",d); p.setAttribute("fill",state.farben["wangen"]||"#fca5a5");
+    p.setAttribute("opacity","0.6"); p.setAttribute("class","gesichtTeil"); p.setAttribute("id","teil_wange_"+i);
+    p.addEventListener("click",function(){faerbeTeil("wangen","wangen",this);});
+    svg.appendChild(p);
+  });
+
+  // Nase
+  var nase=document.createElementNS("http://www.w3.org/2000/svg","path");
+  nase.setAttribute("d","M192,228 Q200,218 208,228 Q204,242 200,244 Q196,242 192,228 Z");
+  nase.setAttribute("fill",state.farben["nase"]||"#f97316"); nase.setAttribute("class","gesichtTeil"); nase.setAttribute("id","teil_nase");
+  nase.addEventListener("click",function(){faerbeTeil("nase","nase",this);});
+  svg.appendChild(nase);
+
+  // Augen
+  var augenOpt=findOption("augen");
+  if(augenOpt&&augenOpt.pfad){
+    augenOpt.pfad.split("|").forEach(function(d,i){
+      var p=document.createElementNS("http://www.w3.org/2000/svg","path");
+      p.setAttribute("d",d); p.setAttribute("fill","none");
+      p.setAttribute("stroke",state.farben["augen"]||augenOpt.farbe); p.setAttribute("stroke-width","3");
+      p.setAttribute("class","gesichtTeil"); p.setAttribute("id","teil_augen_"+i);
+      p.addEventListener("click",function(){faerbeTeil("augen","augen",this);});
+      svg.appendChild(p);
+      // Ausgefüllte Version für Sterne/Flächen
+      var p2=document.createElementNS("http://www.w3.org/2000/svg","path");
+      p2.setAttribute("d",d); p2.setAttribute("fill",state.farben["augen"]||augenOpt.farbe);
+      p2.setAttribute("opacity","0.9"); p2.setAttribute("class","gesichtTeil");
+      p2.addEventListener("click",function(){faerbeTeil("augen","augen",this);});
+      svg.appendChild(p2);
+    });
+  }
+
+  // Mund
+  var mundOpt=findOption("mund");
+  if(mundOpt&&mundOpt.pfad){
+    mundOpt.pfad.split("|").forEach(function(d,i){
+      var p=document.createElementNS("http://www.w3.org/2000/svg","path");
+      p.setAttribute("d",d); p.setAttribute("fill","none");
+      p.setAttribute("stroke",state.farben["mund"]||mundOpt.farbe); p.setAttribute("stroke-width","3");
+      p.setAttribute("class","gesichtTeil"); p.setAttribute("id","teil_mund_"+i);
+      p.addEventListener("click",function(){faerbeTeil("mund","mund",this);});
+      svg.appendChild(p);
+      var p2=document.createElementNS("http://www.w3.org/2000/svg","path");
+      p2.setAttribute("d",d); p2.setAttribute("fill",state.farben["mund"]||mundOpt.farbe);
+      p2.setAttribute("opacity","0.85"); p2.setAttribute("class","gesichtTeil");
+      p2.addEventListener("click",function(){faerbeTeil("mund","mund",this);});
+      svg.appendChild(p2);
+    });
+  }
+
+  // Deko
+  var dekoId=state.gewaehlt["deko"];
+  if(dekoId){
+    var dekoOpt=OPTIONEN.deko.find(function(o){return o.id===dekoId;});
+    if(dekoOpt&&dekoOpt.pfad){
+      dekoOpt.pfad.split("|").forEach(function(d,i){
+        var p=document.createElementNS("http://www.w3.org/2000/svg","path");
+        p.setAttribute("d",d); p.setAttribute("fill",state.farben["deko"]||dekoOpt.farbe);
+        p.setAttribute("class","gesichtTeil"); p.setAttribute("id","teil_deko_"+i);
+        p.addEventListener("click",function(){faerbeTeil("deko","deko",this);});
+        svg.appendChild(p);
+      });
+    }
+  }
+  rebindDwell();
+}
+
+function findOption(kat){
+  var id=state.gewaehlt[kat];
+  if(!id)return null;
+  return (OPTIONEN[kat]||[]).find(function(o){return o.id===id;})||null;
+}
+
+function faerbeTeil(key, farbenKey, el){
+  var alteFarbe=state.farben[farbenKey]||"";
+  state.history.push({key:farbenKey,alt:alteFarbe});
+  if(state.history.length>30)state.history.shift();
+  state.farben[farbenKey]=state.farbe;
+  zeichneGesicht();
+}
+
+function baueOptionen(){
+  var liste=document.getElementById("optionenListe");
+  liste.innerHTML="";
+  var opts=OPTIONEN[state.aktivKat]||[];
+  opts.forEach(function(opt){
+    var a=document.createElement("a");
+    a.href="#"; a.className="optionBtn"+(state.gewaehlt[state.aktivKat]===opt.id?" aktiv":"");
+    a.textContent=opt.emoji; a.title=opt.label;
+    a.setAttribute("data-opt",opt.id);
+    a.addEventListener("click",function(ev){
+      ev.preventDefault();
+      if(state.aktivKat==="deko" && state.gewaehlt["deko"]===opt.id){
+        state.gewaehlt["deko"]=null;
+      } else {
+        state.gewaehlt[state.aktivKat]=opt.id;
+      }
+      liste.querySelectorAll(".optionBtn").forEach(function(b){b.classList.remove("aktiv");});
+      if(state.gewaehlt[state.aktivKat]===opt.id) a.classList.add("aktiv");
+      zeichneGesicht();
+    });
+    liste.appendChild(a);
+  });
+  rebindDwell();
+}
+
+function baueFarben(){
+  var grid=document.getElementById("farbGrid");
+  FARBEN_ALL.forEach(function(farbe){
+    var a=document.createElement("a");
+    a.href="#"; a.className="farbBtn"+(farbe===state.farbe?" gewaehlt":"");
+    a.style.background=farbe;
+    if(farbe==="#ffffff")a.style.border="3px solid #ccc";
+    a.setAttribute("data-farbe",farbe);
+    a.addEventListener("click",function(ev){
+      ev.preventDefault(); state.farbe=farbe;
+      grid.querySelectorAll(".farbBtn").forEach(function(b){b.classList.toggle("gewaehlt",b.getAttribute("data-farbe")===farbe);});
+    });
+    grid.appendChild(a);
+  });
+}
+
+var _dh=null;
+function rebindDwell(){
+  var att=window.LaetitiaAttachDwell||function(){return{cancelDwell:function(){}};};
+  if(_dh)_dh.cancelDwell();
+  var ms=Math.min(parseInt(localStorage.getItem("laetitia_dwell_ms")) || 700, 700);
+  var lg=parseInt(localStorage.getItem("laetitia_leave_grace_ms"))||100;
+  _dh=att("a.katBtn, a.optionBtn, a.farbBtn, a.topBtn, .gesichtTeil, #btnZurueck",{
+    dwellMs:ms, leaveGrace:lg, onActivate:function(el){try{el.click();}catch(e){}}
+  });
+}
+
+document.querySelectorAll(".katBtn").forEach(function(btn){
+  btn.addEventListener("click",function(ev){
+    ev.preventDefault();
+    state.aktivKat=btn.getAttribute("data-kat");
+    document.querySelectorAll(".katBtn").forEach(function(b){b.classList.remove("aktiv");});
+    btn.classList.add("aktiv");
+    baueOptionen();
+  });
+});
+document.getElementById("btnUndo").addEventListener("click",function(ev){
+  ev.preventDefault();
+  if(!state.history.length)return;
+  var last=state.history.pop();
+  state.farben[last.key]=last.alt;
+  zeichneGesicht();
+});
+document.getElementById("btnReset").addEventListener("click",function(ev){
+  ev.preventDefault(); state.farben={}; state.history=[]; zeichneGesicht();
+});
+document.getElementById("btnSpeichern").addEventListener("click",function(ev){ev.preventDefault();speichern();});
+
+ladeSpeicherstand(); baueFarben(); baueOptionen(); zeichneGesicht();
+})();
+</script>
+
+<div class="zurueckLeiste"><a class="zurueckBtn" href="./malen.html" id="btnZurueck">← Zurück</a></div>
+</body>
+</html>

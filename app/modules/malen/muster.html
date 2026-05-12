@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Muster-Magie</title>
+<style>
+:root{
+  --bg:#f6f7fb; --panel:#fff;
+  --border:rgba(15,23,42,.14); --shadow:0 4px 16px rgba(15,23,42,.08);
+  --text:#0f172a; --muted:rgba(15,23,42,.60);
+  --pink:#ec4899; --pink2:#db2777; --radius:16px;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{ font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); height:100vh; overflow:hidden; display:flex; flex-direction:column; }
+.topBar{ flex:0 0 auto; background:var(--panel); border-bottom:1px solid var(--border); padding:8px 12px; display:flex; align-items:center; gap:8px; box-shadow:var(--shadow); }
+.topTitel{ font-size:18px; font-weight:1000; color:var(--pink); flex:1; }
+a.topBtn{ display:flex; align-items:center; justify-content:center; min-height:52px; padding:6px 14px; font-size:14px; font-weight:1000; border-radius:12px; border:1px solid var(--border); background:rgba(15,23,42,.06); color:var(--text); text-decoration:none; cursor:pointer; user-select:none; position:relative; transition:none; white-space:nowrap; }
+a.topBtn:hover, a.topBtn:focus{ background:rgba(15,23,42,.14); outline:3px solid var(--pink); transition:none; }
+a.topBtn.pink{ background:var(--pink); color:#fff; border-color:transparent; }
+a.topBtn.pink:hover, a.topBtn.pink:focus{ background:var(--pink2); }
+a.topBtn.lila{ background:#ede9fe; color:#4c1d95; border:2px solid #8b5cf6; }
+a.topBtn.lila:hover, a.topBtn.lila:focus{ background:#ddd6fe; outline:3px solid #8b5cf6; }
+
+.main{ flex:1; display:grid; grid-template-columns:110px 1fr 130px; gap:0; min-height:0; overflow:hidden; }
+
+/* Linke Spalte: Muster-Vorlagen */
+.linksPanel{ background:var(--panel); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:6px; gap:3px; overflow:hidden; }
+.panelLabel{ font-size:10px; font-weight:900; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:2px; flex:0 0 auto; text-align:center; }
+a.musterBtn{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; flex:1; border-radius:10px; border:2px solid var(--border); background:rgba(15,23,42,.04); color:var(--text); text-decoration:none; cursor:pointer; user-select:none; position:relative; transition:none; font-size:10px; font-weight:900; padding:3px; text-align:center; }
+a.musterBtn:hover, a.musterBtn:focus{ background:rgba(236,72,153,0.12); outline:3px solid var(--pink); transition:none; }
+a.musterBtn.aktiv{ background:rgba(236,72,153,0.20); border-color:var(--pink); color:var(--pink); }
+.musterEmoji{ font-size:22px; }
+
+/* Mitte: SVG-Leinwand */
+.leinwandWrap{ display:flex; align-items:center; justify-content:center; background:#1a1a2e; overflow:hidden; }
+#leinwand{ border-radius:8px; }
+
+/* Rechte Spalte: Farbe + Geschwindigkeit */
+.rechtsPanel{ background:var(--panel); border-left:1px solid var(--border); display:flex; flex-direction:column; padding:6px; gap:6px; overflow:hidden; }
+.sektLabel{ font-size:10px; font-weight:900; color:var(--muted); text-transform:uppercase; text-align:center; flex:0 0 auto; }
+.farbGrid{ display:grid; grid-template-columns:1fr 1fr; gap:4px; flex:0 0 auto; }
+a.farbBtn{ border-radius:8px; border:3px solid transparent; cursor:pointer; user-select:none; position:relative; transition:none; text-decoration:none; display:block; min-height:52px; }
+a.farbBtn:hover, a.farbBtn:focus{ transform:scale(1.12); outline:3px solid #fff; transition:none; z-index:2; }
+a.farbBtn.gewaehlt{ border:3px solid #fff; transform:scale(1.10); }
+.schnellButtons{ display:flex; flex-direction:column; gap:4px; flex:0 0 auto; }
+a.schnellBtn{ display:flex; align-items:center; justify-content:center; min-height:44px; border-radius:10px; border:2px solid var(--border); background:rgba(15,23,42,.04); color:var(--text); text-decoration:none; cursor:pointer; user-select:none; position:relative; font-size:12px; font-weight:1000; transition:none; }
+a.schnellBtn:hover, a.schnellBtn:focus{ background:rgba(15,23,42,.14); outline:3px solid var(--pink); transition:none; }
+a.schnellBtn.aktiv{ background:var(--pink); color:#fff; border-color:transparent; }
+.animBtn{ display:flex; align-items:center; justify-content:center; min-height:52px; border-radius:10px; border:2px solid var(--border); background:rgba(236,72,153,0.10); color:var(--pink); text-decoration:none; cursor:pointer; user-select:none; position:relative; font-size:13px; font-weight:1000; flex:0 0 auto; transition:none; }
+.animBtn:hover, .animBtn:focus{ background:rgba(236,72,153,0.22); outline:3px solid var(--pink); transition:none; }
+
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none; z-index:10; width:60px; height:60px; }
+.dwell-ring-svg circle{ fill:none; stroke:var(--pink); stroke-width:5; stroke-dasharray:220; stroke-dashoffset:220; transform:rotate(-90deg); transform-origin:30px 30px; }
+.dwell-ring-svg circle.animating{ animation:dwellRing var(--dwell-duration,0.8s) linear forwards; }
+.dwell-active{ outline:3px solid var(--pink) !important; transition:none !important; }
+
+  /* Zurück-Button unten mittig */
+  .zurueckLeiste{
+    flex:0 0 auto; padding:8px 12px;
+    background:var(--panel, #fff); border-top:1px solid var(--border, rgba(15,23,42,.14));
+  }
+  a.zurueckBtn{
+    display:flex; align-items:center; justify-content:center;
+    min-height:78px; font-size:18px; font-weight:1000; width:100%;
+    border-radius:16px; border:2px solid #8b5cf6;
+    background:#ede9fe; color:#4c1d95;
+    text-decoration:none; cursor:pointer; user-select:none;
+    position:relative; transition:none;
+  }
+  a.zurueckBtn:hover, a.zurueckBtn:focus{
+    background:#ddd6fe; outline:4px solid #8b5cf6; transition:none;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="topBar">
+  <div class="topTitel" id="topTitelText">✨ Muster-Magie</div>
+  <a class="topBtn" href="#" id="btnAnimieren">▶ Animieren</a>
+  <a class="topBtn" href="#" id="btnNeu">🗑 Neu</a>
+  <a class="topBtn pink" href="#" id="btnSpeichern">💾 Speichern</a>
+  
+</div>
+
+<div class="main">
+
+  <!-- Links: Muster -->
+  <div class="linksPanel">
+    <div class="panelLabel">Muster</div>
+    <a class="musterBtn aktiv" href="#" data-muster="kreis"><span class="musterEmoji">⭕</span>Kreise</a>
+    <a class="musterBtn" href="#" data-muster="stern"><span class="musterEmoji">✨</span>Stern</a>
+    <a class="musterBtn" href="#" data-muster="spirale"><span class="musterEmoji">🌀</span>Spirale</a>
+    <a class="musterBtn" href="#" data-muster="welle"><span class="musterEmoji">〰️</span>Wellen</a>
+    <a class="musterBtn" href="#" data-muster="blume"><span class="musterEmoji">🌸</span>Blume</a>
+    <a class="musterBtn" href="#" data-muster="netz"><span class="musterEmoji">🕸️</span>Netz</a>
+    <a class="musterBtn" href="#" data-muster="diamant"><span class="musterEmoji">💎</span>Diamant</a>
+    <a class="musterBtn" href="#" data-muster="strahlen"><span class="musterEmoji">🌟</span>Strahlen</a>
+  </div>
+
+  <!-- Mitte: SVG -->
+  <div class="leinwandWrap" id="leinwandWrap">
+    <svg id="leinwand" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <!-- Rechts: Farbe + Anzahl -->
+  <div class="rechtsPanel">
+    <div class="sektLabel">🎨 Farbe</div>
+    <div class="farbGrid" id="farbGrid"></div>
+    <div class="sektLabel">Linien</div>
+    <div class="schnellButtons">
+      <a class="schnellBtn" href="#" data-n="6">6</a>
+      <a class="schnellBtn aktiv" href="#" data-n="12">12</a>
+      <a class="schnellBtn" href="#" data-n="24">24</a>
+      <a class="schnellBtn" href="#" data-n="36">36</a>
+    </div>
+    <a class="animBtn" href="#" id="btnAnim2">🎬 Schritt</a>
+  </div>
+
+</div>
+
+<script src="../../core/dwell.js"></script>
+<script src="../../core/error_handler.js"></script>
+<script>
+(function(){
+"use strict";
+
+var FARBEN = [
+  "#ec4899","#f97316","#fbbf24","#22c55e",
+  "#3b82f6","#8b5cf6","#06b6d4","#ffffff",
+  "#ef4444","#86efac","#93c5fd","#fde68a"
+];
+
+var state = {
+  muster: "kreis",
+  farbe: "#ec4899",
+  linien: 12,
+  schritt: 0,
+  animTimer: null
+};
+
+// ── SVG-Muster-Generatoren ────────────────────────────────────────────────────
+function genKreis(cx, cy, r, n, farbe){
+  var els = [];
+  for(var i = 0; i < n; i++){
+    var radius = r * (i + 1) / n;
+    var c = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("cx", cx); c.setAttribute("cy", cy);
+    c.setAttribute("r", radius);
+    c.setAttribute("fill","none");
+    c.setAttribute("stroke", farbe);
+    c.setAttribute("stroke-width", "1.5");
+    c.setAttribute("opacity", 0.4 + 0.6 * (i / n));
+    els.push(c);
+  }
+  return els;
+}
+
+function genStern(cx, cy, r, n, farbe){
+  var els = [];
+  for(var i = 0; i < n; i++){
+    var winkel = (Math.PI * 2 * i) / n;
+    var x2 = cx + r * Math.cos(winkel);
+    var y2 = cy + r * Math.sin(winkel);
+    var x3 = cx + r * Math.cos(winkel + Math.PI / n);
+    var y3 = cy + r * Math.sin(winkel + Math.PI / n);
+    var l = document.createElementNS("http://www.w3.org/2000/svg","line");
+    l.setAttribute("x1", x2); l.setAttribute("y1", y2);
+    l.setAttribute("x2", x3); l.setAttribute("y2", y3);
+    l.setAttribute("stroke", farbe); l.setAttribute("stroke-width","1.5");
+    l.setAttribute("opacity","0.85");
+    els.push(l);
+  }
+  return els;
+}
+
+function genSpirale(cx, cy, r, n, farbe){
+  var punkte = [];
+  for(var i = 0; i <= n * 3; i++){
+    var t = (i / (n * 3)) * Math.PI * 6;
+    var radius = r * (i / (n * 3));
+    punkte.push((cx + radius * Math.cos(t)).toFixed(1) + "," + (cy + radius * Math.sin(t)).toFixed(1));
+  }
+  var p = document.createElementNS("http://www.w3.org/2000/svg","polyline");
+  p.setAttribute("points", punkte.join(" "));
+  p.setAttribute("fill","none"); p.setAttribute("stroke", farbe);
+  p.setAttribute("stroke-width","1.8"); p.setAttribute("opacity","0.9");
+  return [p];
+}
+
+function genWelle(cx, cy, r, n, farbe){
+  var els = [];
+  for(var w = 0; w < 4; w++){
+    var punkte = [];
+    for(var i = 0; i <= 60; i++){
+      var x = cx - r + (2 * r * i / 60);
+      var y = cy + (r * 0.3 * (w - 1.5)) + (r * 0.15 * Math.sin(Math.PI * 2 * n * i / 60));
+      punkte.push(x.toFixed(1) + "," + y.toFixed(1));
+    }
+    var pl = document.createElementNS("http://www.w3.org/2000/svg","polyline");
+    pl.setAttribute("points", punkte.join(" "));
+    pl.setAttribute("fill","none"); pl.setAttribute("stroke", farbe);
+    pl.setAttribute("stroke-width","2"); pl.setAttribute("opacity", 0.5 + 0.15 * w);
+    els.push(pl);
+  }
+  return els;
+}
+
+function genBlume(cx, cy, r, n, farbe){
+  var els = [];
+  for(var i = 0; i < n; i++){
+    var winkel = (Math.PI * 2 * i) / n;
+    var bx = cx + (r * 0.45) * Math.cos(winkel);
+    var by = cy + (r * 0.45) * Math.sin(winkel);
+    var c = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("cx", bx); c.setAttribute("cy", by);
+    c.setAttribute("r", r * 0.38);
+    c.setAttribute("fill","none"); c.setAttribute("stroke", farbe);
+    c.setAttribute("stroke-width","1.5"); c.setAttribute("opacity","0.75");
+    els.push(c);
+  }
+  var kern = document.createElementNS("http://www.w3.org/2000/svg","circle");
+  kern.setAttribute("cx", cx); kern.setAttribute("cy", cy);
+  kern.setAttribute("r", r * 0.2);
+  kern.setAttribute("fill", farbe); kern.setAttribute("opacity","0.5");
+  els.push(kern);
+  return els;
+}
+
+function genNetz(cx, cy, r, n, farbe){
+  var els = [];
+  var punkte = [];
+  for(var i = 0; i < n; i++){
+    var w = (Math.PI * 2 * i) / n;
+    punkte.push([cx + r * Math.cos(w), cy + r * Math.sin(w)]);
+  }
+  for(var a = 0; a < punkte.length; a++){
+    for(var b2 = a + 1; b2 < punkte.length; b2++){
+      var l = document.createElementNS("http://www.w3.org/2000/svg","line");
+      l.setAttribute("x1", punkte[a][0].toFixed(1)); l.setAttribute("y1", punkte[a][1].toFixed(1));
+      l.setAttribute("x2", punkte[b2][0].toFixed(1)); l.setAttribute("y2", punkte[b2][1].toFixed(1));
+      l.setAttribute("stroke", farbe); l.setAttribute("stroke-width","0.8"); l.setAttribute("opacity","0.4");
+      els.push(l);
+    }
+  }
+  return els;
+}
+
+function genDiamant(cx, cy, r, n, farbe){
+  var els = [];
+  for(var i = 1; i <= n; i++){
+    var s = r * i / n;
+    var poly = document.createElementNS("http://www.w3.org/2000/svg","polygon");
+    poly.setAttribute("points",
+      cx+","+  (cy-s)+" "+
+      (cx+s)+","+ cy+" "+
+      cx+","+   (cy+s)+" "+
+      (cx-s)+","+cy
+    );
+    poly.setAttribute("fill","none"); poly.setAttribute("stroke", farbe);
+    poly.setAttribute("stroke-width","1.2"); poly.setAttribute("opacity", 0.3 + 0.7 * (i/n));
+    els.push(poly);
+  }
+  return els;
+}
+
+function genStrahlen(cx, cy, r, n, farbe){
+  var els = [];
+  for(var i = 0; i < n; i++){
+    var w = (Math.PI * 2 * i) / n;
+    var l = document.createElementNS("http://www.w3.org/2000/svg","line");
+    l.setAttribute("x1", cx); l.setAttribute("y1", cy);
+    l.setAttribute("x2", (cx + r * Math.cos(w)).toFixed(1));
+    l.setAttribute("y2", (cy + r * Math.sin(w)).toFixed(1));
+    l.setAttribute("stroke", farbe); l.setAttribute("stroke-width","1.5");
+    l.setAttribute("opacity", 0.4 + 0.6 * Math.abs(Math.cos(w)));
+    els.push(l);
+  }
+  return els;
+}
+
+var GENERATOREN = {
+  kreis: genKreis, stern: genStern, spirale: genSpirale,
+  welle: genWelle, blume: genBlume, netz: genNetz,
+  diamant: genDiamant, strahlen: genStrahlen
+};
+
+// ── Zeichnen ──────────────────────────────────────────────────────────────────
+function zeichne(extra){
+  var svg = document.getElementById("leinwand");
+  var wrap = document.getElementById("leinwandWrap");
+  var size = Math.min(wrap.clientWidth - 16, wrap.clientHeight - 16);
+  svg.setAttribute("width", size); svg.setAttribute("height", size);
+  svg.setAttribute("viewBox", "0 0 " + size + " " + size);
+  svg.style.background = "#1a1a2e";
+
+  // Hintergrundrechteck
+  svg.innerHTML = "";
+  var bg = document.createElementNS("http://www.w3.org/2000/svg","rect");
+  bg.setAttribute("width", size); bg.setAttribute("height", size);
+  bg.setAttribute("fill","#1a1a2e");
+  svg.appendChild(bg);
+
+  var gen = GENERATOREN[state.muster] || genKreis;
+  var n = extra || state.linien;
+  var els = gen(size/2, size/2, size * 0.44, n, state.farbe);
+  els.forEach(function(el){ svg.appendChild(el); });
+}
+
+function zeigeStatus(msg){
+  var el = document.getElementById("topTitelText");
+  if(el){ el.textContent = msg; setTimeout(function(){ el.textContent = "✨ Muster-Magie"; }, 2000); }
+}
+
+// ── Farbpalette ───────────────────────────────────────────────────────────────
+function baueFarben(){
+  var grid = document.getElementById("farbGrid");
+  FARBEN.forEach(function(farbe){
+    var a = document.createElement("a");
+    a.href = "#"; a.className = "farbBtn" + (farbe === state.farbe ? " gewaehlt" : "");
+    a.style.background = farbe; a.setAttribute("data-farbe", farbe);
+    a.addEventListener("click", function(ev){
+      ev.preventDefault(); state.farbe = farbe;
+      grid.querySelectorAll(".farbBtn").forEach(function(b){ b.classList.toggle("gewaehlt", b.getAttribute("data-farbe") === farbe); });
+      zeichne();
+    });
+    grid.appendChild(a);
+  });
+}
+
+// ── Dwell ─────────────────────────────────────────────────────────────────────
+var _dh = null;
+function rebindDwell(){
+  var att = window.LaetitiaAttachDwell || function(){ return { cancelDwell: function(){} }; };
+  if(_dh) _dh.cancelDwell();
+  var ms = Math.min(parseInt(localStorage.getItem("laetitia_dwell_ms")) || 700, 700);
+  var lg = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 100;
+  _dh = att("a.musterBtn, a.farbBtn, a.schnellBtn, a.topBtn, a.animBtn, #btnZurueck",{
+    dwellMs: ms, leaveGrace: lg,
+    onActivate: function(el){ try{ el.click(); }catch(e){} }
+  });
+}
+
+// ── Buttons ───────────────────────────────────────────────────────────────────
+document.querySelectorAll(".musterBtn").forEach(function(btn){
+  btn.addEventListener("click", function(ev){
+    ev.preventDefault();
+    state.muster = btn.getAttribute("data-muster");
+    document.querySelectorAll(".musterBtn").forEach(function(b){ b.classList.remove("aktiv"); });
+    btn.classList.add("aktiv");
+    zeichne();
+  });
+});
+
+document.querySelectorAll(".schnellBtn").forEach(function(btn){
+  btn.addEventListener("click", function(ev){
+    ev.preventDefault();
+    state.linien = parseInt(btn.getAttribute("data-n"));
+    document.querySelectorAll(".schnellBtn").forEach(function(b){ b.classList.remove("aktiv"); });
+    btn.classList.add("aktiv");
+    zeichne();
+  });
+});
+
+// Animieren: Linienanzahl schrittweise erhöhen
+document.getElementById("btnAnimieren").addEventListener("click", function(ev){
+  ev.preventDefault();
+  if(state.animTimer){ clearInterval(state.animTimer); state.animTimer = null; this.textContent = "▶ Animieren"; return; }
+  var self = this; var n = 1;
+  self.textContent = "⏹ Stop";
+  state.animTimer = setInterval(function(){
+    zeichne(n);
+    n++;
+    if(n > state.linien){ clearInterval(state.animTimer); state.animTimer = null; self.textContent = "▶ Animieren"; }
+  }, 80);
+});
+
+// Schritt: ein Schritt weiter
+document.getElementById("btnAnim2").addEventListener("click", function(ev){
+  ev.preventDefault();
+  state.schritt = (state.schritt % state.linien) + 1;
+  zeichne(state.schritt);
+});
+
+document.getElementById("btnNeu").addEventListener("click", function(ev){
+  ev.preventDefault(); state.schritt = 0; zeichne();
+});
+
+document.getElementById("btnSpeichern").addEventListener("click", function(ev){
+  ev.preventDefault();
+  try{
+    var svg = document.getElementById("leinwand");
+    localStorage.setItem("laetitia_muster", JSON.stringify({ muster: state.muster, farbe: state.farbe, linien: state.linien }));
+    zeigeStatus("Gespeichert! ✅");
+  }catch(e){}
+});
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+try{
+  var d = JSON.parse(localStorage.getItem("laetitia_muster") || "null");
+  if(d){ state.muster = d.muster || "kreis"; state.farbe = d.farbe || "#ec4899"; state.linien = d.linien || 12; }
+}catch(e){}
+
+baueFarben();
+zeichne();
+rebindDwell();
+
+})();
+</script>
+
+<div class="zurueckLeiste"><a class="zurueckBtn" href="./malen.html" id="btnZurueck">← Zurück</a></div>
+</body>
+</html>
