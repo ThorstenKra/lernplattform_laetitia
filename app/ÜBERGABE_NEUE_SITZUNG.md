@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 27. April 2026*
+*Stand: 14. Mai 2026*
 
 ---
 
@@ -17,7 +17,7 @@ Claude beschränkt sich auf entscheidungsrelevante Ausgaben. Einzelschritte, Üb
 
 ---
 
-## 11 Goldstandard-Regeln
+## 16 Goldstandard-Regeln
 
 1. `dwell.js` immer `<script src="...">`, nie `import()`
 2. `localStorage["laetitia_input_mode"] = "tobii"` als Standard
@@ -30,6 +30,11 @@ Claude beschränkt sich auf entscheidungsrelevante Ausgaben. Einzelschritte, Üb
 9. Feedback mit `LOB_TEXTE` + `zufallsLob()`, TTS wartet auf `onend`
 10. `error_handler.js` in jede Spielseite einbinden
 11. **Stimme:** Microsoft Katja Online (Natural) — vollständiger Selektor in PROJEKT_WISSEN.md
+12. Jede HTML-Datei: `<!-- depth:N — Pfade: ../×N zu app/ -->` direkt nach `<!doctype html>` (depth 0 = in app/, 1 = modules/X/, 2 = modules/X/Y/, 3 = modules/X/Y/Z/)
+13. Inline-`<script>` max. 20 Zeilen — nur Init/Config/dwell-Aufruf/localStorage-Einzeiler. Alle Logik gehört in externe `.js`-Dateien.
+14. Mediendateien per `*_media_config.js` parametrisiert — nie löschen, nur `"id": false`. Neue Datei: Ordner + info.js + `<script>`-Tag + Eintrag in Config.
+15. `stats.js` in jede Spielseite einbinden, die Antworten erfasst. Pflicht: `sessionStart()` beim Laden, `taskStart()` vor Aufgabe, `taskAnswer()` nach Antwort, `sessionEnd()` beim Verlassen.
+16. Vor jedem `git push`: `validate.ps1` ausführen — alle 7 Prüfungen müssen grün sein.
 
 ---
 
@@ -70,10 +75,18 @@ Claude beschränkt sich auf entscheidungsrelevante Ausgaben. Einzelschritte, Üb
 
 | Datei | Status |
 |---|---|
-| `geraete.js` | ✅ neu — Lautstärke + Bluetooth-Umschaltung |
+| `geraete.js` | ✅ Lautstärke + Bluetooth-Umschaltung |
 | `dwell.js` | ✅ v10 |
-| `error_handler.js` | ✅ |
+| `error_handler.js` | ✅ v2 |
 | `schulprofil.js` | ✅ |
+| `stats.js` | ✅ NEU — window.LaetitiaStats, localStorage["laetitia_stats_v1"], 200 Sessions |
+
+## Werkzeuge (Projektwurzel)
+
+| Datei | Zweck |
+|---|---|
+| `validate.ps1` | 7 Konsistenzprüfungen: Script-Pfade, import()-Verbot, depth-Kommentar, stats.js-Referenzen, media_config-IDs. Ausführen: `powershell.exe -ExecutionPolicy Bypass -File .\validate.ps1` |
+| `app/pruefung.html` | Browser-Runtime-Check: LaetitiaAttachDwell, TTS-Stimme, localStorage, alle Core-APIs. Im Edge öffnen nach Deployment. |
 
 ## Hörbuch-Modul (app/modules/hoerbuch/)
 
@@ -90,26 +103,28 @@ Claude beschränkt sich auf entscheidungsrelevante Ausgaben. Einzelschritte, Üb
 
 ---
 
-## 🔴 Offene Aufgabe — Bluetooth (HOCHPRIORITÄT)
+## 🔴 Offene Aufgaben — Hochpriorität
 
-Alle Dateien deployed. Einziger offener Schritt:
+**Bluetooth-Umschaltung:**
+Einziger offener Schritt — als Administrator ausführen:
 ```powershell
 Install-Module -Name AudioDeviceCmdlets -Force -Scope CurrentUser
 ```
-Als Administrator ausführen → `lernwelt_starten.exe` neu starten → Audio-Dialog testen.
+Dann `lernwelt_starten.exe` neu starten → Audio-Dialog testen.
 
----
+**Lies-mal-3 Bilder:**
+- `taucher_lies`: Schätzwerte in BILD_CROP → exakt neu croppen
+- Neues Buch: Seiten 2, 8, 14, 16, 22, 28 fotografieren → hochladen
 
-## 🔴 Offene Aufgabe — Lies-mal-3 Bilder
+**Rule-18-Backlog:** ~45 HTML-Dateien haben noch Inline-`<script>` mit mehr als 20 Zeilen Logik. Nicht dringend, aber nach und nach abarbeiten.
 
-- `taucher_lies` hat noch Schätzwerte im BILD_CROP → neu croppen
-- Neues Buch kaufen → Seiten 2, 8, 14, 16, 22, 28 fotografieren → hochladen
+**Rule-12-Backlog:** ~58 HTML-Dateien ohne `<!-- depth:N -->` Kommentar. Wird von validate.ps1 gemeldet.
 
 ---
 
 ## 🟡 Mittelfristig
 
-- Mathe-Hefte digitalisieren (PDFs vorhanden)
+- Mathe-Hefte digitalisieren (PDFs vorhanden) → `schule_mathe_data.js`
 - Sachkunde-Bilder für 7 fehlende Themen ergänzen
 
 ---
@@ -122,32 +137,31 @@ TAGESPLAN · QUASSEL-ÜBERGANG · SONOS · AUFMERKSAMKEITS-SIGNAL (Fritz!Box)
 
 ## Start-Anleitung für neue Sitzung
 
-1. `ÜBERGABE.md` und `PROJEKT_WISSEN.md` hochladen → Claude liest und bestätigt
-2. Zu bearbeitende Dateien hochladen (nie aus Gedächtnis arbeiten)
-3. Aufgabe nennen
+Erste Nachricht an Claude:
+> **"Lies ÜBERGABE_NEUE_SITZUNG.md und PROJEKT_WISSEN.md und fasse den Stand zusammen."**
+
+Claude liest beide Dateien, bestätigt die 16 Goldstandard-Regeln und nennt offene Aufgaben.
 
 **Wichtig:** Claude arbeitet nie aus dem Gedächtnis an Kerndateien. Immer erst hochladen.
 
 ---
 
-## GitHub-Workflow
+## GitHub-Workflow (etabliert seit Mai 2026)
 
-Nach jeder Arbeitssitzung Änderungen sichern:
+GitHub: `https://github.com/ThorstenKra/lernplattform_laetitia`
 
+Nach jeder Arbeitssitzung:
 ```powershell
-git add .
-git commit -m "Kurze Beschreibung der Änderungen"
+powershell.exe -ExecutionPolicy Bypass -File .\validate.ps1   # erst prüfen
+git add -p                                                     # selektiv stagen
+git commit -m "Kurze Beschreibung"
+git push
 ```
 
-Remote einrichten (einmalig, nach Anlage des Repos auf GitHub):
+Auf dem Accent-Gerät (OneDrive-Sync-Ordner):
 ```powershell
-git remote add origin [GitHub-URL]
-git push -u origin main
+git pull
 ```
+Dann Edge komplett neu starten.
 
-Danach bei jedem Push:
-```powershell
-git push origin main
-```
-
-**Hinweis:** `.exe` und `.bat` Dateien stehen in `.gitignore` und bleiben lokal. Das Remote-Repo enthält nur den Quellcode.
+**Hinweis:** `.exe`, `.bat`, Mediendateien (MP3, JPG, PNG, …) stehen in `.gitignore` und bleiben lokal.

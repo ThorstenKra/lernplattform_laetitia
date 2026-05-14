@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Kollaborations-Handbuch
-**Stand: 2026-04-23**
+**Stand: 2026-05-14**
 
 ---
 
@@ -457,7 +457,137 @@ if(!alleAufgaben || alleAufgaben.length === 0){
 
 ---
 
-## 13. Changelog
+## 13. Neue Goldstandard-Regeln (ab 2026-05-14)
+
+### Regel 12 — Depth-Kommentar
+
+Jede HTML-Datei beginnt mit einem Pfadkommentar direkt nach `<!doctype html>`:
+
+```html
+<!doctype html>
+<!-- depth:2 — Pfade: ../../core/, ../../modules/ -->
+<html lang="de">
+```
+
+| depth | Lage der Datei | Pfad zu core/ |
+|---|---|---|
+| 0 | `app/` | `./core/` |
+| 1 | `app/modules/X/` | `../core/` |
+| 2 | `app/modules/X/Y/` | `../../core/` |
+| 3 | `app/modules/X/Y/Z/` | `../../../core/` |
+
+`validate.ps1` prüft, ob jede HTML-Datei diesen Kommentar enthält (Prüfung 4).
+
+---
+
+### Regel 13 — Inline-Script-Limit (≤20 Zeilen)
+
+Inline-`<script>` in HTML darf maximal **20 Zeilen** enthalten und nur folgende Inhalte haben:
+- Variable Zuweisung (Config, Konstanten)
+- `dwell.js`-Aufruf (`window.LaetitiaAttachDwell(...)`)
+- localStorage-Einzeiler
+- Aufruf einer Funktion aus einer externen Datei (`zeigeStartseite()` o.ä.)
+
+**Alle Logik (Funktionen, Event-Handler, Render-Loops, Datenverarbeitung)** gehört in externe `.js`-Dateien.
+
+Struktur:
+```html
+<script src="./data/modul_data.js"></script>
+<script src="./modul_mod.js"></script>       <!-- ← Logik hier -->
+<script>
+  var attachDwell = window.LaetitiaAttachDwell || function(){ return {cancelDwell:function(){}}; };
+  attachDwell("a.btn, #btnZurueck", { dwellMs: 900, leaveGrace: 100,
+    onActivate: function(el){ try{ el.click(); }catch(e){} }
+  });
+  try{ localStorage.setItem("laetitia_return_url_v1",
+    new URL("./uebersicht.html", window.location.href).href); }catch(e){}
+</script>
+```
+
+---
+
+### Regel 14 — Media-Config-Muster
+
+Jedes Medienmodul (Musik, Hörbuch, Fotos, …) hat eine `*_media_config.js` Parametertabelle.
+
+**Dateistruktur:**
+```javascript
+(function(){
+  "use strict";
+  var config = {
+    "album_id_1": true,
+    "album_id_2": false   // deaktiviert, bleibt im Repo
+  };
+  window.LaetitiaMusik = (window.LaetitiaMusik || []).filter(function(a){
+    return config[a.id] !== false;
+  });
+})();
+```
+
+**Ladereihenfolge in HTML:** alle `info.js`-Tags → `*_media_config.js` → Modul-JS.
+
+**Neues Medium einbinden:**
+1. Ordner anlegen, `info.js` schreiben (Pfade relativ zum HTML)
+2. `<script src="./alben/NeuAlbum/info.js"></script>` in HTML
+3. `"neue_id": true` in `*_media_config.js`
+
+**Medium deaktivieren:** `"id": false` — nie die Datei löschen.
+
+---
+
+### Regel 15 — Lernfortschritt-Erfassung (stats.js)
+
+`app/core/stats.js` → `window.LaetitiaStats`, speichert in `localStorage["laetitia_stats_v1"]`.
+
+Einbindung in Spielseiten (nach `error_handler.js`, vor Modul-JS):
+```html
+<script src="../../core/stats.js"></script>
+```
+
+Pflicht-Aufrufe:
+```javascript
+window.LaetitiaStats.sessionStart("modul", stufe);   // beim Laden
+window.LaetitiaStats.taskStart();                     // vor jeder Aufgabe
+window.LaetitiaStats.taskAnswer(id, richtig, gewaehlt, hilfe, null);  // nach Antwort
+window.LaetitiaStats.markHilfe(id);                  // wenn Hilfe-Button genutzt
+window.LaetitiaStats.sessionEnd(true);               // bei sauberem Abschluss
+window.LaetitiaStats.sessionEnd(false);              // bei Abbruch/Zurück
+```
+
+Analyse-API (für statistik.html):
+```javascript
+LaetitiaStats.schwacheAufgaben(modul)   // → [{id, fehlerRate, gesamt, avgMs}]
+LaetitiaStats.hilfeWortRanking(modul)   // → [{wort, anzahl}]
+LaetitiaStats.levelEmpfehlungen(modul)  // → [{modul, stufe, allesRichtig, sessions}]
+LaetitiaStats.musterWarnung(modul, 10)  // → {warnung, gesamt} | null
+```
+
+---
+
+### Regel 16 — validate.ps1 vor jedem Push
+
+`validate.ps1` in der Projektwurzel — führt 7 statische Konsistenzprüfungen durch:
+
+| # | Prüfung |
+|---|---|
+| 1 | Script-src-Pfade — jede referenzierte `.js`-Datei muss existieren |
+| 2 | `import()` verboten — kein `import()` in Script-Blöcken |
+| 3 | Inline-Script-Länge — max. 20 Zeilen pro `<script>` ohne `src` |
+| 4 | Depth-Kommentar — jede HTML-Datei braucht `<!-- depth:N -->` |
+| 5 | stats.js-Referenzen — jede HTML die `LaetitiaStats` nutzt, muss `stats.js` laden |
+| 6 | media_config-IDs — alle IDs in `*_media_config.js` müssen in info.js vorkommen |
+| 7 | info.js-IDs — alle IDs in info.js müssen in der passenden `*_media_config.js` stehen |
+
+Ausführen:
+```powershell
+powershell.exe -ExecutionPolicy Bypass -File .\validate.ps1
+```
+
+Alle Prüfungen müssen **grün** (0 Fehler) sein vor `git push`.
+
+---
+
+## 14. Changelog
 
 | Datum | Was |
 |---|---|
@@ -472,4 +602,11 @@ if(!alleAufgaben || alleAufgaben.length === 0){
 | 2026-04-23 | Schule-Navigation umgebaut: 3-Ebenen-Architektur (schule → fach → modul) |
 | 2026-04-23 | Sachkunde-Modul ✅ — schule_lesen.html + schule_lesen_data.js + Bilder aus PDFs |
 | 2026-04-23 | TTS-Pflichtimplementierung mit Watchdog in Abschnitt 5 dokumentiert ✅ |
-| 2026-04-23 | Dwell auf dynamischen Buttons: Abschnitt 5b + Fallstrick 38 ergänzt |
+| 2026-04-23 | Dwell auf dynamischen Buttons: Abschnitt 5b ergänzt |
+| 2026-05-14 | Regel 12–16 eingeführt: depth-Kommentar, Inline-Script-Limit, Media-Config, stats.js, validate.ps1 |
+| 2026-05-14 | validate.ps1 ✅ — 7 automatische Konsistenzprüfungen (Pfade, import(), depth, stats, config-IDs) |
+| 2026-05-14 | pruefung.html ✅ — Browser-Runtime-Health-Check (Accent-Gerät) |
+| 2026-05-14 | media_config.js Pattern ✅ — Musik, Hörbuch, Fotos, Glaube-Lieder, Glaube-Hörbücher, Psalmen |
+| 2026-05-14 | stats.js ✅ — window.LaetitiaStats, Lernfortschritt-Erfassung, 6 Analyse-Funktionen |
+| 2026-05-14 | Pfadfehler-Fixes: 9 HTML-Dateien (glossar, platzhalter, schach/6 Figuren, hoerbuch_glaube) |
+| 2026-05-14 | Regel 13-Extraktion (Rule 18): sinnesorgane_info.html, sinnesorgane.html, lernen.html |

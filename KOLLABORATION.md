@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Kollaborations-Regeln
-*Stand: 12. Mai 2026*
+*Stand: 14. Mai 2026*
 
 ---
 
@@ -30,9 +30,9 @@ Claude liest beide Dateien, bestätigt die 11 Goldstandard-Regeln und nennt offe
 
 ---
 
-## 11 Goldstandard-Regeln (NIEMALS brechen)
+## 16 Goldstandard-Regeln (NIEMALS brechen)
 
-Vollständige Dokumentation mit Code-Beispielen: `app/PROJEKT_WISSEN.md`
+Vollständige Dokumentation mit Code-Beispielen: `app/KOLLABORATION.md` (Abschnitt 13)
 
 1. `dwell.js` immer `<script src="...">`, nie `import()`
 2. `localStorage["laetitia_input_mode"] = "tobii"` als Standard
@@ -45,18 +45,26 @@ Vollständige Dokumentation mit Code-Beispielen: `app/PROJEKT_WISSEN.md`
 9. Lob-Feedback via `LOB_TEXTE` + `zufallsLob()`, TTS wartet auf `onend`-Callback
 10. `error_handler.js` in jede Spielseite einbinden
 11. **Stimme Goldstandard:** Microsoft Katja Online (Natural) — vollständiger Selektor in `app/PROJEKT_WISSEN.md`
+12. Jede HTML-Datei: `<!-- depth:N — Pfade: ../×N zu app/ -->` direkt nach `<!doctype html>`
+13. Inline-`<script>` max. 20 Zeilen — nur Init/Config/dwell-Aufruf/localStorage. Logik → externe `.js`
+14. Mediendateien per `*_media_config.js` parametrisiert — nie löschen, nur `"id": false`
+15. `stats.js` in jede Spielseite einbinden, die Antworten erfasst
+16. Vor `git push`: `validate.ps1` ausführen — alle 7 Prüfungen grün
 
 ---
 
 ## GitHub-Workflow
 
-Repository: wird nach Anlage auf GitHub hier eingetragen.
+Repository: `https://github.com/ThorstenKra/lernplattform_laetitia`
 
 Nach jeder Arbeitssitzung:
 ```
-git add .
+powershell.exe -ExecutionPolicy Bypass -File .\validate.ps1
+git add -p
 git commit -m "Kurze Beschreibung der Änderungen"
-git push origin main
+git push
 ```
 
-`.exe` und `.bat` Dateien sind in `.gitignore` — sie bleiben nur lokal.
+Auf dem Accent-Gerät (OneDrive-Sync-Ordner): `git pull`, dann Edge neu starten.
+
+`.exe`, `.bat` und Mediendateien (MP3, JPG, PNG, …) sind in `.gitignore` — bleiben nur lokal.

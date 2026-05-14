@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Projekt-Wissen
-*Stand: 3. Mai 2026*
+*Stand: 14. Mai 2026*
 
 ## System
 
@@ -274,17 +274,59 @@ Danach: `lernwelt_starten.exe` neu starten → Audio-Dialog erscheint beim Start
 
 ---
 
+## window.LaetitiaStats (stats.js)
+
+`app/core/stats.js` — speichert Lernfortschritt in `localStorage["laetitia_stats_v1"]`, max. 200 Sessions.
+
+**Session-Struktur:**
+```javascript
+{
+  sessions: [{
+    id: "1715689200000_deutsch", modul: "deutsch", stufe: "A2",
+    ts: 1715689200000, abgeschlossen: true,
+    aufgaben: [{
+      id: "A2|1|Textanfang|Frage", richtig: true,
+      gewaehlt: "A", hilfe: false, ms: 1500
+    }]
+  }]
+}
+```
+
+**Pflicht-Aufruf-Reihenfolge in Spielseiten:**
+```javascript
+LaetitiaStats.sessionStart("deutsch", "A2");  // beim Seitenload
+LaetitiaStats.taskStart();                    // vor Aufgabe anzeigen
+LaetitiaStats.taskAnswer(id, richtig, gewaehlt, hilfe, null);  // nach Antwort
+LaetitiaStats.markHilfe(taskId);             // wenn Hilfe genutzt
+LaetitiaStats.sessionEnd(true/false);        // bei Verlassen
+```
+
+**Analyse (in statistik.html):**
+```javascript
+LaetitiaStats.schwacheAufgaben(modul)   // ≥30% Fehlerrate, ≥2 Versuche
+LaetitiaStats.hilfeWortRanking(modul)   // Aufgaben mit hilfe=true, absteigend
+LaetitiaStats.levelEmpfehlungen(modul)  // ≥3× allesRichtig → nächste Stufe
+LaetitiaStats.musterWarnung(modul, 10)  // >70% dieselbe Option → Warnung
+```
+
+Derzeit eingebunden in: `lesen.html`, `deutsch.html`, `logik.html`, `mathe.html`, `mathe_test.html`, `sinnesorgane_quiz.html`, `statistik.html`.
+
+---
+
 ## Offene Aufgaben
 
 ### 🔴 Dringend
 - **Bluetooth-Modul aktivieren:** `Install-Module AudioDeviceCmdlets` (einmalig als Admin)
 - **taucher_lies** Crop-Werte korrigieren (aktuell Schätzwert)
 - **Neues Lies-mal-3-Buch** → 6 Comic-Seiten (S. 2, 8, 14, 16, 22, 28) fotografieren → hochladen
+- **Rule-13-Backlog:** ~45 HTML-Dateien mit Inline-`<script>` > 20 Zeilen — schrittweise auslagern
+- **Rule-12-Backlog:** ~58 HTML-Dateien ohne `<!-- depth:N -->` Kommentar
 
 ### 🟡 Mittelfristig
 - Mathe-Hefte (Mathe1/2/3.pdf) → Aufgaben digitalisieren → `schule_mathe_data.js`
 - Sachkunde-Bilder für: `wiese`, `apfelbaum`, `gaensebluemchen`, `kirschbaum`, `hyazinthe`, `narzisse`, `krokus`
 - `schule_lies` Zeichnungen (nach Buchkauf)
+- stats.js in weitere Spielseiten einbinden (Regel 15 vollständig umsetzen)
 
 ### ⬜ Noch nicht angegangen
 - TAGESPLAN, QUASSEL-ÜBERGANG, SONOS-Steuerung, AUFMERKSAMKEITS-SIGNAL (Fritz!Box)
@@ -294,3 +336,14 @@ Danach: `lernwelt_starten.exe` neu starten → Audio-Dialog erscheint beim Start
 ## Wichtige Warnung
 
 Claude darf **niemals** Kerndateien (`dwell.js`, `error_handler.js`, `geraete.js`) aus dem Gedächtnis rekonstruieren. Immer hochladen lassen.
+
+---
+
+## Changelog (Projekt-Wissen)
+
+| Datum | Was |
+|---|---|
+| 2026-04-08 | Erstanlage — System, TTS, Goldstandards |
+| 2026-04-23 | Schule-Architektur, schule_jaein-Konzept, BILD_CROP, Bluetooth |
+| 2026-05-03 | Sachkunde (sinnesorgane), Lies-mal-3, Schach-Goldstandard |
+| 2026-05-14 | stats.js API dokumentiert; Offene Aufgaben aktualisiert (Rule-12/13-Backlog) |
