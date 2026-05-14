@@ -1,0 +1,250 @@
+<!doctype html>
+<!-- depth:2 -- Pfade: ../../core/ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia - Grammatik</title>
+<style>
+:root{
+  --bg:#faf5ff; --panel:#ffffff;
+  --border:rgba(15,23,42,.14); --shadow:0 6px 18px rgba(15,23,42,.07);
+  --text:#0f172a; --muted:rgba(15,23,42,.65);
+  --akzent:#7c3aed; --akzent2:#5b21b6;
+  --akzent-bg:rgba(124,58,237,0.08); --radius:16px;
+  --lila:#8b5cf6; --lila-bg:#ede9fe;
+  --gruen:#16a34a; --gruen-bg:#dcfce7;
+  --rot:#dc2626; --rot-bg:rgba(220,38,38,0.08);
+  --orange:#f97316; --orange-bg:#fff7ed;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg); color:var(--text);
+  height:100vh; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+
+/* Header */
+.header{
+  background:var(--panel); border-bottom:2px solid var(--akzent);
+  box-shadow:0 2px 8px rgba(15,23,42,.06); flex-shrink:0;
+  padding:10px 16px; display:flex; align-items:center; gap:10px;
+}
+.header-emoji{ font-size:28px; }
+.header-titel{ font-size:18px; font-weight:1000; color:var(--akzent); }
+.header-sub{ font-size:12px; font-weight:800; color:var(--muted); margin-left:auto; }
+
+/* Fortschritt */
+.fortschritt-bar{ height:6px; background:rgba(124,58,237,0.12); flex-shrink:0; }
+.fortschritt-fill{ height:100%; background:var(--akzent); transition:width .4s ease; }
+
+/* Spielfeld */
+.spielfeld{
+  flex:1; overflow-y:hidden; padding:10px 12px;
+  display:flex; flex-direction:column; gap:8px;
+  min-height:0;
+}
+
+/* Erklär-Screen */
+.erklaer-card{
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  background:var(--panel); border:2px solid var(--akzent);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:20px 16px; gap:14px; text-align:center;
+}
+.erklaer-emoji{ font-size:56px; }
+.erklaer-titel{ font-size:22px; font-weight:1000; color:var(--akzent); }
+.erklaer-merksatz{
+  font-size:20px; font-weight:1000;
+  background:var(--akzent-bg); border:2px solid var(--akzent);
+  border-radius:12px; padding:12px 20px;
+  color:var(--akzent2); line-height:1.4;
+}
+
+/* Aufgaben-Card */
+.aufgabe-card{
+  background:var(--panel); border:2px solid var(--akzent);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:14px 16px; flex-shrink:0;
+}
+.aufgabe-frage{
+  font-size:20px; font-weight:1000; color:var(--text);
+  line-height:1.3;
+}
+.aufgabe-satz{
+  margin-top:10px;
+  font-size:22px; font-weight:800;
+  color:var(--akzent2);
+  background:var(--akzent-bg);
+  border-radius:10px; padding:10px 14px;
+  line-height:1.4;
+}
+
+/* Antwort-Buttons: Zweier (Ja/Nein, A/B, Richtig/Falsch) */
+.antwort-zweier{
+  display:flex; gap:10px; flex-shrink:0;
+}
+.antwort-btn{
+  flex:1; min-height:90px;
+  border-radius:var(--radius); border:2px solid var(--lila);
+  background:var(--lila-bg); color:#4c1d95;
+  font-size:22px; font-weight:1000;
+  cursor:pointer; user-select:none;
+  position:relative; display:flex;
+  align-items:center; justify-content:center;
+  transition:none;
+}
+.antwort-btn:hover:not(:disabled){ background:#ddd6fe; outline:3px solid var(--lila); }
+.antwort-btn.dwell-active{ transform:scale(1.03) !important; outline:3px solid var(--lila) !important; transition:none !important; }
+.antwort-btn:disabled{ opacity:.5; cursor:default; }
+.antwort-ja{ background:#dcfce7; border-color:var(--gruen); color:#166534; }
+.antwort-ja:hover:not(:disabled){ background:#bbf7d0; outline:3px solid var(--gruen); }
+.antwort-ja.dwell-active{ outline:3px solid var(--gruen) !important; }
+.antwort-nein{ background:#fee2e2; border-color:var(--rot); color:#991b1b; }
+.antwort-nein:hover:not(:disabled){ background:#fecaca; outline:3px solid var(--rot); }
+.antwort-nein.dwell-active{ outline:3px solid var(--rot) !important; }
+.antwort-richtig-btn{ background:#dcfce7; border-color:var(--gruen); color:#166534; }
+.antwort-falsch-btn{ background:#fee2e2; border-color:var(--rot); color:#991b1b; }
+
+/* Antwort-Buttons: Dreier (A/B/C) */
+.antwort-dreier{
+  display:flex; flex-direction:column; gap:8px; flex-shrink:0;
+}
+.antwort-dreier .antwort-btn{
+  min-height:76px; font-size:20px;
+}
+
+/* Wort-Buttons */
+.wort-reihe{
+  display:flex; flex-wrap:wrap; gap:8px; flex-shrink:0;
+}
+.wort-btn{
+  flex:1; min-width:80px; min-height:72px;
+  border-radius:var(--radius); border:2px solid var(--lila);
+  background:var(--lila-bg); color:#4c1d95;
+  font-size:18px; font-weight:1000;
+  cursor:pointer; user-select:none;
+  position:relative; display:flex;
+  align-items:center; justify-content:center;
+  transition:none;
+}
+.wort-btn:hover:not(:disabled){ background:#ddd6fe; outline:3px solid var(--lila); }
+.wort-btn.dwell-active{ transform:scale(1.03) !important; outline:3px solid var(--lila) !important; transition:none !important; }
+.wort-btn:disabled{ opacity:.6; cursor:default; }
+.wort-btn.btn-richtig{ background:#dcfce7 !important; border-color:var(--gruen) !important; color:#166534 !important; }
+.wort-btn.btn-falsch{ background:#fee2e2 !important; border-color:var(--rot) !important; color:#991b1b !important; }
+
+/* Feedback */
+.feedback-zeile{
+  padding:10px 14px; border-radius:12px;
+  font-size:17px; font-weight:800; display:none;
+  border:2px solid transparent; flex-shrink:0; line-height:1.4;
+}
+.feedback-richtig{ display:block; background:#dcfce7; border-color:var(--gruen); color:#166534; }
+.feedback-falsch{ display:block; background:#fee2e2; border-color:var(--rot); color:#991b1b; }
+
+/* Fertig-Screen */
+.fertig-screen{
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:14px; padding:24px; text-align:center;
+}
+.fertig-stern{ font-size:64px; }
+.fertig-stern.gold{ filter:drop-shadow(0 0 12px #fbbf24); }
+.fertig-titel{ font-size:24px; font-weight:1000; color:var(--akzent); }
+.fertig-punkte{ font-size:30px; font-weight:1000; color:var(--akzent2); }
+.fertig-nochmal-btn{
+  min-height:72px; min-width:200px;
+  border-radius:var(--radius); border:2px solid var(--lila);
+  background:var(--lila-bg); color:#4c1d95;
+  font-size:18px; font-weight:1000;
+  cursor:pointer; user-select:none;
+  position:relative; display:flex;
+  align-items:center; justify-content:center;
+  gap:8px; margin-top:8px; transition:none;
+}
+.fertig-nochmal-btn:hover{ background:#ddd6fe; outline:3px solid var(--lila); }
+.fertig-nochmal-btn.dwell-active{ transform:scale(1.02) !important; outline:3px solid var(--lila) !important; transition:none !important; }
+
+/* Nav */
+.nav-leiste-unten{ display:flex; gap:8px; padding:8px 12px; flex-shrink:0; }
+.nav-btn{
+  flex:1; min-height:64px; border-radius:var(--radius);
+  font-size:16px; font-weight:1000;
+  cursor:pointer; user-select:none;
+  position:relative; display:flex;
+  align-items:center; justify-content:center;
+  gap:6px; transition:none; border:2px solid;
+  text-decoration:none;
+}
+a.nav-btn{ color:inherit; }
+.nav-btn-zurueck{ background:var(--lila-bg); border-color:var(--lila); color:#4c1d95; }
+.nav-btn-zurueck:hover{ background:#ddd6fe; outline:3px solid var(--lila); }
+.nav-btn-zurueck .dwell-ring-svg circle{ stroke:var(--lila); }
+.nav-btn-weiter{ background:var(--gruen-bg); border-color:var(--gruen); color:#166534; display:none; }
+.nav-btn-weiter.sichtbar{ display:flex; }
+.nav-btn-weiter:hover{ background:#bbf7d0; outline:3px solid var(--gruen); }
+.nav-btn-weiter .dwell-ring-svg circle{ stroke:var(--gruen); }
+.nav-btn-ueberspringen{ background:var(--orange-bg); border-color:var(--orange); color:#9a3412; }
+.nav-btn-ueberspringen:hover{ background:#ffedd5; outline:3px solid var(--orange); }
+.nav-btn-ueberspringen .dwell-ring-svg circle{ stroke:var(--orange); }
+.nav-btn.dwell-active{ transform:scale(1.02) !important; outline:3px solid currentColor !important; transition:none !important; }
+
+/* Dwell-Ring */
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  pointer-events:none; z-index:10; width:60px; height:60px;
+}
+.dwell-ring-svg circle{
+  fill:none; stroke:var(--akzent); stroke-width:5;
+  stroke-dasharray:220; stroke-dashoffset:220;
+  transform:rotate(-90deg); transform-origin:35px 35px;
+}
+.dwell-ring-svg circle.animating{ animation:dwellRing var(--dwell-duration,.9s) linear forwards; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="header-emoji">📝</span>
+  <span class="header-titel" id="headerTitel">Grammatik-Werkstatt</span>
+  <span class="header-sub" id="headerSub">Lade…</span>
+</div>
+
+<div class="fortschritt-bar"><div class="fortschritt-fill" id="fortschritt" style="width:0%"></div></div>
+
+<div class="spielfeld" id="spielfeld">
+  <!-- wird von grammatik_mod.js befüllt -->
+</div>
+
+<div class="nav-leiste-unten" id="navLeiste">
+  <a class="nav-btn nav-btn-zurueck" id="btnZurueck" href="./grammatik.html">
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+    ← Zurück
+  </a>
+  <button class="nav-btn nav-btn-weiter" id="weiterBtn">
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+    Weiter ✅
+  </button>
+  <button class="nav-btn nav-btn-ueberspringen" id="btnUeberspringen">
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+    → Überspringen
+  </button>
+</div>
+
+<script src="../../core/dwell.js"></script>
+<script src="../../core/error_handler.js"></script>
+<script src="../../core/stats.js"></script>
+<script src="./grammatik_data.js"></script>
+<script src="./grammatik_mod.js"></script>
+<script>
+var _eid = new URLSearchParams(window.location.search).get("einheit") || "E-00";
+try{ localStorage.setItem("laetitia_return_url_v1", new URL("./grammatik.html", window.location.href).href); }catch(e){}
+if(speechSynthesis.getVoices().length > 0){ window.GrammatikMod.starteEinheit(_eid); }
+else { speechSynthesis.addEventListener("voiceschanged", function(){ window.GrammatikMod.starteEinheit(_eid); },{once:true}); setTimeout(function(){ window.GrammatikMod.starteEinheit(_eid); },800); }
+</script>
+</body>
+</html>

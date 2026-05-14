@@ -1,0 +1,136 @@
+<!doctype html>
+<!-- depth:2 -- Pfade: ../../core/ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia - Grammatik-Werkstatt</title>
+<style>
+:root{
+  --bg:#faf5ff; --panel:#ffffff;
+  --border:rgba(15,23,42,.14); --shadow:0 6px 18px rgba(15,23,42,.07);
+  --text:#0f172a; --muted:rgba(15,23,42,.65);
+  --akzent:#7c3aed; --akzent2:#5b21b6;
+  --akzent-bg:rgba(124,58,237,0.08); --radius:16px;
+  --lila:#8b5cf6; --lila-bg:#ede9fe;
+  --gruen:#16a34a; --gruen-bg:#dcfce7;
+  --grau:#94a3b8; --grau-bg:#f1f5f9;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg); color:var(--text);
+  height:100vh; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+.header{
+  background:var(--panel); border-bottom:2px solid var(--akzent);
+  box-shadow:0 2px 8px rgba(15,23,42,.06); flex-shrink:0;
+  padding:10px 16px; display:flex; align-items:center; gap:10px;
+}
+.header-emoji{ font-size:28px; }
+.header-titel{ font-size:20px; font-weight:1000; color:var(--akzent); }
+.header-sub{ font-size:13px; font-weight:800; color:var(--muted); margin-left:auto; }
+
+/* Einheiten-Raster */
+.einheiten-bereich{
+  flex:1; overflow-y:auto; padding:12px;
+}
+.stufe-label{
+  font-size:13px; font-weight:1000; color:var(--muted);
+  text-transform:uppercase; letter-spacing:.05em;
+  padding:8px 4px 4px;
+}
+.einheiten-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:12px;
+}
+.einheit-btn{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:6px; min-height:100px; padding:12px;
+  background:var(--panel); border:2px solid var(--border);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  text-decoration:none; color:var(--text); font-weight:1000;
+  user-select:none; cursor:pointer; position:relative; transition:none;
+}
+.einheit-btn.verfuegbar{
+  border-color:var(--lila); background:var(--lila-bg);
+}
+.einheit-btn.gemeistert{
+  border-color:var(--gruen); background:var(--gruen-bg);
+}
+.einheit-btn.gesperrt{
+  opacity:0.45; cursor:default; pointer-events:none;
+}
+.einheit-btn:not(.gesperrt):hover{
+  transform:scale(1.03); outline:3px solid var(--akzent); background:var(--akzent-bg);
+}
+.einheit-btn.dwell-active{
+  transform:scale(1.04) !important; outline:3px solid var(--akzent) !important;
+  background:var(--akzent-bg) !important; transition:none !important;
+}
+.einheit-emoji{ font-size:28px; }
+.einheit-id{ font-size:10px; font-weight:1000; color:var(--muted); }
+.einheit-label{ font-size:13px; text-align:center; font-weight:1000; line-height:1.3; }
+.einheit-status{ font-size:18px; }
+
+/* Zurück */
+.zurueck-leiste{ padding:8px 12px; flex-shrink:0; }
+a.zurueckBtn{
+  display:flex; align-items:center; justify-content:center;
+  min-height:72px; font-size:20px; font-weight:1000;
+  border-radius:16px; border:2px solid #8b5cf6;
+  background:#ede9fe; color:#4c1d95;
+  text-decoration:none; cursor:pointer; user-select:none;
+  position:relative; transition:none; width:100%;
+}
+a.zurueckBtn:hover{ background:#ddd6fe; outline:3px solid #8b5cf6; }
+a.zurueckBtn.dwell-active{ transform:scale(1.02) !important; outline:3px solid #8b5cf6 !important; }
+a.zurueckBtn .dwell-ring-svg circle{ stroke:#8b5cf6; }
+
+/* Dwell-Ring */
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  pointer-events:none; z-index:10; width:60px; height:60px;
+}
+.dwell-ring-svg circle{
+  fill:none; stroke:var(--akzent); stroke-width:5;
+  stroke-dasharray:220; stroke-dashoffset:220;
+  transform:rotate(-90deg); transform-origin:35px 35px;
+}
+a.zurueckBtn .dwell-ring-svg circle{ stroke:#8b5cf6; }
+.dwell-ring-svg circle.animating{ animation:dwellRing var(--dwell-duration,.9s) linear forwards; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="header-emoji">📝</span>
+  <span class="header-titel">Grammatik-Werkstatt</span>
+  <span class="header-sub" id="headerSub">Einheit wählen</span>
+</div>
+
+<div class="einheiten-bereich" id="einheitenBereich">
+  <!-- wird per JS befüllt -->
+</div>
+
+<div class="zurueck-leiste">
+  <a class="zurueckBtn" href="./schule.html" id="btnZurueck">
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+    ← Zurück zur Schule
+  </a>
+</div>
+
+<script src="../../core/dwell.js"></script>
+<script src="../../core/error_handler.js"></script>
+<script src="./grammatik_data.js"></script>
+<script src="./grammatik_uebersicht.js"></script>
+<script>
+try{ localStorage.setItem("laetitia_return_url_v1", new URL("./grammatik.html", window.location.href).href); }catch(e){}
+window.GrammatikUebersicht.baueUebersicht();
+</script>
+</body>
+</html>
