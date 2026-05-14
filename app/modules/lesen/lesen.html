@@ -324,9 +324,11 @@
   #btnReturnFromMenu, #btnReturnFromOverlay {
     background:#ede9fe !important; color:#4c1d95 !important;
     border:2px solid #8b5cf6 !important;
-    min-height:78px !important; font-size:18px !important;
+    min-height:78px !important; font-size:20px !important;
     font-weight:1000 !important;
   }
+  #btnReturnFromMenu{ width:100% !important; }
+  .zurueck-leiste{ margin-top:8px; flex-shrink:0; }
   #btnReturnFromMenu:hover, #btnReturnFromMenu:focus,
   #btnReturnFromOverlay:hover, #btnReturnFromOverlay:focus {
     background:#ddd6fe !important; outline:4px solid #8b5cf6 !important;
@@ -377,8 +379,9 @@
           <a class="uibtn repeatBtn" href="#" id="btnWrong">Nur falsche Antworten wiederholen</a>
           <div class="savedLine" id="savedLine">Gespeicherte falsche Antworten: 0</div>
         </div>
-        <a class="uibtn" id="btnReturnFromMenu" href="../../index.html"
-           style="margin-top:8px; min-height:68px; font-size:18px;">← Zur Gesamtübersicht</a>
+        <div class="zurueck-leiste">
+          <a class="uibtn" id="btnReturnFromMenu" href="../../index.html">← Zur Gesamtübersicht</a>
+        </div>
       </div>
 
       <!-- AUFGABE -->
