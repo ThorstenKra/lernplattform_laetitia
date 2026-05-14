@@ -147,38 +147,6 @@
     onActivate: function(el){ try{ el.click(); }catch(e){} }
   });
 
-  // Direktes pointerenter als Fallback (zuverlaessig auf Tobii Accent)
-  var btns = document.querySelectorAll("a.wahlBtn, a.zurueckBtn");
-  btns.forEach(function(el){
-    var timer = null;
-    var ring  = el.querySelector(".dwell-ring-svg circle");
-
-    function start(){
-      if(timer) return;
-      el.classList.add("dwell-active");
-      if(ring){
-        ring.classList.remove("animating");
-        void ring.offsetWidth;
-        ring.style.setProperty("--dwell-duration", (dwellMs/1000) + "s");
-        ring.classList.add("animating");
-      }
-      timer = setTimeout(function(){
-        timer = null;
-        try{ el.click(); }catch(e){}
-      }, dwellMs);
-    }
-    function stop(){
-      if(timer){ clearTimeout(timer); timer = null; }
-      el.classList.remove("dwell-active");
-      if(ring) ring.classList.remove("animating");
-    }
-
-    el.addEventListener("pointerenter", start);
-    el.addEventListener("pointerleave", stop);
-    el.addEventListener("mouseenter",   start);
-    el.addEventListener("mouseleave",   stop);
-    el.addEventListener("click",        stop);
-  });
 })();
 </script>
 </body>
