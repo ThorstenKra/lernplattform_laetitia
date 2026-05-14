@@ -20,6 +20,7 @@ if(!window._LDwellState){
     target:           null,
     dwellTimer:       null,
     leaveTimer:       null,
+    aliveKickTimer:   null,
     onActivate:       null,
     dwellMs:          600,
     leaveGrace:       100,
@@ -54,6 +55,7 @@ function makeSvgRing(){
 function clearRing(){
   if(S.leaveTimer){ clearTimeout(S.leaveTimer); S.leaveTimer = null; }
   if(S.dwellTimer){ clearTimeout(S.dwellTimer); S.dwellTimer = null; }
+  if(S.aliveKickTimer){ clearTimeout(S.aliveKickTimer); S.aliveKickTimer = null; }
   if(S.target){
     S.target.classList.remove("dwell-active");
     var rings = S.target.querySelectorAll(".dwell-ring-svg");
@@ -115,6 +117,35 @@ function startDwell(el){
       S.onActivate(target);
     }
   }, S.dwellMs);
+
+  // Alive-Kick: nach dwellMs + 2s prüfen ob Element noch aktiv ohne Timer ist.
+  // Tritt auf wenn cancelDwell() während des Dwell-Vorgangs greift und das
+  // Element weiter angeblickt wird ohne erneutes pointerenter vom Tobii.
+  if(S.aliveKickTimer) clearTimeout(S.aliveKickTimer);
+  var _aliveEl = el;
+  S.aliveKickTimer = setTimeout(function(){
+    S.aliveKickTimer = null;
+    if(S.target !== _aliveEl || S.dwellTimer || Date.now() < S.protectUntil) return;
+    var rings = _aliveEl.querySelectorAll(".dwell-ring-svg");
+    for(var r=0;r<rings.length;r++){
+      if(rings[r].parentNode) rings[r].parentNode.removeChild(rings[r]);
+    }
+    var svg = makeSvgRing();
+    svg.style.setProperty("--dwell-duration",(S.dwellMs/1000)+"s");
+    _aliveEl.appendChild(svg);
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        var c = svg.querySelector("circle");
+        if(c) c.classList.add("animating");
+      });
+    });
+    S.dwellTimer = setTimeout(function(){
+      S.dwellTimer = null;
+      var t = S.target;
+      clearRing();
+      if(t && !isDisabled(t) && typeof S.onActivate === "function") S.onActivate(t);
+    }, S.dwellMs);
+  }, S.dwellMs + 2000);
 }
 
 function scheduledLeave(){
@@ -215,6 +246,18 @@ function attachDwell(selector, opts){
       el.addEventListener("blur", scheduledLeave);
     })(els[i]);
   }
+
+  // Hover-Recheck: nach Schutzzeit prüfen ob Blick bereits auf einem Element ist.
+  // Tobii sendet kein erneutes pointerenter wenn Blick nach rebindDwell() nicht weggeht.
+  setTimeout(function(){
+    if(S.target || Date.now() < S.protectUntil) return;
+    try{
+      var all = document.querySelectorAll(selector);
+      for(var i=0;i<all.length;i++){
+        if(all[i].matches && all[i].matches(":hover")){ startDwell(all[i]); break; }
+      }
+    }catch(e){}
+  }, 1300);
 
   return { cancelDwell: cancelDwell };
 }
