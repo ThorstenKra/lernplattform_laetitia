@@ -108,7 +108,7 @@
   }
   a.infBtn.zurueck{
     background:#ede9fe; color:#4c1d95; border:2px solid var(--lila);
-    flex:1;
+    flex:1; font-size:20px;
   }
   a.infBtn.zurueck:hover, a.infBtn.zurueck:focus{
     background:#ddd6fe; outline:4px solid var(--lila); transition:none;
@@ -228,6 +228,16 @@
 
   var dwellMs    = parseInt(localStorage.getItem("laetitia_dwell_ms"))       || 900;
   var leaveGrace = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
+
+  // Rule 7: LaetitiaAttachDwell als primaerer Mechanismus
+  var attachDwell = window.LaetitiaAttachDwell || function(){ return {cancelDwell:function(){}}; };
+  attachDwell("a.infBtn:not([aria-disabled='true'])", {
+    dwellMs: dwellMs, leaveGrace: leaveGrace,
+    onActivate: function(el){
+      if(el.getAttribute("aria-disabled") === "true") return;
+      try{ el.click(); }catch(e){}
+    }
+  });
 
   function zeige(i){
     if(!daten.length) return;

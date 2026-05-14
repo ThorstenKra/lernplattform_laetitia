@@ -58,9 +58,10 @@
   .wahl-label{ font-size:clamp(18px,2.5vw,24px); font-weight:1000; }
   .wahl-sub{ font-size:13px; font-weight:900; color:var(--muted); margin-top:4px; }
 
+  .zurueck-leiste{ flex-shrink:0; }
   a.zurueckBtn{
     display:flex; align-items:center; justify-content:center;
-    min-height:72px; font-size:18px; font-weight:1000;
+    min-height:72px; font-size:20px; font-weight:1000; width:100%;
     border-radius:16px; border:2px solid var(--lila);
     background:#ede9fe; color:#4c1d95;
     text-decoration:none; cursor:pointer; user-select:none;
@@ -116,10 +117,12 @@
     </a>
   </div>
 
-  <a class="zurueckBtn" href="../sachkunde.html" id="btnZurueck">
-    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#8b5cf6"/></svg>
-    ← Zurück zur Sachkunde
-  </a>
+  <div class="zurueck-leiste">
+    <a class="zurueckBtn" href="../sachkunde.html" id="btnZurueck">
+      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#8b5cf6"/></svg>
+      ← Zurück zur Sachkunde
+    </a>
+  </div>
 </div>
 
 <script src="../../../core/dwell.js"></script>
@@ -136,6 +139,14 @@
   var dwellMs    = parseInt(localStorage.getItem("laetitia_dwell_ms"))       || 900;
   var leaveGrace = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
 
+  // Rule 7: LaetitiaAttachDwell als primaerer Mechanismus
+  var attachDwell = window.LaetitiaAttachDwell || function(){ return {cancelDwell:function(){}}; };
+  attachDwell("a.wahlBtn, a.zurueckBtn", {
+    dwellMs: dwellMs, leaveGrace: leaveGrace,
+    onActivate: function(el){ try{ el.click(); }catch(e){} }
+  });
+
+  // Direktes pointerenter als Fallback (zuverlaessig auf Tobii Accent)
   var btns = document.querySelectorAll("a.wahlBtn, a.zurueckBtn");
   btns.forEach(function(el){
     var timer = null;
