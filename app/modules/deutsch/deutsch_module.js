@@ -32,31 +32,32 @@
   const speak = AQ ? AQ.speak : function(){};
   const stopSpeak = AQ ? AQ.stopSpeak : function(){};
 
-  // ── Dwell-System (analog moduleKit) ─────────────────────────────────────────
+  // ── Dwell-System ─────────────────────────────────────────────────────────
+  // dwell.js wird als normales <script> geladen → window.LaetitiaAttachDwell
+  // KEIN dynamisches import() — funktioniert nicht bei file:// in Edge
   let _attachDwell = null;
   let _dwellHandle = null;
 
-  async function loadDwell(){
+  function loadDwell(){
     if(_attachDwell) return _attachDwell;
-    try{
-      // Pfad relativ zur deutsch.html-Datei (modules/deutsch/ → core/)
-      const scriptEl = document.querySelector('script[src*="deutsch_module"]');
-      const base = scriptEl ? scriptEl.src : location.href;
-      const url  = new URL("../../core/dwell.js", base).href;
-      const mod  = await import(url);
-      _attachDwell = mod.attachDwell;
-    }catch(e){
-      console.warn("[Deutsch] dwell.js konnte nicht geladen werden:", e);
-      _attachDwell = () => ({ cancelDwell: ()=>{} });
+    if(typeof window.LaetitiaAttachDwell === "function"){
+      _attachDwell = window.LaetitiaAttachDwell;
+    } else {
+      console.warn("[Deutsch] window.LaetitiaAttachDwell nicht gefunden — dwell.js geladen?");
+      _attachDwell = function(){ return { cancelDwell: function(){} }; };
     }
     return _attachDwell;
   }
 
-  async function rebindDwell(){
+  function rebindDwell(){
     if(_dwellHandle && typeof _dwellHandle.cancelDwell === "function"){
       _dwellHandle.cancelDwell();
+    } else {
+      if(window._LDwellState && typeof window._LDwellState === "object"){
+        window._LDwellState.protectUntil = Date.now() + 1200;
+      }
     }
-    const attach = await loadDwell();
+    var attach = loadDwell();
     const selector = [
       "a.uibtn", "button.uibtn",
       "a.levelBtn", "[data-level]", "[data-answer]",
@@ -69,7 +70,7 @@
     _dwellHandle = attach(selector, {
       dwellMs:    DWELL_MS,
       leaveGrace: LEAVE_GRACE,
-      onActivate: (el) => {
+      onActivate: function(el){
         if(el.getAttribute("aria-disabled") === "true") return;
         if(el.getAttribute("data-disabled")  === "1")   return;
         try{ el.click(); }catch(e){}

@@ -9,7 +9,10 @@
     }catch{ return fallback; }
   }
   function setJson(key, value){
-    try{ localStorage.setItem(key, JSON.stringify(value)); }catch{}
+    try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){
+      console.error("[LaetitiaStorage] setJson(" + key + ") fehlgeschlagen:", e);
+      try{ if(window.LaetitiaFehler) window.LaetitiaFehler.zeige("Speicher-Fehler beim Schreiben: " + key, "storage"); }catch(e2){}
+    }
   }
   function getString(key, fallback){
     try{
@@ -18,7 +21,10 @@
     }catch{ return fallback; }
   }
   function setString(key, value){
-    try{ localStorage.setItem(key, String(value)); }catch{}
+    try{ localStorage.setItem(key, String(value)); }catch(e){
+      console.error("[LaetitiaStorage] setString(" + key + ") fehlgeschlagen:", e);
+      try{ if(window.LaetitiaFehler) window.LaetitiaFehler.zeige("Speicher-Fehler beim Schreiben: " + key, "storage"); }catch(e2){}
+    }
   }
 
   window.LaetitiaStorage = { getJson, setJson, getString, setString };
