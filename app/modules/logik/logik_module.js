@@ -19,14 +19,15 @@
     icon:       "Logik",
     dataKey:    "logik",
 
-    levelOrder: ["L1","L2","L3","L4"],
+    levelOrder: ["L1","L2","L3","L4","L5"],
 
     levelLabel: function(lv){
       var namen = {
         L1: "L1 - Was passt nicht?",
         L2: "L2 - Was kommt als Nächstes?",
         L3: "L3 - Was ist ähnlich?",
-        L4: "L4 - Richtig oder Falsch?"
+        L4: "L4 - Richtig oder Falsch?",
+        L5: "L5 - Wenn ... dann ...?"
       };
       return namen[lv] || lv;
     },
