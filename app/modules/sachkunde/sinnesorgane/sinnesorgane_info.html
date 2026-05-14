@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Sinnesorgane Info</title>
+<style>
+  :root{
+    --bg:#f0fdf4;
+    --panel:#ffffff;
+    --border:rgba(15,23,42,.14);
+    --shadow:0 10px 26px rgba(15,23,42,.08);
+    --text:#0f172a;
+    --muted:rgba(15,23,42,.65);
+    --green:#16a34a;
+    --green2:#15803d;
+    --lila:#8b5cf6;
+    --radius:18px;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    background:var(--bg); color:var(--text);
+    height:100vh; overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .app{
+    width:min(1000px,96vw);
+    height:calc(100vh - 20px);
+    display:flex; flex-direction:column; gap:8px; min-height:0;
+  }
+
+  /* ── Header ── */
+  .infoHeader{
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:14px; box-shadow:var(--shadow);
+    padding:10px 16px;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    flex-shrink:0;
+  }
+  .infoHeaderTitle{ font-size:18px; font-weight:1000; color:var(--green); }
+  .infoHeaderCount{ font-size:14px; font-weight:900; color:var(--muted); }
+  .progressDots{ display:flex; gap:6px; }
+  .dot{
+    width:14px; height:14px; border-radius:50%;
+    background:rgba(22,163,74,0.18); border:2px solid rgba(22,163,74,0.35);
+    transition:none;
+  }
+  .dot.aktiv{ background:var(--green); border-color:var(--green); }
+
+  /* ── Hauptkarte ── */
+  .infoCard{
+    background:var(--panel); border:2px solid rgba(22,163,74,0.30);
+    border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:14px 18px; flex:1; min-height:0;
+    display:flex; flex-direction:column; gap:10px; overflow:hidden;
+  }
+
+  /* Organ-Kopf */
+  .organKopf{
+    display:flex; align-items:center; gap:16px;
+    padding-bottom:10px; border-bottom:2px solid rgba(22,163,74,0.20);
+    flex-shrink:0;
+  }
+  .organEmoji{ font-size:clamp(44px,6vw,64px); line-height:1; }
+  .organName{ font-size:clamp(24px,3.5vw,36px); font-weight:1000; color:var(--green); }
+  .organSinnBadge{
+    font-size:14px; font-weight:900;
+    background:rgba(22,163,74,0.12); border:1px solid rgba(22,163,74,0.35);
+    color:var(--green); border-radius:999px; padding:4px 12px; margin-top:4px;
+    display:inline-block;
+  }
+
+  /* Info-Grid */
+  .infoGrid{
+    display:grid; grid-template-columns:1fr 1fr; gap:8px;
+    flex:1; min-height:0; overflow:hidden;
+  }
+  .infoZeile{
+    background:rgba(240,253,244,0.80); border:1px solid rgba(22,163,74,0.18);
+    border-radius:12px; padding:8px 12px;
+    display:flex; flex-direction:column; gap:3px;
+  }
+  .infoZeile.voll{ grid-column:1 / -1; }
+  .infoZeile.fakt{
+    grid-column:1 / -1;
+    background:rgba(245,158,11,0.08); border-color:rgba(245,158,11,0.35);
+  }
+  .infoLabel{
+    font-size:11px; font-weight:1000; letter-spacing:0.08em;
+    color:var(--green); text-transform:uppercase;
+  }
+  .infoZeile.fakt .infoLabel{ color:#92400e; }
+  .infoWert{
+    font-size:clamp(13px,1.5vw,17px); font-weight:900; color:var(--text); line-height:1.35;
+  }
+
+  /* ── Footer ── */
+  .infoFooter{
+    display:flex; gap:10px; flex-shrink:0;
+  }
+  a.infBtn{
+    display:flex; align-items:center; justify-content:center;
+    text-decoration:none; font-weight:1000; user-select:none;
+    border-radius:16px; padding:0 16px; min-height:72px;
+    font-size:clamp(15px,2vw,18px); position:relative; transition:none;
+  }
+  a.infBtn.zurueck{
+    background:#ede9fe; color:#4c1d95; border:2px solid var(--lila);
+    flex:1;
+  }
+  a.infBtn.zurueck:hover, a.infBtn.zurueck:focus{
+    background:#ddd6fe; outline:4px solid var(--lila); transition:none;
+  }
+  a.infBtn.nav{
+    background:rgba(22,163,74,0.12); color:var(--green);
+    border:2px solid rgba(22,163,74,0.40); flex:1;
+  }
+  a.infBtn.nav:hover, a.infBtn.nav:focus{
+    background:rgba(22,163,74,0.25); outline:4px solid var(--green); transition:none;
+  }
+  a.infBtn.nav[aria-disabled="true"]{
+    opacity:0.35; pointer-events:none;
+  }
+  a.infBtn.quiz{
+    background:var(--green); color:#fff;
+    border:2px solid var(--green2); flex:1.5;
+  }
+  a.infBtn.quiz:hover, a.infBtn.quiz:focus{
+    background:var(--green2); outline:4px solid var(--green); transition:none;
+  }
+
+  /* Dwell */
+  @keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+  .dwell-ring-svg{
+    position:absolute; top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    pointer-events:none; z-index:10; width:60px; height:60px;
+  }
+  .dwell-ring-svg circle{
+    fill:none; stroke-width:5; stroke-linecap:round;
+    stroke-dasharray:220; stroke-dashoffset:220;
+    transform:rotate(-90deg); transform-origin:35px 35px;
+  }
+  .dwell-ring-svg circle.animating{
+    animation:dwellRing var(--dwell-duration,0.6s) linear forwards;
+  }
+  a.infBtn.dwell-active{ transform:scale(1.05) !important; transition:none !important; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Header -->
+  <div class="infoHeader">
+    <div class="infoHeaderTitle">🔬 Sinnesorgane — Informationen</div>
+    <div class="progressDots" id="progressDots"></div>
+    <div class="infoHeaderCount" id="fortschritt">Organ 1 von 5</div>
+  </div>
+
+  <!-- Hauptkarte -->
+  <div class="infoCard">
+    <div class="organKopf">
+      <div class="organEmoji" id="organEmoji">👁️</div>
+      <div>
+        <div class="organName" id="organName">Die Augen</div>
+        <div class="organSinnBadge" id="organSinn">Sehen</div>
+      </div>
+    </div>
+
+    <div class="infoGrid">
+      <div class="infoZeile">
+        <div class="infoLabel">Körperteil</div>
+        <div class="infoWert" id="organKoerper">–</div>
+      </div>
+      <div class="infoZeile">
+        <div class="infoLabel">Ich nehme wahr</div>
+        <div class="infoWert" id="organWahrnehmung">–</div>
+      </div>
+      <div class="infoZeile voll">
+        <div class="infoLabel">Wie funktioniert es?</div>
+        <div class="infoWert" id="organFunktion">–</div>
+      </div>
+      <div class="infoZeile voll">
+        <div class="infoLabel">Im Alltag</div>
+        <div class="infoWert" id="organAlltag">–</div>
+      </div>
+      <div class="infoZeile fakt">
+        <div class="infoLabel">💡 Wusstest du?</div>
+        <div class="infoWert" id="organFakt">–</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Navigation -->
+  <div class="infoFooter">
+    <a class="infBtn zurueck" href="../sinnesorgane.html" id="btnZurueck">
+      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#8b5cf6"/></svg>
+      ← Zurück
+    </a>
+    <a class="infBtn nav" href="#" id="btnPrev" aria-disabled="true">
+      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#16a34a"/></svg>
+      ◀ Vorheriges
+    </a>
+    <a class="infBtn nav" href="#" id="btnNext">
+      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#16a34a"/></svg>
+      Nächstes ▶
+    </a>
+    <a class="infBtn quiz" href="./sinnesorgane_quiz.html" id="btnQuiz">
+      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#15803d"/></svg>
+      🎯 Zum Quiz
+    </a>
+  </div>
+
+</div>
+
+<script src="../../../core/dwell.js"></script>
+<script src="../../../core/error_handler.js"></script>
+<script src="./data/sinnesorgane_info_data.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var daten = window.SINNESORGANE_INFO || [];
+  var idx = 0;
+
+  var dwellMs    = parseInt(localStorage.getItem("laetitia_dwell_ms"))       || 900;
+  var leaveGrace = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
+
+  function zeige(i){
+    if(!daten.length) return;
+    idx = Math.max(0, Math.min(i, daten.length - 1));
+    var d = daten[idx];
+
+    document.getElementById("organEmoji").textContent       = d.emoji;
+    document.getElementById("organName").textContent        = d.name;
+    document.getElementById("organSinn").textContent        = d.sinn;
+    document.getElementById("organKoerper").textContent     = d.koerperteil;
+    document.getElementById("organWahrnehmung").textContent = d.wahrnehmen;
+    document.getElementById("organFunktion").textContent    = d.funktion;
+    document.getElementById("organAlltag").textContent      = d.alltag;
+    document.getElementById("organFakt").textContent        = d.fakt;
+    document.getElementById("fortschritt").textContent      = "Organ " + (idx+1) + " von " + daten.length;
+
+    var btnPrev = document.getElementById("btnPrev");
+    btnPrev.setAttribute("aria-disabled", idx === 0 ? "true" : "false");
+
+    var btnNext = document.getElementById("btnNext");
+    btnNext.setAttribute("aria-disabled", idx === daten.length - 1 ? "true" : "false");
+
+    // Punkte faerben
+    var dots = document.querySelectorAll(".dot");
+    dots.forEach(function(dot, j){
+      dot.classList.toggle("aktiv", j === idx);
+    });
+
+    // TTS vorlesen
+    try{
+      var text = d.name + ". " + d.sinn + ". " + d.funktion + " " + d.fakt;
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.92;
+      var voices = speechSynthesis.getVoices();
+      var katja = voices.find(function(v){ return v.name && v.name.indexOf("Katja") >= 0; });
+      var de    = voices.find(function(v){ return (v.lang||"").toLowerCase().startsWith("de"); });
+      if(katja) u.voice = katja;
+      else if(de) u.voice = de;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }catch(e){}
+  }
+
+  // Punkte aufbauen
+  function aufbauenDots(){
+    var container = document.getElementById("progressDots");
+    container.innerHTML = "";
+    daten.forEach(function(_, i){
+      var dot = document.createElement("div");
+      dot.className = "dot";
+      container.appendChild(dot);
+    });
+  }
+
+  // Klick-Handler
+  document.getElementById("btnNext").addEventListener("click", function(e){
+    e.preventDefault();
+    if(idx < daten.length - 1) zeige(idx + 1);
+  });
+  document.getElementById("btnPrev").addEventListener("click", function(e){
+    e.preventDefault();
+    if(idx > 0) zeige(idx - 1);
+  });
+
+  // Return-URL setzen damit Quiz-Zurueck-Button hierher kann
+  try{
+    var abs = new URL("./sinnesorgane.html", window.location.href).href;
+    localStorage.setItem("laetitia_return_url_v1", abs);
+  }catch(e){}
+
+  // Dwell
+  var allBtns = document.querySelectorAll("a.infBtn");
+  allBtns.forEach(function(el){
+    var timer = null;
+    var ring = el.querySelector(".dwell-ring-svg circle");
+
+    function start(){
+      if(timer) return;
+      if(el.getAttribute("aria-disabled") === "true") return;
+      el.classList.add("dwell-active");
+      if(ring){
+        ring.classList.remove("animating");
+        void ring.offsetWidth;
+        ring.style.setProperty("--dwell-duration", (dwellMs/1000) + "s");
+        ring.classList.add("animating");
+      }
+      timer = setTimeout(function(){
+        timer = null;
+        if(el.getAttribute("aria-disabled") === "true") return;
+        try{ el.click(); }catch(e){}
+      }, dwellMs);
+    }
+    function stop(){
+      if(timer){ clearTimeout(timer); timer = null; }
+      el.classList.remove("dwell-active");
+      if(ring) ring.classList.remove("animating");
+    }
+
+    el.addEventListener("pointerenter", start);
+    el.addEventListener("pointerleave", stop);
+    el.addEventListener("mouseenter", start);
+    el.addEventListener("mouseleave", stop);
+    el.addEventListener("click", stop);
+  });
+
+  // Voices-Event abwarten (Edge/Chrome laden Stimmen async)
+  if(speechSynthesis.onvoiceschanged !== undefined){
+    speechSynthesis.onvoiceschanged = function(){};
+  }
+
+  aufbauenDots();
+  zeige(0);
+})();
+</script>
+</body>
+</html>
