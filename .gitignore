@@ -4,17 +4,37 @@ node_modules/
 *.exe
 *.bat
 
-# Mediendateien (bleiben lokal, zu groß für GitHub)
+# Audio — bleiben lokal, zu groß für GitHub
 *.mp3
 *.m4a
-*.mp4
 *.wav
 *.ogg
+*.opus
+*.aac
 *.flac
-*.JPG
+
+# Video
+*.mp4
+*.webm
+*.avi
+*.mov
+
+# Fotos / Bilder (Medieninhalt — kein Code)
 *.jpg
+*.JPG
 *.jpeg
+*.JPEG
 *.png
+*.PNG
 *.gif
 *.webp
+
+# Dokumente
 *.pdf
+
+# Betriebssystem-Artefakte
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.bak
