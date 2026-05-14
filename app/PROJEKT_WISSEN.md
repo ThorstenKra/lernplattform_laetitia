@@ -5,7 +5,7 @@
 
 Kind mit Behinderung. **Tobii Accent 1400**, Augensteuerung (Dwell-Selektion).
 Browser: **Microsoft Edge**, `file://`, offline, Windows 11.
-Pfad: `C:/Users/ThorstenLavinia/OneDrive/2026_04_23_Laetitia_Lernsystem/`
+Pfad: `C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/`
 Module: `app/modules/schule/`
 
 ---

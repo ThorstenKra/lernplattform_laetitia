@@ -30,18 +30,7 @@
       dot.classList.toggle("aktiv", j === idx);
     });
 
-    try{
-      var text = d.name + ". " + d.sinn + ". " + d.funktion + " " + d.fakt;
-      var u = new SpeechSynthesisUtterance(text);
-      u.rate = 0.92;
-      var voices = speechSynthesis.getVoices();
-      var katja = voices.find(function(v){ return v.name && v.name.indexOf("Katja") >= 0; });
-      var de    = voices.find(function(v){ return (v.lang||"").toLowerCase().startsWith("de"); });
-      if(katja) u.voice = katja;
-      else if(de) u.voice = de;
-      speechSynthesis.cancel();
-      speechSynthesis.speak(u);
-    }catch(e){}
+    sprich(d.name + ". " + d.sinn + ". " + d.funktion + " " + d.fakt);
   }
 
   function aufbauenDots(){
@@ -76,8 +65,21 @@
     });
   }
 
-  if(typeof speechSynthesis !== "undefined" && speechSynthesis.onvoiceschanged !== undefined){
-    speechSynthesis.onvoiceschanged = function(){};
+  function sprich(text){
+    try{
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.lang = "de-DE"; u.rate = 0.92;
+      var voices = speechSynthesis.getVoices();
+      var de = voices.find(function(v){ return v.name === "Microsoft Katja Online (Natural) - German (Germany)"; })
+            || voices.find(function(v){ return v.name === "Microsoft Katja - German (Germany)"; })
+            || voices.find(function(v){ return v.name.indexOf("Katja") >= 0; })
+            || voices.find(function(v){ return v.name.indexOf("Microsoft") >= 0 && v.lang.startsWith("de") && v.name.indexOf("Hedda") < 0; })
+            || voices.find(function(v){ return v.name.indexOf("Microsoft") >= 0 && v.lang.startsWith("de"); })
+            || voices.find(function(v){ return v.lang.startsWith("de"); });
+      if(de) u.voice = de;
+      setTimeout(function(){ speechSynthesis.speak(u); }, 120);
+    }catch(e){}
   }
 
   aufbauenDots();
