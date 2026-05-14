@@ -28,9 +28,15 @@
     let q = [];
     let busy = false;
     let _onDone = null;
+    let _watchdog = null;
+    const TIMEOUT_MS = 15000;
 
-    function clear(){ q=[]; busy=false; stopSpeak(); _onDone=null; }
+    function clearWatchdog(){ if(_watchdog){ clearTimeout(_watchdog); _watchdog=null; } }
+    function done(){ clearWatchdog(); busy=false; next(); }
+
+    function clear(){ q=[]; clearWatchdog(); busy=false; stopSpeak(); _onDone=null; }
     function play(items, onDone){
+      clearWatchdog();
       stopSpeak();
       q = (items||[]).slice();
       busy = false;
@@ -48,6 +54,10 @@
       const item = q.shift();
 
       if(item.type==="tts"){
+        _watchdog = setTimeout(()=>{
+          console.error("[AudioQueue] TTS-Timeout nach "+TIMEOUT_MS+"ms, ueberspringe.");
+          done();
+        }, TIMEOUT_MS);
         try{
           const u = new SpeechSynthesisUtterance(String(item.text||""));
           const v = pickGermanVoice();
@@ -55,24 +65,29 @@
           u.rate=item.rate||1.0;
           u.pitch=1.0;
           u.volume=1.0;
-          u.onend=()=>{ busy=false; next(); };
-          u.onerror=()=>{ busy=false; next(); };
+          u.onend=()=>done();
+          u.onerror=()=>done();
           speechSynthesis.speak(u);
-        }catch{ busy=false; next(); }
+        }catch{ done(); }
         return;
       }
 
       if(item.type==="wav"){
+        _watchdog = setTimeout(()=>{
+          console.error("[AudioQueue] WAV-Timeout nach "+TIMEOUT_MS+"ms, ueberspringe:", item.file);
+          done();
+        }, TIMEOUT_MS);
         try{
           const a = new Audio(item.file);
           a.volume = 1.0;
-          a.onended=()=>{ busy=false; next(); };
-          a.onerror=()=>{ busy=false; next(); };
+          a.onended=()=>done();
+          a.onerror=()=>done();
           a.play().catch(()=>{
+            clearWatchdog();
             if(item.fallback) speak(item.fallback, item.rate||1.0);
             busy=false; next();
           });
-        }catch{ busy=false; next(); }
+        }catch{ done(); }
         return;
       }
 
