@@ -71,6 +71,33 @@ Claude beschränkt sich auf entscheidungsrelevante Ausgaben. Einzelschritte, Üb
 | `schule_liesmal3_data.js` | ✅ vollständig |
 | `test_suite.html` | ✅ JS-Checks laufen, HTML-Checks brauchen Edge-Flag |
 
+## Grammatik-Werkstatt — NEU (Sitzung 2026-05-14)
+
+Erreichbar: `schule.html` → Grammatik-Button → `grammatik.html`
+
+| Datei | Inhalt |
+|---|---|
+| `grammatik.html` | Einheiten-Übersicht, Fortschrittsanzeige, Freischalt-Logik |
+| `grammatik_spiel.html` | Spielseite (URL-param `?einheit=E-00`) |
+| `grammatik_data.js` | 15 Einheiten, 148 Aufgaben |
+| `grammatik_mod.js` | Engine: `window.GrammatikMod.starteEinheit(id)` |
+| `grammatik_uebersicht.js` | `window.GrammatikUebersicht.baueUebersicht()` |
+
+**Lernpfad-Stand:**
+
+| Stufe | Einheiten | Thema | Status |
+|---|---|---|---|
+| 0 | E-00–E-02 | Satz und Wort | ✅ 30 Aufgaben |
+| 1 | E-03–E-09 | Nomen, Verben, Adjektive | ✅ 70 Aufgaben |
+| 2 | E-10–E-14 | Artikel der/die/das | ✅ 50 Aufgaben |
+| 3 | E-15–E-20 | Sätze bauen (Subjekt/Prädikat/Objekt) | ⬜ noch nicht implementiert |
+| 4 | E-21–E-26 | Konjugation Gegenwart | ⬜ noch nicht implementiert |
+| 5+ | E-27–E-61 | Plural, Groß-/Kleinschreibung, Kasus … | ⬜ noch nicht implementiert |
+
+**5 dwell-optimierte Aufgabentypen:** `ja_nein` · `ab_wahl` · `abc_wahl` · `wort_button` · `richtig_falsch`
+**Freischalt-Logik:** Vorgänger-Einheit abgeschlossen → nächste frei. ≥80% → Gold-Stern.
+**Storage:** `localStorage["laetitia_grammatik_v1"]`
+
 ## Zentrale Dateien (app/core/)
 
 | Datei | Status |
@@ -79,7 +106,7 @@ Claude beschränkt sich auf entscheidungsrelevante Ausgaben. Einzelschritte, Üb
 | `dwell.js` | ✅ v10 |
 | `error_handler.js` | ✅ v2 |
 | `schulprofil.js` | ✅ |
-| `stats.js` | ✅ NEU — window.LaetitiaStats, localStorage["laetitia_stats_v1"], 200 Sessions |
+| `stats.js` | ✅ window.LaetitiaStats, localStorage["laetitia_stats_v1"], 200 Sessions |
 
 ## Werkzeuge (Projektwurzel)
 
@@ -99,7 +126,7 @@ Claude beschränkt sich auf entscheidungsrelevante Ausgaben. Einzelschritte, Üb
 | `hoerbuch_glaube.html` | ✅ geraete.js eingebunden |
 | `hoerbuch_glaube_mod.js` | ✅ auf geraete.js migriert |
 
-**Neue Bücher heute eingetragen:** Das Fliegende Kamel (60 Tracks), JAguar und NEINguar (54 Tracks), Schwaenke Und Anekdoten Vom Hodscha Nasredin (12 Tracks)
+**Eingetragene Bücher:** Das Fliegende Kamel (60 Tracks), Jaguar und NEINguar (54 Tracks), Schwänke vom Hodscha Nasredin (12 Tracks)
 
 ---
 
@@ -112,13 +139,15 @@ Install-Module -Name AudioDeviceCmdlets -Force -Scope CurrentUser
 ```
 Dann `lernwelt_starten.exe` neu starten → Audio-Dialog testen.
 
+**Grammatik-Werkstatt: Stufe 3 implementieren (E-15–E-20)**
+Nächster Block: Sätze bauen — Subjekt, Prädikat, Objekt, Satz-Reihenfolge.
+Konzept vollständig in PROJEKT_WISSEN.md dokumentiert.
+
 **Lies-mal-3 Bilder:**
 - `taucher_lies`: Schätzwerte in BILD_CROP → exakt neu croppen
 - Neues Buch: Seiten 2, 8, 14, 16, 22, 28 fotografieren → hochladen
 
-**Rule-18-Backlog:** ~45 HTML-Dateien haben noch Inline-`<script>` mit mehr als 20 Zeilen Logik. Nicht dringend, aber nach und nach abarbeiten.
-
-**Rule-12-Backlog:** ~58 HTML-Dateien ohne `<!-- depth:N -->` Kommentar. Wird von validate.ps1 gemeldet.
+**Rule-13-Backlog:** 48 HTML-Dateien mit Inline-`<script>` > 20 Zeilen. validate.ps1 meldet als WRN. Schrittweise abarbeiten.
 
 ---
 
@@ -126,6 +155,7 @@ Dann `lernwelt_starten.exe` neu starten → Audio-Dialog testen.
 
 - Mathe-Hefte digitalisieren (PDFs vorhanden) → `schule_mathe_data.js`
 - Sachkunde-Bilder für 7 fehlende Themen ergänzen
+- `stats.js` in weitere Spielseiten einbinden (Regel 15 vollständig umsetzen)
 
 ---
 
@@ -153,14 +183,15 @@ GitHub: `https://github.com/ThorstenKra/lernplattform_laetitia`
 Nach jeder Arbeitssitzung:
 ```powershell
 powershell.exe -ExecutionPolicy Bypass -File .\validate.ps1   # erst prüfen
-git add -p                                                     # selektiv stagen
+git add app/pfad/zur/datei.js                                 # gezielt stagen
 git commit -m "Kurze Beschreibung"
 git push
 ```
 
-Auf dem Accent-Gerät (OneDrive-Sync-Ordner):
+**Deployment in OneDrive (kein git pull möglich!):**
+Der OneDrive-Ordner ist KEIN Git-Repo. Geänderte Dateien müssen nach jedem Push manuell kopiert werden:
 ```powershell
-git pull
+cp app/modules/schule/grammatik*.* "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/modules/schule/"
 ```
 Dann Edge komplett neu starten.
 

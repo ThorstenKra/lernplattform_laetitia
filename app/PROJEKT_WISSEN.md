@@ -313,14 +313,86 @@ Derzeit eingebunden in: `lesen.html`, `deutsch.html`, `logik.html`, `mathe.html`
 
 ---
 
+## Grammatik-Werkstatt (neu: 2026-05-14)
+
+Erreichbar: `schule.html` → Grammatik → `grammatik.html` → `grammatik_spiel.html?einheit=E-XX`
+
+**Dateien:**
+```
+app/modules/schule/
+  grammatik.html            — Einheiten-Übersicht (lila Akzent #7c3aed)
+  grammatik_spiel.html      — Spielseite
+  grammatik_data.js         — GRAMMATIK_EINHEITEN Array (alle Einheiten + Aufgaben)
+  grammatik_mod.js          — window.GrammatikMod.starteEinheit(id)
+  grammatik_uebersicht.js   — window.GrammatikUebersicht.baueUebersicht()
+```
+
+**5 Aufgabentypen (alle dwell-optimiert, max. 1 Klick pro Aufgabe):**
+
+| Typ | Beschreibung | Buttons |
+|---|---|---|
+| `ja_nein` | Ja / Nein | 2 große Buttons |
+| `ab_wahl` | A oder B | 2 Buttons |
+| `abc_wahl` | A / B / C | 3 Buttons vertikal gestapelt |
+| `wort_button` | Wort im Satz anklicken | max. 4 Wort-Buttons |
+| `richtig_falsch` | Satz richtig oder falsch | 2 Buttons |
+
+**Datenstruktur je Einheit:**
+```javascript
+{
+  id: "E-03", titel: "...", emoji: "🏷️", stufe: 1,
+  erklaerung_tts: "...",      // Katja spricht beim Erklär-Screen
+  erklaerung_merksatz: "...", // großer Text auf dem Erklär-Screen
+  aufgaben: [
+    { typ: "ja_nein", frage: "...", tts: "...", richtig: "ja"|"nein", erklaerung: "..." },
+    { typ: "ab_wahl", frage: "...", tts: "...", option_a: "...", option_b: "...", richtig: "a"|"b", erklaerung: "..." },
+    { typ: "abc_wahl", ..., option_c: "...", richtig: "a"|"b"|"c", ... },
+    { typ: "wort_button", frage: "...", tts: "...", woerter: ["Der","Hund","bellt."], richtig: 2, erklaerung: "..." },
+    { typ: "richtig_falsch", frage: "...", satz: "...", tts: "...", richtig: "richtig"|"falsch", erklaerung: "..." }
+  ]
+}
+```
+
+**Freischalt- und Fortschritts-Logik:**
+- Storage: `localStorage["laetitia_grammatik_v1"]`
+- Freischaltung: Vorgänger-Einheit `abgeschlossen:true` → nächste frei
+- Meisterung: ≥80% in einer Session → Gold-Stern ⭐
+- Falsch beantwortete Aufgaben kommen am Ende nochmal (wiederholungsQueue)
+
+**Implementierter Lernpfad:**
+
+| Stufe | Einheiten | Thema | Aufgaben |
+|---|---|---|---|
+| 0 | E-00–E-02 | Satz und Wort | 28 |
+| 1 | E-03–E-09 | Nomen, Verben, Adjektive | 70 |
+| 2 | E-10–E-14 | Artikel der/die/das | 50 |
+| 3 | E-15–E-20 | Sätze bauen | ⬜ offen |
+| 4 | E-21–E-26 | Konjugation Gegenwart | ⬜ offen |
+| 5 | E-27–E-30 | Singular & Plural | ⬜ offen |
+| 6 | E-31–E-34 | Groß-/Kleinschreibung | ⬜ offen |
+| 7–13 | E-35–E-61 | Kasus, Pronomen, Satzzeichen … | ⬜ offen |
+
+---
+
+## Deployment-Workflow (wichtig!)
+
+Der OneDrive-Ordner (`C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/`) ist **kein Git-Repo**.
+Nach jedem `git push` müssen geänderte Dateien manuell kopiert werden, z.B.:
+```powershell
+cp app/modules/schule/grammatik*.* "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/modules/schule/"
+```
+Dann Edge komplett neu starten.
+
+---
+
 ## Offene Aufgaben
 
 ### 🔴 Dringend
 - **Bluetooth-Modul aktivieren:** `Install-Module AudioDeviceCmdlets` (einmalig als Admin)
+- **Grammatik Stufe 3 implementieren:** E-15–E-20 (Sätze bauen — Subjekt, Prädikat, Objekt)
 - **taucher_lies** Crop-Werte korrigieren (aktuell Schätzwert)
 - **Neues Lies-mal-3-Buch** → 6 Comic-Seiten (S. 2, 8, 14, 16, 22, 28) fotografieren → hochladen
-- **Rule-13-Backlog:** ~45 HTML-Dateien mit Inline-`<script>` > 20 Zeilen — schrittweise auslagern
-- **Rule-12-Backlog:** ~58 HTML-Dateien ohne `<!-- depth:N -->` Kommentar
+- **Rule-13-Backlog:** 48 HTML-Dateien mit Inline-`<script>` > 20 Zeilen — schrittweise auslagern
 
 ### 🟡 Mittelfristig
 - Mathe-Hefte (Mathe1/2/3.pdf) → Aufgaben digitalisieren → `schule_mathe_data.js`
@@ -346,4 +418,5 @@ Claude darf **niemals** Kerndateien (`dwell.js`, `error_handler.js`, `geraete.js
 | 2026-04-08 | Erstanlage — System, TTS, Goldstandards |
 | 2026-04-23 | Schule-Architektur, schule_jaein-Konzept, BILD_CROP, Bluetooth |
 | 2026-05-03 | Sachkunde (sinnesorgane), Lies-mal-3, Schach-Goldstandard |
-| 2026-05-14 | stats.js API dokumentiert; Offene Aufgaben aktualisiert (Rule-12/13-Backlog) |
+| 2026-05-14 | stats.js API dokumentiert; Rule-12-Backlog erledigt |
+| 2026-05-14 | Grammatik-Werkstatt (E-00–E-14, 148 Aufgaben); OneDrive-Pfad korrigiert; sinnesorgane_info_mod.js TTS auf Goldstandard; Deployment-Workflow dokumentiert |
