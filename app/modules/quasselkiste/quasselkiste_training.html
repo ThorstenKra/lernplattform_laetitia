@@ -1,0 +1,159 @@
+<!doctype html>
+<!-- depth:2 — Pfade: ../../core/ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Quasselkiste Training</title>
+<style>
+:root{
+  --lila:#8b5cf6; --lila-bg:#ede9fe; --lila-dark:#4c1d95;
+  --blau:#3b82f6; --blau-bg:#dbeafe;
+  --gruen:#16a34a; --gruen-bg:#dcfce7;
+  --gold:#f59e0b;
+  --border:#1a1a1a;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:#2a2a2a; height:100vh; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+#header{
+  flex-shrink:0; height:52px;
+  background:#111; border-bottom:2px solid #444;
+  display:flex; align-items:center; gap:10px; padding:0 12px;
+}
+#headerTitel{ font-size:15px; font-weight:1000; color:#f59e0b; white-space:nowrap; }
+#zielAnzeige{
+  flex:1; font-size:20px; font-weight:1000; color:#fff;
+  background:#222; border:2px solid #f59e0b; border-radius:8px;
+  padding:4px 10px; min-width:0; text-align:center;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+#statsAnzeige{ font-size:14px; font-weight:900; color:#aaa; white-space:nowrap; }
+
+/* ── Grid ────────────────────────────────────────────────────────────────── */
+#grid{
+  flex:1; min-height:0;
+  display:grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  border-left:2px solid var(--border);
+  border-top:2px solid var(--border);
+}
+.kachel{
+  border-right:2px solid var(--border);
+  border-bottom:2px solid var(--border);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  cursor:pointer; position:relative;
+  user-select:none; overflow:hidden;
+  transition:none;
+}
+.kachel:hover{ filter:brightness(.88); }
+.kachel:focus{ outline:3px solid #f59e0b; outline-offset:-2px; }
+.kachel.richtig{
+  outline:4px solid #16a34a !important;
+  outline-offset:-2px; z-index:2;
+  background-color: rgba(22,163,74,0.25) !important;
+}
+.kachel.falsch{
+  outline:4px solid #ef4444 !important;
+  outline-offset:-2px; z-index:2;
+  filter:brightness(0.75) saturate(2);
+}
+.kachel.hinweis{
+  outline:5px solid #f59e0b !important;
+  outline-offset:-2px; z-index:3;
+  animation: hinweisPuls 0.7s ease-in-out infinite alternate;
+}
+@keyframes hinweisPuls{
+  from{ filter:brightness(1.0); }
+  to  { filter:brightness(1.35); }
+}
+.kachel-name{
+  font-size:clamp(9px,1.1vw,14px); font-weight:900;
+  color:#111; text-align:center; line-height:1.2;
+  padding:2px 3px; word-break:break-word;
+  pointer-events:none;
+}
+
+/* ── Dwell-Ring ──────────────────────────────────────────────────────────── */
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none; z-index:10;
+  width:min(52px,80%) ; height:min(52px,80%);
+}
+.dwell-ring-svg circle{
+  fill:none; stroke-width:4;
+  stroke-dasharray:220; stroke-dashoffset:220;
+  transform:rotate(-90deg); transform-origin:35px 35px;
+  opacity:0;
+}
+.dwell-ring-svg circle.animating{
+  opacity:1;
+  animation:dwellRing var(--dwell-duration,.9s) linear forwards;
+}
+
+/* ── Nav-Leiste ──────────────────────────────────────────────────────────── */
+.nav-leiste{
+  flex-shrink:0; height:72px;
+  display:flex; gap:6px; padding:6px 8px;
+  background:#111; border-top:2px solid #444;
+}
+.nav-btn{
+  flex:1; border-radius:12px;
+  font-size:clamp(13px,1.5vw,17px); font-weight:1000;
+  cursor:pointer; position:relative;
+  display:flex; align-items:center; justify-content:center;
+  gap:5px; transition:none; border:2px solid; text-decoration:none;
+  background:none;
+}
+.nav-btn-zurueck{ background:var(--lila-bg); border-color:var(--lila); color:var(--lila-dark); }
+.nav-btn-hinweis{ background:#fef3c7; border-color:#f59e0b; color:#92400e; }
+.nav-btn-weiter { background:var(--gruen-bg); border-color:var(--gruen); color:#14532d; }
+.nav-btn:hover,.nav-btn:focus{ filter:brightness(.9); outline:3px solid currentColor; }
+.nav-btn[aria-disabled="true"]{ opacity:.35; pointer-events:none; }
+.nav-btn .dwell-ring-svg{ width:52px; height:52px; }
+.nav-btn .dwell-ring-svg circle{ stroke:currentColor; }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div id="headerTitel">🎯 Pfad-Training</div>
+  <div id="zielAnzeige">–</div>
+  <div id="statsAnzeige">0 gelöst</div>
+</div>
+
+<div id="grid"></div>
+
+<div class="nav-leiste">
+  <button class="nav-btn nav-btn-zurueck" id="btnZurueck">
+    <span class="btnLabel">← Zurück</span>
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#8b5cf6"/></svg>
+  </button>
+  <button class="nav-btn nav-btn-hinweis" id="btnHinweis">
+    <span class="btnLabel">💡 Hinweis</span>
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#f59e0b"/></svg>
+  </button>
+  <button class="nav-btn nav-btn-weiter" id="btnWeiter">
+    <span class="btnLabel">⏭ Weiter</span>
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#16a34a"/></svg>
+  </button>
+</div>
+
+<script src="../../core/dwell.js"></script>
+<script src="../../core/error_handler.js"></script>
+<script src="./data/quasselkiste_data.js"></script>
+<script src="./quasselkiste_training_mod.js"></script>
+<script>
+  window.QuasselTrainingMod && window.QuasselTrainingMod.init();
+</script>
+</body>
+</html>

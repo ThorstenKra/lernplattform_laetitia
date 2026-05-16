@@ -1,0 +1,149 @@
+<!doctype html>
+<!-- depth:2 — Pfade: ../../core/ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Quasselkiste 60</title>
+<style>
+:root{
+  --lila:#8b5cf6; --lila-bg:#ede9fe; --lila-dark:#4c1d95;
+  --blau:#3b82f6; --blau-bg:#dbeafe;
+  --gruen:#16a34a; --gruen-bg:#dcfce7;
+  --border:#1a1a1a;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:#2a2a2a; height:100vh; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+#header{
+  flex-shrink:0; height:52px;
+  background:#111; border-bottom:2px solid #444;
+  display:flex; align-items:center; gap:10px; padding:0 12px;
+}
+#headerTitel{
+  font-size:16px; font-weight:1000; color:#f59e0b; white-space:nowrap;
+}
+#ausgabe{
+  flex:1; font-size:18px; font-weight:1000; color:#fff;
+  background:#222; border:1px solid #555; border-radius:8px;
+  padding:4px 10px; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+#pfadAnzeige{
+  font-size:13px; font-weight:900; color:#aaa; white-space:nowrap;
+}
+
+/* ── Grid ────────────────────────────────────────────────────────────────── */
+#grid{
+  flex:1; min-height:0;
+  display:grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  border-left:2px solid var(--border);
+  border-top:2px solid var(--border);
+}
+.kachel{
+  border-right:2px solid var(--border);
+  border-bottom:2px solid var(--border);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  cursor:pointer; position:relative;
+  user-select:none; overflow:hidden;
+  transition:none;
+}
+.kachel:hover{ filter:brightness(.88); }
+.kachel:focus{ outline:3px solid #f59e0b; outline-offset:-2px; }
+.kachel.gewaehlt{
+  outline:4px solid #f59e0b !important;
+  outline-offset:-2px;
+  filter:brightness(.92);
+  z-index:2;
+}
+.kachel.gewaehlt-1{ outline-color:#ef4444 !important; }
+.kachel-name{
+  font-size:clamp(9px,1.1vw,14px); font-weight:900;
+  color:#111; text-align:center; line-height:1.2;
+  padding:2px 3px; word-break:break-word;
+  pointer-events:none;
+}
+
+/* ── Dwell-Ring ──────────────────────────────────────────────────────────── */
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none; z-index:10;
+  width:min(52px,80%) ; height:min(52px,80%);
+}
+.dwell-ring-svg circle{
+  fill:none; stroke-width:4;
+  stroke-dasharray:220; stroke-dashoffset:220;
+  transform:rotate(-90deg); transform-origin:35px 35px;
+  opacity:0;
+}
+.dwell-ring-svg circle.animating{
+  opacity:1;
+  animation:dwellRing var(--dwell-duration,.9s) linear forwards;
+}
+
+/* ── Nav-Leiste ──────────────────────────────────────────────────────────── */
+.nav-leiste{
+  flex-shrink:0; height:72px;
+  display:flex; gap:6px; padding:6px 8px;
+  background:#111; border-top:2px solid #444;
+}
+.nav-btn{
+  flex:1; border-radius:12px;
+  font-size:clamp(13px,1.5vw,17px); font-weight:1000;
+  cursor:pointer; position:relative;
+  display:flex; align-items:center; justify-content:center;
+  gap:5px; transition:none; border:2px solid; text-decoration:none;
+  background:none;
+}
+.nav-btn-zurueck{ background:var(--lila-bg); border-color:var(--lila); color:var(--lila-dark); }
+.nav-btn-loeschen{ background:#fee2e2; border-color:#ef4444; color:#991b1b; }
+.nav-btn-sprechen{ background:var(--blau-bg); border-color:var(--blau); color:#1e3a8a; }
+.nav-btn:hover,.nav-btn:focus{ filter:brightness(.9); outline:3px solid currentColor; }
+.nav-btn[aria-disabled="true"]{ opacity:.35; pointer-events:none; }
+.nav-btn .dwell-ring-svg{ width:52px; height:52px; }
+.nav-btn .dwell-ring-svg circle{ stroke:currentColor; }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div id="headerTitel">🗣️ Quasselkiste 60</div>
+  <div id="ausgabe">–</div>
+  <div id="pfadAnzeige"></div>
+</div>
+
+<div id="grid"></div>
+
+<div class="nav-leiste">
+  <button class="nav-btn nav-btn-zurueck" id="btnZurueck">
+    <span class="btnLabel">← Zurück</span>
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#8b5cf6"/></svg>
+  </button>
+  <button class="nav-btn nav-btn-loeschen" id="btnLoesche">
+    <span class="btnLabel">✕ Löschen</span>
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#ef4444"/></svg>
+  </button>
+  <button class="nav-btn nav-btn-sprechen" id="btnSpreche">
+    <span class="btnLabel">🔊 Sprechen</span>
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#3b82f6"/></svg>
+  </button>
+</div>
+
+<script src="../../core/dwell.js"></script>
+<script src="../../core/error_handler.js"></script>
+<script src="./data/quasselkiste_data.js"></script>
+<script src="./quasselkiste_mod.js"></script>
+<script>
+  window.QuasselKisteMod && window.QuasselKisteMod.init();
+</script>
+</body>
+</html>
