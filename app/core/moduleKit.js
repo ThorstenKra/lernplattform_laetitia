@@ -140,8 +140,7 @@
     const DELAY_MS     = Cfg ? (Cfg.getInt(cfgNow,"delay",3)*1000) : 4000;
 
     // Dwell-Zeit aus localStorage (konsistent mit index.html)
-    const DWELL_MS    = parseInt(localStorage.getItem("laetitia_dwell_ms"))       || 900;
-    const LEAVE_GRACE = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
+    const DWELL_MS = parseInt(localStorage.getItem("laetitia_dwell_ms")) || 900;
 
     // Storage
     const Store = window.LaetitiaStorage;
@@ -247,74 +246,27 @@
       return _attachDwell;
     }
 
-    // rebindDwell: direktes pointerenter/pointerleave wie Eierjagd-Muster
-    // Funktioniert zuverlässig auf Tobii Accent (der mouseenter nicht immer sendet)
+    // rebindDwell: Goldstandard — LaetitiaAttachDwell aus dwell.js v10 (Regel 7)
     function rebindDwell(){
-      // Schutzzeit setzen
-      if(window._LDwellState){
-        if(window._LDwellState.dwellTimer){ clearTimeout(window._LDwellState.dwellTimer); window._LDwellState.dwellTimer=null; }
-        if(window._LDwellState.leaveTimer){ clearTimeout(window._LDwellState.leaveTimer); window._LDwellState.leaveTimer=null; }
-        if(window._LDwellState.target){ window._LDwellState.target.classList.remove("dwell-active"); window._LDwellState.target=null; }
-        window._LDwellState.protectUntil = Date.now() + 400;
+      if(_dwellHandle && typeof _dwellHandle.cancelDwell === "function"){
+        _dwellHandle.cancelDwell();
+        _dwellHandle = null;
       }
-
-      const selector = [
-        "a.uibtn", "button.uibtn", "a.levelBtn", "[data-level]", "[data-answer]",
-        "#btnNext", "#btnHome", "#btnHelp", "#btnWrong",
-        "#btnReturnFromMenu", "#btnReturnFromOverlay",
+      var attach = loadDwell();
+      var leaveGrace = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
+      var selector = [
+        "a.uibtn", "button.uibtn", "[data-answer]",
         "a[data-action='OVL_REPEAT']", "#btnHelpClose", "#btnExplainBack"
       ].join(", ");
-
-      document.querySelectorAll(selector).forEach(function(el){
-        if(el.getAttribute("data-pdwell") === "1") return;
-        if(el.getAttribute("aria-disabled") === "true") return;
-        if(el.getAttribute("data-disabled") === "1") return;
-        el.setAttribute("data-pdwell", "1");
-
-        var timer = null;
-
-        function startDwell(){
-          if(timer) return;
-          el.classList.add("dwell-active");
-          // Dwell-Ring starten falls vorhanden
-          var ring = el.querySelector(".dwell-ring-svg circle");
-          if(ring){
-            ring.classList.remove("animating");
-            void ring.offsetWidth;
-            ring.style.setProperty("--dwell-duration", (DWELL_MS/1000)+"s");
-            ring.classList.add("animating");
-          }
-          timer = setTimeout(function(){
-            timer = null;
-            if(el.getAttribute("aria-disabled")==="true") return;
-            if(el.getAttribute("data-disabled")==="1") return;
-            try{ el.click(); }catch(e){}
-          }, DWELL_MS);
+      _dwellHandle = attach(selector, {
+        dwellMs:    DWELL_MS,
+        leaveGrace: leaveGrace,
+        onActivate: function(el){
+          if(el.getAttribute("aria-disabled") === "true") return;
+          if(el.getAttribute("data-disabled") === "1") return;
+          try{ el.click(); }catch(e){}
         }
-
-        function stopDwell(){
-          if(timer){ clearTimeout(timer); timer=null; }
-          el.classList.remove("dwell-active");
-          var ring = el.querySelector(".dwell-ring-svg circle");
-          if(ring) ring.classList.remove("animating");
-        }
-
-        el.addEventListener("pointerenter", startDwell);
-        el.addEventListener("pointerleave", stopDwell);
-        el.addEventListener("click", stopDwell);
-        // Desktop-Fallback
-        el.addEventListener("mouseenter", startDwell);
-        el.addEventListener("mouseleave", stopDwell);
       });
-
-      // Fallback: attachDwell für Elemente die data-pdwell bereits haben könnten
-      // (z.B. nach erneutem rebindDwell-Aufruf)
-      // data-pdwell beim Screen-Wechsel zurücksetzen:
-      _dwellHandle = { cancelDwell: function(){
-        document.querySelectorAll("[data-pdwell]").forEach(function(el){
-          el.removeAttribute("data-pdwell");
-        });
-      }};
     }
 
     // ── UI-Hilfsfunktionen ───────────────────────────────────────────────────────
@@ -335,7 +287,6 @@
         var mt = $("moduleTitle"); if(mt) mt.textContent = icon + " " + moduleName;
         var ms = $("moduleSub");   if(ms) ms.textContent = "Wähle eine Lektion";
         updateSavedLine();
-        document.querySelectorAll("[data-pdwell]").forEach(function(el){ el.removeAttribute("data-pdwell"); });
         rebindDwell();
       }catch(e){
         setTopStatus("showMenu Fehler: " + (e && e.message ? e.message : String(e)));
@@ -345,7 +296,6 @@
     function showTask(){
       hideAll();
       $("screenTask")?.classList.remove("hidden");
-      document.querySelectorAll("[data-pdwell]").forEach(function(el){ el.removeAttribute("data-pdwell"); });
       rebindDwell();
     }
 

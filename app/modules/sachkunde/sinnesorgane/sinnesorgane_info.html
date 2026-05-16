@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- depth:3 — Pfade: ../../../core/, ../../../lernen.html -->
+<!-- depth:3 — Pfade: ../../../core/ -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -7,137 +7,144 @@
 <title>Laetitia – Sinnesorgane Info</title>
 <style>
   :root{
-    --bg:#f0fdf4;
-    --panel:#ffffff;
-    --border:rgba(15,23,42,.14);
-    --shadow:0 10px 26px rgba(15,23,42,.08);
-    --text:#0f172a;
-    --muted:rgba(15,23,42,.65);
-    --green:#16a34a;
-    --green2:#15803d;
-    --lila:#8b5cf6;
-    --radius:18px;
+    --gruen:#16a34a; --gruen2:#15803d;
+    --lila:#8b5cf6;  --lila-bg:#ede9fe;
+    --blau:#3b82f6;  --blau-bg:#dbeafe;
+    --amber:#f59e0b; --amber-bg:#fffbeb;
+    --sky:#0ea5e9;   --sky-bg:#f0f9ff;
+    --nav-nav:#16a34a; --nav-nav-bg:#dcfce7;
+    --bg:#f0fdf4; --panel:#fff;
+    --border:rgba(15,23,42,.13); --shadow:0 8px 24px rgba(15,23,42,.08);
+    --text:#0f172a; --muted:rgba(15,23,42,.60);
+    --r:18px;
   }
-  *{ box-sizing:border-box; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
   body{
-    margin:0;
     font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
     background:var(--bg); color:var(--text);
     height:100vh; overflow:hidden;
     display:flex; align-items:center; justify-content:center;
   }
   .app{
-    width:min(1000px,96vw);
-    height:calc(100vh - 20px);
+    width:min(1020px,97vw); height:calc(100vh - 16px);
     display:flex; flex-direction:column; gap:8px; min-height:0;
   }
+  .hidden{ display:none !important; }
 
-  /* ── Header ── */
+  /* ── Header ─────────────────────────────────────────── */
   .infoHeader{
     background:var(--panel); border:1px solid var(--border);
     border-radius:14px; box-shadow:var(--shadow);
-    padding:10px 16px;
-    display:flex; align-items:center; justify-content:space-between; gap:12px;
-    flex-shrink:0;
+    padding:8px 16px; flex-shrink:0;
+    display:flex; align-items:center; gap:12px;
   }
-  .infoHeaderTitle{ font-size:18px; font-weight:1000; color:var(--green); }
-  .infoHeaderCount{ font-size:14px; font-weight:900; color:var(--muted); }
-  .progressDots{ display:flex; gap:6px; }
+  .headerTitel{ font-size:15px; font-weight:1000; color:var(--gruen); white-space:nowrap; }
+  .headerBreadcrumb{ flex:1; font-size:15px; font-weight:900; color:var(--text); }
+  .progressDots{ display:flex; gap:6px; align-items:center; }
   .dot{
-    width:14px; height:14px; border-radius:50%;
-    background:rgba(22,163,74,0.18); border:2px solid rgba(22,163,74,0.35);
-    transition:none;
+    width:13px; height:13px; border-radius:50%; flex-shrink:0;
+    background:rgba(22,163,74,.18); border:2px solid rgba(22,163,74,.35);
   }
-  .dot.aktiv{ background:var(--green); border-color:var(--green); }
+  .dot.aktiv{ background:var(--gruen); border-color:var(--gruen); }
+  .headerCount{ font-size:13px; font-weight:900; color:var(--muted); white-space:nowrap; }
 
-  /* ── Hauptkarte ── */
-  .infoCard{
-    background:var(--panel); border:2px solid rgba(22,163,74,0.30);
-    border-radius:var(--radius); box-shadow:var(--shadow);
-    padding:14px 18px; flex:1; min-height:0;
-    display:flex; flex-direction:column; gap:10px; overflow:hidden;
+  /* ── Hauptkarte ─────────────────────────────────────── */
+  .hauptKarte{
+    background:var(--panel); border:2px solid rgba(22,163,74,.25);
+    border-radius:var(--r); box-shadow:var(--shadow);
+    padding:16px 20px; flex:1; min-height:0;
   }
 
-  /* Organ-Kopf */
+  /* ── Screen: Organ ───────────────────────────────────── */
+  #screenOrgan{
+    height:100%; display:flex; flex-direction:column; gap:10px; min-height:0;
+  }
   .organKopf{
-    display:flex; align-items:center; gap:16px;
-    padding-bottom:10px; border-bottom:2px solid rgba(22,163,74,0.20);
-    flex-shrink:0;
+    display:flex; align-items:center; gap:16px; flex-shrink:0;
+    padding-bottom:12px; border-bottom:2px solid rgba(22,163,74,.20);
   }
-  .organEmoji{ font-size:clamp(44px,6vw,64px); line-height:1; }
-  .organName{ font-size:clamp(24px,3.5vw,36px); font-weight:1000; color:var(--green); }
-  .organSinnBadge{
-    font-size:14px; font-weight:900;
-    background:rgba(22,163,74,0.12); border:1px solid rgba(22,163,74,0.35);
-    color:var(--green); border-radius:999px; padding:4px 12px; margin-top:4px;
-    display:inline-block;
+  .organEmoji{ font-size:clamp(48px,5.5vw,62px); line-height:1; }
+  .organMeta{ display:flex; flex-direction:column; gap:4px; }
+  .organName{ font-size:clamp(24px,3vw,34px); font-weight:1000; color:var(--gruen); line-height:1.1; }
+  .sinnBadge{
+    display:inline-block; font-size:13px; font-weight:900;
+    background:rgba(22,163,74,.12); border:1px solid rgba(22,163,74,.35);
+    color:var(--gruen); border-radius:999px; padding:3px 12px;
+  }
+  .kernaussage{
+    font-size:clamp(20px,2.5vw,28px); font-weight:1000;
+    line-height:1.35; color:var(--text); flex:1; min-height:0;
+    display:flex; align-items:flex-start;
+  }
+  .erklaerung{
+    font-size:clamp(16px,1.9vw,21px); font-weight:900;
+    line-height:1.45; color:rgba(15,23,42,.80); flex-shrink:0;
+    background:rgba(240,253,244,.70); border:1px solid rgba(22,163,74,.18);
+    border-radius:12px; padding:10px 14px;
+  }
+  .tiefButtons{ display:flex; gap:10px; flex-shrink:0; }
+  button.tiefBtn{
+    flex:1; min-height:76px; border-radius:16px;
+    font-size:clamp(16px,2vw,21px); font-weight:1000;
+    cursor:pointer; user-select:none; position:relative;
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    transition:none; border:2px solid;
+  }
+  button.tiefBtn.tiefStaunen{
+    background:var(--amber-bg); border-color:var(--amber); color:#78350f;
+  }
+  button.tiefBtn.tiefLeben{
+    background:var(--sky-bg); border-color:var(--sky); color:#0c4a6e;
+  }
+  button.tiefBtn.tiefStaunen:hover, button.tiefBtn.tiefStaunen:focus{
+    background:#fef3c7; outline:3px solid var(--amber); transition:none;
+  }
+  button.tiefBtn.tiefLeben:hover, button.tiefBtn.tiefLeben:focus{
+    background:#e0f2fe; outline:3px solid var(--sky); transition:none;
+  }
+  button.tiefBtn.dwell-active{ transform:scale(1.03) !important; transition:none !important; }
+
+  /* ── Screen: Detail ──────────────────────────────────── */
+  #screenDetail{
+    height:100%; display:flex; flex-direction:column; gap:14px; min-height:0;
+  }
+  .detailKopf{
+    display:flex; align-items:center; gap:16px; flex-shrink:0;
+    padding-bottom:12px; border-bottom:2px solid rgba(22,163,74,.20);
+  }
+  .detailIcon{ font-size:clamp(48px,5.5vw,62px); line-height:1; }
+  .detailTitel{ font-size:clamp(24px,3vw,34px); font-weight:1000; color:var(--text); }
+  .detailText{
+    font-size:clamp(21px,2.6vw,30px); font-weight:900;
+    line-height:1.45; color:var(--text); flex:1; min-height:0;
+    display:flex; align-items:flex-start;
   }
 
-  /* Info-Grid */
-  .infoGrid{
-    display:grid; grid-template-columns:1fr 1fr; gap:8px;
-    flex:1; min-height:0; overflow:hidden;
-  }
-  .infoZeile{
-    background:rgba(240,253,244,0.80); border:1px solid rgba(22,163,74,0.18);
-    border-radius:12px; padding:8px 12px;
-    display:flex; flex-direction:column; gap:3px;
-  }
-  .infoZeile.voll{ grid-column:1 / -1; }
-  .infoZeile.fakt{
-    grid-column:1 / -1;
-    background:rgba(245,158,11,0.08); border-color:rgba(245,158,11,0.35);
-  }
-  .infoLabel{
-    font-size:11px; font-weight:1000; letter-spacing:0.08em;
-    color:var(--green); text-transform:uppercase;
-  }
-  .infoZeile.fakt .infoLabel{ color:#92400e; }
-  .infoWert{
-    font-size:clamp(13px,1.5vw,17px); font-weight:900; color:var(--text); line-height:1.35;
-  }
-
-  /* ── Footer ── */
-  .infoFooter{
-    display:flex; gap:10px; flex-shrink:0;
-  }
-  a.infBtn{
+  /* ── Nav-Leiste ──────────────────────────────────────── */
+  .nav-leiste-unten{ display:flex; gap:8px; padding:4px 0 0 0; flex-shrink:0; }
+  .nav-btn{
+    flex:1; min-height:72px; border-radius:16px;
+    font-size:clamp(14px,1.6vw,18px); font-weight:1000;
+    cursor:pointer; user-select:none; position:relative;
     display:flex; align-items:center; justify-content:center;
-    text-decoration:none; font-weight:1000; user-select:none;
-    border-radius:16px; padding:0 16px; min-height:72px;
-    font-size:clamp(15px,2vw,18px); position:relative; transition:none;
+    gap:6px; transition:none; border:2px solid; text-decoration:none; background:none;
   }
-  a.infBtn.zurueck{
-    background:#ede9fe; color:#4c1d95; border:2px solid var(--lila);
-    flex:1; font-size:20px;
-  }
-  a.infBtn.zurueck:hover, a.infBtn.zurueck:focus{
-    background:#ddd6fe; outline:4px solid var(--lila); transition:none;
-  }
-  a.infBtn.nav{
-    background:rgba(22,163,74,0.12); color:var(--green);
-    border:2px solid rgba(22,163,74,0.40); flex:1;
-  }
-  a.infBtn.nav:hover, a.infBtn.nav:focus{
-    background:rgba(22,163,74,0.25); outline:4px solid var(--green); transition:none;
-  }
-  a.infBtn.nav[aria-disabled="true"]{
-    opacity:0.35; pointer-events:none;
-  }
-  a.infBtn.quiz{
-    background:var(--green); color:#fff;
-    border:2px solid var(--green2); flex:1.5;
-  }
-  a.infBtn.quiz:hover, a.infBtn.quiz:focus{
-    background:var(--green2); outline:4px solid var(--green); transition:none;
-  }
+  .nav-btn-zurueck { background:var(--lila-bg); border-color:var(--lila); color:#4c1d95; }
+  .nav-btn-vorlesen{ background:var(--blau-bg); border-color:var(--blau); color:#1e3a8a; }
+  .nav-btn-nav     { background:var(--nav-nav-bg); border-color:var(--nav-nav); color:#14532d; }
+  .nav-btn-staunen { background:var(--amber-bg); border-color:var(--amber); color:#78350f; }
+  .nav-btn-leben   { background:var(--sky-bg);   border-color:var(--sky);   color:#0c4a6e; }
+  .nav-btn-quiz    { background:var(--nav-nav-bg); border-color:var(--nav-nav); color:#14532d; }
+  .nav-btn:hover, .nav-btn:focus{ filter:brightness(.93); outline:3px solid currentColor; transition:none; }
+  .nav-btn[aria-disabled="true"]{ opacity:.35; pointer-events:none; }
+  .nav-btn.dwell-active{ transform:scale(1.02) !important; outline:3px solid currentColor !important; transition:none !important; }
 
-  /* Dwell */
+  /* ── Dwell-Ring ──────────────────────────────────────── */
   @keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
   .dwell-ring-svg{
     position:absolute; top:50%; left:50%;
     transform:translate(-50%,-50%);
-    pointer-events:none; z-index:10; width:60px; height:60px;
+    pointer-events:none; z-index:10; width:64px; height:64px;
   }
   .dwell-ring-svg circle{
     fill:none; stroke-width:5; stroke-linecap:round;
@@ -145,9 +152,8 @@
     transform:rotate(-90deg); transform-origin:35px 35px;
   }
   .dwell-ring-svg circle.animating{
-    animation:dwellRing var(--dwell-duration,0.6s) linear forwards;
+    animation:dwellRing var(--dwell-duration,.6s) linear forwards;
   }
-  a.infBtn.dwell-active{ transform:scale(1.05) !important; transition:none !important; }
 </style>
 </head>
 <body>
@@ -156,63 +162,67 @@
 
   <!-- Header -->
   <div class="infoHeader">
-    <div class="infoHeaderTitle">🔬 Sinnesorgane — Informationen</div>
+    <div class="headerTitel">🔬 Sinnesorgane</div>
+    <div class="headerBreadcrumb" id="headerBreadcrumb">–</div>
     <div class="progressDots" id="progressDots"></div>
-    <div class="infoHeaderCount" id="fortschritt">Organ 1 von 5</div>
+    <div class="headerCount" id="headerCount">Organ 1 von 5</div>
   </div>
 
   <!-- Hauptkarte -->
-  <div class="infoCard">
-    <div class="organKopf">
-      <div class="organEmoji" id="organEmoji">👁️</div>
-      <div>
-        <div class="organName" id="organName">Die Augen</div>
-        <div class="organSinnBadge" id="organSinn">Sehen</div>
+  <div class="hauptKarte">
+
+    <!-- Organ-Ansicht -->
+    <div id="screenOrgan">
+      <div class="organKopf">
+        <span class="organEmoji" id="organEmoji">👁️</span>
+        <div class="organMeta">
+          <div class="organName" id="organName">–</div>
+          <span class="sinnBadge" id="organSinn">–</span>
+        </div>
+      </div>
+      <div class="kernaussage" id="organKernaussage">–</div>
+      <div class="erklaerung" id="organErklaerung">–</div>
+      <div class="tiefButtons">
+        <button class="tiefBtn tiefStaunen" id="btnStaunen">
+          <span class="btnLabel">💡 Wow!</span>
+          <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#f59e0b"/></svg>
+        </button>
+        <button class="tiefBtn tiefLeben" id="btnLeben">
+          <span class="btnLabel">🌍 Im echten Leben</span>
+          <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#0ea5e9"/></svg>
+        </button>
       </div>
     </div>
 
-    <div class="infoGrid">
-      <div class="infoZeile">
-        <div class="infoLabel">Körperteil</div>
-        <div class="infoWert" id="organKoerper">–</div>
+    <!-- Detail-Ansicht -->
+    <div id="screenDetail" class="hidden">
+      <div class="detailKopf">
+        <span class="detailIcon" id="detailIcon">💡</span>
+        <div class="detailTitel" id="detailTitel">–</div>
       </div>
-      <div class="infoZeile">
-        <div class="infoLabel">Ich nehme wahr</div>
-        <div class="infoWert" id="organWahrnehmung">–</div>
-      </div>
-      <div class="infoZeile voll">
-        <div class="infoLabel">Wie funktioniert es?</div>
-        <div class="infoWert" id="organFunktion">–</div>
-      </div>
-      <div class="infoZeile voll">
-        <div class="infoLabel">Im Alltag</div>
-        <div class="infoWert" id="organAlltag">–</div>
-      </div>
-      <div class="infoZeile fakt">
-        <div class="infoLabel">💡 Wusstest du?</div>
-        <div class="infoWert" id="organFakt">–</div>
-      </div>
+      <div class="detailText" id="detailText">–</div>
     </div>
+
   </div>
 
-  <!-- Footer Navigation -->
-  <div class="infoFooter">
-    <a class="infBtn zurueck" href="../sinnesorgane.html" id="btnZurueck">
+  <!-- Nav-Leiste -->
+  <div class="nav-leiste-unten" id="navLeiste">
+    <button class="nav-btn nav-btn-zurueck" id="navBtn1">
+      <span class="btnLabel">← Zurueck</span>
       <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#8b5cf6"/></svg>
-      ← Zurück
-    </a>
-    <a class="infBtn nav" href="#" id="btnPrev" aria-disabled="true">
+    </button>
+    <button class="nav-btn nav-btn-vorlesen" id="navBtn2">
+      <span class="btnLabel">🔊 Hoeren</span>
+      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#3b82f6"/></svg>
+    </button>
+    <button class="nav-btn nav-btn-nav" id="navBtn3">
+      <span class="btnLabel">◀ Vorher</span>
       <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#16a34a"/></svg>
-      ◀ Vorheriges
-    </a>
-    <a class="infBtn nav" href="#" id="btnNext">
+    </button>
+    <button class="nav-btn nav-btn-nav" id="navBtn4">
+      <span class="btnLabel">Naechstes ▶</span>
       <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#16a34a"/></svg>
-      Nächstes ▶
-    </a>
-    <a class="infBtn quiz" href="./sinnesorgane_quiz.html" id="btnQuiz">
-      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#15803d"/></svg>
-      🎯 Zum Quiz
-    </a>
+    </button>
   </div>
 
 </div>
@@ -222,10 +232,11 @@
 <script src="./data/sinnesorgane_info_data.js"></script>
 <script src="./sinnesorgane_info_mod.js"></script>
 <script>
-try{
-  localStorage.setItem("laetitia_return_url_v1",
-    new URL("./sinnesorgane.html", window.location.href).href);
-}catch(e){}
+  window.SinnInfoMod && window.SinnInfoMod.init();
+  try{
+    localStorage.setItem("laetitia_return_url_v1",
+      new URL("./sinnesorgane.html", window.location.href).href);
+  }catch(e){}
 </script>
 </body>
 </html>
