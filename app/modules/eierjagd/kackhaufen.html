@@ -195,7 +195,7 @@ a.zurueckBtn .dwell-ring-svg circle.animating{
 var DWELL_MS    = 1200;
 var MAX_KACK    = 4;
 var SPAWN_MS    = 2000;
-var SPEED_BASIS = 72;
+var SPEED_BASIS = 48;
 
 var GROESSEN = [
   { sz:58,  spd:1.3  },
@@ -330,6 +330,30 @@ function rauschFurz(ctx, dauer, f0, f1, fTyp, Q, gainSpitze, zeitOffset){
   src.connect(fil); fil.connect(gain); gain.connect(ctx.destination);
   src.start(ctx.currentTime + tOff);
   src.stop(ctx.currentTime + tOff + dauer + 0.05);
+}
+
+// Juhu-Ausruf per TTS (Katja-Goldstandard)
+var JUHU_TEXTE = ["Juhu!", "Super!", "Toll!", "Wunderbar!", "Klasse!", "Genial!", "Bravo!", "Fantastisch!"];
+function spieleJuhu(){
+  try{
+    speechSynthesis.cancel();
+    var text = JUHU_TEXTE[Math.floor(Math.random() * JUHU_TEXTE.length)];
+    setTimeout(function(){
+      try{
+        var u = new SpeechSynthesisUtterance(text);
+        u.lang = "de-DE"; u.rate = 1.1; u.pitch = 1.2; u.volume = 1.0;
+        var vv = speechSynthesis.getVoices();
+        var de = vv.find(function(v){ return v.name === "Microsoft Katja Online (Natural) - German (Germany)"; })
+              || vv.find(function(v){ return v.name === "Microsoft Katja - German (Germany)"; })
+              || vv.find(function(v){ return v.name.indexOf("Katja") >= 0; })
+              || vv.find(function(v){ return v.name.indexOf("Microsoft") >= 0 && v.lang.startsWith("de") && v.name.indexOf("Hedda") < 0; })
+              || vv.find(function(v){ return v.name.indexOf("Microsoft") >= 0 && v.lang.startsWith("de"); })
+              || vv.find(function(v){ return v.lang.startsWith("de"); });
+        if(de) u.voice = de;
+        speechSynthesis.speak(u);
+      }catch(e){}
+    }, 120);
+  }catch(e){}
 }
 
 // 7 verschiedene Furz-Charaktere
@@ -502,7 +526,7 @@ function platzeKack(k){
   var cy = k.y + k.sz * 0.82;
   if(k.el.parentNode) k.el.parentNode.removeChild(k.el);
 
-  spieleFurz();
+  if(Math.random() < 0.20){ spieleJuhu(); } else { spieleFurz(); }
 
   // Furz-Wolken (aufsteigend)
   var wolkenTypen = ["💨","💨","🌫️","✨","💨","💥"];
