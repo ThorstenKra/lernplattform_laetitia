@@ -513,8 +513,8 @@ app/modules/schule/
 | 2 | E-10–E-14 | Artikel der/die/das | 50 | ✅ |
 | 3 | E-15–E-20 | Sätze bauen (Subjekt/Prädikat/Objekt) | 60 | ✅ |
 | 4 | E-21–E-26 | Konjugation Gegenwart | 60 | ✅ |
-| 5 | E-27–E-30 | Singular & Plural | — | ⬜ nächster Block |
-| 6 | E-31–E-34 | Groß-/Kleinschreibung | — | ⬜ offen |
+| 5 | E-27–E-30 | Singular & Plural | 40 | ✅ |
+| 6 | E-31–E-34 | Groß-/Kleinschreibung | — | ⬜ nächster Block |
 | 7–13 | E-35–E-61 | Kasus, Pronomen, Satzzeichen … | — | ⬜ offen |
 
 ---
@@ -533,7 +533,7 @@ Dann Edge komplett neu starten.
 ## Offene Aufgaben
 
 ### 🔴 Dringend
-- **Grammatik Stufe 5 implementieren:** E-27–E-30 (Singular & Plural — Hund/Hunde, Kind/Kinder …)
+- **Grammatik Stufe 6 implementieren:** E-31–E-34 (Groß-/Kleinschreibung — Nomen groß, Verben/Adjektive klein)
 - **Bluetooth-Modul aktivieren:** `Install-Module AudioDeviceCmdlets` (einmalig als Admin)
 - **taucher_lies** Crop-Werte korrigieren (aktuell Schätzwert)
 - **Neues Lies-mal-3-Buch** → 6 Comic-Seiten (S. 2, 8, 14, 16, 22, 28) fotografieren → hochladen

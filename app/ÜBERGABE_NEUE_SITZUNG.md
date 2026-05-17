@@ -93,9 +93,10 @@ Erreichbar: `schule.html` → Grammatik-Button → `grammatik.html`
 | 0 | E-00–E-02 | Satz und Wort | 28 | ✅ |
 | 1 | E-03–E-09 | Nomen, Verben, Adjektive | 70 | ✅ |
 | 2 | E-10–E-14 | Artikel der/die/das | 50 | ✅ |
-| 3 | E-15–E-20 | Sätze bauen (Subjekt/Prädikat/Objekt) | 60 | ✅ NEU |
-| 4 | E-21–E-26 | Konjugation Gegenwart | 60 | ✅ NEU |
-| 5 | E-27–E-30 | Singular & Plural | — | ⬜ nächster Block |
+| 3 | E-15–E-20 | Sätze bauen (Subjekt/Prädikat/Objekt) | 60 | ✅ |
+| 4 | E-21–E-26 | Konjugation Gegenwart | 60 | ✅ |
+| 5 | E-27–E-30 | Singular & Plural | 40 | ✅ NEU |
+| 6 | E-31–E-34 | Groß-/Kleinschreibung | — | ⬜ nächster Block |
 | 6 | E-31–E-34 | Groß-/Kleinschreibung | — | ⬜ |
 | 7–13 | E-35–E-61 | Kasus, Pronomen, Satzzeichen … | — | ⬜ |
 
@@ -144,8 +145,8 @@ Eingetragene Bücher: Das Fliegende Kamel (60 Tracks), Jaguar und NEINguar (54 T
 
 ## 🔴 Offene Aufgaben — Hochpriorität
 
-**Grammatik-Werkstatt: Stufe 5 implementieren (E-27–E-30)**
-Nächster Block: Singular & Plural. Konzept: Hund/Hunde, Katze/Katzen, Kind/Kinder — Erkennungsregeln + Übungen.
+**Grammatik-Werkstatt: Stufe 6 implementieren (E-31–E-34)**
+Nächster Block: Groß-/Kleinschreibung. Konzept: Nomen groß, Verben/Adjektive klein — Erkennungsregeln + Übungen.
 
 **Bluetooth-Umschaltung:**
 Einziger offener Schritt — als Administrator ausführen:
