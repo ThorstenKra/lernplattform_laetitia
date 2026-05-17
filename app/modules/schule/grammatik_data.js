@@ -2103,6 +2103,663 @@ var GRAMMATIK_EINHEITEN = [
         erklaerung: "Das Prädikat fehlt — was macht die Katze mit der Maus? Das Verb fehlt!"
       }
     ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // STUFE 4 — Konjugation Gegenwart
+  // ══════════════════════════════════════════════════════════════════
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-21 — Was ist Konjugation?
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-21",
+    titel: "Was ist Konjugation?",
+    emoji: "🔄",
+    stufe: 4,
+    erklaerung_tts: "Verben verändern ihre Form — je nachdem, wer etwas tut. Das nennt man Konjugation. Ich laufe — du läufst — er läuft. Dasselbe Verb, aber jedes Mal ein bisschen anders.",
+    erklaerung_merksatz: "Konjugation = das Verb ändert sich je nach Person",
+    aufgaben: [
+      {
+        typ: "ja_nein",
+        frage: "Verändert sich das Verb je nach Person?",
+        satz: "ich laufe — du läufst — er läuft",
+        tts: "Verändert sich das Verb je nach Person? — ich laufe, du läufst, er läuft.",
+        richtig: "ja",
+        erklaerung: "Ja! Das Verb ändert seine Form — das ist Konjugation."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welche Form passt zu 'ich'?",
+        tts: "Welche Form passt zu ich? — ich laufe oder ich läufst?",
+        option_a: "ich laufe",
+        option_b: "ich läufst",
+        richtig: "a",
+        erklaerung: "Ich laufe ist richtig. Die Form für ich endet oft auf -e."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welche Form passt zu 'du'?",
+        tts: "Welche Form passt zu du? — du laufe oder du läufst?",
+        option_a: "du laufe",
+        option_b: "du läufst",
+        richtig: "b",
+        erklaerung: "Du läufst ist richtig. Die Form für du endet auf -st."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist diese Form richtig?",
+        satz: "er laufe",
+        tts: "Ist diese Form richtig? — er laufe.",
+        richtig: "falsch",
+        erklaerung: "Nein. Richtig ist: er läuft. Die Form für er endet auf -t."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist diese Form richtig?",
+        satz: "ich spiele",
+        tts: "Ist diese Form richtig? — ich spiele.",
+        richtig: "richtig",
+        erklaerung: "Ja! Ich spiele ist richtig. Die Form für ich endet auf -e."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welche Form passt zu 'er'?",
+        tts: "Welche Form passt zu er? — er lerne, er lernst, oder er lernt?",
+        option_a: "er lerne",
+        option_b: "er lernst",
+        option_c: "er lernt",
+        richtig: "c",
+        erklaerung: "Er lernt ist richtig. Die Form für er/sie/es endet auf -t."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welche Form passt zu 'wir'?",
+        tts: "Welche Form passt zu wir? — wir spielt, wir spielen, oder wir spielst?",
+        option_a: "wir spielt",
+        option_b: "wir spielen",
+        option_c: "wir spielst",
+        richtig: "b",
+        erklaerung: "Wir spielen ist richtig. Die Form für wir endet auf -en."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welche Form ist falsch konjugiert?",
+        tts: "Welche Form ist falsch? — du lernst oder du lernen?",
+        option_a: "du lernst",
+        option_b: "du lernen",
+        richtig: "b",
+        erklaerung: "Du lernen ist falsch. Richtig ist: du lernst."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist diese Form richtig?",
+        satz: "sie malt",
+        tts: "Ist diese Form richtig? — sie malt.",
+        richtig: "richtig",
+        erklaerung: "Ja! Sie malt ist richtig. Die Form für sie endet auf -t."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welche Form passt zu 'ihr'?",
+        tts: "Welche Form passt zu ihr? — ihr spielen oder ihr spielt?",
+        option_a: "ihr spielen",
+        option_b: "ihr spielt",
+        richtig: "b",
+        erklaerung: "Ihr spielt ist richtig. Die Form für ihr endet auf -t."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-22 — Personalformen: ich / du / er / wir / ihr / sie
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-22",
+    titel: "ich — du — er / sie / es",
+    emoji: "👤",
+    stufe: 4,
+    erklaerung_tts: "Es gibt sechs Personen: ich, du, er, sie, es, wir, ihr, sie. Für jede Person gibt es eine eigene Verbform. Heute lernst du die drei wichtigsten: ich, du, und er oder sie oder es.",
+    erklaerung_merksatz: "ich — du — er/sie/es — wir — ihr — sie",
+    aufgaben: [
+      {
+        typ: "ab_wahl",
+        frage: "Wer ist gemeint mit 'ich'?",
+        tts: "Wer ist gemeint mit ich?",
+        option_a: "Die Person, die spricht",
+        option_b: "Die Person, die zuhört",
+        richtig: "a",
+        erklaerung: "Ich bin die Person, die spricht. Du bist die Person, die zuhört."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Wer ist gemeint mit 'du'?",
+        tts: "Wer ist gemeint mit du?",
+        option_a: "Die Person, die spricht",
+        option_b: "Die Person, mit der man spricht",
+        richtig: "b",
+        erklaerung: "Du ist die Person, mit der man spricht."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welche Person passt? — 'Der Hund bellt.'",
+        tts: "Welche Person passt? — Der Hund bellt.",
+        option_a: "ich",
+        option_b: "du",
+        option_c: "er",
+        richtig: "c",
+        erklaerung: "Der Hund — er bellt. Ein Tier oder eine Sache ist er, sie oder es."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welche Person passt? — 'Die Katze schläft.'",
+        tts: "Welche Person passt? — Die Katze schläft.",
+        option_a: "er",
+        option_b: "sie",
+        option_c: "es",
+        richtig: "b",
+        erklaerung: "Die Katze — sie schläft. Die Katze ist weiblich, also sie."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welche Person passt? — 'Das Kind lacht.'",
+        tts: "Welche Person passt? — Das Kind lacht.",
+        option_a: "er",
+        option_b: "es",
+        richtig: "b",
+        erklaerung: "Das Kind — es lacht. Das Kind ist sächlich, also es."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Passt hier 'wir'? — 'Peter und ich spielen.'",
+        satz: "Peter und ich spielen. → wir spielen",
+        tts: "Passt hier wir? — Peter und ich spielen, also wir spielen.",
+        richtig: "richtig",
+        erklaerung: "Ja! Peter und ich zusammen — das ist wir."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welche Person passt? — 'Du und Max lernt.'",
+        tts: "Welche Person passt? — Du und Max.",
+        option_a: "wir",
+        option_b: "ihr",
+        richtig: "b",
+        erklaerung: "Du und Max zusammen — das ist ihr. Ihr lernt."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welche Verbform passt zu 'ich'?",
+        tts: "Welche Verbform passt zu ich? — malen",
+        option_a: "ich malst",
+        option_b: "ich male",
+        option_c: "ich malt",
+        richtig: "b",
+        erklaerung: "Ich male ist richtig."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welche Verbform passt zu 'du'?",
+        tts: "Welche Verbform passt zu du? — lernen",
+        option_a: "du lernen",
+        option_b: "du lerne",
+        option_c: "du lernst",
+        richtig: "c",
+        erklaerung: "Du lernst ist richtig. Die du-Form endet auf -st."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'sie malen' richtig? (für: Anna und Lisa malen.)",
+        satz: "Anna und Lisa malen. → sie malen",
+        tts: "Ist sie malen richtig? — Anna und Lisa malen, also sie malen.",
+        richtig: "richtig",
+        erklaerung: "Ja! Mehrere Personen zusammen — das ist sie. Sie malen ist richtig."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-23 — Das Verb "sein" konjugieren
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-23",
+    titel: "Das Verb \"sein\"",
+    emoji: "🌟",
+    stufe: 4,
+    erklaerung_tts: "Das Verb sein ist sehr wichtig und sehr besonders. Es heißt: ich bin, du bist, er oder sie ist, wir sind, ihr seid, sie sind. Diese Formen musst du auswendig lernen!",
+    erklaerung_merksatz: "ich bin — du bist — er/sie/es ist — wir sind — ihr seid — sie sind",
+    aufgaben: [
+      {
+        typ: "ab_wahl",
+        frage: "Welche Form von 'sein' passt?",
+        satz: "Ich ___ müde.",
+        tts: "Welche Form passt? — Ich bin oder ich bist?",
+        option_a: "bin",
+        option_b: "bist",
+        richtig: "a",
+        erklaerung: "Ich bin müde. Die Form für ich heißt bin."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welche Form von 'sein' passt?",
+        satz: "Du ___ stark.",
+        tts: "Welche Form passt? — Du bist oder du bin?",
+        option_a: "bist",
+        option_b: "bin",
+        richtig: "a",
+        erklaerung: "Du bist stark. Die Form für du heißt bist."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welche Form von 'sein' passt?",
+        satz: "Der Hund ___ groß.",
+        tts: "Welche Form passt? — Der Hund ist, bin, oder bist?",
+        option_a: "bin",
+        option_b: "bist",
+        option_c: "ist",
+        richtig: "c",
+        erklaerung: "Der Hund ist groß. Die Form für er/sie/es heißt ist."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welche Form von 'sein' passt?",
+        satz: "Wir ___ Freunde.",
+        tts: "Welche Form passt? — Wir sind, wir seid, oder wir ist?",
+        option_a: "sind",
+        option_b: "seid",
+        option_c: "ist",
+        richtig: "a",
+        erklaerung: "Wir sind Freunde. Die Form für wir heißt sind."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welche Form von 'sein' passt?",
+        satz: "Ihr ___ lustig.",
+        tts: "Welche Form passt? — Ihr seid oder ihr sind?",
+        option_a: "seid",
+        option_b: "sind",
+        richtig: "a",
+        erklaerung: "Ihr seid lustig. Die Form für ihr heißt seid."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welche Form von 'sein' passt?",
+        satz: "Die Kinder ___ glücklich.",
+        tts: "Welche Form passt? — Die Kinder sind oder die Kinder seid?",
+        option_a: "sind",
+        option_b: "seid",
+        richtig: "a",
+        erklaerung: "Die Kinder sind glücklich. Für mehrere Personen heißt es sind."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist diese Form richtig?",
+        satz: "Du bist müde.",
+        tts: "Ist diese Form richtig? — Du bist müde.",
+        richtig: "richtig",
+        erklaerung: "Ja! Du bist müde ist richtig."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist diese Form richtig?",
+        satz: "Ich ist glücklich.",
+        tts: "Ist diese Form richtig? — Ich ist glücklich.",
+        richtig: "falsch",
+        erklaerung: "Nein. Richtig ist: Ich bin glücklich."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist diese Form richtig?",
+        satz: "Wir sind zu Hause.",
+        tts: "Ist diese Form richtig? — Wir sind zu Hause.",
+        richtig: "richtig",
+        erklaerung: "Ja! Wir sind zu Hause ist richtig."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welche Form von 'sein' passt?",
+        satz: "Die Sonne ___ warm.",
+        tts: "Welche Form passt? — Die Sonne ist, bin oder sind?",
+        option_a: "bin",
+        option_b: "ist",
+        option_c: "sind",
+        richtig: "b",
+        erklaerung: "Die Sonne ist warm. Die Sonne ist weiblich — sie ist."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-24 — Das Verb "haben" konjugieren
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-24",
+    titel: "Das Verb \"haben\"",
+    emoji: "🎁",
+    stufe: 4,
+    erklaerung_tts: "Das Verb haben ist auch sehr wichtig. Es heißt: ich habe, du hast, er oder sie hat, wir haben, ihr habt, sie haben. Lerne diese Formen gut — du brauchst sie sehr oft!",
+    erklaerung_merksatz: "ich habe — du hast — er/sie/es hat — wir haben — ihr habt — sie haben",
+    aufgaben: [
+      {
+        typ: "ab_wahl",
+        frage: "Welche Form von 'haben' passt?",
+        satz: "Ich ___ einen Hund.",
+        tts: "Welche Form passt? — Ich habe oder ich hast?",
+        option_a: "habe",
+        option_b: "hast",
+        richtig: "a",
+        erklaerung: "Ich habe einen Hund. Die Form für ich heißt habe."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welche Form von 'haben' passt?",
+        satz: "Du ___ viele Freunde.",
+        tts: "Welche Form passt? — Du hast oder du habe?",
+        option_a: "hast",
+        option_b: "habe",
+        richtig: "a",
+        erklaerung: "Du hast viele Freunde. Die Form für du heißt hast."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welche Form von 'haben' passt?",
+        satz: "Er ___ ein Fahrrad.",
+        tts: "Welche Form passt? — Er hat, er habe, oder er hast?",
+        option_a: "hat",
+        option_b: "habe",
+        option_c: "hast",
+        richtig: "a",
+        erklaerung: "Er hat ein Fahrrad. Die Form für er/sie/es heißt hat."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welche Form von 'haben' passt?",
+        satz: "Wir ___ Hunger.",
+        tts: "Welche Form passt? — Wir haben, wir habt, oder wir hat?",
+        option_a: "habt",
+        option_b: "hat",
+        option_c: "haben",
+        richtig: "c",
+        erklaerung: "Wir haben Hunger. Die Form für wir heißt haben."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welche Form von 'haben' passt?",
+        satz: "Ihr ___ Zeit.",
+        tts: "Welche Form passt? — Ihr habt oder ihr haben?",
+        option_a: "habt",
+        option_b: "haben",
+        richtig: "a",
+        erklaerung: "Ihr habt Zeit. Die Form für ihr heißt habt."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welche Form von 'haben' passt?",
+        satz: "Die Schüler ___ Bücher.",
+        tts: "Welche Form passt? — Die Schüler haben oder die Schüler habt?",
+        option_a: "haben",
+        option_b: "habt",
+        richtig: "a",
+        erklaerung: "Die Schüler haben Bücher. Für mehrere Personen: haben."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist diese Form richtig?",
+        satz: "Sie hat ein schönes Kleid.",
+        tts: "Ist diese Form richtig? — Sie hat ein schönes Kleid.",
+        richtig: "richtig",
+        erklaerung: "Ja! Sie hat ist richtig. Die Form für sie heißt hat."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist diese Form richtig?",
+        satz: "Du habe ein Eis.",
+        tts: "Ist diese Form richtig? — Du habe ein Eis.",
+        richtig: "falsch",
+        erklaerung: "Nein. Richtig ist: Du hast ein Eis."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist diese Form richtig?",
+        satz: "Wir haben ein neues Auto.",
+        tts: "Ist diese Form richtig? — Wir haben ein neues Auto.",
+        richtig: "richtig",
+        erklaerung: "Ja! Wir haben ist richtig."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welche Form von 'haben' passt?",
+        satz: "Das Baby ___ Hunger.",
+        tts: "Welche Form passt? — Das Baby hat, habe oder habt?",
+        option_a: "habe",
+        option_b: "habt",
+        option_c: "hat",
+        richtig: "c",
+        erklaerung: "Das Baby hat Hunger. Das Baby ist sächlich — es hat."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-25 — Regelmäßige Verben konjugieren
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-25",
+    titel: "Verben konjugieren",
+    emoji: "✏️",
+    stufe: 4,
+    erklaerung_tts: "Jetzt üben wir regelmäßige Verben! Das sind Verben wie spielen, malen, lernen und kaufen. Bei diesen Verben gibt es immer dieselben Endungen: ich -e, du -st, er -t, wir -en, ihr -t, sie -en.",
+    erklaerung_merksatz: "ich -e · du -st · er/sie/es -t · wir -en · ihr -t · sie -en",
+    aufgaben: [
+      {
+        typ: "abc_wahl",
+        frage: "Welche Form passt? (spielen)",
+        satz: "Ich ___ Fußball.",
+        tts: "Welche Form passt? — Ich spiele, spielst, oder spielt?",
+        option_a: "spiele",
+        option_b: "spielst",
+        option_c: "spielt",
+        richtig: "a",
+        erklaerung: "Ich spiele Fußball. Die ich-Form endet auf -e."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welche Form passt? (spielen)",
+        satz: "Du ___ gut.",
+        tts: "Welche Form passt? — Du spiele, spielst, oder spielen?",
+        option_a: "spiele",
+        option_b: "spielst",
+        option_c: "spielen",
+        richtig: "b",
+        erklaerung: "Du spielst gut. Die du-Form endet auf -st."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welche Form passt? (malen)",
+        satz: "Er ___ ein Bild.",
+        tts: "Welche Form passt? — Er male, malst, oder malt?",
+        option_a: "male",
+        option_b: "malst",
+        option_c: "malt",
+        richtig: "c",
+        erklaerung: "Er malt ein Bild. Die er-Form endet auf -t."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welche Form passt? (lernen)",
+        satz: "Wir ___ Deutsch.",
+        tts: "Welche Form passt? — Wir lerne, lernst, oder lernen?",
+        option_a: "lerne",
+        option_b: "lernst",
+        option_c: "lernen",
+        richtig: "c",
+        erklaerung: "Wir lernen Deutsch. Die wir-Form endet auf -en."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welche Form passt? (kaufen)",
+        satz: "Ihr ___ Brot.",
+        tts: "Welche Form passt? — Ihr kauft oder ihr kaufen?",
+        option_a: "kauft",
+        option_b: "kaufen",
+        richtig: "a",
+        erklaerung: "Ihr kauft Brot. Die ihr-Form endet auf -t."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welche Form passt? (singen)",
+        satz: "Sie ___ ein Lied.",
+        tts: "Welche Form passt für sie, also mehrere Personen? — singen oder singt?",
+        option_a: "singen",
+        option_b: "singt",
+        richtig: "a",
+        erklaerung: "Sie singen ein Lied. Die sie-Form für viele endet auf -en."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist diese Form richtig?",
+        satz: "Das Kind malt ein Bild.",
+        tts: "Ist diese Form richtig? — Das Kind malt ein Bild.",
+        richtig: "richtig",
+        erklaerung: "Ja! Das Kind malt — es-Form endet auf -t. Richtig!"
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist diese Form richtig?",
+        satz: "Du singest laut.",
+        tts: "Ist diese Form richtig? — Du singest laut.",
+        richtig: "falsch",
+        erklaerung: "Nein. Richtig ist: Du singst laut. Die du-Form endet auf -st."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist diese Form richtig?",
+        satz: "Wir lachen viel.",
+        tts: "Ist diese Form richtig? — Wir lachen viel.",
+        richtig: "richtig",
+        erklaerung: "Ja! Wir lachen — die wir-Form endet auf -en. Richtig!"
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welche Form passt? (tanzen)",
+        satz: "Sie ___ schön. (eine Person)",
+        tts: "Welche Form passt für sie, also eine Person? — sie tanzt, sie tanze, oder sie tanzen?",
+        option_a: "tanzt",
+        option_b: "tanze",
+        option_c: "tanzen",
+        richtig: "a",
+        erklaerung: "Sie tanzt schön. Für eine weibliche Person endet die Form auf -t."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-26 — Wiederholung: Konjugation
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-26",
+    titel: "Konjugation — Wiederholung",
+    emoji: "🏆",
+    stufe: 4,
+    erklaerung_tts: "Jetzt wiederholen wir alles aus Stufe 4! Du kennst sein, haben und viele andere Verben. Ich stelle dir gemischte Fragen. Du schaffst das!",
+    erklaerung_merksatz: "sein: bin/bist/ist/sind/seid · haben: habe/hast/hat/haben/habt",
+    aufgaben: [
+      {
+        typ: "abc_wahl",
+        frage: "Welche Form von 'sein' passt?",
+        satz: "Ich ___ acht Jahre alt.",
+        tts: "Welche Form von sein passt? — Ich bin, bist oder ist?",
+        option_a: "bin",
+        option_b: "bist",
+        option_c: "ist",
+        richtig: "a",
+        erklaerung: "Ich bin acht Jahre alt. Die ich-Form von sein ist bin."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welche Form von 'haben' passt?",
+        satz: "Er ___ Geburtstag.",
+        tts: "Welche Form von haben passt? — Er hat, habe oder hast?",
+        option_a: "habe",
+        option_b: "hast",
+        option_c: "hat",
+        richtig: "c",
+        erklaerung: "Er hat Geburtstag. Die er-Form von haben ist hat."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welche Form passt? (rennen)",
+        satz: "Du ___ schnell.",
+        tts: "Welche Form passt? — Du rennst oder du rennen?",
+        option_a: "rennst",
+        option_b: "rennen",
+        richtig: "a",
+        erklaerung: "Du rennst schnell. Die du-Form endet auf -st."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist diese Form richtig?",
+        satz: "Ihr habt viele Aufgaben.",
+        tts: "Ist diese Form richtig? — Ihr habt viele Aufgaben.",
+        richtig: "richtig",
+        erklaerung: "Ja! Ihr habt ist richtig. Die ihr-Form von haben ist habt."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist diese Form richtig?",
+        satz: "Wir ist müde.",
+        tts: "Ist diese Form richtig? — Wir ist müde.",
+        richtig: "falsch",
+        erklaerung: "Nein. Richtig ist: Wir sind müde. Die wir-Form von sein ist sind."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welche Form passt? (schlafen)",
+        satz: "Die Kinder ___ schon.",
+        tts: "Welche Form passt? — Die Kinder schläft, schlafen oder schlafst?",
+        option_a: "schläft",
+        option_b: "schlafen",
+        option_c: "schlafst",
+        richtig: "b",
+        erklaerung: "Die Kinder schlafen schon. Für mehrere Personen endet die Form auf -en."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welche Form von 'sein' passt?",
+        satz: "Ihr ___ sehr fleißig.",
+        tts: "Welche Form von sein passt? — Ihr seid oder ihr sind?",
+        option_a: "seid",
+        option_b: "sind",
+        richtig: "a",
+        erklaerung: "Ihr seid sehr fleißig. Die ihr-Form von sein ist seid."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist diese Form richtig?",
+        satz: "Sie hat lange Haare.",
+        tts: "Ist diese Form richtig? — Sie hat lange Haare.",
+        richtig: "richtig",
+        erklaerung: "Ja! Sie hat ist richtig. Die sie-Form von haben ist hat."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welche Form passt? (lesen)",
+        satz: "Ich ___ ein Buch.",
+        tts: "Welche Form passt? — Ich lese, liest oder lesen?",
+        option_a: "lese",
+        option_b: "liest",
+        option_c: "lesen",
+        richtig: "a",
+        erklaerung: "Ich lese ein Buch. Die ich-Form endet auf -e."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist diese Form richtig?",
+        satz: "Du bist mein Freund.",
+        tts: "Ist diese Form richtig? — Du bist mein Freund.",
+        richtig: "richtig",
+        erklaerung: "Ja! Du bist ist richtig. Die du-Form von sein ist bist."
+      }
+    ]
   }
 
 ];
