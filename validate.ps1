@@ -173,6 +173,30 @@ if ($mediaFound.Count -eq 0) {
 }
 
 # =============================================================================
+HEAD "8 -- href-Links: Zieldateien vorhanden?"
+# =============================================================================
+$hrefRe  = 'href="([^"]+)"'
+$hrefErr = 0
+foreach ($f in $html) {
+    $dir = Split-Path $f.FullName
+    $raw = ReadRaw $f.FullName
+    foreach ($m in [regex]::Matches($raw, $hrefRe)) {
+        $href = $m.Groups[1].Value
+        # Anker, JavaScript, externe URLs, Data-URIs ueberspringen
+        if ($href -match '^[#?]|^javascript:|^mailto:|^http|^file://|^data:') { continue }
+        $clean = ($href -split '[?#]')[0].Trim()
+        if (-not $clean) { continue }
+        $full = [IO.Path]::GetFullPath([IO.Path]::Combine($dir, $clean))
+        if (-not (Test-Path $full)) {
+            ERR "href-Ziel fehlt: $href"
+            ERR "               <- $(Rel $f.FullName)"
+            $hrefErr++
+        }
+    }
+}
+if ($hrefErr -eq 0) { OK "Alle href-Links zeigen auf vorhandene Dateien" }
+
+# =============================================================================
 # Zusammenfassung
 # =============================================================================
 $total = $nErr + $nWrn + $nOk

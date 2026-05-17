@@ -1,6 +1,7 @@
-// grammatik_mod.js — Spiellogik für die Grammatik-Werkstatt
+// grammatik_mod.js — Spiellogik für die Grammatik-Werkstatt  v2
+// Layout-Prinzip: Lesebereich (passiv, pointer-events:none) OBEN,
+//                 Trennstreifen, Aktionsbereich (dwell-aktiv) UNTEN.
 // Typen: ja_nein | ab_wahl | abc_wahl | wort_button | richtig_falsch
-// Alle Screens: ein Dwell-Klick pro Aufgabe
 
 (function(){
 
@@ -44,7 +45,7 @@ function einheitFreigegeben(index){
   return einheitAbgeschlossen(vorgaenger.id);
 }
 
-// ── TTS ──────────────────────────────────────────────────────────
+// ── TTS (Goldstandard) ───────────────────────────────────────────
 function sprich(text, danach){
   try{
     speechSynthesis.cancel();
@@ -81,8 +82,8 @@ function sprich(text, danach){
 var dwellCtrl = null;
 function bindeDwell(selector){
   if(dwellCtrl) dwellCtrl.cancelDwell();
-  var attach  = window.LaetitiaAttachDwell || function(){ return {cancelDwell:function(){}}; };
-  var dwellMs    = parseInt(localStorage.getItem("laetitia_dwell_ms")) || 900;
+  var attach     = window.LaetitiaAttachDwell || function(){ return {cancelDwell:function(){}}; };
+  var dwellMs    = parseInt(localStorage.getItem("laetitia_dwell_ms"))       || 900;
   var leaveGrace = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
   dwellCtrl = attach(selector, {
     dwellMs: dwellMs, leaveGrace: leaveGrace,
@@ -92,6 +93,24 @@ function bindeDwell(selector){
     }
   });
 }
+
+// ── HTML-Bausteine ───────────────────────────────────────────────
+// Lesebereich: kein pointer-events, kein Dwell
+function leseHtml(frage, satz){
+  var satzBlock = satz
+    ? "<div class=\"lese-satz\">" + esc(satz) + "</div>"
+    : "";
+  return "<div class=\"lese-bereich\">" +
+    "<div class=\"lese-frage\">" + esc(frage) + "</div>" +
+    satzBlock +
+    "</div>" +
+    "<div class=\"trenn-streifen\"><span class=\"trenn-label\">👆 Deine Antwort</span></div>" +
+    "<div class=\"aktions-bereich\" id=\"aktionsBereich\">";
+}
+function leseHtmlEnde(){ return "</div>"; }
+
+// Dwell-Ring SVG
+var RING = "<svg class=\"dwell-ring-svg\" viewBox=\"0 0 70 70\"><circle cx=\"35\" cy=\"35\" r=\"30\"/></svg>";
 
 // ── Spielzustand ─────────────────────────────────────────────────
 var aktEinheit  = null;
@@ -106,7 +125,7 @@ window.GrammatikMod = {
 
   starteEinheit: function(einheitId){
     aktEinheit = null;
-    for(var i=0; i<GRAMMATIK_EINHEITEN.length; i++){
+    for(var i = 0; i < GRAMMATIK_EINHEITEN.length; i++){
       if(GRAMMATIK_EINHEITEN[i].id === einheitId){
         aktEinheit = GRAMMATIK_EINHEITEN[i];
         break;
@@ -114,7 +133,6 @@ window.GrammatikMod = {
     }
     if(!aktEinheit){ return; }
 
-    // Header-Titel setzen (Regel 13: Logik aus Inline-Script fernhalten)
     var ht = document.getElementById("headerTitel");
     if(ht) ht.textContent = aktEinheit.emoji + " " + aktEinheit.titel;
     if(document.title) document.title = "Laetitia - " + aktEinheit.titel;
@@ -130,7 +148,7 @@ window.GrammatikMod = {
     zeigeErklaerung();
   },
 
-  ladeStand: ladeStand,
+  ladeStand:         ladeStand,
   einheitFreigegeben: einheitFreigegeben
 };
 
@@ -141,18 +159,16 @@ function zeigeErklaerung(){
     "<div class=\"erklaer-card\" id=\"erklaerCard\">" +
       "<div class=\"erklaer-emoji\">" + aktEinheit.emoji + "</div>" +
       "<div class=\"erklaer-titel\">" + aktEinheit.titel + "</div>" +
-      "<div class=\"erklaer-merksatz\" id=\"erklaerMerksatz\">" + aktEinheit.erklaerung_merksatz + "</div>" +
+      "<div class=\"erklaer-merksatz\">" + aktEinheit.erklaerung_merksatz + "</div>" +
     "</div>";
 
-  // Fortschritt auf 0
   setFortschritt(0);
   setHeaderSub("Einführung");
 
-  bindeDwell("#weiterBtn");
   var weiter = document.getElementById("weiterBtn");
   if(weiter){
     weiter.className = "nav-btn nav-btn-weiter sichtbar";
-    weiter.onclick = function(){ zeigeAufgabe(); };
+    weiter.onclick   = function(){ zeigeAufgabe(); };
   }
   var ub = document.getElementById("btnUeberspringen");
   if(ub) ub.style.display = "none";
@@ -166,7 +182,6 @@ function zeigeErklaerung(){
 function zeigeAufgabe(){
   if(aktIndex >= aufgaben.length){
     if(wiederholungsQueue.length > 0){
-      // Falsch beantwortete nochmal
       aufgaben = wiederholungsQueue.slice();
       wiederholungsQueue = [];
       aktIndex = 0;
@@ -184,7 +199,6 @@ function zeigeAufgabe(){
   setFortschritt(Math.round((aktIndex / aufgaben.length) * 100));
   setHeaderSub((aktIndex + 1) + " / " + aufgaben.length);
 
-  // Weiter-Button ausblenden, Überspringen einblenden
   var weiter = document.getElementById("weiterBtn");
   if(weiter) weiter.className = "nav-btn nav-btn-weiter";
   var ub = document.getElementById("btnUeberspringen");
@@ -192,93 +206,64 @@ function zeigeAufgabe(){
 
   var spielfeld = document.getElementById("spielfeld");
 
-  if(aufgabe.typ === "ja_nein"){
-    rendereJaNein(spielfeld, aufgabe);
-  } else if(aufgabe.typ === "ab_wahl"){
-    rendereAbWahl(spielfeld, aufgabe);
-  } else if(aufgabe.typ === "abc_wahl"){
-    rendereAbcWahl(spielfeld, aufgabe);
-  } else if(aufgabe.typ === "wort_button"){
-    rendereWortButton(spielfeld, aufgabe);
-  } else if(aufgabe.typ === "richtig_falsch"){
-    rendereRichtigFalsch(spielfeld, aufgabe);
-  }
+  if     (aufgabe.typ === "ja_nein")      rendereJaNein(spielfeld, aufgabe);
+  else if(aufgabe.typ === "ab_wahl")      rendereAbWahl(spielfeld, aufgabe);
+  else if(aufgabe.typ === "abc_wahl")     rendereAbcWahl(spielfeld, aufgabe);
+  else if(aufgabe.typ === "wort_button")  rendereWortButton(spielfeld, aufgabe);
+  else if(aufgabe.typ === "richtig_falsch") rendereRichtigFalsch(spielfeld, aufgabe);
 
-  setTimeout(function(){
-    sprich(aufgabe.tts);
-  }, 400);
+  setTimeout(function(){ sprich(aufgabe.tts); }, 400);
 }
 
 // ── Typ: Ja / Nein ───────────────────────────────────────────────
 function rendereJaNein(container, aufgabe){
-  var satzHtml = aufgabe.satz
-    ? "<div class=\"aufgabe-satz\">" + esc(aufgabe.satz) + "</div>"
-    : "";
-
   container.innerHTML =
-    "<div class=\"aufgabe-card\">" +
-      "<div class=\"aufgabe-frage\">" + esc(aufgabe.frage) + "</div>" +
-      satzHtml +
-    "</div>" +
-    "<div class=\"antwort-zweier\">" +
-      "<button class=\"antwort-btn antwort-ja\" id=\"btnJa\" onclick=\"window._GrammAntwort('ja')\">JA<svg class=\"dwell-ring-svg\" viewBox=\"0 0 70 70\"><circle cx=\"35\" cy=\"35\" r=\"30\"/></svg></button>" +
-      "<button class=\"antwort-btn antwort-nein\" id=\"btnNein\" onclick=\"window._GrammAntwort('nein')\">NEIN<svg class=\"dwell-ring-svg\" viewBox=\"0 0 70 70\"><circle cx=\"35\" cy=\"35\" r=\"30\"/></svg></button>" +
-    "</div>" +
-    "<div class=\"feedback-zeile\" id=\"feedbackZeile\"></div>";
+    leseHtml(aufgabe.frage, aufgabe.satz || null) +
+      "<div class=\"antwort-zweier\">" +
+        "<button class=\"antwort-btn antwort-ja\" id=\"btnJa\" onclick=\"window._GrammAntwort('ja')\">JA" + RING + "</button>" +
+        "<button class=\"antwort-btn antwort-nein\" id=\"btnNein\" onclick=\"window._GrammAntwort('nein')\">NEIN" + RING + "</button>" +
+      "</div>" +
+      "<div class=\"feedback-zeile\" id=\"feedbackZeile\"></div>" +
+    leseHtmlEnde();
 
   window._GrammAntwort = function(wahl){
     pruefeAntwort(wahl, aufgabe.richtig, aufgabe.erklaerung, aufgabe);
   };
-
   bindeDwell("#btnJa, #btnNein, #btnZurueck");
 }
 
 // ── Typ: A / B Wahl ──────────────────────────────────────────────
 function rendereAbWahl(container, aufgabe){
-  var satzHtml = aufgabe.satz
-    ? "<div class=\"aufgabe-satz\">" + esc(aufgabe.satz) + "</div>"
-    : "";
-
   container.innerHTML =
-    "<div class=\"aufgabe-card\">" +
-      "<div class=\"aufgabe-frage\">" + esc(aufgabe.frage) + "</div>" +
-      satzHtml +
-    "</div>" +
-    "<div class=\"antwort-zweier\">" +
-      "<button class=\"antwort-btn\" id=\"btnA\" onclick=\"window._GrammAntwort('a')\">" + esc(aufgabe.option_a) + "<svg class=\"dwell-ring-svg\" viewBox=\"0 0 70 70\"><circle cx=\"35\" cy=\"35\" r=\"30\"/></svg></button>" +
-      "<button class=\"antwort-btn\" id=\"btnB\" onclick=\"window._GrammAntwort('b')\">" + esc(aufgabe.option_b) + "<svg class=\"dwell-ring-svg\" viewBox=\"0 0 70 70\"><circle cx=\"35\" cy=\"35\" r=\"30\"/></svg></button>" +
-    "</div>" +
-    "<div class=\"feedback-zeile\" id=\"feedbackZeile\"></div>";
+    leseHtml(aufgabe.frage, aufgabe.satz || null) +
+      "<div class=\"antwort-zweier\">" +
+        "<button class=\"antwort-btn\" id=\"btnA\" onclick=\"window._GrammAntwort('a')\">" + esc(aufgabe.option_a) + RING + "</button>" +
+        "<button class=\"antwort-btn\" id=\"btnB\" onclick=\"window._GrammAntwort('b')\">" + esc(aufgabe.option_b) + RING + "</button>" +
+      "</div>" +
+      "<div class=\"feedback-zeile\" id=\"feedbackZeile\"></div>" +
+    leseHtmlEnde();
 
   window._GrammAntwort = function(wahl){
     pruefeAntwort(wahl, aufgabe.richtig, aufgabe.erklaerung, aufgabe);
   };
-
   bindeDwell("#btnA, #btnB, #btnZurueck");
 }
 
 // ── Typ: A / B / C Wahl ──────────────────────────────────────────
 function rendereAbcWahl(container, aufgabe){
-  var satzHtml = aufgabe.satz
-    ? "<div class=\"aufgabe-satz\">" + esc(aufgabe.satz) + "</div>"
-    : "";
-
   container.innerHTML =
-    "<div class=\"aufgabe-card\">" +
-      "<div class=\"aufgabe-frage\">" + esc(aufgabe.frage) + "</div>" +
-      satzHtml +
-    "</div>" +
-    "<div class=\"antwort-dreier\">" +
-      "<button class=\"antwort-btn\" id=\"btnA\" onclick=\"window._GrammAntwort('a')\">" + esc(aufgabe.option_a) + "<svg class=\"dwell-ring-svg\" viewBox=\"0 0 70 70\"><circle cx=\"35\" cy=\"35\" r=\"30\"/></svg></button>" +
-      "<button class=\"antwort-btn\" id=\"btnB\" onclick=\"window._GrammAntwort('b')\">" + esc(aufgabe.option_b) + "<svg class=\"dwell-ring-svg\" viewBox=\"0 0 70 70\"><circle cx=\"35\" cy=\"35\" r=\"30\"/></svg></button>" +
-      "<button class=\"antwort-btn\" id=\"btnC\" onclick=\"window._GrammAntwort('c')\">" + esc(aufgabe.option_c) + "<svg class=\"dwell-ring-svg\" viewBox=\"0 0 70 70\"><circle cx=\"35\" cy=\"35\" r=\"30\"/></svg></button>" +
-    "</div>" +
-    "<div class=\"feedback-zeile\" id=\"feedbackZeile\"></div>";
+    leseHtml(aufgabe.frage, aufgabe.satz || null) +
+      "<div class=\"antwort-dreier\">" +
+        "<button class=\"antwort-btn\" id=\"btnA\" onclick=\"window._GrammAntwort('a')\">" + esc(aufgabe.option_a) + RING + "</button>" +
+        "<button class=\"antwort-btn\" id=\"btnB\" onclick=\"window._GrammAntwort('b')\">" + esc(aufgabe.option_b) + RING + "</button>" +
+        "<button class=\"antwort-btn\" id=\"btnC\" onclick=\"window._GrammAntwort('c')\">" + esc(aufgabe.option_c) + RING + "</button>" +
+      "</div>" +
+      "<div class=\"feedback-zeile\" id=\"feedbackZeile\"></div>" +
+    leseHtmlEnde();
 
   window._GrammAntwort = function(wahl){
     pruefeAntwort(wahl, aufgabe.richtig, aufgabe.erklaerung, aufgabe);
   };
-
   bindeDwell("#btnA, #btnB, #btnC, #btnZurueck");
 }
 
@@ -287,21 +272,19 @@ function rendereWortButton(container, aufgabe){
   var btnHtml = "";
   aufgabe.woerter.forEach(function(wort, i){
     btnHtml += "<button class=\"wort-btn\" id=\"wortBtn" + i + "\" onclick=\"window._GrammAntwort(" + i + ")\">" +
-      esc(wort) + "<svg class=\"dwell-ring-svg\" viewBox=\"0 0 70 70\"><circle cx=\"35\" cy=\"35\" r=\"30\"/></svg></button>";
+      esc(wort) + RING + "</button>";
   });
 
   container.innerHTML =
-    "<div class=\"aufgabe-card\">" +
-      "<div class=\"aufgabe-frage\">" + esc(aufgabe.frage) + "</div>" +
-    "</div>" +
-    "<div class=\"wort-reihe\">" + btnHtml + "</div>" +
-    "<div class=\"feedback-zeile\" id=\"feedbackZeile\"></div>";
+    leseHtml(aufgabe.frage, null) +
+      "<div class=\"wort-reihe\">" + btnHtml + "</div>" +
+      "<div class=\"feedback-zeile\" id=\"feedbackZeile\"></div>" +
+    leseHtmlEnde();
 
   window._GrammAntwort = function(index){
     var gewaehlt = String(index);
     var richtig  = String(aufgabe.richtig);
     pruefeAntwort(gewaehlt, richtig, aufgabe.erklaerung, aufgabe);
-    // Visuelles Feedback direkt auf den Buttons
     var alle = container.querySelectorAll(".wort-btn");
     alle.forEach(function(b){ b.disabled = true; });
     var gewaehltBtn = document.getElementById("wortBtn" + index);
@@ -321,20 +304,17 @@ function rendereWortButton(container, aufgabe){
 // ── Typ: Richtig / Falsch ────────────────────────────────────────
 function rendereRichtigFalsch(container, aufgabe){
   container.innerHTML =
-    "<div class=\"aufgabe-card\">" +
-      "<div class=\"aufgabe-frage\">" + esc(aufgabe.frage) + "</div>" +
-      "<div class=\"aufgabe-satz\">" + esc(aufgabe.satz) + "</div>" +
-    "</div>" +
-    "<div class=\"antwort-zweier\">" +
-      "<button class=\"antwort-btn antwort-richtig-btn\" id=\"btnRichtig\" onclick=\"window._GrammAntwort('richtig')\">✓ Richtig<svg class=\"dwell-ring-svg\" viewBox=\"0 0 70 70\"><circle cx=\"35\" cy=\"35\" r=\"30\"/></svg></button>" +
-      "<button class=\"antwort-btn antwort-falsch-btn\" id=\"btnFalsch\" onclick=\"window._GrammAntwort('falsch')\">✗ Falsch<svg class=\"dwell-ring-svg\" viewBox=\"0 0 70 70\"><circle cx=\"35\" cy=\"35\" r=\"30\"/></svg></button>" +
-    "</div>" +
-    "<div class=\"feedback-zeile\" id=\"feedbackZeile\"></div>";
+    leseHtml(aufgabe.frage, aufgabe.satz) +
+      "<div class=\"antwort-zweier\">" +
+        "<button class=\"antwort-btn antwort-richtig-btn\" id=\"btnRichtig\" onclick=\"window._GrammAntwort('richtig')\">✓ Richtig" + RING + "</button>" +
+        "<button class=\"antwort-btn antwort-falsch-btn\"  id=\"btnFalsch\"  onclick=\"window._GrammAntwort('falsch')\">✗ Falsch"  + RING + "</button>" +
+      "</div>" +
+      "<div class=\"feedback-zeile\" id=\"feedbackZeile\"></div>" +
+    leseHtmlEnde();
 
   window._GrammAntwort = function(wahl){
     pruefeAntwort(wahl, aufgabe.richtig, aufgabe.erklaerung, aufgabe);
   };
-
   bindeDwell("#btnRichtig, #btnFalsch, #btnZurueck");
 }
 
@@ -343,8 +323,7 @@ function pruefeAntwort(gewaehlt, richtig, erklaerung, aufgabe){
   if(gesperrt) return;
   gesperrt = true;
 
-  // Alle Buttons sperren
-  var alleBtns = document.querySelectorAll(".antwort-btn");
+  var alleBtns = document.querySelectorAll(".antwort-btn, .wort-btn");
   alleBtns.forEach(function(b){ b.disabled = true; b.classList.add("gesperrt"); });
 
   var feedback = document.getElementById("feedbackZeile");
@@ -357,22 +336,15 @@ function pruefeAntwort(gewaehlt, richtig, erklaerung, aufgabe){
 
   if(istRichtig){
     richtigCnt++;
-    if(feedback){
-      feedback.className = "feedback-zeile feedback-richtig";
-      feedback.textContent = "✓ " + erklaerung;
-    }
+    if(feedback){ feedback.className = "feedback-zeile feedback-richtig"; feedback.textContent = "✓ " + erklaerung; }
     sprich(zufallsLob() + " " + erklaerung, function(){
       if(weiter){ weiter.className = "nav-btn nav-btn-weiter sichtbar"; weiter.onclick = function(){ aktIndex++; zeigeAufgabe(); }; }
       if(ub) ub.style.display = "none";
       bindeDwell("#weiterBtn, #btnZurueck");
     });
   } else {
-    // Falsch beantwortete Aufgabe hinten nochmal anhängen
     wiederholungsQueue.push(aufgabe);
-    if(feedback){
-      feedback.className = "feedback-zeile feedback-falsch";
-      feedback.textContent = "✗ " + erklaerung;
-    }
+    if(feedback){ feedback.className = "feedback-zeile feedback-falsch"; feedback.textContent = "✗ " + erklaerung; }
     sprich("Das stimmt leider nicht. " + erklaerung, function(){
       if(weiter){ weiter.className = "nav-btn nav-btn-weiter sichtbar"; weiter.onclick = function(){ aktIndex++; zeigeAufgabe(); }; }
       if(ub) ub.style.display = "none";
@@ -389,19 +361,18 @@ function ueberspringen(){
 
 // ── Fertig-Screen ─────────────────────────────────────────────────
 function zeigeFertig(){
-  var gesamt = aktEinheit.aufgaben.length;
-  var quote  = gesamt > 0 ? richtigCnt / gesamt : 0;
+  var gesamt    = aktEinheit.aufgaben.length;
+  var quote     = gesamt > 0 ? richtigCnt / gesamt : 0;
   var bestanden = quote >= 0.8;
 
   if(window.LaetitiaStats) window.LaetitiaStats.sessionEnd(bestanden);
 
-  // Fortschritt speichern
   var stand = ladeStand();
   var bisherBeste = stand[aktEinheit.id] ? stand[aktEinheit.id].besteQuote : 0;
   stand[aktEinheit.id] = {
     abgeschlossen: true,
-    besteQuote: Math.max(quote, bisherBeste),
-    versuche: ((stand[aktEinheit.id] || {}).versuche || 0) + 1
+    besteQuote:    Math.max(quote, bisherBeste),
+    versuche:      ((stand[aktEinheit.id] || {}).versuche || 0) + 1
   };
   speichereStand(stand);
 
@@ -420,7 +391,7 @@ function zeigeFertig(){
       "<div class=\"fertig-titel\">" + sternText + "</div>" +
       "<div class=\"fertig-punkte\">" + richtigCnt + " von " + gesamt + " richtig</div>" +
       "<button class=\"fertig-nochmal-btn\" id=\"nochmalBtn\" onclick=\"window.GrammatikMod.starteEinheit('" + aktEinheit.id + "')\">" +
-        "<svg class=\"dwell-ring-svg\" viewBox=\"0 0 70 70\"><circle cx=\"35\" cy=\"35\" r=\"30\"/></svg>🔁 Nochmal" +
+        RING + "🔁 Nochmal" +
       "</button>" +
     "</div>";
 

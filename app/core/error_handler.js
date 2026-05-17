@@ -1,4 +1,4 @@
-// error_handler.js  v2
+// error_handler.js  v3
 // Globaler Fehler-Handler fuer das Laetitia-Lernsystem
 //
 // Features:
@@ -9,6 +9,7 @@
 //   5. Fehler-Log (letzte 10, in localStorage)
 //   6. Diagnose-Panel (aktivierbar via localStorage-Flag fuer Entwicklung)
 //   7. Not-Overlay mit grossem Zurueck-Button + TTS (Laetitia kommt selbst raus)
+//   8. Link-Navigator-Guard: prueft Zieldatei per XHR vor Navigation (kein Browser-404)
 //
 // Einbindung: nach dwell.js, vor Modul-Scripts
 //   <script src="../../core/dwell.js"></script>
@@ -367,7 +368,68 @@ function zeigeDiagPanel(){
   if(document.body) document.body.appendChild(panel);
 }
 
-// ── 7. ÖFFENTLICHE API ───────────────────────────────────────────────────────
+// ── 8. LINK-NAVIGATOR-GUARD ──────────────────────────────────────────────────
+// Faengt alle Klicks auf <a href> ab und prueft per XHR ob die Zieldatei
+// existiert, bevor die Navigation stattfindet.
+// Bei fehlender Datei -> Fehler-Overlay statt Browser-"Datei nicht gefunden"-Seite.
+// Funktioniert mit Dwell (dwell.js ruft el.click() auf → Interceptor greift).
+
+var _navPending = false;
+
+document.addEventListener("click", function(ev){
+  if(_fehlerAktiv || _navPending) return;
+
+  // Naechstes <a>-Element im Klickpfad suchen
+  var el = ev.target;
+  while(el && el.tagName !== "A"){ el = el.parentElement; }
+  if(!el) return;
+
+  var raw  = el.getAttribute("href") || "";
+  var href = el.href || "";
+
+  // Nur lokale relative Pfade pruefen; externe/Anker/Spezial ueberspringen
+  if(!raw || raw.charAt(0) === "#" ||
+     raw.indexOf("javascript") === 0 ||
+     raw.indexOf("mailto")     === 0 ||
+     raw.indexOf("http")       === 0 ||
+     raw.indexOf("data:")      === 0) return;
+  if(!href.startsWith("file://")) return;
+
+  ev.preventDefault();
+  _navPending = true;
+
+  // Query-String und Hash fuer Existenzpruefung entfernen
+  var checkUrl = href.split("?")[0].split("#")[0];
+
+  var xhr = new XMLHttpRequest();
+  xhr.onload = function(){
+    _navPending = false;
+    window.location.href = href;
+  };
+  xhr.onerror = function(){
+    _navPending = false;
+    logFehler("nav_404", "Datei nicht gefunden: " + raw,
+              window.location.href.split("/").pop(), "");
+    zeigeFehlerschirm(
+      "Seite nicht gefunden: " + raw.split("/").pop().split("?")[0],
+      "nav_404"
+    );
+  };
+  try{
+    xhr.open("GET", checkUrl, true);
+    xhr.send();
+  }catch(e){
+    _navPending = false;
+    logFehler("nav_404", "XHR-Fehler: " + raw + " | " + String(e),
+              window.location.href.split("/").pop(), "");
+    zeigeFehlerschirm(
+      "Seite nicht erreichbar: " + raw.split("/").pop().split("?")[0],
+      "nav_404"
+    );
+  }
+}, true); // capture-Phase: greift vor allen anderen Handlern
+
+// ── 9. ÖFFENTLICHE API ───────────────────────────────────────────────────────
 
 window.LaetitiaFehler = {
   // Manuell einen Fehler-Screen anzeigen

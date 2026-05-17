@@ -1466,6 +1466,643 @@ var GRAMMATIK_EINHEITEN = [
         erklaerung: "Ja! Katzen ist Plural — also die Katzen. Alles richtig."
       }
     ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // STUFE 3 — Sätze bauen: Subjekt, Prädikat, Objekt
+  // ══════════════════════════════════════════════════════════════════
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-15 — Was ist das Subjekt?
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-15",
+    titel: "Was ist das Subjekt?",
+    emoji: "🙋",
+    stufe: 3,
+    erklaerung_tts: "Jeder Satz hat ein Subjekt. Das Subjekt ist die Person oder Sache, die etwas tut. Frage: Wer oder was macht etwas? Die Antwort ist das Subjekt.",
+    erklaerung_merksatz: "Subjekt = Wer oder was macht etwas?",
+    aufgaben: [
+      {
+        typ: "ja_nein",
+        frage: "Ist 'Der Hund' das Subjekt?",
+        satz: "Der Hund bellt laut.",
+        tts: "Ist der Hund das Subjekt? — Der Hund bellt laut.",
+        richtig: "ja",
+        erklaerung: "Ja! Der Hund bellt — der Hund ist das Subjekt."
+      },
+      {
+        typ: "ja_nein",
+        frage: "Ist 'laut' das Subjekt?",
+        satz: "Der Hund bellt laut.",
+        tts: "Ist laut das Subjekt? — Der Hund bellt laut.",
+        richtig: "nein",
+        erklaerung: "Nein. Laut sagt wie der Hund bellt — es ist kein Subjekt."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist das Subjekt? (Wer macht etwas?)",
+        tts: "Welches Wort ist das Subjekt? — Die Katze schläft.",
+        woerter: ["Die", "Katze", "schläft."],
+        richtig: 1,
+        erklaerung: "Die Katze schläft — Katze ist das Subjekt."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist das Subjekt?",
+        tts: "Welches Wort ist das Subjekt? — Peter spielt Ball.",
+        woerter: ["Peter", "spielt", "Ball."],
+        richtig: 0,
+        erklaerung: "Peter spielt — Peter ist das Subjekt."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist das Subjekt im Satz?",
+        satz: "Die Sonne scheint hell.",
+        tts: "Was ist das Subjekt? — Die Sonne scheint hell.",
+        option_a: "Die Sonne",
+        option_b: "hell",
+        richtig: "a",
+        erklaerung: "Die Sonne scheint — Sonne ist das Subjekt."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist das Subjekt im Satz?",
+        satz: "Das Kind lacht.",
+        tts: "Was ist das Subjekt? — Das Kind lacht.",
+        option_a: "lacht",
+        option_b: "Das Kind",
+        richtig: "b",
+        erklaerung: "Das Kind lacht — Kind ist das Subjekt."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist das Subjekt?",
+        tts: "Welches Wort ist das Subjekt? — Der Vogel singt.",
+        woerter: ["Der", "Vogel", "singt."],
+        richtig: 1,
+        erklaerung: "Der Vogel singt — Vogel ist das Subjekt."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'schläft' das Subjekt im Satz?",
+        satz: "Die Maus schläft.",
+        tts: "Ist schläft das Subjekt? — Die Maus schläft.",
+        richtig: "falsch",
+        erklaerung: "Nein. Schläft ist das Verb. Das Subjekt ist die Maus."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist das Subjekt?",
+        satz: "Der Ball rollt schnell.",
+        tts: "Was ist das Subjekt? — Der Ball rollt schnell.",
+        option_a: "schnell",
+        option_b: "Der Ball",
+        richtig: "b",
+        erklaerung: "Der Ball rollt — Ball ist das Subjekt."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist das Subjekt?",
+        tts: "Welches Wort ist das Subjekt? — Anna malt ein Bild.",
+        woerter: ["Anna", "malt", "Bild."],
+        richtig: 0,
+        erklaerung: "Anna malt — Anna ist das Subjekt."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-16 — Was ist das Prädikat?
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-16",
+    titel: "Was ist das Prädikat?",
+    emoji: "⚡",
+    stufe: 3,
+    erklaerung_tts: "Das Prädikat ist das wichtigste Wort im Satz. Es sagt, was passiert — was jemand tut oder ist. Das Prädikat ist immer ein Verb. Frage: Was passiert im Satz?",
+    erklaerung_merksatz: "Prädikat = Was passiert? Das ist immer ein Verb!",
+    aufgaben: [
+      {
+        typ: "ja_nein",
+        frage: "Ist 'läuft' das Prädikat?",
+        satz: "Der Hund läuft schnell.",
+        tts: "Ist läuft das Prädikat? — Der Hund läuft schnell.",
+        richtig: "ja",
+        erklaerung: "Ja! Läuft sagt, was der Hund tut — das ist das Prädikat."
+      },
+      {
+        typ: "ja_nein",
+        frage: "Ist 'Hund' das Prädikat?",
+        satz: "Der Hund läuft schnell.",
+        tts: "Ist Hund das Prädikat? — Der Hund läuft schnell.",
+        richtig: "nein",
+        erklaerung: "Nein. Hund ist das Subjekt. Das Prädikat ist läuft."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist das Prädikat?",
+        tts: "Welches Wort ist das Prädikat? — Die Katze schläft.",
+        woerter: ["Die", "Katze", "schläft."],
+        richtig: 2,
+        erklaerung: "Schläft sagt, was die Katze tut — das ist das Prädikat."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist das Prädikat?",
+        tts: "Welches Wort ist das Prädikat? — Peter spielt Ball.",
+        woerter: ["Peter", "spielt", "Ball."],
+        richtig: 1,
+        erklaerung: "Spielt sagt, was Peter tut — das ist das Prädikat."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist das Prädikat?",
+        satz: "Die Sonne scheint hell.",
+        tts: "Was ist das Prädikat? — Die Sonne scheint hell.",
+        option_a: "scheint",
+        option_b: "Die Sonne",
+        richtig: "a",
+        erklaerung: "Scheint sagt, was die Sonne tut — das ist das Prädikat."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist das Prädikat?",
+        tts: "Welches Wort ist das Prädikat? — Anna singt ein Lied.",
+        woerter: ["Anna", "singt", "Lied."],
+        richtig: 1,
+        erklaerung: "Singt ist das Prädikat — es sagt, was Anna tut."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'Vogel' das Prädikat im Satz?",
+        satz: "Der Vogel fliegt hoch.",
+        tts: "Ist Vogel das Prädikat? — Der Vogel fliegt hoch.",
+        richtig: "falsch",
+        erklaerung: "Nein. Vogel ist das Subjekt. Das Prädikat ist fliegt."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist das Prädikat?",
+        satz: "Das Kind lacht laut.",
+        tts: "Was ist das Prädikat? — Das Kind lacht laut.",
+        option_a: "Das Kind",
+        option_b: "lacht",
+        richtig: "b",
+        erklaerung: "Lacht sagt, was das Kind tut — das ist das Prädikat."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist das Prädikat?",
+        tts: "Welches Wort ist das Prädikat? — Der Ball rollt.",
+        woerter: ["Der", "Ball", "rollt."],
+        richtig: 2,
+        erklaerung: "Rollt ist das Prädikat."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welches Wort ist das Prädikat?",
+        satz: "Die Mutter kocht Suppe.",
+        tts: "Welches Wort ist das Prädikat? — Die Mutter kocht Suppe.",
+        option_a: "Die Mutter",
+        option_b: "kocht",
+        option_c: "Suppe",
+        richtig: "b",
+        erklaerung: "Kocht sagt, was die Mutter tut — das ist das Prädikat."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-17 — Subjekt und Prädikat gemeinsam finden
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-17",
+    titel: "Subjekt und Prädikat",
+    emoji: "🔎",
+    stufe: 3,
+    erklaerung_tts: "Jetzt üben wir Subjekt und Prädikat zusammen! Das Subjekt fragt: Wer oder was? Das Prädikat fragt: Was passiert? Beide zusammen bilden den Kern des Satzes.",
+    erklaerung_merksatz: "Subjekt + Prädikat = Kern des Satzes",
+    aufgaben: [
+      {
+        typ: "ab_wahl",
+        frage: "Was ist das Subjekt?",
+        satz: "Der Fisch schwimmt im Teich.",
+        tts: "Was ist das Subjekt? — Der Fisch schwimmt im Teich.",
+        option_a: "Der Fisch",
+        option_b: "schwimmt",
+        richtig: "a",
+        erklaerung: "Der Fisch schwimmt — Fisch ist das Subjekt."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist das Prädikat?",
+        satz: "Der Fisch schwimmt im Teich.",
+        tts: "Was ist das Prädikat? — Der Fisch schwimmt im Teich.",
+        option_a: "Der Fisch",
+        option_b: "schwimmt",
+        richtig: "b",
+        erklaerung: "Schwimmt sagt, was der Fisch tut — das ist das Prädikat."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist das Subjekt?",
+        satz: "Die Lehrerin erklärt die Aufgabe.",
+        tts: "Was ist das Subjekt? — Die Lehrerin erklärt die Aufgabe.",
+        option_a: "erklärt",
+        option_b: "Die Lehrerin",
+        richtig: "b",
+        erklaerung: "Die Lehrerin erklärt — Lehrerin ist das Subjekt."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist das Prädikat?",
+        satz: "Die Lehrerin erklärt die Aufgabe.",
+        tts: "Was ist das Prädikat? — Die Lehrerin erklärt die Aufgabe.",
+        option_a: "erklärt",
+        option_b: "Die Aufgabe",
+        richtig: "a",
+        erklaerung: "Erklärt sagt, was die Lehrerin tut — das ist das Prädikat."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist das Subjekt 'spielt' und das Prädikat 'der Junge'?",
+        satz: "Der Junge spielt Fußball.",
+        tts: "Ist das Subjekt spielt und das Prädikat der Junge? — Der Junge spielt Fußball.",
+        richtig: "falsch",
+        erklaerung: "Nein! Der Junge ist das Subjekt, spielt ist das Prädikat."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'Die Blume' das Subjekt und 'wächst' das Prädikat?",
+        satz: "Die Blume wächst schnell.",
+        tts: "Ist die Blume das Subjekt und wächst das Prädikat? — Die Blume wächst schnell.",
+        richtig: "richtig",
+        erklaerung: "Ja! Die Blume ist das Subjekt, wächst ist das Prädikat."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist das Prädikat?",
+        tts: "Welches Wort ist das Prädikat? — Das Baby weint.",
+        woerter: ["Das", "Baby", "weint."],
+        richtig: 2,
+        erklaerung: "Weint ist das Prädikat — es sagt, was das Baby tut."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist das Subjekt?",
+        tts: "Welches Wort ist das Subjekt? — Der Zug fährt schnell.",
+        woerter: ["Zug", "fährt", "schnell."],
+        richtig: 0,
+        erklaerung: "Zug ist das Subjekt — er ist es, der fährt."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was ist das Subjekt?",
+        satz: "Das Pferd galoppiert über die Wiese.",
+        tts: "Was ist das Subjekt? — Das Pferd galoppiert über die Wiese.",
+        option_a: "galoppiert",
+        option_b: "die Wiese",
+        option_c: "Das Pferd",
+        richtig: "c",
+        erklaerung: "Das Pferd galoppiert — Pferd ist das Subjekt."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was ist das Prädikat?",
+        satz: "Das Pferd galoppiert über die Wiese.",
+        tts: "Was ist das Prädikat? — Das Pferd galoppiert über die Wiese.",
+        option_a: "galoppiert",
+        option_b: "die Wiese",
+        option_c: "Das Pferd",
+        richtig: "a",
+        erklaerung: "Galoppiert sagt, was das Pferd tut — das ist das Prädikat."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-18 — Was ist das Objekt?
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-18",
+    titel: "Was ist das Objekt?",
+    emoji: "🎯",
+    stufe: 3,
+    erklaerung_tts: "Viele Sätze haben noch ein drittes Wort: das Objekt. Das Objekt sagt, wen oder was die Aktion betrifft. Frage: Wen oder was? Die Antwort ist das Objekt.",
+    erklaerung_merksatz: "Objekt = Wen oder was betrifft die Aktion?",
+    aufgaben: [
+      {
+        typ: "ja_nein",
+        frage: "Ist 'den Ball' das Objekt?",
+        satz: "Peter wirft den Ball.",
+        tts: "Ist den Ball das Objekt? — Peter wirft den Ball.",
+        richtig: "ja",
+        erklaerung: "Ja! Peter wirft den Ball — den Ball ist das Objekt."
+      },
+      {
+        typ: "ja_nein",
+        frage: "Ist 'Peter' das Objekt?",
+        satz: "Peter wirft den Ball.",
+        tts: "Ist Peter das Objekt? — Peter wirft den Ball.",
+        richtig: "nein",
+        erklaerung: "Nein. Peter ist das Subjekt — er tut etwas."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist das Objekt?",
+        satz: "Anna liest ein Buch.",
+        tts: "Was ist das Objekt? — Anna liest ein Buch.",
+        option_a: "Anna",
+        option_b: "ein Buch",
+        richtig: "b",
+        erklaerung: "Ein Buch ist das Objekt — Anna liest es."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist das Objekt?",
+        satz: "Der Hund frisst die Wurst.",
+        tts: "Was ist das Objekt? — Der Hund frisst die Wurst.",
+        option_a: "Der Hund",
+        option_b: "die Wurst",
+        richtig: "b",
+        erklaerung: "Die Wurst ist das Objekt — der Hund frisst sie."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist das Objekt? (Wen oder was?)",
+        tts: "Welches Wort ist das Objekt? — Die Mutter kauft Brot.",
+        woerter: ["Mutter", "kauft", "Brot."],
+        richtig: 2,
+        erklaerung: "Brot ist das Objekt — die Mutter kauft es."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist das Objekt?",
+        tts: "Welches Wort ist das Objekt? — Der Vater liest die Zeitung.",
+        woerter: ["Vater", "liest", "Zeitung."],
+        richtig: 2,
+        erklaerung: "Zeitung ist das Objekt — der Vater liest sie."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'malt' das Objekt im Satz?",
+        satz: "Das Kind malt ein Bild.",
+        tts: "Ist malt das Objekt? — Das Kind malt ein Bild.",
+        richtig: "falsch",
+        erklaerung: "Nein. Malt ist das Prädikat. Das Objekt ist ein Bild."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was ist das Objekt?",
+        satz: "Lisa füttert den Hund.",
+        tts: "Was ist das Objekt? — Lisa füttert den Hund.",
+        option_a: "Lisa",
+        option_b: "füttert",
+        option_c: "den Hund",
+        richtig: "c",
+        erklaerung: "Den Hund ist das Objekt — Lisa füttert ihn."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was ist das Objekt?",
+        satz: "Der Koch kocht die Suppe.",
+        tts: "Was ist das Objekt? — Der Koch kocht die Suppe.",
+        option_a: "Der Koch",
+        option_b: "kocht",
+        option_c: "die Suppe",
+        richtig: "c",
+        erklaerung: "Die Suppe ist das Objekt — der Koch kocht sie."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Hat dieser Satz ein Objekt?",
+        satz: "Der Vogel singt.",
+        tts: "Hat dieser Satz ein Objekt? — Der Vogel singt.",
+        richtig: "falsch",
+        erklaerung: "Nein. Der Vogel singt — aber es gibt kein Objekt. Nur Subjekt und Prädikat."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-19 — Subjekt, Prädikat, Objekt erkennen
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-19",
+    titel: "Subjekt, Prädikat, Objekt",
+    emoji: "🧩",
+    stufe: 3,
+    erklaerung_tts: "Jetzt üben wir alle drei zusammen! Subjekt — wer oder was? Prädikat — was passiert? Objekt — wen oder was betrifft es? Ich zeige dir Sätze und du erkennst die Teile.",
+    erklaerung_merksatz: "Subjekt → Prädikat → Objekt — das sind die Teile des Satzes!",
+    aufgaben: [
+      {
+        typ: "abc_wahl",
+        frage: "Was ist das Subjekt?",
+        satz: "Der Junge isst den Apfel.",
+        tts: "Was ist das Subjekt? — Der Junge isst den Apfel.",
+        option_a: "Der Junge",
+        option_b: "isst",
+        option_c: "den Apfel",
+        richtig: "a",
+        erklaerung: "Der Junge isst — Junge ist das Subjekt."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was ist das Prädikat?",
+        satz: "Der Junge isst den Apfel.",
+        tts: "Was ist das Prädikat? — Der Junge isst den Apfel.",
+        option_a: "Der Junge",
+        option_b: "isst",
+        option_c: "den Apfel",
+        richtig: "b",
+        erklaerung: "Isst sagt, was der Junge tut — das ist das Prädikat."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was ist das Objekt?",
+        satz: "Der Junge isst den Apfel.",
+        tts: "Was ist das Objekt? — Der Junge isst den Apfel.",
+        option_a: "Der Junge",
+        option_b: "isst",
+        option_c: "den Apfel",
+        richtig: "c",
+        erklaerung: "Den Apfel ist das Objekt — der Junge isst ihn."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'die Katze' das Subjekt?",
+        satz: "Die Katze jagt die Maus.",
+        tts: "Ist die Katze das Subjekt? — Die Katze jagt die Maus.",
+        richtig: "richtig",
+        erklaerung: "Ja! Die Katze jagt — Katze ist das Subjekt."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'die Maus' das Prädikat?",
+        satz: "Die Katze jagt die Maus.",
+        tts: "Ist die Maus das Prädikat? — Die Katze jagt die Maus.",
+        richtig: "falsch",
+        erklaerung: "Nein. Die Maus ist das Objekt. Das Prädikat ist jagt."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was ist das Objekt?",
+        satz: "Der Schüler schreibt einen Brief.",
+        tts: "Was ist das Objekt? — Der Schüler schreibt einen Brief.",
+        option_a: "Der Schüler",
+        option_b: "schreibt",
+        option_c: "einen Brief",
+        richtig: "c",
+        erklaerung: "Einen Brief ist das Objekt — der Schüler schreibt ihn."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist das Subjekt?",
+        satz: "Das Mädchen singt ein Lied.",
+        tts: "Was ist das Subjekt? — Das Mädchen singt ein Lied.",
+        option_a: "Das Mädchen",
+        option_b: "ein Lied",
+        richtig: "a",
+        erklaerung: "Das Mädchen singt — Mädchen ist das Subjekt."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist das Objekt?",
+        satz: "Das Mädchen singt ein Lied.",
+        tts: "Was ist das Objekt? — Das Mädchen singt ein Lied.",
+        option_a: "Das Mädchen",
+        option_b: "ein Lied",
+        richtig: "b",
+        erklaerung: "Ein Lied ist das Objekt — das Mädchen singt es."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Hat dieser Satz: Subjekt = Der Arzt, Prädikat = heilt, Objekt = den Patienten?",
+        satz: "Der Arzt heilt den Patienten.",
+        tts: "Stimmt: Subjekt gleich Der Arzt, Prädikat gleich heilt, Objekt gleich den Patienten? — Der Arzt heilt den Patienten.",
+        richtig: "richtig",
+        erklaerung: "Genau! Der Arzt ist Subjekt, heilt ist Prädikat, den Patienten ist Objekt."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was fehlt im Satz? Subjekt, Prädikat oder Objekt?",
+        satz: "___ trinkt Wasser.",
+        tts: "Was fehlt im Satz? — Leerstelle trinkt Wasser.",
+        option_a: "Das Objekt",
+        option_b: "Das Prädikat",
+        option_c: "Das Subjekt",
+        richtig: "c",
+        erklaerung: "Das Subjekt fehlt — wer trinkt das Wasser? Das wissen wir nicht."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-20 — Satz selbst bauen (Wiederholung Stufe 3)
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-20",
+    titel: "Sätze bauen — Wiederholung",
+    emoji: "🏗️",
+    stufe: 3,
+    erklaerung_tts: "Jetzt wiederholen wir alles aus Stufe 3! Subjekt, Prädikat und Objekt. Du hast das super gelernt. Ich stelle dir gemischte Fragen — du weißt die Antworten!",
+    erklaerung_merksatz: "Subjekt + Prädikat + Objekt = ein vollständiger Satz!",
+    aufgaben: [
+      {
+        typ: "ab_wahl",
+        frage: "Was ist das Subjekt?",
+        satz: "Der Hund frisst den Knochen.",
+        tts: "Was ist das Subjekt? — Der Hund frisst den Knochen.",
+        option_a: "Der Hund",
+        option_b: "den Knochen",
+        richtig: "a",
+        erklaerung: "Der Hund frisst — Hund ist das Subjekt."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist das Prädikat?",
+        satz: "Der Hund frisst den Knochen.",
+        tts: "Was ist das Prädikat? — Der Hund frisst den Knochen.",
+        option_a: "den Knochen",
+        option_b: "frisst",
+        richtig: "b",
+        erklaerung: "Frisst sagt, was der Hund tut — das ist das Prädikat."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist das Subjekt?",
+        tts: "Welches Wort ist das Subjekt? — Maria kauft ein Eis.",
+        woerter: ["Maria", "kauft", "Eis."],
+        richtig: 0,
+        erklaerung: "Maria kauft — Maria ist das Subjekt."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist das Prädikat?",
+        tts: "Welches Wort ist das Prädikat? — Maria kauft ein Eis.",
+        woerter: ["Maria", "kauft", "Eis."],
+        richtig: 1,
+        erklaerung: "Kauft sagt, was Maria tut — das ist das Prädikat."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist das Objekt?",
+        tts: "Welches Wort ist das Objekt? — Maria kauft ein Eis.",
+        woerter: ["Maria", "kauft", "Eis."],
+        richtig: 2,
+        erklaerung: "Eis ist das Objekt — Maria kauft es."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist die Reihenfolge: Subjekt — Prädikat — Objekt?",
+        satz: "Das Kind malt ein Bild.",
+        tts: "Stimmt die Reihenfolge: Subjekt, Prädikat, Objekt? — Das Kind malt ein Bild.",
+        richtig: "richtig",
+        erklaerung: "Ja! Das Kind (Subjekt) malt (Prädikat) ein Bild (Objekt). Perfekt!"
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was ist das Subjekt?",
+        satz: "Der Vater baut ein Haus.",
+        tts: "Was ist das Subjekt? — Der Vater baut ein Haus.",
+        option_a: "ein Haus",
+        option_b: "baut",
+        option_c: "Der Vater",
+        richtig: "c",
+        erklaerung: "Der Vater baut — Vater ist das Subjekt."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was ist das Objekt?",
+        satz: "Der Vater baut ein Haus.",
+        tts: "Was ist das Objekt? — Der Vater baut ein Haus.",
+        option_a: "ein Haus",
+        option_b: "baut",
+        option_c: "Der Vater",
+        richtig: "a",
+        erklaerung: "Ein Haus ist das Objekt — der Vater baut es."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'trinkt' das Prädikat?",
+        satz: "Der Bär trinkt Wasser.",
+        tts: "Ist trinkt das Prädikat? — Der Bär trinkt Wasser.",
+        richtig: "richtig",
+        erklaerung: "Ja! Trinkt sagt, was der Bär tut — das ist das Prädikat."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welcher Satzteil fehlt hier?",
+        satz: "Die Katze ___ die Maus.",
+        tts: "Welcher Satzteil fehlt? — Die Katze, Leerstelle, die Maus.",
+        option_a: "das Subjekt",
+        option_b: "das Prädikat",
+        option_c: "das Objekt",
+        richtig: "b",
+        erklaerung: "Das Prädikat fehlt — was macht die Katze mit der Maus? Das Verb fehlt!"
+      }
+    ]
   }
 
 ];
