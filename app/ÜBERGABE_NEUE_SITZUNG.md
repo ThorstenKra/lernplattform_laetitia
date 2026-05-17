@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 14. Mai 2026*
+*Stand: 17. Mai 2026*
 
 ---
 
@@ -17,7 +17,7 @@ Claude beschränkt sich auf entscheidungsrelevante Ausgaben. Einzelschritte, Üb
 
 ---
 
-## 16 Goldstandard-Regeln
+## 17 Goldstandard-Regeln
 
 1. `dwell.js` immer `<script src="...">`, nie `import()`
 2. `localStorage["laetitia_input_mode"] = "tobii"` als Standard
@@ -30,11 +30,12 @@ Claude beschränkt sich auf entscheidungsrelevante Ausgaben. Einzelschritte, Üb
 9. Feedback mit `LOB_TEXTE` + `zufallsLob()`, TTS wartet auf `onend`
 10. `error_handler.js` in jede Spielseite einbinden
 11. **Stimme:** Microsoft Katja Online (Natural) — vollständiger Selektor in PROJEKT_WISSEN.md
-12. Jede HTML-Datei: `<!-- depth:N — Pfade: ../×N zu app/ -->` direkt nach `<!doctype html>` (depth 0 = in app/, 1 = modules/X/, 2 = modules/X/Y/, 3 = modules/X/Y/Z/)
-13. Inline-`<script>` max. 20 Zeilen — nur Init/Config/dwell-Aufruf/localStorage-Einzeiler. Alle Logik gehört in externe `.js`-Dateien.
-14. Mediendateien per `*_media_config.js` parametrisiert — nie löschen, nur `"id": false`. Neue Datei: Ordner + info.js + `<script>`-Tag + Eintrag in Config.
-15. `stats.js` in jede Spielseite einbinden, die Antworten erfasst. Pflicht: `sessionStart()` beim Laden, `taskStart()` vor Aufgabe, `taskAnswer()` nach Antwort, `sessionEnd()` beim Verlassen.
-16. Vor jedem `git push`: `validate.ps1` ausführen — alle 7 Prüfungen müssen grün sein.
+12. Jede HTML-Datei: `<!-- depth:N — Pfade: ../×N zu app/ -->` direkt nach `<!doctype html>`
+13. Inline-`<script>` max. 20 Zeilen — Logik in externe `.js`-Dateien
+14. Mediendateien per `*_media_config.js` parametrisiert — nie löschen, nur `"id": false`
+15. `stats.js` in jede Spielseite einbinden (sessionStart/taskStart/taskAnswer/sessionEnd)
+16. Vor jedem `git push`: `validate.ps1` ausführen — alle 8 Prüfungen müssen grün sein
+17. **Lesebereich von Aktionsbereich trennen:** Text/Frage oben passiv (`pointer-events:none`), Trennstreifen mit Label, Antwort-Buttons unten dwell-aktiv. Buttons nach Antwort vollständig ausblenden (`display:none`). Vollständiges Muster in PROJEKT_WISSEN.md.
 
 ---
 
@@ -44,13 +45,15 @@ Claude beschränkt sich auf entscheidungsrelevante Ausgaben. Einzelschritte, Üb
 
 **Aufgaben-Reihenfolge:** Chronologisch, kein Mischen. Antwort-Optionen (A/B/C) werden zufällig gemischt.
 
-**Überspringen-Button:** Orange, gleiche Größe wie andere Nav-Buttons, in Nav-Leiste unten. Variablen-Namen müssen zum Modul passen.
+**Überspringen-Button:** Orange, gleiche Größe wie andere Nav-Buttons, in Nav-Leiste unten.
 
 **Antwort-Layout:** Text links, Bestätigen-Button (✓) rechts als `.antwortZeile`.
 
-**Nav-Leiste (alle Module):** `← Zurück | ✅ Weiter | → Überspringen` — immer nebeneinander in einer Zeile (`flex-direction:row`), nie gestapelt. Container: `.nav-leiste-unten#navLeiste`. CSS-Goldstandard in PROJEKT_WISSEN.md.
+**Nav-Leiste (alle Module):** `← Zurück | ✅ Weiter | → Überspringen` — immer nebeneinander in einer Zeile (`flex-direction:row`). Container: `.nav-leiste-unten#navLeiste`.
 
 **Lautstärke:** Zentral über `geraete.js` (`LaetitiaGeraete.initLautstaerke()`). Zwei Profile: JBL und intern.
+
+**Grammatik-Werkstatt Auto-Weiter:** Nach TTS-Ende 3 Sekunden warten, dann automatisch zur nächsten Aufgabe. Weiter-Button für sofortiges Vorwärts. Antwort-Buttons nach Klick sofort `display:none`.
 
 ---
 
@@ -71,66 +74,78 @@ Claude beschränkt sich auf entscheidungsrelevante Ausgaben. Einzelschritte, Üb
 | `schule_liesmal3_data.js` | ✅ vollständig |
 | `test_suite.html` | ✅ JS-Checks laufen, HTML-Checks brauchen Edge-Flag |
 
-## Grammatik-Werkstatt — NEU (Sitzung 2026-05-14)
+## Grammatik-Werkstatt — Stand 17. Mai 2026
 
 Erreichbar: `schule.html` → Grammatik-Button → `grammatik.html`
 
-| Datei | Inhalt |
-|---|---|
-| `grammatik.html` | Einheiten-Übersicht, Fortschrittsanzeige, Freischalt-Logik |
-| `grammatik_spiel.html` | Spielseite (URL-param `?einheit=E-00`) |
-| `grammatik_data.js` | 15 Einheiten, 148 Aufgaben |
-| `grammatik_mod.js` | Engine: `window.GrammatikMod.starteEinheit(id)` |
-| `grammatik_uebersicht.js` | `window.GrammatikUebersicht.baueUebersicht()` |
+| Datei | Inhalt | Version |
+|---|---|---|
+| `grammatik.html` | Einheiten-Übersicht, Fortschrittsanzeige, Freischalt-Logik | ✅ |
+| `grammatik_spiel.html` | Spielseite (URL-param `?einheit=E-00`) — Lese/Aktions-Layout | v2 ✅ |
+| `grammatik_data.js` | 27 Einheiten, 268 Aufgaben | ✅ |
+| `grammatik_mod.js` | Engine: `window.GrammatikMod.starteEinheit(id)` — Auto-Weiter | v3 ✅ |
+| `grammatik_uebersicht.js` | `window.GrammatikUebersicht.baueUebersicht()` | ✅ |
 
 **Lernpfad-Stand:**
 
-| Stufe | Einheiten | Thema | Status |
-|---|---|---|---|
-| 0 | E-00–E-02 | Satz und Wort | ✅ 30 Aufgaben |
-| 1 | E-03–E-09 | Nomen, Verben, Adjektive | ✅ 70 Aufgaben |
-| 2 | E-10–E-14 | Artikel der/die/das | ✅ 50 Aufgaben |
-| 3 | E-15–E-20 | Sätze bauen (Subjekt/Prädikat/Objekt) | ⬜ noch nicht implementiert |
-| 4 | E-21–E-26 | Konjugation Gegenwart | ⬜ noch nicht implementiert |
-| 5+ | E-27–E-61 | Plural, Groß-/Kleinschreibung, Kasus … | ⬜ noch nicht implementiert |
+| Stufe | Einheiten | Thema | Aufgaben | Status |
+|---|---|---|---|---|
+| 0 | E-00–E-02 | Satz und Wort | 28 | ✅ |
+| 1 | E-03–E-09 | Nomen, Verben, Adjektive | 70 | ✅ |
+| 2 | E-10–E-14 | Artikel der/die/das | 50 | ✅ |
+| 3 | E-15–E-20 | Sätze bauen (Subjekt/Prädikat/Objekt) | 60 | ✅ NEU |
+| 4 | E-21–E-26 | Konjugation Gegenwart | 60 | ✅ NEU |
+| 5 | E-27–E-30 | Singular & Plural | — | ⬜ nächster Block |
+| 6 | E-31–E-34 | Groß-/Kleinschreibung | — | ⬜ |
+| 7–13 | E-35–E-61 | Kasus, Pronomen, Satzzeichen … | — | ⬜ |
 
-**5 dwell-optimierte Aufgabentypen:** `ja_nein` · `ab_wahl` · `abc_wahl` · `wort_button` · `richtig_falsch`
-**Freischalt-Logik:** Vorgänger-Einheit abgeschlossen → nächste frei. ≥80% → Gold-Stern.
-**Storage:** `localStorage["laetitia_grammatik_v1"]`
+**Neue Features der Grammatik-Werkstatt (seit 17.05.):**
+- Lesebereich (grau, `pointer-events:none`) oben — Frage + Satz sind PASSIV
+- Trennstreifen „👆 Deine Antwort" als sichtbare Grenze
+- Aktionsbereich (weiß, dwell-aktiv) unten — nur Buttons
+- Nach Antwort: Buttons vollständig ausgeblendet (`display:none`)
+- 3 Sekunden nach TTS-Ende: Auto-Weiter zur nächsten Aufgabe
+- Weiter-Button bleibt für sofortiges Vorwärts
+- E-15: 7 Aufgaben mit 5–7-Wort-Sätzen (Adjektivattribute als Ablenkung)
 
 ## Zentrale Dateien (app/core/)
 
-| Datei | Status |
-|---|---|
-| `geraete.js` | ✅ Lautstärke + Bluetooth-Umschaltung |
-| `dwell.js` | ✅ v10 |
-| `error_handler.js` | ✅ v2 |
-| `schulprofil.js` | ✅ |
-| `stats.js` | ✅ window.LaetitiaStats, localStorage["laetitia_stats_v1"], 200 Sessions |
+| Datei | Status | Version |
+|---|---|---|
+| `geraete.js` | ✅ Lautstärke + Bluetooth-Umschaltung | — |
+| `dwell.js` | ✅ | v10 |
+| `error_handler.js` | ✅ Link-Navigator-Guard + Not-Overlay | v3 NEU |
+| `schulprofil.js` | ✅ | — |
+| `stats.js` | ✅ window.LaetitiaStats, localStorage["laetitia_stats_v1"] | — |
+
+**error_handler.js v3 — Features:**
+1. Globale JS-Fehler (`window.onerror` + `unhandledrejection`)
+2. TTS-Watchdog (12s Timeout → `LaetitiaSprich.wrap`)
+3. Page-Alive-Monitor (60s DOM/localStorage-Check)
+4. localStorage-Schutzfunktionen
+5. Fehler-Log (letzte 10)
+6. Diagnose-Panel (via `localStorage["laetitia_diag_mode"]="1"`)
+7. Not-Overlay mit `← Zurück zur Startseite` + Dwell + TTS
+8. **NEU: Link-Navigator-Guard** — XHR-Check vor Navigation; bei fehlender Datei Overlay statt Browser-404
 
 ## Werkzeuge (Projektwurzel)
 
 | Datei | Zweck |
 |---|---|
-| `validate.ps1` | 7 Konsistenzprüfungen: Script-Pfade, import()-Verbot, depth-Kommentar, stats.js-Referenzen, media_config-IDs. Ausführen: `powershell.exe -ExecutionPolicy Bypass -File .\validate.ps1` |
-| `app/pruefung.html` | Browser-Runtime-Check: LaetitiaAttachDwell, TTS-Stimme, localStorage, alle Core-APIs. Im Edge öffnen nach Deployment. |
+| `validate.ps1` | **8 Prüfungen** (NEU: Prüfung 8 — alle href-Links auf vorhandene Zieldateien). Ausführen: `powershell.exe -ExecutionPolicy Bypass -File .\validate.ps1` |
+| `app/pruefung.html` | Browser-Runtime-Check: LaetitiaAttachDwell, TTS-Stimme, localStorage. Im Edge öffnen nach Deployment. |
 
 ## Hörbuch-Modul (app/modules/hoerbuch/)
 
-| Datei | Status |
-|---|---|
-| `hoerbuch.html` | ✅ geraete.js eingebunden |
-| `hoerbuch_mod.js` | ✅ auf geraete.js migriert |
-| `musik.html` | ✅ geraete.js eingebunden |
-| `musik_mod.js` | ✅ auf geraete.js migriert |
-| `hoerbuch_glaube.html` | ✅ geraete.js eingebunden |
-| `hoerbuch_glaube_mod.js` | ✅ auf geraete.js migriert |
-
-**Eingetragene Bücher:** Das Fliegende Kamel (60 Tracks), Jaguar und NEINguar (54 Tracks), Schwänke vom Hodscha Nasredin (12 Tracks)
+Alle Dateien: ✅ auf geraete.js migriert.
+Eingetragene Bücher: Das Fliegende Kamel (60 Tracks), Jaguar und NEINguar (54 Tracks), Schwänke vom Hodscha Nasredin (12 Tracks)
 
 ---
 
 ## 🔴 Offene Aufgaben — Hochpriorität
+
+**Grammatik-Werkstatt: Stufe 5 implementieren (E-27–E-30)**
+Nächster Block: Singular & Plural. Konzept: Hund/Hunde, Katze/Katzen, Kind/Kinder — Erkennungsregeln + Übungen.
 
 **Bluetooth-Umschaltung:**
 Einziger offener Schritt — als Administrator ausführen:
@@ -138,10 +153,6 @@ Einziger offener Schritt — als Administrator ausführen:
 Install-Module -Name AudioDeviceCmdlets -Force -Scope CurrentUser
 ```
 Dann `lernwelt_starten.exe` neu starten → Audio-Dialog testen.
-
-**Grammatik-Werkstatt: Stufe 3 implementieren (E-15–E-20)**
-Nächster Block: Sätze bauen — Subjekt, Prädikat, Objekt, Satz-Reihenfolge.
-Konzept vollständig in PROJEKT_WISSEN.md dokumentiert.
 
 **Lies-mal-3 Bilder:**
 - `taucher_lies`: Schätzwerte in BILD_CROP → exakt neu croppen
@@ -156,6 +167,7 @@ Konzept vollständig in PROJEKT_WISSEN.md dokumentiert.
 - Mathe-Hefte digitalisieren (PDFs vorhanden) → `schule_mathe_data.js`
 - Sachkunde-Bilder für 7 fehlende Themen ergänzen
 - `stats.js` in weitere Spielseiten einbinden (Regel 15 vollständig umsetzen)
+- Grammatik Stufe 6 (E-31–E-34): Groß-/Kleinschreibung
 
 ---
 
@@ -170,7 +182,7 @@ TAGESPLAN · QUASSEL-ÜBERGANG · SONOS · AUFMERKSAMKEITS-SIGNAL (Fritz!Box)
 Erste Nachricht an Claude:
 > **"Lies ÜBERGABE_NEUE_SITZUNG.md und PROJEKT_WISSEN.md und fasse den Stand zusammen."**
 
-Claude liest beide Dateien, bestätigt die 16 Goldstandard-Regeln und nennt offene Aufgaben.
+Claude liest beide Dateien, bestätigt die 17 Goldstandard-Regeln und nennt offene Aufgaben.
 
 **Wichtig:** Claude arbeitet nie aus dem Gedächtnis an Kerndateien. Immer erst hochladen.
 
@@ -192,7 +204,24 @@ git push
 Der OneDrive-Ordner ist KEIN Git-Repo. Geänderte Dateien müssen nach jedem Push manuell kopiert werden:
 ```powershell
 cp app/modules/schule/grammatik*.* "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/modules/schule/"
+cp app/core/error_handler.js      "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/core/"
 ```
 Dann Edge komplett neu starten.
 
 **Hinweis:** `.exe`, `.bat`, Mediendateien (MP3, JPG, PNG, …) stehen in `.gitignore` und bleiben lokal.
+
+---
+
+## Sitzungsprotokoll 17. Mai 2026
+
+| Was | Ergebnis |
+|---|---|
+| error_handler.js v3: Link-Navigator-Guard | ✅ XHR-Check vor Navigation, kein Browser-404 mehr |
+| validate.ps1 Prüfung 8: href-Links | ✅ Sofort echten Bug gefunden (sinnesorgane_quiz.html) |
+| sinnesorgane_quiz.html href-Pfad | ✅ `../sinnesorgane.html` → `sinnesorgane.html` |
+| grammatik_spiel.html Redesign | ✅ Lese/Aktions-Trennung, größere Schrift 24/26px |
+| grammatik_mod.js v3 | ✅ Buttons ausblenden + Auto-Weiter 3s |
+| Grammatik Stufe 3 (E-15–E-20) | ✅ 60 Aufgaben: Subjekt, Prädikat, Objekt |
+| Grammatik Stufe 4 (E-21–E-26) | ✅ 60 Aufgaben: Konjugation Gegenwart |
+| E-15 schwieriger | ✅ 7 Aufgaben mit 5–7-Wort-Sätzen |
+| index.html Begrüßung | ✅ "Lätitia" (Umlaut), Katja-Goldstandard-Stimme |
