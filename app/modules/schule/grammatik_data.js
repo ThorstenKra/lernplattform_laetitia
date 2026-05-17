@@ -2768,6 +2768,425 @@ var GRAMMATIK_EINHEITEN = [
         erklaerung: "Ja! Du bist ist richtig. Die du-Form von sein ist bist."
       }
     ]
+  },
+
+  // ── Stufe 5: Singular & Plural ────────────────────────────────────────────
+
+  {
+    id: "E-27", titel: "Einzahl und Mehrzahl", emoji: "1️⃣",
+    stufe: 5,
+    erklaerung_tts: "Heute lernen wir Einzahl und Mehrzahl. Ein Hund — das ist Einzahl. Zwei Hunde — das ist Mehrzahl.",
+    erklaerung_merksatz: "Einzahl = ein Ding. Mehrzahl = mehrere Dinge.",
+    aufgaben: [
+      {
+        typ: "ab_wahl",
+        frage: "Einzahl oder Mehrzahl?",
+        satz: "der Hund",
+        tts: "Einzahl oder Mehrzahl? — der Hund",
+        option_a: "Einzahl",
+        option_b: "Mehrzahl",
+        richtig: "a",
+        erklaerung: "Der Hund — das ist Einzahl. Es ist nur ein Hund."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Einzahl oder Mehrzahl?",
+        satz: "die Hunde",
+        tts: "Einzahl oder Mehrzahl? — die Hunde",
+        option_a: "Einzahl",
+        option_b: "Mehrzahl",
+        richtig: "b",
+        erklaerung: "Die Hunde — das ist Mehrzahl. Es sind mehrere Hunde."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Einzahl oder Mehrzahl?",
+        satz: "das Kind",
+        tts: "Einzahl oder Mehrzahl? — das Kind",
+        option_a: "Einzahl",
+        option_b: "Mehrzahl",
+        richtig: "a",
+        erklaerung: "Das Kind — das ist Einzahl. Es ist nur ein Kind."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Einzahl oder Mehrzahl?",
+        satz: "die Kinder",
+        tts: "Einzahl oder Mehrzahl? — die Kinder",
+        option_a: "Einzahl",
+        option_b: "Mehrzahl",
+        richtig: "b",
+        erklaerung: "Die Kinder — das ist Mehrzahl. Es sind mehrere Kinder."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt das?",
+        satz: "\"die Katze\" ist Mehrzahl.",
+        tts: "Stimmt das? — die Katze ist Mehrzahl.",
+        richtig: "falsch",
+        erklaerung: "Nein. Die Katze ist Einzahl. Die Mehrzahl wäre: die Katzen."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt das?",
+        satz: "\"die Bücher\" ist Mehrzahl.",
+        tts: "Stimmt das? — die Bücher ist Mehrzahl.",
+        richtig: "richtig",
+        erklaerung: "Ja! Die Bücher ist Mehrzahl. Einzahl wäre: das Buch."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Einzahl oder Mehrzahl?",
+        satz: "die Autos",
+        tts: "Einzahl oder Mehrzahl? — die Autos",
+        option_a: "Einzahl",
+        option_b: "Mehrzahl",
+        richtig: "b",
+        erklaerung: "Die Autos — das ist Mehrzahl. Einzahl wäre: das Auto."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Einzahl oder Mehrzahl?",
+        satz: "der Ball",
+        tts: "Einzahl oder Mehrzahl? — der Ball",
+        option_a: "Einzahl",
+        option_b: "Mehrzahl",
+        richtig: "a",
+        erklaerung: "Der Ball ist Einzahl. Die Mehrzahl wäre: die Bälle."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt das?",
+        satz: "\"die Blumen\" ist Einzahl.",
+        tts: "Stimmt das? — die Blumen ist Einzahl.",
+        richtig: "falsch",
+        erklaerung: "Nein. Die Blumen ist Mehrzahl. Einzahl wäre: die Blume."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Einzahl oder Mehrzahl?",
+        satz: "die Häuser",
+        tts: "Einzahl oder Mehrzahl? — die Häuser",
+        option_a: "Einzahl",
+        option_b: "Mehrzahl",
+        richtig: "b",
+        erklaerung: "Die Häuser ist Mehrzahl. Einzahl wäre: das Haus."
+      }
+    ]
+  },
+
+  {
+    id: "E-28", titel: "Mehrzahl bilden (1)", emoji: "🐾",
+    stufe: 5,
+    erklaerung_tts: "Wie macht man Mehrzahl? Meistens hängt man Buchstaben ans Wort. Hund wird Hunde. Katze wird Katzen. Kind wird Kinder.",
+    erklaerung_merksatz: "Hund → Hunde · Katze → Katzen · Kind → Kinder",
+    aufgaben: [
+      {
+        typ: "ab_wahl",
+        frage: "Was ist die Mehrzahl von 'Hund'?",
+        satz: "der Hund → die ___",
+        tts: "Was ist die Mehrzahl von Hund? — die Hunde oder die Hunden?",
+        option_a: "Hunde",
+        option_b: "Hunden",
+        richtig: "a",
+        erklaerung: "Die Mehrzahl von Hund ist Hunde."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist die Mehrzahl von 'Katze'?",
+        satz: "die Katze → die ___",
+        tts: "Was ist die Mehrzahl von Katze? — die Katzen oder die Katzes?",
+        option_a: "Katzen",
+        option_b: "Katzes",
+        richtig: "a",
+        erklaerung: "Die Mehrzahl von Katze ist Katzen. Wörter auf -e bekommen meistens -n."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was ist die Mehrzahl von 'Kind'?",
+        satz: "das Kind → die ___",
+        tts: "Was ist die Mehrzahl von Kind? — die Kinder, die Kinds oder die Kinde?",
+        option_a: "Kinder",
+        option_b: "Kinds",
+        option_c: "Kinde",
+        richtig: "a",
+        erklaerung: "Die Mehrzahl von Kind ist Kinder."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist die Mehrzahl von 'Baum'?",
+        satz: "der Baum → die ___",
+        tts: "Was ist die Mehrzahl von Baum? — die Bäume oder die Baumen?",
+        option_a: "Bäume",
+        option_b: "Baumen",
+        richtig: "a",
+        erklaerung: "Die Mehrzahl von Baum ist Bäume. Der Umlaut (ä) kommt dazu."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was ist die Mehrzahl von 'Buch'?",
+        satz: "das Buch → die ___",
+        tts: "Was ist die Mehrzahl von Buch? — die Bücher, die Buche oder die Buchs?",
+        option_a: "Bücher",
+        option_b: "Buche",
+        option_c: "Buchs",
+        richtig: "a",
+        erklaerung: "Die Mehrzahl von Buch ist Bücher."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist die Mehrzahl richtig?",
+        satz: "Stuhl → Stühle",
+        tts: "Ist die Mehrzahl richtig? — Stuhl wird Stühle.",
+        richtig: "richtig",
+        erklaerung: "Ja! Die Mehrzahl von Stuhl ist Stühle."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist die Mehrzahl richtig?",
+        satz: "Blume → Blumen",
+        tts: "Ist die Mehrzahl richtig? — Blume wird Blumen.",
+        richtig: "richtig",
+        erklaerung: "Ja! Die Mehrzahl von Blume ist Blumen."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist die Mehrzahl richtig?",
+        satz: "Auto → Autoen",
+        tts: "Ist die Mehrzahl richtig? — Auto wird Autoen.",
+        richtig: "falsch",
+        erklaerung: "Nein. Die Mehrzahl von Auto ist Autos, nicht Autoen."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist die Mehrzahl von 'Tisch'?",
+        satz: "der Tisch → die ___",
+        tts: "Was ist die Mehrzahl von Tisch? — die Tische oder die Tischen?",
+        option_a: "Tische",
+        option_b: "Tischen",
+        richtig: "a",
+        erklaerung: "Die Mehrzahl von Tisch ist Tische."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was ist die Mehrzahl von 'Maus'?",
+        satz: "die Maus → die ___",
+        tts: "Was ist die Mehrzahl von Maus? — die Mäuse, die Mause oder die Mäusen?",
+        option_a: "Mäuse",
+        option_b: "Mause",
+        option_c: "Mäusen",
+        richtig: "a",
+        erklaerung: "Die Mehrzahl von Maus ist Mäuse. Das au wird zu äu."
+      }
+    ]
+  },
+
+  {
+    id: "E-29", titel: "Mehrzahl bilden (2)", emoji: "🌸",
+    stufe: 5,
+    erklaerung_tts: "Wir üben weiter Mehrzahl. Manche Wörter verändern sich gar nicht. Manche bekommen einen Umlaut. Und manche Wörter enden auf s.",
+    erklaerung_merksatz: "Lehrer → Lehrer (gleich) · Ball → Bälle (Umlaut) · Auto → Autos (-s)",
+    aufgaben: [
+      {
+        typ: "ab_wahl",
+        frage: "Was ist die Mehrzahl von 'Lehrer'?",
+        satz: "der Lehrer → die ___",
+        tts: "Was ist die Mehrzahl von Lehrer? — die Lehrer oder die Lehrers?",
+        option_a: "Lehrer",
+        option_b: "Lehrers",
+        richtig: "a",
+        erklaerung: "Die Mehrzahl von Lehrer ist Lehrer. Das Wort bleibt gleich."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist die Mehrzahl von 'Fenster'?",
+        satz: "das Fenster → die ___",
+        tts: "Was ist die Mehrzahl von Fenster? — die Fenster oder die Fensters?",
+        option_a: "Fenster",
+        option_b: "Fensters",
+        richtig: "a",
+        erklaerung: "Die Mehrzahl von Fenster ist Fenster. Das Wort bleibt gleich."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was ist die Mehrzahl von 'Auto'?",
+        satz: "das Auto → die ___",
+        tts: "Was ist die Mehrzahl von Auto? — die Autos, die Auto oder die Autoen?",
+        option_a: "Autos",
+        option_b: "Auto",
+        option_c: "Autoen",
+        richtig: "a",
+        erklaerung: "Die Mehrzahl von Auto ist Autos. Fremdwörter bekommen oft -s."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist die Mehrzahl richtig?",
+        satz: "Vögel → Vogel",
+        tts: "Ist die Mehrzahl richtig? — Vögel ist die Mehrzahl von Vogel.",
+        richtig: "falsch",
+        erklaerung: "Nein. Vögel ist die Mehrzahl, nicht Vogel. Vogel ist Einzahl."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist die Mehrzahl von 'Vogel'?",
+        satz: "der Vogel → die ___",
+        tts: "Was ist die Mehrzahl von Vogel? — die Vögel oder die Vogels?",
+        option_a: "Vögel",
+        option_b: "Vogels",
+        richtig: "a",
+        erklaerung: "Die Mehrzahl von Vogel ist Vögel. Das o wird zu ö."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist die Mehrzahl richtig?",
+        satz: "Wörter → Wort",
+        tts: "Ist die Mehrzahl richtig? — Wörter ist die Mehrzahl von Wort.",
+        richtig: "falsch",
+        erklaerung: "Nein. Wort ist Einzahl, Wörter ist die Mehrzahl."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was ist die Mehrzahl von 'Haus'?",
+        satz: "das Haus → die ___",
+        tts: "Was ist die Mehrzahl von Haus? — die Häuser, die Hause oder die Hauses?",
+        option_a: "Häuser",
+        option_b: "Hause",
+        option_c: "Hauses",
+        richtig: "a",
+        erklaerung: "Die Mehrzahl von Haus ist Häuser. Das au wird zu äu."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist die Mehrzahl von 'Schule'?",
+        satz: "die Schule → die ___",
+        tts: "Was ist die Mehrzahl von Schule? — die Schulen oder die Schules?",
+        option_a: "Schulen",
+        option_b: "Schules",
+        richtig: "a",
+        erklaerung: "Die Mehrzahl von Schule ist Schulen. Wörter auf -e bekommen -n."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist die Mehrzahl richtig?",
+        satz: "Städte → Stadt",
+        tts: "Ist die Mehrzahl richtig? — Städte ist die Mehrzahl von Stadt.",
+        richtig: "falsch",
+        erklaerung: "Nein. Stadt ist Einzahl, Städte ist Mehrzahl. Hier ist es andersherum."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist die Mehrzahl von 'Hand'?",
+        satz: "die Hand → die ___",
+        tts: "Was ist die Mehrzahl von Hand? — die Hände oder die Handen?",
+        option_a: "Hände",
+        option_b: "Handen",
+        richtig: "a",
+        erklaerung: "Die Mehrzahl von Hand ist Hände. Das a wird zu ä."
+      }
+    ]
+  },
+
+  {
+    id: "E-30", titel: "Einzahl und Mehrzahl im Satz", emoji: "📖",
+    stufe: 5,
+    erklaerung_tts: "Jetzt üben wir Einzahl und Mehrzahl in ganzen Sätzen. Ist das Nomen im Satz Einzahl oder Mehrzahl?",
+    erklaerung_merksatz: "Im Satz auf Artikel achten: der/die/das = Einzahl · die (vor Mehrzahl) = Mehrzahl",
+    aufgaben: [
+      {
+        typ: "ab_wahl",
+        frage: "Einzahl oder Mehrzahl im Satz?",
+        satz: "Die Hunde bellen laut.",
+        tts: "Einzahl oder Mehrzahl im Satz? — Die Hunde bellen laut.",
+        option_a: "Einzahl",
+        option_b: "Mehrzahl",
+        richtig: "b",
+        erklaerung: "Die Hunde — das ist Mehrzahl. Es sind mehrere Hunde."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Einzahl oder Mehrzahl im Satz?",
+        satz: "Die Katze schläft auf dem Sofa.",
+        tts: "Einzahl oder Mehrzahl im Satz? — Die Katze schläft auf dem Sofa.",
+        option_a: "Einzahl",
+        option_b: "Mehrzahl",
+        richtig: "a",
+        erklaerung: "Die Katze — das ist Einzahl. Es ist eine Katze."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist der Satz richtig?",
+        satz: "Die Kinder spielen im Garten.",
+        tts: "Ist der Satz richtig? — Die Kinder spielen im Garten.",
+        richtig: "richtig",
+        erklaerung: "Ja! Kinder ist Mehrzahl, und spielen passt zur Mehrzahl."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist der Satz richtig?",
+        satz: "Das Bücher liegt auf dem Tisch.",
+        tts: "Ist der Satz richtig? — Das Bücher liegt auf dem Tisch.",
+        richtig: "falsch",
+        erklaerung: "Nein. Bücher ist Mehrzahl — richtig wäre: Die Bücher liegen auf dem Tisch."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was passt in die Lücke?",
+        satz: "Die ___ fliegen durch die Luft.",
+        tts: "Was passt in die Lücke? — Die Vogel, die Vögel oder die Vögels fliegen durch die Luft?",
+        option_a: "Vogel",
+        option_b: "Vögel",
+        option_c: "Vögels",
+        richtig: "b",
+        erklaerung: "Die Vögel fliegen. Vögel ist die Mehrzahl von Vogel."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Einzahl oder Mehrzahl im Satz?",
+        satz: "Der Baum wächst im Garten.",
+        tts: "Einzahl oder Mehrzahl im Satz? — Der Baum wächst im Garten.",
+        option_a: "Einzahl",
+        option_b: "Mehrzahl",
+        richtig: "a",
+        erklaerung: "Der Baum — Einzahl. Artikel der zeigt: es ist ein Baum."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Einzahl oder Mehrzahl im Satz?",
+        satz: "Die Bäume sind sehr groß.",
+        tts: "Einzahl oder Mehrzahl im Satz? — Die Bäume sind sehr groß.",
+        option_a: "Einzahl",
+        option_b: "Mehrzahl",
+        richtig: "b",
+        erklaerung: "Die Bäume — Mehrzahl. Es sind mehrere Bäume."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist der Satz richtig?",
+        satz: "Die Blumen blühen im Frühling.",
+        tts: "Ist der Satz richtig? — Die Blumen blühen im Frühling.",
+        richtig: "richtig",
+        erklaerung: "Ja! Blumen ist Mehrzahl, und blühen passt zur Mehrzahl."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was passt in die Lücke?",
+        satz: "Das ___ liegt auf dem Boden.",
+        tts: "Was passt in die Lücke? — Das Bücher, das Buches oder das Buch liegt auf dem Boden?",
+        option_a: "Bücher",
+        option_b: "Buches",
+        option_c: "Buch",
+        richtig: "c",
+        erklaerung: "Das Buch liegt auf dem Boden. Nach Artikel das kommt Einzahl."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist der Satz richtig?",
+        satz: "Die Kinder spielen gerne Fußball.",
+        tts: "Ist der Satz richtig? — Die Kinder spielen gerne Fußball.",
+        richtig: "richtig",
+        erklaerung: "Ja! Kinder ist Mehrzahl, spielen gerne passt perfekt."
+      }
+    ]
   }
 
 ];
