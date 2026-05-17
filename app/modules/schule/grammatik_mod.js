@@ -1,7 +1,7 @@
-// grammatik_mod.js — Spiellogik für die Grammatik-Werkstatt  v2
-// Layout-Prinzip: Lesebereich (passiv, pointer-events:none) OBEN,
-//                 Trennstreifen, Aktionsbereich (dwell-aktiv) UNTEN.
-// Typen: ja_nein | ab_wahl | abc_wahl | wort_button | richtig_falsch
+// grammatik_mod.js — Spiellogik für die Grammatik-Werkstatt  v3
+// Layout-Prinzip: Lesebereich (passiv) OBEN, Aktionsbereich (dwell) UNTEN.
+// Nach Antwort: Buttons vollständig ausgeblendet, Feedback sichtbar,
+//               nach TTS-Ende 3 s Auto-Weiter (oder sofort per Weiter-Button).
 
 (function(){
 
@@ -94,8 +94,27 @@ function bindeDwell(selector){
   });
 }
 
+// ── Auto-Weiter-Timer ────────────────────────────────────────────
+var autoTimer = null;
+
+function starteAutoWeiter(fn){
+  stoppAutoWeiter();
+  autoTimer = setTimeout(function(){ autoTimer = null; fn(); }, 3000);
+}
+
+function stoppAutoWeiter(){
+  if(autoTimer){ clearTimeout(autoTimer); autoTimer = null; }
+}
+
+// ── Buttons nach Antwort vollständig ausblenden ──────────────────
+function verbergeAntwortButtons(){
+  [".antwort-zweier", ".antwort-dreier", ".wort-reihe"].forEach(function(sel){
+    var el = document.querySelector(sel);
+    if(el) el.style.display = "none";
+  });
+}
+
 // ── HTML-Bausteine ───────────────────────────────────────────────
-// Lesebereich: kein pointer-events, kein Dwell
 function leseHtml(frage, satz){
   var satzBlock = satz
     ? "<div class=\"lese-satz\">" + esc(satz) + "</div>"
@@ -109,7 +128,6 @@ function leseHtml(frage, satz){
 }
 function leseHtmlEnde(){ return "</div>"; }
 
-// Dwell-Ring SVG
 var RING = "<svg class=\"dwell-ring-svg\" viewBox=\"0 0 70 70\"><circle cx=\"35\" cy=\"35\" r=\"30\"/></svg>";
 
 // ── Spielzustand ─────────────────────────────────────────────────
@@ -124,6 +142,7 @@ var wiederholungsQueue = [];
 window.GrammatikMod = {
 
   starteEinheit: function(einheitId){
+    stoppAutoWeiter();
     aktEinheit = null;
     for(var i = 0; i < GRAMMATIK_EINHEITEN.length; i++){
       if(GRAMMATIK_EINHEITEN[i].id === einheitId){
@@ -148,12 +167,13 @@ window.GrammatikMod = {
     zeigeErklaerung();
   },
 
-  ladeStand:         ladeStand,
+  ladeStand:          ladeStand,
   einheitFreigegeben: einheitFreigegeben
 };
 
 // ── Erklär-Screen ────────────────────────────────────────────────
 function zeigeErklaerung(){
+  stoppAutoWeiter();
   var spielfeld = document.getElementById("spielfeld");
   spielfeld.innerHTML =
     "<div class=\"erklaer-card\" id=\"erklaerCard\">" +
@@ -180,6 +200,8 @@ function zeigeErklaerung(){
 
 // ── Aufgabe anzeigen ─────────────────────────────────────────────
 function zeigeAufgabe(){
+  stoppAutoWeiter();
+
   if(aktIndex >= aufgaben.length){
     if(wiederholungsQueue.length > 0){
       aufgaben = wiederholungsQueue.slice();
@@ -206,10 +228,10 @@ function zeigeAufgabe(){
 
   var spielfeld = document.getElementById("spielfeld");
 
-  if     (aufgabe.typ === "ja_nein")      rendereJaNein(spielfeld, aufgabe);
-  else if(aufgabe.typ === "ab_wahl")      rendereAbWahl(spielfeld, aufgabe);
-  else if(aufgabe.typ === "abc_wahl")     rendereAbcWahl(spielfeld, aufgabe);
-  else if(aufgabe.typ === "wort_button")  rendereWortButton(spielfeld, aufgabe);
+  if     (aufgabe.typ === "ja_nein")        rendereJaNein(spielfeld, aufgabe);
+  else if(aufgabe.typ === "ab_wahl")        rendereAbWahl(spielfeld, aufgabe);
+  else if(aufgabe.typ === "abc_wahl")       rendereAbcWahl(spielfeld, aufgabe);
+  else if(aufgabe.typ === "wort_button")    rendereWortButton(spielfeld, aufgabe);
   else if(aufgabe.typ === "richtig_falsch") rendereRichtigFalsch(spielfeld, aufgabe);
 
   setTimeout(function(){ sprich(aufgabe.tts); }, 400);
@@ -220,8 +242,8 @@ function rendereJaNein(container, aufgabe){
   container.innerHTML =
     leseHtml(aufgabe.frage, aufgabe.satz || null) +
       "<div class=\"antwort-zweier\">" +
-        "<button class=\"antwort-btn antwort-ja\" id=\"btnJa\" onclick=\"window._GrammAntwort('ja')\">JA" + RING + "</button>" +
-        "<button class=\"antwort-btn antwort-nein\" id=\"btnNein\" onclick=\"window._GrammAntwort('nein')\">NEIN" + RING + "</button>" +
+        "<button class=\"antwort-btn antwort-ja\"   id=\"btnJa\"   onclick=\"window._GrammAntwort('ja')  \">JA"   + RING + "</button>" +
+        "<button class=\"antwort-btn antwort-nein\"  id=\"btnNein\" onclick=\"window._GrammAntwort('nein')\">NEIN" + RING + "</button>" +
       "</div>" +
       "<div class=\"feedback-zeile\" id=\"feedbackZeile\"></div>" +
     leseHtmlEnde();
@@ -284,7 +306,7 @@ function rendereWortButton(container, aufgabe){
   window._GrammAntwort = function(index){
     var gewaehlt = String(index);
     var richtig  = String(aufgabe.richtig);
-    pruefeAntwort(gewaehlt, richtig, aufgabe.erklaerung, aufgabe);
+    // Visuelles Feedback auf Buttons vor dem Ausblenden kurz zeigen
     var alle = container.querySelectorAll(".wort-btn");
     alle.forEach(function(b){ b.disabled = true; });
     var gewaehltBtn = document.getElementById("wortBtn" + index);
@@ -295,6 +317,8 @@ function rendereWortButton(container, aufgabe){
       if(gewaehltBtn) gewaehltBtn.classList.add("btn-falsch");
       if(richtigBtn)  richtigBtn.classList.add("btn-richtig");
     }
+    // Kurze Pause damit Farbe sichtbar ist, dann ausblenden
+    setTimeout(function(){ pruefeAntwort(gewaehlt, richtig, aufgabe.erklaerung, aufgabe); }, 400);
   };
 
   var dwellSel = aufgabe.woerter.map(function(w, i){ return "#wortBtn" + i; }).join(", ") + ", #btnZurueck";
@@ -307,7 +331,7 @@ function rendereRichtigFalsch(container, aufgabe){
     leseHtml(aufgabe.frage, aufgabe.satz) +
       "<div class=\"antwort-zweier\">" +
         "<button class=\"antwort-btn antwort-richtig-btn\" id=\"btnRichtig\" onclick=\"window._GrammAntwort('richtig')\">✓ Richtig" + RING + "</button>" +
-        "<button class=\"antwort-btn antwort-falsch-btn\"  id=\"btnFalsch\"  onclick=\"window._GrammAntwort('falsch')\">✗ Falsch"  + RING + "</button>" +
+        "<button class=\"antwort-btn antwort-falsch-btn\"  id=\"btnFalsch\"  onclick=\"window._GrammAntwort('falsch') \">✗ Falsch"  + RING + "</button>" +
       "</div>" +
       "<div class=\"feedback-zeile\" id=\"feedbackZeile\"></div>" +
     leseHtmlEnde();
@@ -323,8 +347,10 @@ function pruefeAntwort(gewaehlt, richtig, erklaerung, aufgabe){
   if(gesperrt) return;
   gesperrt = true;
 
+  // Alle Antwort-Buttons sofort deaktivieren und vollständig ausblenden
   var alleBtns = document.querySelectorAll(".antwort-btn, .wort-btn");
   alleBtns.forEach(function(b){ b.disabled = true; b.classList.add("gesperrt"); });
+  verbergeAntwortButtons();
 
   var feedback = document.getElementById("feedbackZeile");
   var weiter   = document.getElementById("weiterBtn");
@@ -334,33 +360,45 @@ function pruefeAntwort(gewaehlt, richtig, erklaerung, aufgabe){
   var taskId = aktEinheit.id + "|" + aktIndex + "|" + (aufgabe.frage || aufgabe.satz || "");
   if(window.LaetitiaStats) window.LaetitiaStats.taskAnswer(taskId, istRichtig, gewaehlt, false, null);
 
+  // Überspringen-Button sofort weg
+  if(ub) ub.style.display = "none";
+
+  function nachTts(){
+    // Weiter-Button einblenden
+    if(weiter){
+      weiter.className = "nav-btn nav-btn-weiter sichtbar";
+      weiter.onclick = function(){
+        stoppAutoWeiter();
+        aktIndex++;
+        zeigeAufgabe();
+      };
+    }
+    bindeDwell("#weiterBtn, #btnZurueck");
+    // 3 Sekunden Auto-Weiter
+    starteAutoWeiter(function(){ aktIndex++; zeigeAufgabe(); });
+  }
+
   if(istRichtig){
     richtigCnt++;
     if(feedback){ feedback.className = "feedback-zeile feedback-richtig"; feedback.textContent = "✓ " + erklaerung; }
-    sprich(zufallsLob() + " " + erklaerung, function(){
-      if(weiter){ weiter.className = "nav-btn nav-btn-weiter sichtbar"; weiter.onclick = function(){ aktIndex++; zeigeAufgabe(); }; }
-      if(ub) ub.style.display = "none";
-      bindeDwell("#weiterBtn, #btnZurueck");
-    });
+    sprich(zufallsLob() + " " + erklaerung, nachTts);
   } else {
     wiederholungsQueue.push(aufgabe);
     if(feedback){ feedback.className = "feedback-zeile feedback-falsch"; feedback.textContent = "✗ " + erklaerung; }
-    sprich("Das stimmt leider nicht. " + erklaerung, function(){
-      if(weiter){ weiter.className = "nav-btn nav-btn-weiter sichtbar"; weiter.onclick = function(){ aktIndex++; zeigeAufgabe(); }; }
-      if(ub) ub.style.display = "none";
-      bindeDwell("#weiterBtn, #btnZurueck");
-    });
+    sprich("Das stimmt leider nicht. " + erklaerung, nachTts);
   }
 }
 
 // ── Überspringen ──────────────────────────────────────────────────
 function ueberspringen(){
+  stoppAutoWeiter();
   aktIndex++;
   zeigeAufgabe();
 }
 
 // ── Fertig-Screen ─────────────────────────────────────────────────
 function zeigeFertig(){
+  stoppAutoWeiter();
   var gesamt    = aktEinheit.aufgaben.length;
   var quote     = gesamt > 0 ? richtigCnt / gesamt : 0;
   var bestanden = quote >= 0.8;

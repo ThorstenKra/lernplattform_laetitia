@@ -1508,66 +1508,74 @@ var GRAMMATIK_EINHEITEN = [
         erklaerung: "Die Katze schläft — Katze ist das Subjekt."
       },
       {
-        typ: "wort_button",
-        frage: "Welches Wort ist das Subjekt?",
-        tts: "Welches Wort ist das Subjekt? — Peter spielt Ball.",
-        woerter: ["Peter", "spielt", "Ball."],
-        richtig: 0,
-        erklaerung: "Peter spielt — Peter ist das Subjekt."
-      },
-      {
         typ: "ab_wahl",
         frage: "Was ist das Subjekt im Satz?",
-        satz: "Die Sonne scheint hell.",
-        tts: "Was ist das Subjekt? — Die Sonne scheint hell.",
+        satz: "Die Sonne scheint heute sehr hell.",
+        tts: "Was ist das Subjekt? — Die Sonne scheint heute sehr hell.",
         option_a: "Die Sonne",
-        option_b: "hell",
+        option_b: "sehr hell",
         richtig: "a",
         erklaerung: "Die Sonne scheint — Sonne ist das Subjekt."
       },
       {
         typ: "ab_wahl",
         frage: "Was ist das Subjekt im Satz?",
-        satz: "Das Kind lacht.",
-        tts: "Was ist das Subjekt? — Das Kind lacht.",
-        option_a: "lacht",
-        option_b: "Das Kind",
+        satz: "Der kleine Hund bellt sehr laut.",
+        tts: "Was ist das Subjekt? — Der kleine Hund bellt sehr laut.",
+        option_a: "bellt sehr laut",
+        option_b: "Der kleine Hund",
         richtig: "b",
-        erklaerung: "Das Kind lacht — Kind ist das Subjekt."
+        erklaerung: "Der kleine Hund bellt — der kleine Hund ist das Subjekt."
       },
       {
-        typ: "wort_button",
-        frage: "Welches Wort ist das Subjekt?",
-        tts: "Welches Wort ist das Subjekt? — Der Vogel singt.",
-        woerter: ["Der", "Vogel", "singt."],
-        richtig: 1,
-        erklaerung: "Der Vogel singt — Vogel ist das Subjekt."
+        typ: "abc_wahl",
+        frage: "Was ist das Subjekt?",
+        satz: "Das rote Auto fährt sehr schnell.",
+        tts: "Was ist das Subjekt? — Das rote Auto fährt sehr schnell.",
+        option_a: "sehr schnell",
+        option_b: "fährt",
+        option_c: "Das rote Auto",
+        richtig: "c",
+        erklaerung: "Das rote Auto fährt — das rote Auto ist das Subjekt."
       },
       {
         typ: "richtig_falsch",
         frage: "Ist 'schläft' das Subjekt im Satz?",
-        satz: "Die Maus schläft.",
-        tts: "Ist schläft das Subjekt? — Die Maus schläft.",
+        satz: "Die Maus schläft im warmen Nest.",
+        tts: "Ist schläft das Subjekt? — Die Maus schläft im warmen Nest.",
         richtig: "falsch",
         erklaerung: "Nein. Schläft ist das Verb. Das Subjekt ist die Maus."
       },
       {
         typ: "ab_wahl",
         frage: "Was ist das Subjekt?",
-        satz: "Der Ball rollt schnell.",
-        tts: "Was ist das Subjekt? — Der Ball rollt schnell.",
-        option_a: "schnell",
-        option_b: "Der Ball",
-        richtig: "b",
-        erklaerung: "Der Ball rollt — Ball ist das Subjekt."
+        satz: "Die alte Frau geht in den Laden.",
+        tts: "Was ist das Subjekt? — Die alte Frau geht in den Laden.",
+        option_a: "Die alte Frau",
+        option_b: "in den Laden",
+        richtig: "a",
+        erklaerung: "Die alte Frau geht — die alte Frau ist das Subjekt."
       },
       {
-        typ: "wort_button",
-        frage: "Welches Wort ist das Subjekt?",
-        tts: "Welches Wort ist das Subjekt? — Anna malt ein Bild.",
-        woerter: ["Anna", "malt", "Bild."],
-        richtig: 0,
-        erklaerung: "Anna malt — Anna ist das Subjekt."
+        typ: "abc_wahl",
+        frage: "Was ist das Subjekt?",
+        satz: "Das kleine Mädchen singt ein schönes Lied.",
+        tts: "Was ist das Subjekt? — Das kleine Mädchen singt ein schönes Lied.",
+        option_a: "singt",
+        option_b: "ein schönes Lied",
+        option_c: "Das kleine Mädchen",
+        richtig: "c",
+        erklaerung: "Das kleine Mädchen singt — das kleine Mädchen ist das Subjekt."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist das Subjekt?",
+        satz: "Der große Bruder spielt mit dem Ball.",
+        tts: "Was ist das Subjekt? — Der große Bruder spielt mit dem Ball.",
+        option_a: "mit dem Ball",
+        option_b: "Der große Bruder",
+        richtig: "b",
+        erklaerung: "Der große Bruder spielt — der große Bruder ist das Subjekt."
       }
     ]
   },
