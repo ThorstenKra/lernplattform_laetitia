@@ -215,11 +215,14 @@ if(!localStorage.getItem("laetitia_welcome_spoken")){
   window.addEventListener("load", function(){
     setTimeout(function(){
       try{
-        var u = new SpeechSynthesisUtterance("Hallo Laetitia! Was moechten wir heute machen?");
-        var voices = speechSynthesis.getVoices();
-        var de = (voices||[]).find(function(v){ return (v.lang||"").toLowerCase().startsWith("de"); });
+        var u = new SpeechSynthesisUtterance("Hallo Lätitia! Was möchten wir heute machen?");
+        u.lang = "de-DE"; u.rate = 0.92;
+        var vv = speechSynthesis.getVoices();
+        var de = vv.find(function(v){ return v.name.indexOf("Katja") >= 0; })
+              || vv.find(function(v){ return v.name.indexOf("Microsoft") >= 0 && v.lang.startsWith("de") && v.name.indexOf("Hedda") < 0; })
+              || vv.find(function(v){ return v.lang.startsWith("de"); });
         if(de) u.voice = de;
-        speechSynthesis.speak(u);
+        if(window.LaetitiaSprich){ window.LaetitiaSprich.wrap(u, null); } else { speechSynthesis.speak(u); }
         localStorage.setItem("laetitia_welcome_spoken","1");
       }catch(e){}
     },500);
