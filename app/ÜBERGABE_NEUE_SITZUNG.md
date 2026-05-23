@@ -144,7 +144,7 @@ Erreichbar: `spielewelt.html` → 🗣️ Quasselkiste 60 / 🎯 Pfad-Training
 
 | Datei | Zweck |
 |---|---|
-| `validate.ps1` | **8 Prüfungen** (NEU: Prüfung 8 — alle href-Links auf vorhandene Zieldateien). Ausführen: `powershell.exe -ExecutionPolicy Bypass -File .\validate.ps1` |
+| `validate.ps1` | **9 Prüfungen** (NEU: Prüfung 9 — OneDrive-Sync-Check). Ausführen: `powershell.exe -ExecutionPolicy Bypass -File .\validate.ps1` |
 | `app/pruefung.html` | Browser-Runtime-Check: LaetitiaAttachDwell, TTS-Stimme, localStorage. Im Edge öffnen nach Deployment. |
 
 ## Hörbuch-Modul (app/modules/hoerbuch/)
@@ -200,6 +200,20 @@ Claude liest beide Dateien, bestätigt die 17 Goldstandard-Regeln und nennt offe
 
 ---
 
+## Bekannter Fehler: OneDrive-Sync (gelöst 23.05.2026)
+
+**Symptom:** „Ups! Da ist etwas schiefgelaufen" + gelber Text „Die Datei wurde nicht gefunden" nach Klick auf beliebiges Modul.
+
+**Ursache:** Der Link-Navigator-Guard in `error_handler.js` prüfte Zieldateien per XHR. Edge wirft bei XHR auf OneDrive-Platzhalter (Online-Only) einen `window.onerror` mit dem Windows-Fehlertext, was fälschlicherweise das Fehler-Overlay auslöste. Zusätzlich wurden `cp`-Befehle nach Sitzungen nie ausgeführt — die OneDrive-Kopie enthielt veraltete Dateiversionen.
+
+**Fix:** Link-Navigator-Guard vollständig entfernt (verursachte mehr Schaden als Nutzen, `validate.ps1` Prüfung 8 ist der eigentliche Schutz gegen fehlende Links).
+
+**Prävention:** `validate.ps1` Prüfung 9 vergleicht jetzt alle HTML/JS-Dateien zwischen Repo und OneDrive per MD5-Hash. Jede veraltete Datei wird als ERR gemeldet.
+
+**Wichtig:** Claude kann Dateien direkt nach OneDrive kopieren (Bash-Tool). Sag einfach „deploy" oder „nach OneDrive kopieren" — kein manuelles `cp` nötig.
+
+---
+
 ## GitHub-Workflow (etabliert seit Mai 2026)
 
 GitHub: `https://github.com/ThorstenKra/lernplattform_laetitia`
@@ -239,13 +253,16 @@ Dann Edge komplett neu starten.
 
 | Was | Ergebnis |
 |---|---|
-| OneDrive Online-Only-Bug | ✅ `attrib +P /S /D` — alle Dateien gepinnt, "Datei nicht gefunden" behoben |
+| OneDrive Online-Only-Bug | ✅ `attrib +P /S /D` — alle Dateien gepinnt |
 | Deployment-Anleitung | ✅ `attrib +P` als Pflichtschritt nach jedem `cp` dokumentiert |
 | Grammatik Stufe 6 (E-31–E-34) | ✅ 40 Aufgaben: Groß-/Kleinschreibung — implementiert + getestet |
 | Quasselkiste 60 | ✅ getestet — funktioniert |
 | Pfad-Training | ✅ getestet — funktioniert |
 | Quasselkiste: 11 korrupte Einträge | ✅ in beiden Modulen herausgefiltert (1.862 von 1.880 aktiv) |
 | OneDrive-Deployment Quasselkiste | ✅ korrigiert (falsche Verschachtelung + kleine data.js ersetzt) |
+| Link-Navigator-Guard Bug | ✅ Guard aus error_handler.js entfernt (XHR auf OneDrive-Platzhalter → fälschlicher Fehler-Overlay) |
+| validate.ps1 Prüfung 9 | ✅ MD5-Sync-Check: Repo vs. OneDrive — meldet veraltete Dateien als ERR |
+| Claude deployt direkt | ✅ Bash cp + attrib +P direkt ausführbar — kein manuelles Kopieren nötig |
 
 ## Sitzungsprotokoll 17. Mai 2026
 

@@ -9,7 +9,7 @@
 //   5. Fehler-Log (letzte 10, in localStorage)
 //   6. Diagnose-Panel (aktivierbar via localStorage-Flag fuer Entwicklung)
 //   7. Not-Overlay mit grossem Zurueck-Button + TTS (Laetitia kommt selbst raus)
-//   8. Link-Navigator-Guard: prueft Zieldatei per XHR vor Navigation (kein Browser-404)
+//   8. (Link-Navigator-Guard entfernt — verursachte Fehlalarme auf OneDrive-Platzhaltern)
 //
 // Einbindung: nach dwell.js, vor Modul-Scripts
 //   <script src="../../core/dwell.js"></script>
@@ -191,11 +191,12 @@ function zeigeFehlerschirm(nachricht, typ){
   // Fehler-Detail (klein, fuer Diagnose)
   var detail = document.createElement("div");
   if(nachricht){
-    detail.textContent = String(nachricht).substring(0, 150);
+    detail.textContent = String(nachricht).substring(0, 200);
     detail.setAttribute("style",[
-      "font-family:monospace","font-size:11px",
-      "color:rgba(241,245,249,0.35)","text-align:center",
-      "max-width:700px","word-break:break-all","margin-top:4px"
+      "font-family:monospace","font-size:18px","font-weight:900",
+      "color:#fde68a","text-align:center","background:rgba(0,0,0,0.4)",
+      "border-radius:10px","padding:10px 16px",
+      "max-width:700px","word-break:break-all","margin-top:8px"
     ].join(";"));
   }
 
@@ -368,66 +369,12 @@ function zeigeDiagPanel(){
   if(document.body) document.body.appendChild(panel);
 }
 
-// ── 8. LINK-NAVIGATOR-GUARD ──────────────────────────────────────────────────
-// Faengt alle Klicks auf <a href> ab und prueft per XHR ob die Zieldatei
-// existiert, bevor die Navigation stattfindet.
-// Bei fehlender Datei -> Fehler-Overlay statt Browser-"Datei nicht gefunden"-Seite.
-// Funktioniert mit Dwell (dwell.js ruft el.click() auf → Interceptor greift).
-
-var _navPending = false;
-
-document.addEventListener("click", function(ev){
-  if(_fehlerAktiv || _navPending) return;
-
-  // Naechstes <a>-Element im Klickpfad suchen
-  var el = ev.target;
-  while(el && el.tagName !== "A"){ el = el.parentElement; }
-  if(!el) return;
-
-  var raw  = el.getAttribute("href") || "";
-  var href = el.href || "";
-
-  // Nur lokale relative Pfade pruefen; externe/Anker/Spezial ueberspringen
-  if(!raw || raw.charAt(0) === "#" ||
-     raw.indexOf("javascript") === 0 ||
-     raw.indexOf("mailto")     === 0 ||
-     raw.indexOf("http")       === 0 ||
-     raw.indexOf("data:")      === 0) return;
-  if(!href.startsWith("file://")) return;
-
-  ev.preventDefault();
-  _navPending = true;
-
-  // Query-String und Hash fuer Existenzpruefung entfernen
-  var checkUrl = href.split("?")[0].split("#")[0];
-
-  var xhr = new XMLHttpRequest();
-  xhr.onload = function(){
-    _navPending = false;
-    window.location.href = href;
-  };
-  xhr.onerror = function(){
-    _navPending = false;
-    logFehler("nav_404", "Datei nicht gefunden: " + raw,
-              window.location.href.split("/").pop(), "");
-    zeigeFehlerschirm(
-      "Seite nicht gefunden: " + raw.split("/").pop().split("?")[0],
-      "nav_404"
-    );
-  };
-  try{
-    xhr.open("GET", checkUrl, true);
-    xhr.send();
-  }catch(e){
-    _navPending = false;
-    logFehler("nav_404", "XHR-Fehler: " + raw + " | " + String(e),
-              window.location.href.split("/").pop(), "");
-    zeigeFehlerschirm(
-      "Seite nicht erreichbar: " + raw.split("/").pop().split("?")[0],
-      "nav_404"
-    );
-  }
-}, true); // capture-Phase: greift vor allen anderen Handlern
+// ── 8. LINK-NAVIGATOR-GUARD (entfernt) ───────────────────────────────────────
+// Der XHR-Check fuer lokale file://-Links wurde entfernt.
+// Grund: Edge wirft bei XHR auf OneDrive-Platzhalter einen window.onerror
+// mit dem Windows-Fehlertext "Die Datei wurde nicht gefunden", was das
+// Fehler-Overlay faelschlicherweise ausloest.
+// Schutz gegen fehlende Zieldateien: validate.ps1 Pruefung 8 vor jedem Push.
 
 // ── 9. ÖFFENTLICHE API ───────────────────────────────────────────────────────
 

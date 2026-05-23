@@ -197,6 +197,37 @@ foreach ($f in $html) {
 if ($hrefErr -eq 0) { OK "Alle href-Links zeigen auf vorhandene Dateien" }
 
 # =============================================================================
+HEAD "9 -- OneDrive-Sync: Repo-Dateien vs. Deployment-Kopie"
+# =============================================================================
+$oneDrive = "C:\Users\ThorstenLavinia\OneDrive\2026_05_12_Lernsystem"
+if (-not (Test-Path $oneDrive)) {
+    WRN "OneDrive-Verzeichnis nicht erreichbar -- Sync-Pruefung uebersprungen"
+} else {
+    $syncErr = 0; $syncOk = 0
+    $syncFiles = @(Get-ChildItem $App -Recurse |
+                   Where-Object { -not $_.PSIsContainer } |
+                   Where-Object { $_.Extension -in @(".html",".js",".css",".json") })
+    foreach ($f in $syncFiles) {
+        $relPath = $f.FullName.Substring($App.Length).TrimStart("\").TrimStart("/")
+        $odf = [IO.Path]::Combine($oneDrive, "app", $relPath)
+        if (-not (Test-Path $odf)) {
+            ERR "Fehlt in OneDrive: $relPath"
+            $syncErr++
+        } else {
+            $hashRepo = (Get-FileHash $f.FullName -Algorithm MD5).Hash
+            $hashOd   = (Get-FileHash $odf -Algorithm MD5).Hash
+            if ($hashRepo -ne $hashOd) {
+                ERR "Veraltet in OneDrive: $relPath"
+                $syncErr++
+            } else {
+                $syncOk++
+            }
+        }
+    }
+    if ($syncErr -eq 0) { OK "$syncOk Dateien in OneDrive aktuell" }
+}
+
+# =============================================================================
 # Zusammenfassung
 # =============================================================================
 $total = $nErr + $nWrn + $nOk

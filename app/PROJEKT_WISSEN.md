@@ -406,28 +406,29 @@ Derzeit eingebunden in: `lesen.html`, `deutsch.html`, `logik.html`, `mathe.html`
 | 5 | Fehler-Log (letzte 10) |
 | 6 | Diagnose-Panel (via `localStorage["laetitia_diag_mode"]="1"`) |
 | 7 | Not-Overlay mit `← Zurück zur Startseite` + Dwell + TTS |
-| 8 | **Link-Navigator-Guard:** XHR-Check vor Navigation; bei fehlender Datei Overlay statt Browser-404 |
+| ~~8~~ | ~~Link-Navigator-Guard~~ — **entfernt 23.05.2026** |
 
-Capture-Phase Click-Handler fängt alle `<a>`-Klicks ab, prüft per XHR ob die Zieldatei existiert (bei `file://` ist status=0 = Erfolg), navigiert dann weiter oder zeigt Fehler-Overlay.
+**Warum Feature 8 entfernt wurde:** Der XHR-Check auf lokale `file://`-Links hat Edge veranlasst, bei OneDrive-Platzhaltern (Online-Only-Dateien) einen `window.onerror` mit dem Windows-Fehlertext „Die Datei wurde nicht gefunden" auszulösen. Dieser Text wurde fälschlicherweise als JS-Fehler erkannt und zeigte das Fehler-Overlay — für ALLE Navigationen. Schutz gegen fehlende Zieldateien: `validate.ps1` Prüfungen 8 (href-Check) und 9 (OneDrive-Sync).
 
 ---
 
-## validate.ps1 — 8 Prüfungen
+## validate.ps1 — 9 Prüfungen
 
 Ausführen vor jedem `git push`: `powershell.exe -ExecutionPolicy Bypass -File .\validate.ps1`
 
 | # | Prüfung |
 |---|---|
-| 1 | depth-Kommentare in allen HTML-Dateien |
+| 1 | Script-Referenzen: alle `<script src>` Dateien vorhanden |
 | 2 | dwell.js nie als import() |
-| 3 | Keine typografischen Anführungszeichen in JS |
-| 4 | error_handler.js in Spielseiten eingebunden |
-| 5 | stats.js in Spielseiten eingebunden |
-| 6 | Inline-`<script>` > 20 Zeilen (WRN) |
-| 7 | Kerndatei-Integrität |
-| 8 | **NEU: href-Links — alle Zieldateien vorhanden** |
+| 3 | depth-Kommentar in HTML-Dateien |
+| 4 | Inline-`<script>` > 20 Zeilen (WRN) |
+| 5 | media_config.js Konsistenz (Config-IDs ↔ info.js-IDs) |
+| 6 | media_config.js in zugehöriger HTML eingebunden |
+| 7 | Keine Mediendateien im Arbeitsverzeichnis |
+| 8 | href-Links — alle Zieldateien vorhanden |
+| 9 | **NEU: OneDrive-Sync — Repo vs. Deployment-Kopie (MD5-Hash-Vergleich)** |
 
-Prüfung 8 löst sofort beim Deployment-Check Fehler aus, bevor der Browser eine 404-Seite zeigt.
+Prüfung 9 meldet jede Datei als ERR, die in OneDrive fehlt oder veraltet ist. Löst den Fehler „Ups, da ist etwas schiefgelaufen" durch veraltete Deployment-Dateien frühzeitig.
 
 ---
 
@@ -523,14 +524,20 @@ app/modules/schule/
 ## Deployment-Workflow (wichtig!)
 
 Der OneDrive-Ordner (`C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/`) ist **kein Git-Repo**.
-Nach jedem `git push` müssen geänderte Dateien manuell kopiert werden, z.B.:
+Nach jedem `git push` müssen geänderte Dateien in die OneDrive-Kopie übertragen werden.
+
+**Claude kann direkt deployen** — einfach „deploy" oder „nach OneDrive kopieren" sagen. Claude führt `cp` + `attrib +P` direkt über das Bash-Tool aus. Kein manuelles Kopieren nötig.
+
+Manuell (falls nötig):
 ```powershell
 cp app/modules/schule/grammatik*.* "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/modules/schule/"
+attrib +P "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/*.*" /S /D
 ```
 
-**PFLICHT nach jedem `cp`: `attrib +P` ausführen.**
-OneDrive "Dateien bei Bedarf" markiert neue Dateien als Online-Only. Der `error_handler.js`-XHR-Check
-schlägt dann fehl → alle Module zeigen "Datei nicht gefunden". Fix:
+**Prüfung vor dem Push:** `validate.ps1` Prüfung 9 zeigt alle Dateien an, die in OneDrive fehlen oder veraltet sind.
+
+**WICHTIG nach jedem `cp`: `attrib +P` ausführen.**
+OneDrive „Dateien bei Bedarf" markiert neue Dateien als Online-Only → Seiten laden nicht.
 ```powershell
 attrib +P "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/*.*" /S /D
 ```
@@ -574,4 +581,4 @@ Claude darf **niemals** Kerndateien (`dwell.js`, `error_handler.js`, `geraete.js
 | 2026-05-14 | stats.js API dokumentiert; Rule-12-Backlog erledigt |
 | 2026-05-14 | Grammatik-Werkstatt (E-00–E-14, 148 Aufgaben); OneDrive-Pfad korrigiert; sinnesorgane_info_mod.js TTS auf Goldstandard; Deployment-Workflow dokumentiert |
 | 2026-05-17 | 17 Goldstandards (Rules 12–17); error_handler.js v3 (Link-Navigator-Guard); validate.ps1 Prüfung 8 (href-Check); Grammatik Stufe 3 (E-15–E-20, 60 Aufgaben) + Stufe 4 (E-21–E-26, 60 Aufgaben); Lese/Aktions-Trennung als Goldstandard 17; Grammatik Auto-Weiter (3s nach TTS); grammatik_mod.js v3; index.html: Aussprache Lätitia + Katja-Stimme |
-| 2026-05-23 | OneDrive Online-Only-Bug behoben (attrib +P); Grammatik Stufe 5 (E-27–E-30) + Stufe 6 (E-31–E-34, je 40 Aufgaben) implementiert + getestet; Quasselkiste 60 + Pfad-Training getestet; 11 korrupte Quasselkiste-Einträge gefiltert; OneDrive-Deployment Quasselkiste korrigiert |
+| 2026-05-23 | OneDrive Online-Only-Bug behoben (attrib +P); Grammatik Stufe 5 (E-27–E-30) + Stufe 6 (E-31–E-34, je 40 Aufgaben) implementiert + getestet; Quasselkiste 60 + Pfad-Training getestet; 11 korrupte Quasselkiste-Einträge gefiltert; OneDrive-Deployment Quasselkiste korrigiert; Link-Navigator-Guard aus error_handler.js entfernt (XHR → fälschlicher window.onerror auf OneDrive-Platzhaltern); validate.ps1 Prüfung 9 (OneDrive-Sync MD5-Check); Claude deployt jetzt direkt per Bash |
