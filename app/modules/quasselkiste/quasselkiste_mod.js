@@ -1,22 +1,25 @@
 // quasselkiste_mod.js -- Laetitia Lernsystem
-// Quasselkiste 60: Raster-Emulation + Pfad-Training
+// Quasselkiste 60: Raster-Emulation + Zwei-Ebenen-Navigation
 // REGEL 1: Kein import(), kein type="module"
 // REGEL 4: Nur gerade Anfuehrungszeichen
 
 (function(){
 "use strict";
 
-var felder   = window.QUASSELKISTE_FELDER || [];
-var pfade    = (window.QUASSELKISTE_PFADE || []).filter(function(p){
-  return p.wort && p.wort.length >= 2 && p.wort.length <= 40 &&
+var felder = window.QUASSELKISTE_FELDER || [];
+var pfade  = (window.QUASSELKISTE_PFADE || []).filter(function(p){
+  return p.wort && p.wort.length >= 2 && p.wort.length <= 60 &&
          p.wort.indexOf("Ôßþ") < 0 &&
          p.wort.indexOf("WIZARD") < 0 &&
          p.wort.indexOf("Mfrag") < 0 &&
-         /^[a-zA-ZäöüÄÖÜß\s\-]+$/.test(p.wort);
+         /^[a-zA-ZäöüÄÖÜß\s\-!?,'.äöüÄÖÜß]+$/.test(p.wort);
 });
-var pfadKey  = [];       // aktuell angeklickte Felder [{r,c},...]
-var _attach  = null;
-var _dwell   = null;
+
+var ebene       = 1;         // 1 = Hauptebene, 2 = Zweite Ebene
+var erstesTaste = null;      // {r, c} der ersten gewaehlten Kachel
+var ebene2Map   = {};        // "r_c" -> wort fuer alle gueltigen Zweit-Schritte
+var _attach     = null;
+var _dwell      = null;
 
 function $(id){ return document.getElementById(id); }
 
@@ -64,52 +67,50 @@ function rebindDwell(){
   });
 }
 
-// ── Feld-Key ─────────────────────────────────────────────────────────────────
-function feldKey(r, c){ return r + "_" + c; }
-
-function feldByKey(k){
-  var p = k.split("_");
-  var r = parseInt(p[0]), c = parseInt(p[1]);
-  return felder.find(function(f){ return f.r === r && f.c === c; }) || null;
-}
-
-// ── Pfad-Suche ───────────────────────────────────────────────────────────────
-function suchePfad(keys){
-  if(!keys.length) return null;
-  return pfade.find(function(p){
-    if(p.pfad.length !== keys.length) return false;
-    return p.pfad.every(function(step, i){
-      return step.r === keys[i].r && step.c === keys[i].c;
-    });
-  }) || null;
-}
-
-// ── UI-Aktualisierung ────────────────────────────────────────────────────────
-function aktualisiereAnzeige(){
-  var names = pfadKey.map(function(k){
-    var f = feldByKey(k);
-    return f ? f.name : k;
+// ── Zweite-Schritt-Suche ─────────────────────────────────────────────────────
+// Gibt {"r_c": wort} zurueck fuer alle 2-Schritt-Pfade mit (r,c) als erster Taste
+function holeZweiteSchritte(r, c){
+  var map = {};
+  pfade.forEach(function(p){
+    if(p.pfad.length === 2 && p.pfad[0].r === r && p.pfad[0].c === c){
+      var k = p.pfad[1].r + "_" + p.pfad[1].c;
+      if(!map[k]) map[k] = p.wort;
+    }
   });
-  var el = $("pfadAnzeige");
-  if(el) el.textContent = names.length ? names.join(" + ") : "";
-
-  var match = suchePfad(pfadKey.map(function(k){
-    var p = k.split("_");
-    return {r:parseInt(p[0]), c:parseInt(p[1])};
-  }));
-  var aus = $("ausgabe");
-  if(aus) aus.textContent = match ? match.wort : (names.length ? names.join(" – ") : "–");
+  return map;
 }
 
-function hightlightPfad(){
+// ── Zweite Ebene anzeigen ────────────────────────────────────────────────────
+function zeigeEbene2(r1, c1, combosMap){
+  ebene2Map = combosMap;
   document.querySelectorAll(".kachel").forEach(function(el){
-    el.classList.remove("gewaehlt");
+    var r = parseInt(el.getAttribute("data-r"));
+    var c = parseInt(el.getAttribute("data-c"));
+    var nameEl = el.querySelector(".kachel-name");
+    el.classList.remove("ebene2-treffer", "ebene2-leer");
+    if(combosMap[r + "_" + c] !== undefined){
+      el.classList.add("ebene2-treffer");
+      if(nameEl) nameEl.textContent = combosMap[r + "_" + c];
+    } else {
+      el.classList.add("ebene2-leer");
+    }
   });
-  pfadKey.forEach(function(k, i){
-    var p = k.split("_");
-    var el = document.querySelector(".kachel[data-r=\""+p[0]+"\"][data-c=\""+p[1]+"\"]");
-    if(el) el.classList.add("gewaehlt");
-    if(i === 0) el && el.classList.add("gewaehlt-1");
+  var f1 = felder.find(function(x){ return x.r === r1 && x.c === c1; });
+  var pfadEl = $("pfadAnzeige");
+  if(pfadEl) pfadEl.textContent = (f1 ? f1.name : "") + " →";
+}
+
+// ── Erste Ebene wiederherstellen ─────────────────────────────────────────────
+function zeigeEbene1(){
+  document.querySelectorAll(".kachel").forEach(function(el){
+    var r = parseInt(el.getAttribute("data-r"));
+    var c = parseInt(el.getAttribute("data-c"));
+    var nameEl = el.querySelector(".kachel-name");
+    el.classList.remove("ebene2-treffer", "ebene2-leer");
+    if(nameEl){
+      var f = felder.find(function(x){ return x.r === r && x.c === c; });
+      nameEl.textContent = f ? (f.name || "") : "";
+    }
   });
 }
 
@@ -118,32 +119,44 @@ function kachelKlick(r, c){
   var f = felder.find(function(x){ return x.r === r && x.c === c; });
   if(!f) return;
 
-  sprich(f.name || "");
+  if(ebene === 1){
+    sprich(f.name || "");
+    var combosMap = holeZweiteSchritte(r, c);
 
-  var k = feldKey(r, c);
-  if(pfadKey.length < 3){
-    pfadKey.push(k);
-  }
+    if(Object.keys(combosMap).length > 0){
+      ebene = 2;
+      erstesTaste = {r: r, c: c};
+      zeigeEbene2(r, c, combosMap);
+    } else {
+      // Keine zweite Ebene: Kachelname in Ausgabe anzeigen
+      var aus = $("ausgabe");
+      if(aus) aus.textContent = f.name || "–";
+    }
 
-  hightlightPfad();
-  aktualisiereAnzeige();
-
-  // Nach Treffer kurz zeigen, dann Reset
-  var match = suchePfad(pfadKey.map(function(k2){
-    var p2 = k2.split("_");
-    return {r:parseInt(p2[0]), c:parseInt(p2[1])};
-  }));
-  if(match){
-    sprich(match.tts || match.wort);
-    setTimeout(loesche, 2000);
+  } else {
+    // Zweite Ebene: passendes Ergebnis suchen
+    var wort = ebene2Map[r + "_" + c];
+    if(wort){
+      sprich(wort);
+      var aus = $("ausgabe");
+      if(aus) aus.textContent = wort;
+      setTimeout(loesche, 2200);
+    } else {
+      loesche();
+    }
   }
 }
 
-// ── Loeschen ─────────────────────────────────────────────────────────────────
+// ── Loeschen / Zurueck zu Ebene 1 ───────────────────────────────────────────
 function loesche(){
-  pfadKey = [];
-  hightlightPfad();
-  aktualisiereAnzeige();
+  ebene = 1;
+  erstesTaste = null;
+  ebene2Map = {};
+  zeigeEbene1();
+  var aus = $("ausgabe");
+  if(aus) aus.textContent = "–";
+  var pfadEl = $("pfadAnzeige");
+  if(pfadEl) pfadEl.textContent = "";
 }
 
 // ── Grid aufbauen ────────────────────────────────────────────────────────────
@@ -194,7 +207,6 @@ function bauGrid(){
 // ── Init ─────────────────────────────────────────────────────────────────────
 function init(){
   bauGrid();
-  aktualisiereAnzeige();
 
   var btnL = $("btnLoesche");
   if(btnL) btnL.addEventListener("click", loesche);
@@ -215,7 +227,6 @@ function init(){
 
   rebindDwell();
 
-  // AudioContext fuer Dwell-Klick vorinitialisieren
   ["pointerdown","click"].forEach(function(ev){
     document.addEventListener(ev, function(){
       try{ speechSynthesis.getVoices(); }catch(e){}

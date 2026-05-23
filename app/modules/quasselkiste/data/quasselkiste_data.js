@@ -4,14 +4,14 @@
 // REGEL 4: Nur gerade Anfuehrungszeichen
 
 window.QUASSELKISTE_FELDER = [
-  {r:1, c: 1, name:"Haus", bg:"#FFFFFF"},
-  {r:1, c: 2, name:"Hammer", bg:"#FFFFFF"},
-  {r:1, c: 3, name:"Minus", bg:"#FFFFFF"},
-  {r:1, c: 4, name:"Plus", bg:"#FFFFFF"},
-  {r:1, c: 5, name:"Zauberer", bg:"#FFFFFF"},
-  {r:1, c: 6, name:"Turm", bg:"#FFFFFF"},
-  {r:1, c: 7, name:"", bg:"#FFFFFF"},
-  {r:1, c: 8, name:"Telefon", bg:"#FFFFFF"},
+  {r:1, c: 1, name:"Start", bg:"#FFFFFF"},
+  {r:1, c: 2, name:"ABC", bg:"#FFFFFF"},
+  {r:1, c: 3, name:"Ja", bg:"#FFFFFF"},
+  {r:1, c: 4, name:"Nein", bg:"#FFFFFF"},
+  {r:1, c: 5, name:"Hallo", bg:"#FFFFFF"},
+  {r:1, c: 6, name:"Cool", bg:"#FFFFFF"},
+  {r:1, c: 7, name:"Bilder", bg:"#FFFFFF"},
+  {r:1, c: 8, name:"Wort", bg:"#FFFFFF"},
   {r:1, c: 9, name:"Fussball", bg:"#FFFFFF"},
   {r:1, c:10, name:"", bg:"#FFFFFF"},
   {r:2, c: 1, name:"ich", bg:"#FFF87F"},

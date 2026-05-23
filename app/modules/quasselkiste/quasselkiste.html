@@ -97,6 +97,31 @@ body{
   animation:dwellRing var(--dwell-duration,.9s) linear forwards;
 }
 
+/* ── Zweite Ebene ────────────────────────────────────────────────────────── */
+.kachel.ebene2-leer {
+  opacity: 0.10;
+  pointer-events: none;
+}
+.kachel.ebene2-leer .kachel-img,
+.kachel.ebene2-leer .kachel-name,
+.kachel.ebene2-leer .dwell-ring-svg {
+  visibility: hidden !important;
+}
+.kachel.ebene2-treffer .kachel-name {
+  display: block !important;
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  z-index: 5;
+  background: rgba(255,255,255,0.90);
+  font-size: clamp(7px,0.85vw,11px);
+  font-weight: 900;
+  color: #111;
+  text-align: center;
+  padding: 1px 3px;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
 /* ── Nav-Leiste ──────────────────────────────────────────────────────────── */
 .nav-leiste{
   flex-shrink:0; height:72px;
