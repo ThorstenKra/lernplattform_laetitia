@@ -164,7 +164,8 @@ $mediaExt = @("*.mp3","*.m4a","*.wav","*.ogg","*.opus","*.aac","*.flac",
 $mediaFound = @()
 foreach ($ext in $mediaExt) {
     $mediaFound += @(Get-ChildItem $Root -Recurse -Filter $ext |
-                     Where-Object { $_.FullName -notmatch "\\.git\\" })
+                     Where-Object { $_.FullName -notmatch "\\.git\\" } |
+                     Where-Object { $_.FullName -notmatch "\\tiles\\" })
 }
 if ($mediaFound.Count -eq 0) {
     OK "Keine Mediendateien im Arbeitsverzeichnis gefunden"
