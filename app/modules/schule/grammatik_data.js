@@ -3187,6 +3187,385 @@ var GRAMMATIK_EINHEITEN = [
         erklaerung: "Ja! Kinder ist Mehrzahl, spielen gerne passt perfekt."
       }
     ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // STUFE 6 — Groß- und Kleinschreibung
+  // ══════════════════════════════════════════════════════════════════
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-31 — Nomen großschreiben
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-31",
+    titel: "Nomen groß",
+    emoji: "🔠",
+    stufe: 6,
+    erklaerung_tts: "Nomen sind Wörter für Dinge, Tiere, Menschen und Orte. Sie fangen immer mit einem großen Buchstaben an! Hund, Tisch, Anna — alle groß.",
+    erklaerung_merksatz: "Nomen = GROSSBUCHSTABE\n\n🐕 Hund · 🪑 Tisch · 👧 Anna",
+    aufgaben: [
+      {
+        typ: "ja_nein",
+        frage: "Ist 'Hund' ein Nomen?",
+        tts: "Ist das Wort Hund ein Nomen?",
+        richtig: "ja",
+        erklaerung: "Ja! Hund ist ein Tier — ein Nomen. Nomen werden großgeschrieben."
+      },
+      {
+        typ: "ja_nein",
+        frage: "Ist 'laufen' ein Nomen?",
+        tts: "Ist das Wort laufen ein Nomen?",
+        richtig: "nein",
+        erklaerung: "Nein. Laufen ist ein Tuewort (Verb), kein Nomen."
+      },
+      {
+        typ: "ja_nein",
+        frage: "Ist 'Schule' ein Nomen?",
+        tts: "Ist das Wort Schule ein Nomen?",
+        richtig: "ja",
+        erklaerung: "Ja! Schule ist ein Ort — ein Nomen. Großgeschrieben."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist falsch geschrieben?",
+        tts: "Welches Wort ist falsch geschrieben? — Der hund bellt.",
+        woerter: ["Der", "hund", "bellt."],
+        richtig: 1,
+        erklaerung: "Hund ist ein Nomen: Der Hund bellt."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt die Schreibweise?",
+        satz: "Das Mädchen spielt im Garten.",
+        tts: "Stimmt die Schreibweise? — Das Mädchen spielt im Garten.",
+        richtig: "richtig",
+        erklaerung: "Mädchen ist ein Nomen — großgeschrieben. Richtig!"
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt die Schreibweise?",
+        satz: "Die katze schläft auf dem sofa.",
+        tts: "Stimmt die Schreibweise? — Die katze schläft auf dem sofa.",
+        richtig: "falsch",
+        erklaerung: "Katze und Sofa sind Nomen — sie müssen großgeschrieben werden."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist falsch geschrieben?",
+        tts: "Welches Wort ist falsch geschrieben? — Ein vogel fliegt.",
+        woerter: ["Ein", "vogel", "fliegt."],
+        richtig: 1,
+        erklaerung: "Vogel ist ein Nomen: Ein Vogel fliegt."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Wie schreibt man Nomen?",
+        tts: "Wie schreibt man Nomen — groß oder klein?",
+        option_a: "Groß",
+        option_b: "Klein",
+        richtig: "a",
+        erklaerung: "Nomen schreibt man immer groß!"
+      },
+      {
+        typ: "ja_nein",
+        frage: "Ist 'Ball' ein Nomen?",
+        tts: "Ist das Wort Ball ein Nomen?",
+        richtig: "ja",
+        erklaerung: "Ja! Ball ist ein Ding — ein Nomen. Großgeschrieben."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist falsch geschrieben?",
+        tts: "Welches Wort ist falsch geschrieben? — Der tisch ist braun.",
+        woerter: ["Der", "tisch", "ist", "braun."],
+        richtig: 1,
+        erklaerung: "Tisch ist ein Nomen: Der Tisch ist braun."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-32 — Verben kleinschreiben
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-32",
+    titel: "Verben klein",
+    emoji: "🏃",
+    stufe: 6,
+    erklaerung_tts: "Verben sind Tuewörter. Sie sagen uns, was jemand tut. laufen, essen, spielen — Verben schreibt man klein!",
+    erklaerung_merksatz: "Verben = kleingeschrieben\n\n🏃 laufen · 🍴 essen · ⚽ spielen · 😴 schlafen",
+    aufgaben: [
+      {
+        typ: "ja_nein",
+        frage: "Ist 'spielen' ein Verb?",
+        tts: "Ist das Wort spielen ein Verb?",
+        richtig: "ja",
+        erklaerung: "Ja! Spielen sagt, was jemand tut — ein Tuewort."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt die Schreibweise?",
+        satz: "Die Katze schläft auf dem Sofa.",
+        tts: "Stimmt die Schreibweise? — Die Katze schläft auf dem Sofa.",
+        richtig: "richtig",
+        erklaerung: "Schläft ist das Verb — kleingeschrieben. Richtig!"
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt die Schreibweise?",
+        satz: "Das Kind Spielt im Garten.",
+        tts: "Stimmt die Schreibweise? — Das Kind Spielt im Garten.",
+        richtig: "falsch",
+        erklaerung: "Spielt ist ein Verb und wird kleingeschrieben: spielt."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist falsch geschrieben?",
+        tts: "Welches Wort ist falsch geschrieben? — Der Hund Bellt laut.",
+        woerter: ["Der", "Hund", "Bellt", "laut."],
+        richtig: 2,
+        erklaerung: "Bellt ist ein Verb: Der Hund bellt laut."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Wie schreibt man Verben?",
+        tts: "Wie schreibt man Verben — groß oder klein?",
+        option_a: "Groß",
+        option_b: "Klein",
+        richtig: "b",
+        erklaerung: "Verben (Tuewörter) schreibt man immer klein!"
+      },
+      {
+        typ: "ja_nein",
+        frage: "Ist 'rennen' ein Verb?",
+        tts: "Ist das Wort rennen ein Verb?",
+        richtig: "ja",
+        erklaerung: "Ja! Rennen ist ein Tuewort — ein Verb."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist falsch geschrieben?",
+        tts: "Welches Wort ist falsch geschrieben? — Anna Singt ein Lied.",
+        woerter: ["Anna", "Singt", "ein", "Lied."],
+        richtig: 1,
+        erklaerung: "Singt ist ein Verb: Anna singt ein Lied."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt die Schreibweise?",
+        satz: "Papa liest ein Buch.",
+        tts: "Stimmt die Schreibweise? — Papa liest ein Buch.",
+        richtig: "richtig",
+        erklaerung: "Liest ist das Verb — kleingeschrieben. Richtig!"
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt die Schreibweise?",
+        satz: "Mama Kocht das Mittagessen.",
+        tts: "Stimmt die Schreibweise? — Mama Kocht das Mittagessen.",
+        richtig: "falsch",
+        erklaerung: "Kocht ist ein Verb und wird kleingeschrieben: kocht."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist falsch geschrieben?",
+        tts: "Welches Wort ist falsch geschrieben? — Das Baby Schläft fest.",
+        woerter: ["Das", "Baby", "Schläft", "fest."],
+        richtig: 2,
+        erklaerung: "Schläft ist ein Verb: Das Baby schläft fest."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-33 — Adjektive kleinschreiben
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-33",
+    titel: "Adjektive klein",
+    emoji: "🎨",
+    stufe: 6,
+    erklaerung_tts: "Adjektive sind Wiewörter. Sie beschreiben, wie etwas ist. groß, schön, schnell — Adjektive schreibt man klein!",
+    erklaerung_merksatz: "Adjektive = kleingeschrieben\n\n🌸 schön · 🐢 langsam · 🍬 lecker · 🌟 toll",
+    aufgaben: [
+      {
+        typ: "ja_nein",
+        frage: "Ist 'schön' ein Adjektiv?",
+        tts: "Ist das Wort schön ein Adjektiv?",
+        richtig: "ja",
+        erklaerung: "Ja! Schön beschreibt, wie etwas ist — ein Wiewort."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt die Schreibweise?",
+        satz: "Das Essen ist lecker.",
+        tts: "Stimmt die Schreibweise? — Das Essen ist lecker.",
+        richtig: "richtig",
+        erklaerung: "Lecker ist das Adjektiv — kleingeschrieben. Richtig!"
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt die Schreibweise?",
+        satz: "Die Blume ist Schön.",
+        tts: "Stimmt die Schreibweise? — Die Blume ist Schön.",
+        richtig: "falsch",
+        erklaerung: "Schön ist ein Adjektiv und wird kleingeschrieben: schön."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist falsch geschrieben?",
+        tts: "Welches Wort ist falsch geschrieben? — Der Hund ist Klein.",
+        woerter: ["Der", "Hund", "ist", "Klein."],
+        richtig: 3,
+        erklaerung: "Klein ist ein Adjektiv: Der Hund ist klein."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Wie schreibt man Adjektive?",
+        tts: "Wie schreibt man Adjektive — groß oder klein?",
+        option_a: "Groß",
+        option_b: "Klein",
+        richtig: "b",
+        erklaerung: "Adjektive (Wiewörter) schreibt man immer klein!"
+      },
+      {
+        typ: "ja_nein",
+        frage: "Ist 'lustig' ein Adjektiv?",
+        tts: "Ist das Wort lustig ein Adjektiv?",
+        richtig: "ja",
+        erklaerung: "Ja! Lustig beschreibt, wie jemand ist — ein Wiewort."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist falsch geschrieben?",
+        tts: "Welches Wort ist falsch geschrieben? — Die Sonne scheint Hell.",
+        woerter: ["Die", "Sonne", "scheint", "Hell."],
+        richtig: 3,
+        erklaerung: "Hell ist ein Adjektiv: Die Sonne scheint hell."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt die Schreibweise?",
+        satz: "Der Ball ist rund und bunt.",
+        tts: "Stimmt die Schreibweise? — Der Ball ist rund und bunt.",
+        richtig: "richtig",
+        erklaerung: "Rund und bunt sind Adjektive — kleingeschrieben. Richtig!"
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt die Schreibweise?",
+        satz: "Das Baby ist Niedlich.",
+        tts: "Stimmt die Schreibweise? — Das Baby ist Niedlich.",
+        richtig: "falsch",
+        erklaerung: "Niedlich ist ein Adjektiv und wird kleingeschrieben: niedlich."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist falsch geschrieben?",
+        tts: "Welches Wort ist falsch geschrieben? — Der Apfel schmeckt Süß.",
+        woerter: ["Der", "Apfel", "schmeckt", "Süß."],
+        richtig: 3,
+        erklaerung: "Süß ist ein Adjektiv: Der Apfel schmeckt süß."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-34 — Groß oder Klein? — Alles zusammen
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-34",
+    titel: "Groß oder Klein?",
+    emoji: "📝",
+    stufe: 6,
+    erklaerung_tts: "Jetzt üben wir alles zusammen! Nomen schreibt man groß. Verben und Adjektive schreibt man klein. Schau genau hin!",
+    erklaerung_merksatz: "🔠 Nomen = GROSS\n✏️ Verben = klein\n🎨 Adjektive = klein\n\nDer Hund läuft schnell.",
+    aufgaben: [
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt die Schreibweise?",
+        satz: "Der Hund bellt laut.",
+        tts: "Stimmt die Schreibweise? — Der Hund bellt laut.",
+        richtig: "richtig",
+        erklaerung: "Hund = Nomen (groß), bellt = Verb (klein). Alles richtig!"
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist falsch geschrieben?",
+        tts: "Welches Wort ist falsch geschrieben? — Ein vogel singt.",
+        woerter: ["Ein", "vogel", "singt."],
+        richtig: 1,
+        erklaerung: "Vogel ist ein Nomen: Ein Vogel singt."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt die Schreibweise?",
+        satz: "Das Kind Läuft schnell.",
+        tts: "Stimmt die Schreibweise? — Das Kind Läuft schnell.",
+        richtig: "falsch",
+        erklaerung: "Läuft ist ein Verb und wird kleingeschrieben: läuft."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was muss großgeschrieben werden?",
+        tts: "Was muss großgeschrieben werden — laufen, Tisch oder schön?",
+        option_a: "laufen",
+        option_b: "Tisch",
+        option_c: "schön",
+        richtig: "b",
+        erklaerung: "Tisch ist ein Nomen — es wird großgeschrieben."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt die Schreibweise?",
+        satz: "Mein Bruder ist sehr lustig.",
+        tts: "Stimmt die Schreibweise? — Mein Bruder ist sehr lustig.",
+        richtig: "richtig",
+        erklaerung: "Bruder = Nomen (groß), lustig = Adjektiv (klein). Richtig!"
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist falsch geschrieben?",
+        tts: "Welches Wort ist falsch geschrieben? — Der Ball ist Rund.",
+        woerter: ["Der", "Ball", "ist", "Rund."],
+        richtig: 3,
+        erklaerung: "Rund ist ein Adjektiv: Der Ball ist rund."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt die Schreibweise?",
+        satz: "Die Sonne Scheint hell.",
+        tts: "Stimmt die Schreibweise? — Die Sonne Scheint hell.",
+        richtig: "falsch",
+        erklaerung: "Scheint ist ein Verb und wird kleingeschrieben: scheint."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welches Wort ist ein Nomen?",
+        tts: "Welches Wort ist ein Nomen — laufen, schön oder Schule?",
+        option_a: "laufen",
+        option_b: "schön",
+        option_c: "Schule",
+        richtig: "c",
+        erklaerung: "Schule ist ein Ort — ein Nomen. Nomen werden großgeschrieben."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt die Schreibweise?",
+        satz: "Anna spielt gerne Fußball.",
+        tts: "Stimmt die Schreibweise? — Anna spielt gerne Fußball.",
+        richtig: "richtig",
+        erklaerung: "Anna und Fußball = Nomen (groß), spielt = Verb (klein). Richtig!"
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ist falsch geschrieben?",
+        tts: "Welches Wort ist falsch geschrieben? — Der tisch ist braun.",
+        woerter: ["Der", "tisch", "ist", "braun."],
+        richtig: 1,
+        erklaerung: "Tisch ist ein Nomen: Der Tisch ist braun."
+      }
+    ]
   }
 
 ];
