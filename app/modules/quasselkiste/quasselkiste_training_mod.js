@@ -6,7 +6,13 @@
 (function(){
 "use strict";
 
-var pfade       = window.QUASSELKISTE_PFADE  || [];
+var pfade       = (window.QUASSELKISTE_PFADE || []).filter(function(p){
+  return p.wort && p.wort.length >= 2 && p.wort.length <= 40 &&
+         p.wort.indexOf("Ôßþ") < 0 &&
+         p.wort.indexOf("WIZARD") < 0 &&
+         p.wort.indexOf("Mfrag") < 0 &&
+         /^[a-zA-ZäöüÄÖÜß\s\-]+$/.test(p.wort);
+});
 var felder      = window.QUASSELKISTE_FELDER || [];
 var zielEintrag = null;   // { wort, tts, pfad:[{r,c},...] }
 var aktSchritt  = 0;      // wie weit im Pfad schon korrekt geklickt

@@ -7,7 +7,13 @@
 "use strict";
 
 var felder   = window.QUASSELKISTE_FELDER || [];
-var pfade    = window.QUASSELKISTE_PFADE  || [];
+var pfade    = (window.QUASSELKISTE_PFADE || []).filter(function(p){
+  return p.wort && p.wort.length >= 2 && p.wort.length <= 40 &&
+         p.wort.indexOf("Ôßþ") < 0 &&
+         p.wort.indexOf("WIZARD") < 0 &&
+         p.wort.indexOf("Mfrag") < 0 &&
+         /^[a-zA-ZäöüÄÖÜß\s\-]+$/.test(p.wort);
+});
 var pfadKey  = [];       // aktuell angeklickte Felder [{r,c},...]
 var _attach  = null;
 var _dwell   = null;
