@@ -207,6 +207,17 @@ Der OneDrive-Ordner ist KEIN Git-Repo. Geänderte Dateien müssen nach jedem Pus
 cp app/modules/schule/grammatik*.* "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/modules/schule/"
 cp app/core/error_handler.js      "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/core/"
 ```
+
+**WICHTIG — nach jedem `cp` sofort pinnen:**
+OneDrive "Dateien bei Bedarf" kann neue Dateien als Online-Only markieren. Der XHR-Check im
+`error_handler.js` schlägt dann fehl → "Datei nicht gefunden"-Overlay für alle Module.
+```powershell
+attrib +P "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/modules/schule/*.*"
+# Für core-Dateien:
+attrib +P "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/core/*.*"
+# Einmalig alle pinnen (falls viele Dateien betroffen):
+attrib +P "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/*.*" /S /D
+```
 Dann Edge komplett neu starten.
 
 **Hinweis:** `.exe`, `.bat`, Mediendateien (MP3, JPG, PNG, …) stehen in `.gitignore` und bleiben lokal.

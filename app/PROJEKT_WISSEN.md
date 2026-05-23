@@ -526,6 +526,13 @@ Nach jedem `git push` müssen geänderte Dateien manuell kopiert werden, z.B.:
 ```powershell
 cp app/modules/schule/grammatik*.* "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/modules/schule/"
 ```
+
+**PFLICHT nach jedem `cp`: `attrib +P` ausführen.**
+OneDrive "Dateien bei Bedarf" markiert neue Dateien als Online-Only. Der `error_handler.js`-XHR-Check
+schlägt dann fehl → alle Module zeigen "Datei nicht gefunden". Fix:
+```powershell
+attrib +P "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/*.*" /S /D
+```
 Dann Edge komplett neu starten.
 
 ---
