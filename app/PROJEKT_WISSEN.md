@@ -514,7 +514,7 @@ app/modules/schule/
 | 3 | E-15–E-20 | Sätze bauen (Subjekt/Prädikat/Objekt) | 60 | ✅ |
 | 4 | E-21–E-26 | Konjugation Gegenwart | 60 | ✅ |
 | 5 | E-27–E-30 | Singular & Plural | 40 | ✅ |
-| 6 | E-31–E-34 | Groß-/Kleinschreibung | — | ⬜ nächster Block |
+| 6 | E-31–E-34 | Groß-/Kleinschreibung | 40 | ✅ |
 | 7–13 | E-35–E-61 | Kasus, Pronomen, Satzzeichen … | — | ⬜ offen |
 
 ---

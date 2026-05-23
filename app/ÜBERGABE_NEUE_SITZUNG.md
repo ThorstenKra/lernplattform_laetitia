@@ -95,9 +95,8 @@ Erreichbar: `schule.html` → Grammatik-Button → `grammatik.html`
 | 2 | E-10–E-14 | Artikel der/die/das | 50 | ✅ |
 | 3 | E-15–E-20 | Sätze bauen (Subjekt/Prädikat/Objekt) | 60 | ✅ |
 | 4 | E-21–E-26 | Konjugation Gegenwart | 60 | ✅ |
-| 5 | E-27–E-30 | Singular & Plural | 40 | ✅ NEU |
-| 6 | E-31–E-34 | Groß-/Kleinschreibung | — | ⬜ nächster Block |
-| 6 | E-31–E-34 | Groß-/Kleinschreibung | — | ⬜ |
+| 5 | E-27–E-30 | Singular & Plural | 40 | ✅ |
+| 6 | E-31–E-34 | Groß-/Kleinschreibung | 40 | ✅ NEU |
 | 7–13 | E-35–E-61 | Kasus, Pronomen, Satzzeichen … | — | ⬜ |
 
 **Neue Features der Grammatik-Werkstatt (seit 17.05.):**
@@ -145,8 +144,8 @@ Eingetragene Bücher: Das Fliegende Kamel (60 Tracks), Jaguar und NEINguar (54 T
 
 ## 🔴 Offene Aufgaben — Hochpriorität
 
-**Grammatik-Werkstatt: Stufe 6 implementieren (E-31–E-34)**
-Nächster Block: Groß-/Kleinschreibung. Konzept: Nomen groß, Verben/Adjektive klein — Erkennungsregeln + Übungen.
+**Grammatik-Werkstatt: Stufe 7 (E-35–E-38) — nächster Block**
+Thema: Kasus (Wer-Fall / Wen-Fall Grundlagen)
 
 **Bluetooth-Umschaltung:**
 Einziger offener Schritt — als Administrator ausführen:
