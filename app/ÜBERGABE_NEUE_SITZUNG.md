@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 17. Mai 2026*
+*Stand: 23. Mai 2026*
 
 ---
 
@@ -74,7 +74,7 @@ Claude beschränkt sich auf entscheidungsrelevante Ausgaben. Einzelschritte, Üb
 | `schule_liesmal3_data.js` | ✅ vollständig |
 | `test_suite.html` | ✅ JS-Checks laufen, HTML-Checks brauchen Edge-Flag |
 
-## Grammatik-Werkstatt — Stand 17. Mai 2026
+## Grammatik-Werkstatt — Stand 23. Mai 2026
 
 Erreichbar: `schule.html` → Grammatik-Button → `grammatik.html`
 
@@ -82,7 +82,7 @@ Erreichbar: `schule.html` → Grammatik-Button → `grammatik.html`
 |---|---|---|
 | `grammatik.html` | Einheiten-Übersicht, Fortschrittsanzeige, Freischalt-Logik | ✅ |
 | `grammatik_spiel.html` | Spielseite (URL-param `?einheit=E-00`) — Lese/Aktions-Layout | v2 ✅ |
-| `grammatik_data.js` | 27 Einheiten, 268 Aufgaben | ✅ |
+| `grammatik_data.js` | 35 Einheiten, 348 Aufgaben | ✅ |
 | `grammatik_mod.js` | Engine: `window.GrammatikMod.starteEinheit(id)` — Auto-Weiter | v3 ✅ |
 | `grammatik_uebersicht.js` | `window.GrammatikUebersicht.baueUebersicht()` | ✅ |
 
@@ -96,17 +96,29 @@ Erreichbar: `schule.html` → Grammatik-Button → `grammatik.html`
 | 3 | E-15–E-20 | Sätze bauen (Subjekt/Prädikat/Objekt) | 60 | ✅ |
 | 4 | E-21–E-26 | Konjugation Gegenwart | 60 | ✅ |
 | 5 | E-27–E-30 | Singular & Plural | 40 | ✅ |
-| 6 | E-31–E-34 | Groß-/Kleinschreibung | 40 | ✅ NEU |
-| 7–13 | E-35–E-61 | Kasus, Pronomen, Satzzeichen … | — | ⬜ |
+| 6 | E-31–E-34 | Groß-/Kleinschreibung | 40 | ✅ getestet |
+| **7** | **E-35–E-38** | **Kasus (Wer-/Wen-Fall)** | — | ⬜ nächster Block |
+| 8–13 | E-39–E-61 | Pronomen, Satzzeichen … | — | ⬜ |
 
-**Neue Features der Grammatik-Werkstatt (seit 17.05.):**
+**Grammatik-Werkstatt Features:**
 - Lesebereich (grau, `pointer-events:none`) oben — Frage + Satz sind PASSIV
 - Trennstreifen „👆 Deine Antwort" als sichtbare Grenze
 - Aktionsbereich (weiß, dwell-aktiv) unten — nur Buttons
 - Nach Antwort: Buttons vollständig ausgeblendet (`display:none`)
 - 3 Sekunden nach TTS-Ende: Auto-Weiter zur nächsten Aufgabe
 - Weiter-Button bleibt für sofortiges Vorwärts
-- E-15: 7 Aufgaben mit 5–7-Wort-Sätzen (Adjektivattribute als Ablenkung)
+
+## Quasselkiste / NuVoice-Emulation — Stand 23. Mai 2026
+
+Erreichbar: `spielewelt.html` → 🗣️ Quasselkiste 60 / 🎯 Pfad-Training
+
+| Datei | Inhalt | Status |
+|---|---|---|
+| `quasselkiste.html` + `quasselkiste_mod.js` | 6×10 Raster, Pfad-Aufbau, TTS | ✅ getestet |
+| `quasselkiste_training.html` + `quasselkiste_training_mod.js` | Zielwort → Pfad suchen, Hinweis, Score | ✅ getestet |
+| `data/quasselkiste_data.js` | 60 Kacheln + 1.862 Pfade (bereinigt) | ✅ |
+
+**Bekannte Einschränkung:** 311 mehrdeutige Pfade (MINSPEAK-Eigenheit) — Emulation zeigt ersten Treffer.
 
 ## Zentrale Dateien (app/core/)
 
@@ -167,7 +179,7 @@ Dann `lernwelt_starten.exe` neu starten → Audio-Dialog testen.
 - Mathe-Hefte digitalisieren (PDFs vorhanden) → `schule_mathe_data.js`
 - Sachkunde-Bilder für 7 fehlende Themen ergänzen
 - `stats.js` in weitere Spielseiten einbinden (Regel 15 vollständig umsetzen)
-- Grammatik Stufe 6 (E-31–E-34): Groß-/Kleinschreibung
+- Grammatik Stufe 7 (E-35–E-38): Kasus
 
 ---
 
@@ -222,6 +234,18 @@ Dann Edge komplett neu starten.
 **Hinweis:** `.exe`, `.bat`, Mediendateien (MP3, JPG, PNG, …) stehen in `.gitignore` und bleiben lokal.
 
 ---
+
+## Sitzungsprotokoll 23. Mai 2026
+
+| Was | Ergebnis |
+|---|---|
+| OneDrive Online-Only-Bug | ✅ `attrib +P /S /D` — alle Dateien gepinnt, "Datei nicht gefunden" behoben |
+| Deployment-Anleitung | ✅ `attrib +P` als Pflichtschritt nach jedem `cp` dokumentiert |
+| Grammatik Stufe 6 (E-31–E-34) | ✅ 40 Aufgaben: Groß-/Kleinschreibung — implementiert + getestet |
+| Quasselkiste 60 | ✅ getestet — funktioniert |
+| Pfad-Training | ✅ getestet — funktioniert |
+| Quasselkiste: 11 korrupte Einträge | ✅ in beiden Modulen herausgefiltert (1.862 von 1.880 aktiv) |
+| OneDrive-Deployment Quasselkiste | ✅ korrigiert (falsche Verschachtelung + kleine data.js ersetzt) |
 
 ## Sitzungsprotokoll 17. Mai 2026
 
