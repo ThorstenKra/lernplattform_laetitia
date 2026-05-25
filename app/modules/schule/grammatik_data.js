@@ -3566,6 +3566,412 @@ var GRAMMATIK_EINHEITEN = [
         erklaerung: "Tisch ist ein Nomen: Der Tisch ist braun."
       }
     ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // STUFE 7 — Kasus (Wer-Fall und Wen-Fall)
+  // ══════════════════════════════════════════════════════════════════
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-35 — Der Wer-Fall
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-35", titel: "Der Wer-Fall", emoji: "❓", stufe: 7,
+    erklaerung_tts: "In jedem Satz tut jemand etwas. Dieser jemand ist der Wer-Fall. Wir fragen: WER tut das? Zum Beispiel: Der Hund bellt. WER bellt? Der Hund! Das ist der Wer-Fall.",
+    erklaerung_merksatz: "WER tut das?\n\n❓ Der Hund bellt.\nWER bellt? → Der Hund!\n\nDas ist der Wer-Fall.",
+    aufgaben: [
+      {
+        typ: "ja_nein",
+        frage: "Fragen wir nach dem Wer-Fall mit dem Wort 'Wer?'",
+        tts: "Fragen wir nach dem Wer-Fall mit dem Wort: Wer?",
+        richtig: "ja",
+        erklaerung: "Ja! Der Wer-Fall antwortet auf die Frage: WER?"
+      },
+      {
+        typ: "ja_nein",
+        frage: "Ist 'Die Katze' die Antwort auf WER schläft?",
+        satz: "Die Katze schläft.",
+        tts: "Ist Die Katze die Antwort auf WER schläft? — Die Katze schläft.",
+        richtig: "ja",
+        erklaerung: "Ja! Die Katze ist der Wer-Fall. WER schläft? Die Katze!"
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Wer bellt?",
+        satz: "Der Hund bellt laut.",
+        tts: "Wer bellt? — Der Hund bellt laut.",
+        option_a: "Der Hund",
+        option_b: "laut",
+        richtig: "a",
+        erklaerung: "Der Hund ist die Antwort auf WER bellt — das ist der Wer-Fall."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Wer spielt?",
+        satz: "Das Kind spielt im Garten.",
+        tts: "Wer spielt? — Das Kind spielt im Garten.",
+        option_a: "im Garten",
+        option_b: "Das Kind",
+        richtig: "b",
+        erklaerung: "Das Kind ist die Antwort auf WER spielt — das ist der Wer-Fall."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Nomen im Wer-Fall!",
+        tts: "Klick auf das Nomen im Wer-Fall! — Die Katze schläft.",
+        woerter: ["Die", "Katze", "schläft."],
+        richtig: 1,
+        erklaerung: "Katze ist das Nomen im Wer-Fall! WER schläft? Die Katze."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Nomen im Wer-Fall!",
+        tts: "Klick auf das Nomen im Wer-Fall! — Der Vogel singt.",
+        woerter: ["Der", "Vogel", "singt."],
+        richtig: 1,
+        erklaerung: "Vogel ist das Nomen im Wer-Fall! WER singt? Der Vogel."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'Mama' hier der Wer-Fall?",
+        satz: "Mama liest ein Buch.",
+        tts: "Ist Mama hier der Wer-Fall? — Mama liest ein Buch.",
+        richtig: "richtig",
+        erklaerung: "Ja! WER liest? Mama. Mama ist der Wer-Fall."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'ein Buch' hier der Wer-Fall?",
+        satz: "Mama liest ein Buch.",
+        tts: "Ist ein Buch hier der Wer-Fall? — Mama liest ein Buch.",
+        richtig: "falsch",
+        erklaerung: "Nein! WER liest? Mama. Das Buch ist nicht der Wer-Fall."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Wer rennt?",
+        satz: "Der Hund rennt schnell.",
+        tts: "Wer rennt? — Der Hund rennt schnell.",
+        option_a: "Der Hund",
+        option_b: "schnell",
+        option_c: "rennt",
+        richtig: "a",
+        erklaerung: "Der Hund ist die Antwort auf WER rennt — das ist der Wer-Fall."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Nomen im Wer-Fall!",
+        tts: "Klick auf das Nomen im Wer-Fall! — Papa lacht laut.",
+        woerter: ["Papa", "lacht", "laut."],
+        richtig: 0,
+        erklaerung: "Papa ist das Nomen im Wer-Fall! WER lacht? Papa."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-36 — Der Wen-Fall
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-36", titel: "Der Wen-Fall", emoji: "🎯", stufe: 7,
+    erklaerung_tts: "Im Satz gibt es oft etwas oder jemanden, der eine Aktion bekommt. Das ist der Wen-Fall. Wir fragen: WEN? oder WAS? Zum Beispiel: Das Kind sieht den Hund. WEN sieht das Kind? Den Hund! Das ist der Wen-Fall.",
+    erklaerung_merksatz: "WEN oder WAS?\n\n🎯 Das Kind sieht den Hund.\nWEN sieht es? → den Hund!\n\nDas ist der Wen-Fall.",
+    aufgaben: [
+      {
+        typ: "ja_nein",
+        frage: "Fragen wir nach dem Wen-Fall mit 'Wen?' oder 'Was?'",
+        tts: "Fragen wir nach dem Wen-Fall mit Wen oder Was?",
+        richtig: "ja",
+        erklaerung: "Ja! Der Wen-Fall antwortet auf die Frage: WEN? oder WAS?"
+      },
+      {
+        typ: "ja_nein",
+        frage: "Ist 'den Ball' die Antwort auf WAS tritt der Hund?",
+        satz: "Der Hund tritt den Ball.",
+        tts: "Ist den Ball die Antwort auf WAS tritt der Hund? — Der Hund tritt den Ball.",
+        richtig: "ja",
+        erklaerung: "Ja! Den Ball ist der Wen-Fall. WAS tritt der Hund? Den Ball!"
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was sieht das Kind?",
+        satz: "Das Kind sieht den Hund.",
+        tts: "Was sieht das Kind? — Das Kind sieht den Hund.",
+        option_a: "Das Kind",
+        option_b: "den Hund",
+        richtig: "b",
+        erklaerung: "Den Hund ist die Antwort auf WAS sieht das Kind — das ist der Wen-Fall."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was trinkt Mama?",
+        satz: "Mama trinkt den Tee.",
+        tts: "Was trinkt Mama? — Mama trinkt den Tee.",
+        option_a: "den Tee",
+        option_b: "Mama",
+        richtig: "a",
+        erklaerung: "Den Tee ist die Antwort auf WAS trinkt Mama — das ist der Wen-Fall."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Nomen im Wen-Fall!",
+        tts: "Klick auf das Nomen im Wen-Fall! — Er trägt den Koffer.",
+        woerter: ["Er", "trägt", "den", "Koffer."],
+        richtig: 3,
+        erklaerung: "Koffer ist das Nomen im Wen-Fall! WAS trägt er? Den Koffer."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Nomen im Wen-Fall!",
+        tts: "Klick auf das Nomen im Wen-Fall! — Papa liest das Buch.",
+        woerter: ["Papa", "liest", "das", "Buch."],
+        richtig: 3,
+        erklaerung: "Buch ist das Nomen im Wen-Fall! WAS liest Papa? Das Buch."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'den Ball' hier der Wen-Fall?",
+        satz: "Anna wirft den Ball.",
+        tts: "Ist den Ball hier der Wen-Fall? — Anna wirft den Ball.",
+        richtig: "richtig",
+        erklaerung: "Ja! WAS wirft Anna? Den Ball. Das ist der Wen-Fall."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'Anna' hier der Wen-Fall?",
+        satz: "Anna wirft den Ball.",
+        tts: "Ist Anna hier der Wen-Fall? — Anna wirft den Ball.",
+        richtig: "falsch",
+        erklaerung: "Nein! Anna ist der Wer-Fall. WER wirft? Anna. Den Ball ist der Wen-Fall."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was kauft Mama?",
+        satz: "Mama kauft die Blume.",
+        tts: "Was kauft Mama? — Mama kauft die Blume.",
+        option_a: "Mama",
+        option_b: "kauft",
+        option_c: "die Blume",
+        richtig: "c",
+        erklaerung: "Die Blume ist die Antwort auf WAS kauft Mama — das ist der Wen-Fall."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Nomen im Wen-Fall!",
+        tts: "Klick auf das Nomen im Wen-Fall! — Sie malt ein Bild.",
+        woerter: ["Sie", "malt", "ein", "Bild."],
+        richtig: 3,
+        erklaerung: "Bild ist das Nomen im Wen-Fall! WAS malt sie? Ein Bild."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-37 — Wer oder Wen?
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-37", titel: "Wer oder Wen?", emoji: "🔍", stufe: 7,
+    erklaerung_tts: "Jetzt üben wir beide Fälle zusammen! Der Wer-Fall fragt WER. Der Wen-Fall fragt WEN oder WAS. In jedem Satz gibt es oft beides!",
+    erklaerung_merksatz: "❓ WER tut es? → Wer-Fall\n🎯 WEN oder WAS? → Wen-Fall\n\nDer Hund sieht die Katze.\nWER? Der Hund  —  WEN? die Katze",
+    aufgaben: [
+      {
+        typ: "ab_wahl",
+        frage: "Was ist 'der Hund' in diesem Satz?",
+        satz: "Der Hund sieht die Katze.",
+        tts: "Was ist der Hund in diesem Satz? — Der Hund sieht die Katze.",
+        option_a: "Wer-Fall",
+        option_b: "Wen-Fall",
+        richtig: "a",
+        erklaerung: "WER sieht? Der Hund. Das ist der Wer-Fall."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist 'die Katze' in diesem Satz?",
+        satz: "Der Hund sieht die Katze.",
+        tts: "Was ist die Katze in diesem Satz? — Der Hund sieht die Katze.",
+        option_a: "Wer-Fall",
+        option_b: "Wen-Fall",
+        richtig: "b",
+        erklaerung: "WEN sieht der Hund? Die Katze. Das ist der Wen-Fall."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist 'Papa' in diesem Satz?",
+        satz: "Papa kauft den Apfel.",
+        tts: "Was ist Papa in diesem Satz? — Papa kauft den Apfel.",
+        option_a: "Wer-Fall",
+        option_b: "Wen-Fall",
+        richtig: "a",
+        erklaerung: "WER kauft? Papa. Das ist der Wer-Fall."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist 'den Apfel' in diesem Satz?",
+        satz: "Papa kauft den Apfel.",
+        tts: "Was ist den Apfel in diesem Satz? — Papa kauft den Apfel.",
+        option_a: "Wer-Fall",
+        option_b: "Wen-Fall",
+        richtig: "b",
+        erklaerung: "WAS kauft Papa? Den Apfel. Das ist der Wen-Fall."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'das Kind' hier der Wer-Fall?",
+        satz: "Das Kind trägt den Rucksack.",
+        tts: "Ist das Kind hier der Wer-Fall? — Das Kind trägt den Rucksack.",
+        richtig: "richtig",
+        erklaerung: "Ja! WER trägt? Das Kind. Das ist der Wer-Fall."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'den Rucksack' hier der Wer-Fall?",
+        satz: "Das Kind trägt den Rucksack.",
+        tts: "Ist den Rucksack hier der Wer-Fall? — Das Kind trägt den Rucksack.",
+        richtig: "falsch",
+        erklaerung: "Nein! WAS trägt das Kind? Den Rucksack. Das ist der Wen-Fall."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was ist 'Mama' in diesem Satz?",
+        satz: "Mama liest das Buch.",
+        tts: "Was ist Mama in diesem Satz? — Mama liest das Buch.",
+        option_a: "Wer-Fall",
+        option_b: "Wen-Fall",
+        option_c: "weder noch",
+        richtig: "a",
+        erklaerung: "WER liest? Mama. Das ist der Wer-Fall."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was ist 'das Buch' in diesem Satz?",
+        satz: "Mama liest das Buch.",
+        tts: "Was ist das Buch in diesem Satz? — Mama liest das Buch.",
+        option_a: "Wer-Fall",
+        option_b: "Wen-Fall",
+        option_c: "weder noch",
+        richtig: "b",
+        erklaerung: "WAS liest Mama? Das Buch. Das ist der Wen-Fall."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Nomen im Wer-Fall!",
+        tts: "Klick auf das Nomen im Wer-Fall! — Anna singt das Lied.",
+        woerter: ["Anna", "singt", "das", "Lied."],
+        richtig: 0,
+        erklaerung: "Anna ist der Wer-Fall. WER singt? Anna!"
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Nomen im Wen-Fall!",
+        tts: "Klick auf das Nomen im Wen-Fall! — Anna singt das Lied.",
+        woerter: ["Anna", "singt", "das", "Lied."],
+        richtig: 3,
+        erklaerung: "Lied ist der Wen-Fall. WAS singt Anna? Das Lied!"
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-38 — Kasus — Alles zusammen
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-38", titel: "Kasus — zusammen", emoji: "🏆", stufe: 7,
+    erklaerung_tts: "Jetzt üben wir alles nochmal! WER tut etwas — Wer-Fall. WEN oder WAS — Wen-Fall. Du schaffst das!",
+    erklaerung_merksatz: "❓ WER → Wer-Fall\n🎯 WEN / WAS → Wen-Fall\n\nDer Junge sieht den Hund.\nWER? → Der Junge\nWEN? → den Hund",
+    aufgaben: [
+      {
+        typ: "ab_wahl",
+        frage: "Was fragt der Wer-Fall?",
+        tts: "Was fragt der Wer-Fall?",
+        option_a: "WER?",
+        option_b: "WEN oder WAS?",
+        richtig: "a",
+        erklaerung: "Der Wer-Fall fragt immer: WER tut etwas?"
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was fragt der Wen-Fall?",
+        tts: "Was fragt der Wen-Fall?",
+        option_a: "WER?",
+        option_b: "WEN oder WAS?",
+        richtig: "b",
+        erklaerung: "Der Wen-Fall fragt immer: WEN oder WAS?"
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was ist 'der Junge' in diesem Satz?",
+        satz: "Der Junge tritt den Ball.",
+        tts: "Was ist der Junge in diesem Satz? — Der Junge tritt den Ball.",
+        option_a: "Wer-Fall",
+        option_b: "Wen-Fall",
+        option_c: "keins von beiden",
+        richtig: "a",
+        erklaerung: "WER tritt? Der Junge. Das ist der Wer-Fall."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was ist 'den Ball' in diesem Satz?",
+        satz: "Der Junge tritt den Ball.",
+        tts: "Was ist den Ball in diesem Satz? — Der Junge tritt den Ball.",
+        option_a: "Wer-Fall",
+        option_b: "Wen-Fall",
+        option_c: "keins von beiden",
+        richtig: "b",
+        erklaerung: "WAS tritt der Junge? Den Ball. Das ist der Wen-Fall."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'Die Lehrerin' hier der Wer-Fall?",
+        satz: "Die Lehrerin erklärt die Aufgabe.",
+        tts: "Ist Die Lehrerin hier der Wer-Fall? — Die Lehrerin erklärt die Aufgabe.",
+        richtig: "richtig",
+        erklaerung: "Ja! WER erklärt? Die Lehrerin. Das ist der Wer-Fall."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'die Aufgabe' hier der Wer-Fall?",
+        satz: "Die Lehrerin erklärt die Aufgabe.",
+        tts: "Ist die Aufgabe hier der Wer-Fall? — Die Lehrerin erklärt die Aufgabe.",
+        richtig: "falsch",
+        erklaerung: "Nein! WAS erklärt sie? Die Aufgabe. Das ist der Wen-Fall."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Nomen im Wer-Fall!",
+        tts: "Klick auf das Nomen im Wer-Fall! — Papa sieht den Hund.",
+        woerter: ["Papa", "sieht", "den", "Hund."],
+        richtig: 0,
+        erklaerung: "Papa ist der Wer-Fall. WER sieht? Papa!"
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Nomen im Wen-Fall!",
+        tts: "Klick auf das Nomen im Wen-Fall! — Papa sieht den Hund.",
+        woerter: ["Papa", "sieht", "den", "Hund."],
+        richtig: 3,
+        erklaerung: "Hund ist der Wen-Fall. WEN sieht Papa? Den Hund!"
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist 'das Kind' in diesem Satz?",
+        satz: "Das Kind malt ein Bild.",
+        tts: "Was ist das Kind in diesem Satz? — Das Kind malt ein Bild.",
+        option_a: "Wer-Fall",
+        option_b: "Wen-Fall",
+        richtig: "a",
+        erklaerung: "WER malt? Das Kind. Das ist der Wer-Fall."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist 'ein Bild' in diesem Satz?",
+        satz: "Das Kind malt ein Bild.",
+        tts: "Was ist ein Bild in diesem Satz? — Das Kind malt ein Bild.",
+        option_a: "Wer-Fall",
+        option_b: "Wen-Fall",
+        richtig: "b",
+        erklaerung: "WAS malt das Kind? Ein Bild. Das ist der Wen-Fall."
+      }
+    ]
   }
 
 ];
