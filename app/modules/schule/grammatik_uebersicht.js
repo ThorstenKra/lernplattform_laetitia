@@ -94,6 +94,88 @@ function baueUebersicht(){
   });
 }
 
-window.GrammatikUebersicht = { baueUebersicht: baueUebersicht };
+function schalteStufeFrei(stufe){
+  var stand = ladeStand();
+  GRAMMATIK_EINHEITEN.forEach(function(e){
+    if(e.stufe !== stufe) return;
+    if(!stand[e.id]) stand[e.id] = {};
+    stand[e.id].abgeschlossen = true;
+    if(!stand[e.id].besteQuote) stand[e.id].besteQuote = 1;
+  });
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(stand)); }catch(ex){}
+  location.reload();
+}
+
+function initAdmin(){
+  var headerEl = document.querySelector(".header");
+  if(!headerEl) return;
+  var timer = null;
+  function startHold(){ timer = setTimeout(oeffnePanel, 3000); }
+  function stopHold(){ if(timer){ clearTimeout(timer); timer = null; } }
+  headerEl.addEventListener("mousedown",  startHold);
+  headerEl.addEventListener("touchstart", startHold, {passive:true});
+  headerEl.addEventListener("mouseup",    stopHold);
+  headerEl.addEventListener("mouseleave", stopHold);
+  headerEl.addEventListener("touchend",   stopHold);
+
+  function btn(text, css, fn){
+    var b = document.createElement("button");
+    b.textContent = text;
+    b.style.cssText = "display:block;width:100%;margin-bottom:8px;padding:12px 10px;" +
+      "border-radius:12px;font-size:13px;font-weight:1000;cursor:pointer;text-align:left;border:2px solid;" + css;
+    b.onclick = fn;
+    return b;
+  }
+
+  function oeffnePanel(){
+    var overlay = document.createElement("div");
+    overlay.style.cssText = "position:fixed;top:0;left:0;right:0;bottom:0;" +
+      "background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center;";
+
+    var panel = document.createElement("div");
+    panel.style.cssText = "background:#fff;border-radius:16px;padding:20px;" +
+      "max-width:340px;width:92%;max-height:80vh;overflow-y:auto;";
+
+    var titel = document.createElement("p");
+    titel.textContent = "🔧 Admin — Stufe freigeben";
+    titel.style.cssText = "font-size:17px;font-weight:1000;color:#7c3aed;margin-bottom:14px;";
+    panel.appendChild(titel);
+
+    var stufen = [];
+    var seen = {};
+    GRAMMATIK_EINHEITEN.forEach(function(e){
+      if(!seen[e.stufe]){ seen[e.stufe] = true; stufen.push(e.stufe); }
+    });
+    stufen.forEach(function(st){
+      panel.appendChild(btn(
+        "✅ " + (STUFE_NAMEN[st] || "Stufe " + st) + " freigeben",
+        "border-color:#7c3aed;background:#f5f3ff;color:#4c1d95;",
+        function(){ schalteStufeFrei(st); document.body.removeChild(overlay); }
+      ));
+    });
+
+    panel.appendChild(btn(
+      "🗑️ Alle Fortschritte löschen",
+      "border-color:#ef4444;background:#fef2f2;color:#b91c1c;margin-top:12px;",
+      function(){
+        if(confirm("Wirklich alle Fortschritte löschen?")){
+          localStorage.removeItem(STORAGE_KEY);
+          document.body.removeChild(overlay);
+          location.reload();
+        }
+      }
+    ));
+    panel.appendChild(btn(
+      "✕ Schließen",
+      "border-color:#94a3b8;background:#f8fafc;color:#475569;",
+      function(){ document.body.removeChild(overlay); }
+    ));
+
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+  }
+}
+
+window.GrammatikUebersicht = { baueUebersicht: baueUebersicht, initAdmin: initAdmin };
 
 })();
