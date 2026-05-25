@@ -549,6 +549,7 @@ Dann Edge komplett neu starten.
 ## Offene Aufgaben
 
 ### 🔴 Dringend
+- **Quasselkiste: NuVoice-Export vom Tobii Accent** → vollständige Vokabeldaten (4 Ebenen + alle Piktogramme) exportieren. Danach: Emulation + Pfad-Training. Analyse 25.05.2026 — siehe unten.
 - **Grammatik Stufe 8+:** E-39+ (Pronomen, Satzzeichen — Einheiten noch nicht geplant)
 - **Bluetooth-Modul aktivieren:** `Install-Module AudioDeviceCmdlets` (einmalig als Admin)
 - **taucher_lies** Crop-Werte korrigieren (aktuell Schätzwert)
@@ -584,3 +585,4 @@ Claude darf **niemals** Kerndateien (`dwell.js`, `error_handler.js`, `geraete.js
 | 2026-05-17 | 17 Goldstandards (Rules 12–17); error_handler.js v3 (Link-Navigator-Guard); validate.ps1 Prüfung 8 (href-Check); Grammatik Stufe 3 (E-15–E-20, 60 Aufgaben) + Stufe 4 (E-21–E-26, 60 Aufgaben); Lese/Aktions-Trennung als Goldstandard 17; Grammatik Auto-Weiter (3s nach TTS); grammatik_mod.js v3; index.html: Aussprache Lätitia + Katja-Stimme |
 | 2026-05-23 | OneDrive Online-Only-Bug behoben (attrib +P); Grammatik Stufe 5 (E-27–E-30) + Stufe 6 (E-31–E-34, je 40 Aufgaben) implementiert + getestet; Quasselkiste 60 + Pfad-Training getestet; 11 korrupte Quasselkiste-Einträge gefiltert; OneDrive-Deployment Quasselkiste korrigiert; Link-Navigator-Guard aus error_handler.js entfernt (XHR → fälschlicher window.onerror auf OneDrive-Platzhaltern); validate.ps1 Prüfung 9 (OneDrive-Sync MD5-Check); Claude deployt jetzt direkt per Bash |
 | 2026-05-25 | Grammatik: Stufen-basierte Freischaltung (Stufe N frei wenn Stufe N-1 komplett); STUFE_NAMEN 4–7 ergänzt; Grammatik Stufe 7 (E-35–E-38, 40 Aufgaben: Wer-Fall / Wen-Fall); Admin-Panel (3 Sek. Header halten → Freischalt-Buttons + Reset) |
+| 2026-05-25 | Quasselkiste Machbarkeitsanalyse: aktuelle Datenbasis hat nur 1- u. 2-Schritt-Pfade, 20 Tiles fehlen, Ebene-2–4-Piktogramme nicht vorhanden. Blocker: vollständiger Export vom Tobii Accent nötig. Pfad-Training pausiert. |

@@ -158,6 +158,9 @@ Eingetragene Bücher: Das Fliegende Kamel (60 Tracks), Jaguar und NEINguar (54 T
 
 ## 🔴 Offene Aufgaben — Hochpriorität
 
+**🔴 Quasselkiste: NuVoice-Export vom Tobii Accent durchführen**
+Vollständige Vokabeldaten (4 Ebenen, alle Piktogramme) exportieren → dann Emulation + Pfad-Training
+
 **Grammatik-Werkstatt: Stufe 8+ (E-39+) — nächster Block**
 Thema: Pronomen, Satzzeichen — Einheiten noch nicht geplant
 
@@ -259,6 +262,37 @@ Dann Edge komplett neu starten.
 | STUFE_NAMEN Stufen 4–7 ergänzt | ✅ Konjugation / Plural / Groß-/Kleinschreibung / Kasus |
 | Grammatik Stufe 7 (E-35–E-38) | ✅ 40 Aufgaben: Wer-Fall, Wen-Fall, Unterscheiden, Zusammenfassung |
 | Admin-Panel Freischaltung | ✅ 3 Sek. Header halten → Panel mit Stufen-Freischalt-Buttons + Reset |
+| Quasselkiste: NuVoice-Emulation Machbarkeitsanalyse | ⚠️ Datenbasis unvollständig — siehe unten |
+
+### 🔴 Quasselkiste — Analyse 25. Mai 2026 (HIER WEITERMACHEN)
+
+**Kontext:** Vor dem Pfad-Training muss die NuVoice-Emulation vollständig und fehlerfrei sein.
+
+**Analyseergebnis — aktuelle Datenlage:**
+
+| Was | Befund |
+|---|---|
+| Pfade gesamt | 1.880 — davon nur 1- und 2-Schritt-Pfade |
+| 3-Schritt-Pfade (Ebene 3) | **0 — fehlen komplett** |
+| 4-Schritt-Pfade (Ebene 4) | **0 — fehlen komplett** |
+| Einzigartige Ebene-2-Seiten | 37 (aus vorhandenen Daten ableitbar) |
+| Tile-Bilder (Ebene 1) | **40 von 60** — 20 fehlen (Zeile 6 + Spalten 9–10) |
+| Piktogramme Ebene 2–4 | **Nicht vorhanden** |
+| NuVoice-Installationsverzeichnis | Nur App-Shell + UI-Chrome — keine Vokabeldaten |
+
+**Fehlende Tile-Bilder (Ebene 1):**
+Zeile 6: Maus, Baby, Bett, TV, Freibad, Dieb, Idee, wandern, das, den
+Spalten 9–10, Zeilen 1–5: Fussball, (leer), ihr, Sie, Talker, Lupe, der, des, die, dem
+
+**Ursache:** Die vollständigen Vokabeldaten (4 Ebenen, alle Piktogramme) liegen auf dem **Tobii Accent 1400**, nicht auf diesem PC.
+
+**Nächster Schritt (vom Benutzer durchzuführen):**
+Vollständigen Export der NuVoice-Vokabulardaten vom Tobii Accent 1400:
+- Alle Pfade (1- bis 4-Schritt)
+- Alle Piktogramm-Bilder aller Ebenen
+→ Danach: Vollständige Emulation und Pfad-Training programmieren
+
+**Entscheidung:** Pfad-Training pausiert, bis die Emulation vollständig ist.
 
 ## Sitzungsprotokoll 23. Mai 2026
 
