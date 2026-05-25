@@ -6,9 +6,12 @@ var STORAGE_KEY = "laetitia_grammatik_v1";
 
 var STUFE_NAMEN = {
   0: "Stufe 0 — Satz und Wort",
-  1: "Stufe 1 — Nomen",
-  2: "Stufe 2 — Artikel",
-  3: "Stufe 3 — Sätze bauen"
+  1: "Stufe 1 — Nomen, Verben, Adjektive",
+  2: "Stufe 2 — Artikel der / die / das",
+  3: "Stufe 3 — Sätze bauen",
+  4: "Stufe 4 — Konjugation Gegenwart",
+  5: "Stufe 5 — Singular & Plural",
+  6: "Stufe 6 — Groß- und Kleinschreibung"
 };
 
 function ladeStand(){
@@ -20,6 +23,12 @@ function ladeStand(){
 
 function einheitAbgeschlossen(id, stand){
   return !!(stand[id] && stand[id].abgeschlossen);
+}
+
+function stufeFertig(stufe, stand){
+  return GRAMMATIK_EINHEITEN
+    .filter(function(e){ return e.stufe === stufe; })
+    .every(function(e){ return einheitAbgeschlossen(e.id, stand); });
 }
 
 function baueUebersicht(){
@@ -43,7 +52,7 @@ function baueUebersicht(){
       bereich.appendChild(gridEl);
     }
 
-    var freigegeben = (index === 0) || einheitAbgeschlossen(GRAMMATIK_EINHEITEN[index - 1].id, stand);
+    var freigegeben = (einheit.stufe === 0) || stufeFertig(einheit.stufe - 1, stand);
     var gemeistert  = einheitAbgeschlossen(einheit.id, stand);
     var quote       = stand[einheit.id] ? stand[einheit.id].besteQuote : 0;
     var istGold     = gemeistert && quote >= 0.8;
