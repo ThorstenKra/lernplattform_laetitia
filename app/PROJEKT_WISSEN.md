@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Projekt-Wissen
-*Stand: 23. Mai 2026*
+*Stand: 25. Mai 2026*
 
 ## System
 
@@ -501,9 +501,10 @@ app/modules/schule/
 
 **Freischalt- und Fortschritts-Logik:**
 - Storage: `localStorage["laetitia_grammatik_v1"]`
-- Freischaltung: Vorgänger-Einheit `abgeschlossen:true` → nächste frei
+- **Stufen-basierte Freischaltung** (seit 25.05.2026): Stufe 0 immer offen; Stufe N freigeschaltet sobald alle Units von Stufe N-1 `abgeschlossen:true`
 - Meisterung: ≥80% in einer Session → Gold-Stern ⭐
 - Falsch beantwortete Aufgaben kommen am Ende nochmal (wiederholungsQueue)
+- **Admin-Panel:** 3 Sek. Maus/Touch auf `.header` halten → Panel mit Freischalt-Button pro Stufe + Reset (`grammatik_uebersicht.js → initAdmin()`)
 
 **Implementierter Lernpfad:**
 
@@ -516,8 +517,8 @@ app/modules/schule/
 | 4 | E-21–E-26 | Konjugation Gegenwart | 60 | ✅ |
 | 5 | E-27–E-30 | Singular & Plural | 40 | ✅ |
 | 6 | E-31–E-34 | Groß-/Kleinschreibung | 40 | ✅ getestet |
-| **7** | **E-35–E-38** | **Kasus (Wer-/Wen-Fall)** | — | ⬜ nächster Block |
-| 8–13 | E-39–E-61 | Pronomen, Satzzeichen … | — | ⬜ offen |
+| 7 | E-35–E-38 | Kasus (Wer-/Wen-Fall) | 40 | ✅ |
+| **8–13** | **E-39+** | **Pronomen, Satzzeichen …** | — | ⬜ nächster Block |
 
 ---
 
@@ -548,7 +549,7 @@ Dann Edge komplett neu starten.
 ## Offene Aufgaben
 
 ### 🔴 Dringend
-- **Grammatik Stufe 7:** E-35–E-38 (Kasus — Wer-Fall / Wen-Fall Grundlagen)
+- **Grammatik Stufe 8+:** E-39+ (Pronomen, Satzzeichen — Einheiten noch nicht geplant)
 - **Bluetooth-Modul aktivieren:** `Install-Module AudioDeviceCmdlets` (einmalig als Admin)
 - **taucher_lies** Crop-Werte korrigieren (aktuell Schätzwert)
 - **Neues Lies-mal-3-Buch** → 6 Comic-Seiten (S. 2, 8, 14, 16, 22, 28) fotografieren → hochladen
@@ -582,3 +583,4 @@ Claude darf **niemals** Kerndateien (`dwell.js`, `error_handler.js`, `geraete.js
 | 2026-05-14 | Grammatik-Werkstatt (E-00–E-14, 148 Aufgaben); OneDrive-Pfad korrigiert; sinnesorgane_info_mod.js TTS auf Goldstandard; Deployment-Workflow dokumentiert |
 | 2026-05-17 | 17 Goldstandards (Rules 12–17); error_handler.js v3 (Link-Navigator-Guard); validate.ps1 Prüfung 8 (href-Check); Grammatik Stufe 3 (E-15–E-20, 60 Aufgaben) + Stufe 4 (E-21–E-26, 60 Aufgaben); Lese/Aktions-Trennung als Goldstandard 17; Grammatik Auto-Weiter (3s nach TTS); grammatik_mod.js v3; index.html: Aussprache Lätitia + Katja-Stimme |
 | 2026-05-23 | OneDrive Online-Only-Bug behoben (attrib +P); Grammatik Stufe 5 (E-27–E-30) + Stufe 6 (E-31–E-34, je 40 Aufgaben) implementiert + getestet; Quasselkiste 60 + Pfad-Training getestet; 11 korrupte Quasselkiste-Einträge gefiltert; OneDrive-Deployment Quasselkiste korrigiert; Link-Navigator-Guard aus error_handler.js entfernt (XHR → fälschlicher window.onerror auf OneDrive-Platzhaltern); validate.ps1 Prüfung 9 (OneDrive-Sync MD5-Check); Claude deployt jetzt direkt per Bash |
+| 2026-05-25 | Grammatik: Stufen-basierte Freischaltung (Stufe N frei wenn Stufe N-1 komplett); STUFE_NAMEN 4–7 ergänzt; Grammatik Stufe 7 (E-35–E-38, 40 Aufgaben: Wer-Fall / Wen-Fall); Admin-Panel (3 Sek. Header halten → Freischalt-Buttons + Reset) |

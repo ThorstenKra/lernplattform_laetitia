@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 23. Mai 2026*
+*Stand: 25. Mai 2026*
 
 ---
 
@@ -97,8 +97,8 @@ Erreichbar: `schule.html` → Grammatik-Button → `grammatik.html`
 | 4 | E-21–E-26 | Konjugation Gegenwart | 60 | ✅ |
 | 5 | E-27–E-30 | Singular & Plural | 40 | ✅ |
 | 6 | E-31–E-34 | Groß-/Kleinschreibung | 40 | ✅ getestet |
-| **7** | **E-35–E-38** | **Kasus (Wer-/Wen-Fall)** | — | ⬜ nächster Block |
-| 8–13 | E-39–E-61 | Pronomen, Satzzeichen … | — | ⬜ |
+| 7 | E-35–E-38 | Kasus (Wer-/Wen-Fall) | 40 | ✅ |
+| **8–13** | **E-39+** | **Pronomen, Satzzeichen …** | — | ⬜ nächster Block |
 
 **Grammatik-Werkstatt Features:**
 - Lesebereich (grau, `pointer-events:none`) oben — Frage + Satz sind PASSIV
@@ -107,6 +107,8 @@ Erreichbar: `schule.html` → Grammatik-Button → `grammatik.html`
 - Nach Antwort: Buttons vollständig ausgeblendet (`display:none`)
 - 3 Sekunden nach TTS-Ende: Auto-Weiter zur nächsten Aufgabe
 - Weiter-Button bleibt für sofortiges Vorwärts
+- **Stufen-basierte Freischaltung:** Stufe 0 immer offen; Stufe N freigeschaltet sobald alle Units von Stufe N-1 abgeschlossen
+- **Admin-Panel:** 3 Sekunden auf den Header halten → Panel mit Freischalt-Buttons pro Stufe + Reset aller Fortschritte
 
 ## Quasselkiste / NuVoice-Emulation — Stand 23. Mai 2026
 
@@ -156,8 +158,8 @@ Eingetragene Bücher: Das Fliegende Kamel (60 Tracks), Jaguar und NEINguar (54 T
 
 ## 🔴 Offene Aufgaben — Hochpriorität
 
-**Grammatik-Werkstatt: Stufe 7 (E-35–E-38) — nächster Block**
-Thema: Kasus (Wer-Fall / Wen-Fall Grundlagen)
+**Grammatik-Werkstatt: Stufe 8+ (E-39+) — nächster Block**
+Thema: Pronomen, Satzzeichen — Einheiten noch nicht geplant
 
 **Bluetooth-Umschaltung:**
 Einziger offener Schritt — als Administrator ausführen:
@@ -248,6 +250,15 @@ Dann Edge komplett neu starten.
 **Hinweis:** `.exe`, `.bat`, Mediendateien (MP3, JPG, PNG, …) stehen in `.gitignore` und bleiben lokal.
 
 ---
+
+## Sitzungsprotokoll 25. Mai 2026
+
+| Was | Ergebnis |
+|---|---|
+| Grammatik: Stufen-basierte Freischaltung | ✅ Stufe 0 immer offen; Stufe N frei wenn Stufe N-1 komplett |
+| STUFE_NAMEN Stufen 4–7 ergänzt | ✅ Konjugation / Plural / Groß-/Kleinschreibung / Kasus |
+| Grammatik Stufe 7 (E-35–E-38) | ✅ 40 Aufgaben: Wer-Fall, Wen-Fall, Unterscheiden, Zusammenfassung |
+| Admin-Panel Freischaltung | ✅ 3 Sek. Header halten → Panel mit Stufen-Freischalt-Buttons + Reset |
 
 ## Sitzungsprotokoll 23. Mai 2026
 
