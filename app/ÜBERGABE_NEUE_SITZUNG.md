@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 25. Mai 2026*
+*Stand: 31. Mai 2026*
 
 ---
 
@@ -74,15 +74,15 @@ Claude beschränkt sich auf entscheidungsrelevante Ausgaben. Einzelschritte, Üb
 | `schule_liesmal3_data.js` | ✅ vollständig |
 | `test_suite.html` | ✅ JS-Checks laufen, HTML-Checks brauchen Edge-Flag |
 
-## Grammatik-Werkstatt — Stand 23. Mai 2026
+## Grammatik-Werkstatt — Stand 31. Mai 2026
 
 Erreichbar: `schule.html` → Grammatik-Button → `grammatik.html`
 
 | Datei | Inhalt | Version |
 |---|---|---|
-| `grammatik.html` | Einheiten-Übersicht, Fortschrittsanzeige, Freischalt-Logik | ✅ |
-| `grammatik_spiel.html` | Spielseite (URL-param `?einheit=E-00`) — Lese/Aktions-Layout | v2 ✅ |
-| `grammatik_data.js` | 35 Einheiten, 348 Aufgaben | ✅ |
+| `grammatik.html` | Einheiten-Übersicht, Fortschrittsanzeige | ✅ |
+| `grammatik_spiel.html` | Spielseite (URL-param `?einheit=E-03`) — Lese/Aktions-Layout | v2 ✅ |
+| `grammatik_data.js` | 36 Einheiten, 360 Aufgaben (E-03–E-42) | ✅ |
 | `grammatik_mod.js` | Engine: `window.GrammatikMod.starteEinheit(id)` — Auto-Weiter | v3 ✅ |
 | `grammatik_uebersicht.js` | `window.GrammatikUebersicht.baueUebersicht()` | ✅ |
 
@@ -90,15 +90,15 @@ Erreichbar: `schule.html` → Grammatik-Button → `grammatik.html`
 
 | Stufe | Einheiten | Thema | Aufgaben | Status |
 |---|---|---|---|---|
-| 0 | E-00–E-02 | Satz und Wort | 28 | ✅ |
 | 1 | E-03–E-09 | Nomen, Verben, Adjektive | 70 | ✅ |
 | 2 | E-10–E-14 | Artikel der/die/das | 50 | ✅ |
 | 3 | E-15–E-20 | Sätze bauen (Subjekt/Prädikat/Objekt) | 60 | ✅ |
 | 4 | E-21–E-26 | Konjugation Gegenwart | 60 | ✅ |
 | 5 | E-27–E-30 | Singular & Plural | 40 | ✅ |
-| 6 | E-31–E-34 | Groß-/Kleinschreibung | 40 | ✅ getestet |
+| 6 | E-31–E-34 | Groß-/Kleinschreibung | 40 | ✅ |
 | 7 | E-35–E-38 | Kasus (Wer-/Wen-Fall) | 40 | ✅ |
-| **8–13** | **E-39+** | **Pronomen, Satzzeichen …** | — | ⬜ nächster Block |
+| 8 | E-39–E-42 | Pronomen | 40 | ✅ |
+| **9–13** | **E-43+** | **Satzzeichen, …** | — | ⬜ nächster Block |
 
 **Grammatik-Werkstatt Features:**
 - Lesebereich (grau, `pointer-events:none`) oben — Frage + Satz sind PASSIV
@@ -107,8 +107,8 @@ Erreichbar: `schule.html` → Grammatik-Button → `grammatik.html`
 - Nach Antwort: Buttons vollständig ausgeblendet (`display:none`)
 - 3 Sekunden nach TTS-Ende: Auto-Weiter zur nächsten Aufgabe
 - Weiter-Button bleibt für sofortiges Vorwärts
-- **Stufen-basierte Freischaltung:** Stufe 0 immer offen; Stufe N freigeschaltet sobald alle Units von Stufe N-1 abgeschlossen
-- **Admin-Panel:** 3 Sekunden auf den Header halten → Panel mit Freischalt-Buttons pro Stufe + Reset aller Fortschritte
+- **Alle Einheiten immer zugänglich** — keine Freischaltlogik
+- **Admin-Panel:** 3 Sekunden auf den Header halten → „Alle Fortschritte löschen"
 
 ## Quasselkiste / NuVoice-Emulation — Stand 23. Mai 2026
 
@@ -161,8 +161,8 @@ Eingetragene Bücher: Das Fliegende Kamel (60 Tracks), Jaguar und NEINguar (54 T
 **🔴 Quasselkiste: NuVoice-Export vom Tobii Accent durchführen**
 Vollständige Vokabeldaten (4 Ebenen, alle Piktogramme) exportieren → dann Emulation + Pfad-Training
 
-**Grammatik-Werkstatt: Stufe 8+ (E-39+) — nächster Block**
-Thema: Pronomen, Satzzeichen — Einheiten noch nicht geplant
+**Grammatik-Werkstatt: Stufe 9+ (E-43+) — nächster Block**
+Thema: Satzzeichen — Einheiten noch nicht geplant
 
 **Bluetooth-Umschaltung:**
 Einziger offener Schritt — als Administrator ausführen:
@@ -184,7 +184,7 @@ Dann `lernwelt_starten.exe` neu starten → Audio-Dialog testen.
 - Mathe-Hefte digitalisieren (PDFs vorhanden) → `schule_mathe_data.js`
 - Sachkunde-Bilder für 7 fehlende Themen ergänzen
 - `stats.js` in weitere Spielseiten einbinden (Regel 15 vollständig umsetzen)
-- Grammatik Stufe 7 (E-35–E-38): Kasus
+- Grammatik Stufe 9+ (E-43+): Satzzeichen
 
 ---
 
@@ -251,6 +251,17 @@ attrib +P "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/*.*" /S /
 Dann Edge komplett neu starten.
 
 **Hinweis:** `.exe`, `.bat`, Mediendateien (MP3, JPG, PNG, …) stehen in `.gitignore` und bleiben lokal.
+
+---
+
+## Sitzungsprotokoll 31. Mai 2026
+
+| Was | Ergebnis |
+|---|---|
+| Grammatik: Freischaltungslogik entfernt | ✅ Alle Einheiten immer zugänglich — `freigegeben = true` |
+| Grammatik: Stufe-0-Einheiten E-00–E-02 entfernt | ✅ 28 Aufgaben (Satz/Wort) gelöscht — zu elementar |
+| Grammatik: Admin-Panel vereinfacht | ✅ Nur noch „Alle Fortschritte löschen" |
+| Grammatik Stufe 8 (E-39–E-42) | ✅ 40 Aufgaben: Pronomen ich/du/er/sie/es/wir/ihr + mein/dein |
 
 ---
 
