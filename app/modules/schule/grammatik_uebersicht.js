@@ -11,7 +11,8 @@ var STUFE_NAMEN = {
   4: "Stufe 4 — Konjugation Gegenwart",
   5: "Stufe 5 — Singular & Plural",
   6: "Stufe 6 — Groß- und Kleinschreibung",
-  7: "Stufe 7 — Wer-Fall und Wen-Fall"
+  7: "Stufe 7 — Wer-Fall und Wen-Fall",
+  8: "Stufe 8 — Pronomen"
 };
 
 function ladeStand(){

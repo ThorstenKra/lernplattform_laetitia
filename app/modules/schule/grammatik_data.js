@@ -1,5 +1,5 @@
 // grammatik_data.js — Grammatik-Werkstatt Aufgaben
-// Einheiten E-03+ (Stufen 1–7: Nomen bis Kasus)
+// Einheiten E-03+ (Stufen 1–8: Nomen bis Pronomen)
 // Typen: ja_nein | ab_wahl | abc_wahl | wort_button | richtig_falsch
 
 var GRAMMATIK_EINHEITEN = [
@@ -3698,6 +3698,435 @@ var GRAMMATIK_EINHEITEN = [
         option_b: "Wen-Fall",
         richtig: "b",
         erklaerung: "WAS malt das Kind? Ein Bild. Das ist der Wen-Fall."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-39 — Ich, du, er, sie, es
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-39",
+    titel: "Ich, du, er, sie, es",
+    emoji: "👤",
+    stufe: 8,
+    erklaerung_tts: "Pronomen sind kleine Wörter, die wir statt eines Namens benutzen. Ich — das bin ich selbst. Du — das ist die andere Person. Er — ein Mann oder Junge. Sie — eine Frau oder ein Mädchen. Es — eine Sache oder ein Kind.",
+    erklaerung_merksatz: "Pronomen ersetzen Namen: ich, du, er, sie, es",
+    aufgaben: [
+      {
+        typ: "ja_nein",
+        frage: "Stimmt das?",
+        satz: "'Ich' benutzt man, wenn man von sich selbst spricht.",
+        tts: "Stimmt das? — Ich benutzt man, wenn man von sich selbst spricht.",
+        richtig: "ja",
+        erklaerung: "Ja! Ich bin immer ich selbst."
+      },
+      {
+        typ: "ja_nein",
+        frage: "Stimmt das?",
+        satz: "'Du' benutzt man, wenn man von sich selbst spricht.",
+        tts: "Stimmt das? — Du benutzt man, wenn man von sich selbst spricht.",
+        richtig: "nein",
+        erklaerung: "Nein. Du sagt man zur anderen Person. Ich sagt man zu sich selbst."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welches Pronomen passt zu einem Jungen?",
+        tts: "Welches Pronomen passt zu einem Jungen?",
+        option_a: "er",
+        option_b: "sie",
+        richtig: "a",
+        erklaerung: "Er passt zu einem Jungen oder Mann."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welches Pronomen passt zu einem Mädchen?",
+        tts: "Welches Pronomen passt zu einem Mädchen?",
+        option_a: "er",
+        option_b: "sie",
+        richtig: "b",
+        erklaerung: "Sie passt zu einem Mädchen oder einer Frau."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was kommt statt 'das Baby'?",
+        tts: "Was kommt statt das Baby?",
+        option_a: "er",
+        option_b: "es",
+        richtig: "b",
+        erklaerung: "Das Baby → es. Bei Dingen und kleinen Kindern sagt man es."
+      },
+      {
+        typ: "ja_nein",
+        frage: "Passt 'er' zu diesem Satz?",
+        satz: "Der Mann schläft.",
+        tts: "Passt er zu diesem Satz? — Der Mann schläft.",
+        richtig: "ja",
+        erklaerung: "Ja! Der Mann → er. Er passt zu männlichen Personen."
+      },
+      {
+        typ: "ja_nein",
+        frage: "Passt 'sie' zu diesem Satz?",
+        satz: "Die Oma kocht.",
+        tts: "Passt sie zu diesem Satz? — Die Oma kocht.",
+        richtig: "ja",
+        erklaerung: "Ja! Die Oma → sie. Sie passt zu weiblichen Personen."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was passt? ___ bin müde.",
+        satz: "(Ich spreche von mir selbst.)",
+        tts: "Was passt? Blank bin müde. Ich spreche von mir selbst.",
+        option_a: "Ich",
+        option_b: "Du",
+        richtig: "a",
+        erklaerung: "Ich bin müde — ich rede von mir selbst."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was passt? ___ bist lustig.",
+        satz: "(Ich rede mit einer anderen Person.)",
+        tts: "Was passt? Blank bist lustig. Ich rede mit einer anderen Person.",
+        option_a: "Ich",
+        option_b: "Du",
+        richtig: "b",
+        erklaerung: "Du bist lustig — ich rede mit der anderen Person."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was kommt statt 'der Hund'?",
+        satz: "Der Hund bellt.",
+        tts: "Was kommt statt der Hund? — Der Hund bellt.",
+        option_a: "sie",
+        option_b: "er",
+        richtig: "b",
+        erklaerung: "Der Hund → er. Artikel der → Pronomen er."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-40 — Wir, ihr, sie (Plural)
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-40",
+    titel: "Wir, ihr, sie (Plural)",
+    emoji: "👥",
+    stufe: 8,
+    erklaerung_tts: "Wir — das sind ich und andere zusammen. Ihr — das sind mehrere Personen, die ich direkt anspreche. Sie — das sind mehrere Personen, über die ich spreche.",
+    erklaerung_merksatz: "Pronomen für mehrere: wir, ihr, sie",
+    aufgaben: [
+      {
+        typ: "ja_nein",
+        frage: "Stimmt das?",
+        satz: "'Wir' bedeutet: ich und noch jemand anderes.",
+        tts: "Stimmt das? — Wir bedeutet: ich und noch jemand anderes.",
+        richtig: "ja",
+        erklaerung: "Ja! Wir sind immer mehrere — ich und andere zusammen."
+      },
+      {
+        typ: "ja_nein",
+        frage: "Stimmt das?",
+        satz: "'Ihr' benutzt man nur für eine einzige Person.",
+        tts: "Stimmt das? — Ihr benutzt man nur für eine einzige Person.",
+        richtig: "nein",
+        erklaerung: "Nein. Ihr benutzt man für mehrere Personen, die man direkt anspricht."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Ich und meine Schwester singen. Welches Pronomen passt?",
+        tts: "Ich und meine Schwester singen. Welches Pronomen passt?",
+        option_a: "Wir",
+        option_b: "Ihr",
+        richtig: "a",
+        erklaerung: "Ich und meine Schwester → Wir. Wir sind zusammen."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Du sprichst eine Gruppe Kinder an. Welches Pronomen?",
+        tts: "Du sprichst eine Gruppe Kinder an. Welches Pronomen?",
+        option_a: "ihr",
+        option_b: "sie",
+        richtig: "a",
+        erklaerung: "Ihr benutzt man, wenn man mehrere Personen direkt anspricht."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welches Wort fehlt? ___ seid laut!",
+        satz: "(Ich sage das zu einer Gruppe Kinder.)",
+        tts: "Welches Wort fehlt? Blank seid laut! Ich sage das zu einer Gruppe Kinder.",
+        option_a: "Wir",
+        option_b: "Ihr",
+        richtig: "b",
+        erklaerung: "Ihr seid laut — ich rede direkt mit der Gruppe."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Max und Lena rennen. Welches Pronomen passt?",
+        tts: "Max und Lena rennen. Welches Pronomen passt?",
+        option_a: "ihr",
+        option_b: "sie",
+        richtig: "b",
+        erklaerung: "Max und Lena → sie. Bei mehreren Personen, über die man spricht, sagt man sie."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Mein Bruder und ich essen Kuchen. Welches Pronomen?",
+        tts: "Mein Bruder und ich essen Kuchen. Welches Pronomen?",
+        option_a: "Wir",
+        option_b: "Sie",
+        richtig: "a",
+        erklaerung: "Mein Bruder und ich → Wir. Ich bin dabei, also wir."
+      },
+      {
+        typ: "ja_nein",
+        frage: "Passt 'sie' zu diesem Satz?",
+        satz: "Die Kinder spielen im Garten.",
+        tts: "Passt sie zu diesem Satz? — Die Kinder spielen im Garten.",
+        richtig: "ja",
+        erklaerung: "Ja! Die Kinder → sie. Bei mehreren Personen, über die man spricht: sie."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Mama und Papa kochen. Was passt?",
+        tts: "Mama und Papa kochen. Was passt?",
+        option_a: "wir",
+        option_b: "ihr",
+        option_c: "sie",
+        richtig: "c",
+        erklaerung: "Mama und Papa → sie. Ich spreche über sie, nicht mit ihnen."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welches Wort fehlt? ___ spielen heute Fußball.",
+        satz: "(Ich und meine Freunde.)",
+        tts: "Welches Wort fehlt? Blank spielen heute Fußball. Ich und meine Freunde.",
+        option_a: "Ihr",
+        option_b: "Sie",
+        option_c: "Wir",
+        richtig: "c",
+        erklaerung: "Ich und meine Freunde → Wir spielen heute Fußball."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-41 — Pronomen statt Nomen
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-41",
+    titel: "Pronomen statt Nomen",
+    emoji: "🔄",
+    stufe: 8,
+    erklaerung_tts: "Wenn wir einen Namen schon kennen, benutzen wir ein Pronomen. Statt der Hund sagen wir er. Statt die Katze sagen wir sie. Statt das Kind sagen wir es. Der Artikel zeigt uns, welches Pronomen wir nehmen.",
+    erklaerung_merksatz: "der → er     die → sie     das → es",
+    aufgaben: [
+      {
+        typ: "ab_wahl",
+        frage: "Was kommt statt 'der Hund'?",
+        satz: "Der Hund bellt laut.",
+        tts: "Was kommt statt der Hund? — Der Hund bellt laut.",
+        option_a: "er",
+        option_b: "sie",
+        richtig: "a",
+        erklaerung: "Der Hund → er. Artikel der → Pronomen er."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was kommt statt 'die Katze'?",
+        satz: "Die Katze schläft.",
+        tts: "Was kommt statt die Katze? — Die Katze schläft.",
+        option_a: "er",
+        option_b: "sie",
+        richtig: "b",
+        erklaerung: "Die Katze → sie. Artikel die → Pronomen sie."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was kommt statt 'das Kind'?",
+        satz: "Das Kind lacht.",
+        tts: "Was kommt statt das Kind? — Das Kind lacht.",
+        option_a: "sie",
+        option_b: "es",
+        richtig: "b",
+        erklaerung: "Das Kind → es. Artikel das → Pronomen es."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was kommt statt 'das Buch'?",
+        satz: "Das Buch liegt auf dem Tisch.",
+        tts: "Was kommt statt das Buch? — Das Buch liegt auf dem Tisch.",
+        option_a: "er",
+        option_b: "sie",
+        option_c: "es",
+        richtig: "c",
+        erklaerung: "Das Buch → es. Artikel das → Pronomen es."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was kommt statt 'der Vater'?",
+        satz: "Der Vater kocht.",
+        tts: "Was kommt statt der Vater? — Der Vater kocht.",
+        option_a: "er",
+        option_b: "sie",
+        richtig: "a",
+        erklaerung: "Der Vater → er. Artikel der → Pronomen er."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was kommt statt 'die Lehrerin'?",
+        satz: "Die Lehrerin erklärt.",
+        tts: "Was kommt statt die Lehrerin? — Die Lehrerin erklärt.",
+        option_a: "er",
+        option_b: "sie",
+        richtig: "b",
+        erklaerung: "Die Lehrerin → sie. Artikel die → Pronomen sie."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was kommt statt 'das Auto'?",
+        satz: "Das Auto fährt schnell.",
+        tts: "Was kommt statt das Auto? — Das Auto fährt schnell.",
+        option_a: "er",
+        option_b: "sie",
+        option_c: "es",
+        richtig: "c",
+        erklaerung: "Das Auto → es. Artikel das → Pronomen es."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort ersetzt 'die Blume'?",
+        tts: "Welches Wort ersetzt die Blume?",
+        woerter: ["er", "sie", "es", "wir"],
+        richtig: 1,
+        erklaerung: "Die Blume → sie. Artikel die → Pronomen sie."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was kommt statt 'der Ball'?",
+        satz: "Der Ball rollt.",
+        tts: "Was kommt statt der Ball? — Der Ball rollt.",
+        option_a: "er",
+        option_b: "es",
+        richtig: "a",
+        erklaerung: "Der Ball → er. Artikel der → Pronomen er."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Richtig oder falsch?",
+        satz: "Die Sonne scheint. → Er scheint.",
+        tts: "Richtig oder falsch? — Die Sonne scheint — er scheint.",
+        richtig: "falsch",
+        erklaerung: "Falsch! Die Sonne → sie, nicht er. Artikel die → Pronomen sie."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-42 — Mein und dein
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-42",
+    titel: "Mein und dein",
+    emoji: "🤲",
+    stufe: 8,
+    erklaerung_tts: "Mit Pronomen können wir zeigen, wem etwas gehört. Mein — das gehört mir. Dein — das gehört dir. Sein — das gehört einem Jungen oder Mann. Ihr — das gehört einem Mädchen oder einer Frau.",
+    erklaerung_merksatz: "Besitz zeigen: mein, dein, sein, ihr",
+    aufgaben: [
+      {
+        typ: "ja_nein",
+        frage: "Stimmt das?",
+        satz: "'Mein Buch' bedeutet: das Buch gehört mir.",
+        tts: "Stimmt das? — Mein Buch bedeutet: das Buch gehört mir.",
+        richtig: "ja",
+        erklaerung: "Ja! Mein zeigt, dass etwas mir gehört."
+      },
+      {
+        typ: "ja_nein",
+        frage: "Stimmt das?",
+        satz: "'Dein Ball' bedeutet: der Ball gehört mir.",
+        tts: "Stimmt das? — Dein Ball bedeutet: der Ball gehört mir.",
+        richtig: "nein",
+        erklaerung: "Nein. Dein bedeutet, der Ball gehört dir — der anderen Person."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Das Buch gehört mir. Wie sage ich das?",
+        tts: "Das Buch gehört mir. Wie sage ich das?",
+        option_a: "mein Buch",
+        option_b: "dein Buch",
+        richtig: "a",
+        erklaerung: "Mein Buch — es gehört mir."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Der Ball gehört dir. Wie sage ich das?",
+        tts: "Der Ball gehört dir. Wie sage ich das?",
+        option_a: "mein Ball",
+        option_b: "dein Ball",
+        richtig: "b",
+        erklaerung: "Dein Ball — er gehört dir."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Das Fahrrad gehört dem Jungen. Wie sage ich das?",
+        tts: "Das Fahrrad gehört dem Jungen. Wie sage ich das?",
+        option_a: "sein Fahrrad",
+        option_b: "ihr Fahrrad",
+        richtig: "a",
+        erklaerung: "Sein Fahrrad — es gehört ihm. Sein zeigt, dass etwas einem Jungen oder Mann gehört."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Die Puppe gehört dem Mädchen. Wie sage ich das?",
+        tts: "Die Puppe gehört dem Mädchen. Wie sage ich das?",
+        option_a: "seine Puppe",
+        option_b: "ihre Puppe",
+        richtig: "b",
+        erklaerung: "Ihre Puppe — sie gehört ihr. Ihr zeigt, dass etwas einem Mädchen oder einer Frau gehört."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welches Wort fehlt?",
+        satz: "Das ist ___ Hund. (Er gehört mir.)",
+        tts: "Welches Wort fehlt? — Das ist Blank Hund. Er gehört mir.",
+        option_a: "mein",
+        option_b: "dein",
+        option_c: "sein",
+        richtig: "a",
+        erklaerung: "Mein Hund — er gehört mir."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welches Wort fehlt?",
+        satz: "Das ist ___ Katze. (Sie gehört dir.)",
+        tts: "Welches Wort fehlt? — Das ist Blank Katze. Sie gehört dir.",
+        option_a: "meine",
+        option_b: "deine",
+        option_c: "seine",
+        richtig: "b",
+        erklaerung: "Deine Katze — sie gehört dir."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welches Wort fehlt? Das ist ___ Stuhl.",
+        satz: "(Der Stuhl gehört dir. Ich sage das zu dir.)",
+        tts: "Welches Wort fehlt? — Das ist Blank Stuhl. Der Stuhl gehört dir.",
+        option_a: "mein",
+        option_b: "dein",
+        richtig: "b",
+        erklaerung: "Dein Stuhl — er gehört dir."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welches Wort fehlt?",
+        satz: "Maria hat eine Katze. Das ist ___ Katze.",
+        tts: "Welches Wort fehlt? — Maria hat eine Katze. Das ist Blank Katze.",
+        option_a: "seine",
+        option_b: "meine",
+        option_c: "ihre",
+        richtig: "c",
+        erklaerung: "Ihre Katze — sie gehört Maria."
       }
     ]
   }
