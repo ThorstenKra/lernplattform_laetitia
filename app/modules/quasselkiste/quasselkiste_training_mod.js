@@ -1,5 +1,5 @@
 // quasselkiste_training_mod.js -- Laetitia Lernsystem
-// Pfad-Training: Zielwort vorgeben, Pfad suchen
+// Pfad-Training: Stufenauswahl + Pfad suchen
 // REGEL 1: Kein import(), kein type="module"
 // REGEL 4: Nur gerade Anfuehrungszeichen
 
@@ -14,12 +14,16 @@ var pfade       = (window.QUASSELKISTE_PFADE || []).filter(function(p){
          /^[a-zA-ZäöüÄÖÜß\s\-]+$/.test(p.wort);
 });
 var felder      = window.QUASSELKISTE_FELDER || [];
-var zielEintrag = null;   // { wort, tts, pfad:[{r,c},...] }
-var aktSchritt  = 0;      // wie weit im Pfad schon korrekt geklickt
-var fehlerCount = 0;      // Fehler beim aktuellen Schritt
-var geloest     = 0;      // korrekt abgeschlossene Woerter
+var aktivePfade = [];       // gefilterter Pool fuer aktuelle Stufe
+var aktStufe    = 0;        // 0=Startscreen, 1=Ein-Klick, 2=Zwei-Klicks
+var zielEintrag = null;     // { wort, tts, pfad:[{r,c},...] }
+var aktSchritt  = 0;        // wie weit im Pfad schon korrekt geklickt
+var fehlerCount = 0;        // Fehler beim aktuellen Schritt
+var geloest     = 0;        // korrekt abgeschlossene Woerter
 var _attach     = null;
 var _dwell      = null;
+var _dwellMs    = 900;
+var _graceMs    = 150;
 
 function $(id){ return document.getElementById(id); }
 
@@ -61,12 +65,24 @@ function loadDwell(){
 
 function rebindDwell(){
   if(_dwell && typeof _dwell.cancelDwell === "function") _dwell.cancelDwell();
-  var ms    = parseInt(localStorage.getItem("laetitia_dwell_ms"))       || 900;
-  var grace = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
+  _dwellMs = parseInt(localStorage.getItem("laetitia_dwell_ms"))       || 900;
+  _graceMs = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
   _dwell = loadDwell()(".kachel, .nav-btn", {
-    dwellMs: ms, leaveGrace: grace,
+    dwellMs: _dwellMs, leaveGrace: _graceMs,
     onActivate: function(el){
       if(el.getAttribute("aria-disabled") === "true") return;
+      try{ el.click(); }catch(e){}
+    }
+  });
+}
+
+function rebindDwellStart(){
+  if(_dwell && typeof _dwell.cancelDwell === "function") _dwell.cancelDwell();
+  _dwellMs = parseInt(localStorage.getItem("laetitia_dwell_ms"))       || 900;
+  _graceMs = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
+  _dwell = loadDwell()(".stufe-btn, #startZurueck", {
+    dwellMs: _dwellMs, leaveGrace: _graceMs,
+    onActivate: function(el){
       try{ el.click(); }catch(e){}
     }
   });
@@ -115,13 +131,38 @@ function clearHinweis(){
   });
 }
 
+// ── Start-Screen ─────────────────────────────────────────────────────────────
+function zeigeStartScreen(){
+  $("startScreen").style.display = "";
+  $("grid").style.display = "none";
+  $("navLeiste").style.display = "none";
+  var za = $("zielAnzeige");
+  if(za) za.textContent = "Wähle eine Stufe";
+  var st = $("statsAnzeige");
+  if(st) st.textContent = "";
+  aktStufe = 0; geloest = 0; zielEintrag = null;
+  clearHighlights();
+  rebindDwellStart();
+}
+
+function startTraining(stufe){
+  aktStufe    = stufe;
+  geloest     = 0;
+  zielEintrag = null;
+  aktivePfade = pfade.filter(function(p){ return p.pfad.length === stufe; });
+  $("startScreen").style.display = "none";
+  $("grid").style.display = "grid";
+  $("navLeiste").style.display = "";
+  rebindDwell();
+  neuesWort();
+}
+
 // ── Neues Wort ───────────────────────────────────────────────────────────────
 function neuesWort(){
-  if(!pfade.length) return;
+  if(!aktivePfade.length) return;
   var vorher = zielEintrag ? zielEintrag.wort : null;
-  // Prefer entries where the word differs from the previous one
-  var pool = pfade.filter(function(p){ return p.wort !== vorher; });
-  if(!pool.length) pool = pfade;
+  var pool = aktivePfade.filter(function(p){ return p.wort !== vorher; });
+  if(!pool.length) pool = aktivePfade;
   var entry = pool[Math.floor(Math.random() * pool.length)];
 
   zielEintrag = entry;
@@ -136,7 +177,7 @@ function aktualisiereZiel(){
   var el = $("zielAnzeige");
   if(el) el.textContent = zielEintrag ? "Finde: " + zielEintrag.wort : "–";
   var st = $("statsAnzeige");
-  if(st) st.textContent = geloest + " gelöst";
+  if(st) st.textContent = "Stufe " + aktStufe + " · " + geloest + " gelöst";
 }
 
 // ── Kachel angeklickt ────────────────────────────────────────────────────────
@@ -152,7 +193,6 @@ function kachelKlick(r, c){
     aktSchritt++;
 
     if(aktSchritt >= zielEintrag.pfad.length){
-      // Pfad vollstaendig!
       geloest++;
       aktualisiereZiel();
       sprich(zielEintrag.tts || zielEintrag.wort);
@@ -161,7 +201,6 @@ function kachelKlick(r, c){
         setTimeout(neuesWort, 1800);
       }, 500);
     } else {
-      // Naechsten Schritt sprechen
       var n = feldName(r, c);
       if(n) sprich(n);
     }
@@ -222,12 +261,32 @@ function bauGrid(){
 function init(){
   bauGrid();
 
-  var btnZ = $("btnZurueck");
-  if(btnZ) btnZ.addEventListener("click", function(e){
+  // Stufen-Buttons
+  var btnS1 = $("btnStufe1");
+  if(btnS1) btnS1.addEventListener("click", function(){ startTraining(1); });
+  var btnS2 = $("btnStufe2");
+  if(btnS2) btnS2.addEventListener("click", function(){ startTraining(2); });
+
+  // Start-Screen Zurueck -> spielewelt.html
+  var btnSZ = $("startZurueck");
+  if(btnSZ) btnSZ.addEventListener("click", function(e){
     e.preventDefault();
     try{
       window.location.href = new URL("../../spielewelt.html", window.location.href).href;
     }catch(ex){ history.back(); }
+  });
+
+  // Nav Zurueck: aus Training -> Startscreen, aus Startscreen -> spielewelt.html
+  var btnZ = $("btnZurueck");
+  if(btnZ) btnZ.addEventListener("click", function(e){
+    e.preventDefault();
+    if(aktStufe > 0){
+      zeigeStartScreen();
+    } else {
+      try{
+        window.location.href = new URL("../../spielewelt.html", window.location.href).href;
+      }catch(ex){ history.back(); }
+    }
   });
 
   var btnH = $("btnHinweis");
@@ -236,7 +295,6 @@ function init(){
   var btnW = $("btnWeiter");
   if(btnW) btnW.addEventListener("click", function(){
     if(zielEintrag){
-      // Highlight the correct path briefly, then move on
       zielEintrag.pfad.forEach(function(step){
         var el = kachelEl(step.r, step.c);
         if(el) el.classList.add("hinweis");
@@ -245,15 +303,14 @@ function init(){
     }
   });
 
-  rebindDwell();
-
   ["pointerdown","click"].forEach(function(ev){
     document.addEventListener(ev, function(){
       try{ speechSynthesis.getVoices(); }catch(e){}
     }, {once:true, passive:true});
   });
 
-  neuesWort();
+  // Startscreen anzeigen
+  zeigeStartScreen();
 }
 
 window.QuasselTrainingMod = { init: init };

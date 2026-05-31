@@ -127,6 +127,46 @@ body{
 .nav-btn[aria-disabled="true"]{ opacity:.35; pointer-events:none; }
 .nav-btn .dwell-ring-svg{ width:52px; height:52px; }
 .nav-btn .dwell-ring-svg circle{ stroke:currentColor; }
+
+/* ── Start-Screen ────────────────────────────────────────────────────────── */
+#startScreen{
+  flex:1; min-height:0;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:14px; padding:20px 16px;
+  background:#1a1a1a;
+}
+#startTitel{ font-size:clamp(20px,3vw,28px); font-weight:1000; color:#f59e0b; }
+#startUntertitel{ font-size:clamp(13px,1.6vw,17px); color:#888; margin-bottom:4px; }
+.stufe-btn{
+  width:100%; max-width:540px; min-height:100px;
+  border-radius:16px; font-weight:1000;
+  cursor:pointer; user-select:none; position:relative;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:5px; border:3px solid; background:none; transition:none;
+}
+#btnStufe1{ background:#172554; border-color:#3b82f6; color:#93c5fd; }
+#btnStufe2{ background:#14532d; border-color:#16a34a; color:#86efac; }
+.stufe-btn:hover{ filter:brightness(1.15); }
+.stufe-btn.dwell-active{ transform:scale(1.02) !important; outline:3px solid currentColor !important; transition:none !important; }
+.stufe-nr{ font-size:clamp(15px,2vw,20px); font-weight:1000; pointer-events:none; }
+.stufe-info{ font-size:clamp(11px,1.3vw,14px); opacity:.75; pointer-events:none; }
+.stufe-btn .dwell-ring-svg{ width:52px; height:52px; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); }
+.stufe-btn .dwell-ring-svg circle{ stroke:currentColor; }
+#startZurueck{
+  width:100%; max-width:540px; min-height:72px;
+  border-radius:16px; font-size:clamp(14px,1.8vw,18px); font-weight:1000;
+  cursor:pointer; user-select:none; position:relative;
+  display:flex; align-items:center; justify-content:center;
+  gap:6px; border:2px solid var(--lila);
+  background:var(--lila-bg); color:var(--lila-dark);
+  text-decoration:none; transition:none; margin-top:6px;
+}
+#startZurueck:hover{ background:#ddd6fe; }
+#startZurueck.dwell-active{ transform:scale(1.02) !important; outline:3px solid #8b5cf6 !important; transition:none !important; }
+#startZurueck .dwell-ring-svg{ width:52px; height:52px; }
+#startZurueck .dwell-ring-svg circle{ stroke:#8b5cf6; }
 </style>
 </head>
 <body>
@@ -134,12 +174,32 @@ body{
 <div id="header">
   <div id="headerTitel">🎯 Pfad-Training</div>
   <div id="zielAnzeige">–</div>
-  <div id="statsAnzeige">0 gelöst</div>
+  <div id="statsAnzeige"></div>
 </div>
 
-<div id="grid"></div>
+<!-- Start-Screen -->
+<div id="startScreen">
+  <div id="startTitel">🎯 Pfad-Training</div>
+  <div id="startUntertitel">Wähle eine Stufe</div>
+  <button id="btnStufe1" class="stufe-btn">
+    <span class="stufe-nr">Stufe 1 — Ein Klick</span>
+    <span class="stufe-info">656 Wörter · direkt eine Kachel drücken</span>
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+  </button>
+  <button id="btnStufe2" class="stufe-btn">
+    <span class="stufe-nr">Stufe 2 — Zwei Klicks</span>
+    <span class="stufe-info">1 224 Wörter · zwei Kacheln nacheinander drücken</span>
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+  </button>
+  <a id="startZurueck" href="">
+    ← Zurück
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+  </a>
+</div>
 
-<div class="nav-leiste">
+<div id="grid" style="display:none"></div>
+
+<div class="nav-leiste" id="navLeiste" style="display:none">
   <button class="nav-btn nav-btn-zurueck" id="btnZurueck">
     <span class="btnLabel">← Zurück</span>
     <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#8b5cf6"/></svg>
