@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 31. Mai 2026*
+*Stand: 31. Mai 2026 (Sitzung 2)*
 
 ---
 
@@ -117,11 +117,26 @@ Erreichbar: `spielewelt.html` → 🗣️ Quasselkiste 60 / 🎯 Pfad-Training
 | Datei | Inhalt | Status |
 |---|---|---|
 | `quasselkiste.html` + `quasselkiste_mod.js` | 6×10 Raster, Pfad-Aufbau, TTS | ✅ getestet |
-| `quasselkiste_training.html` + `quasselkiste_training_mod.js` | Zielwort → Pfad suchen, Hinweis, Score, **Tile-Bilder** | ✅ |
+| `quasselkiste_training.html` + `quasselkiste_training_mod.js` | **Stufenauswahl + Pfad-Training** | ✅ |
 | `data/quasselkiste_data.js` | 60 Kacheln + 1.862 Pfade (bereinigt) | ✅ |
 | `tiles/tile_r*.png` | **60/60 Tiles** — aus MTC PRC extrahiert | ✅ |
+| `ANALYSE_MTI_QUASSELKISTE.md` | MTI-Analyse-Ergebnisse (KG-30-05-2026.mti) | ✅ |
+
+**Pfad-Training Stufen:**
+| Stufe | Beschreibung | Pfade |
+|---|---|---|
+| 1 | Ein Klick — direkt eine Kachel drücken | 656 |
+| 2 | Zwei Klicks — zwei Kacheln nacheinander | 1.224 |
+
+**Flow:** Startscreen → Stufenauswahl → Training. Zurück aus Training → Startscreen (nicht spielewelt).
 
 **Bekannte Einschränkung:** 311 mehrdeutige Pfade (MINSPEAK-Eigenheit) — Emulation zeigt ersten Treffer.
+
+**MTI-Analyse (KG-30-05-2026.mti):**
+- Datei = Komplett-Backup Tobii Accent (426 MB, Deflate-komprimiert)
+- ChoiceTrainer = externe App (`%ProgramFiles%\LifeTool\ChoiceTrainer AAC\...`), auf Entwicklungsrechner nicht installiert
+- „Präpositionen lernen mit Willi" (ZZ!W60_PA) = eingebettetes NuVoice-Grammatiksystem, kein Grid-Navigations-Training
+- Vollständige Analyse: `app/ANALYSE_MTI_QUASSELKISTE.md`
 
 ## Zentrale Dateien (app/core/)
 
@@ -158,6 +173,9 @@ Eingetragene Bücher: Das Fliegende Kamel (60 Tracks), Jaguar und NEINguar (54 T
 ---
 
 ## 🔴 Offene Aufgaben — Hochpriorität
+
+**Pfad-Training: Stufe 3 (Kategorien-Filter) — nächster Schritt**
+Stufe 1 + 2 fertig. Nächste Ausbaustufe: Filter nach Themenbereich (Verben, Pronomen, Alltagswörter) oder Fortschritts-Tracking (welche Wörter bereits gelernt).
 
 **Grammatik-Werkstatt: Stufe 9+ (E-43+) — nächster Block**
 Thema: Satzzeichen — Einheiten noch nicht geplant
@@ -252,7 +270,17 @@ Dann Edge komplett neu starten.
 
 ---
 
-## Sitzungsprotokoll 31. Mai 2026
+## Sitzungsprotokoll 31. Mai 2026 — Sitzung 2
+
+| Was | Ergebnis |
+|---|---|
+| MTI-Analyse (KG-30-05-2026.mti) | ✅ Komplett-Backup 426 MB analysiert — Format, Inhalt, Varianten dokumentiert |
+| ChoiceTrainer | ✅ Externe App (LifeTool), nicht extrahierbar — in ANALYSE_MTI_QUASSELKISTE.md dokumentiert |
+| „Präpositionen lernen mit Willi" (ZZ!W60_PA) | ✅ 26 Präpositionen × 3 Übungsseiten — NuVoice-internes Grammatiksystem, kein Grid-Training |
+| Pfad-Training: Stufe 1 + 2 | ✅ Startscreen mit Stufenauswahl; Stufe 1 = 656 Ein-Klick-Pfade, Stufe 2 = 1.224 Zwei-Klick-Pfade |
+| Commit | ✅ c82584b — deployed + gepinnt |
+
+## Sitzungsprotokoll 31. Mai 2026 — Sitzung 1
 
 | Was | Ergebnis |
 |---|---|

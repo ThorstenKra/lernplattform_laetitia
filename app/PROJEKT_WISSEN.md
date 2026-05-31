@@ -432,6 +432,32 @@ Prüfung 9 meldet jede Datei als ERR, die in OneDrive fehlt oder veraltet ist. L
 
 ---
 
+## Pfad-Training (seit 31.05.2026)
+
+Erreichbar: `spielewelt.html` → 🎯 Pfad-Training → `quasselkiste_training.html`
+
+**Startscreen** mit zwei Dwell-Buttons vor dem Training:
+- **Stufe 1 — Ein Klick** (656 Wörter): direkt eine Kachel drücken
+- **Stufe 2 — Zwei Klicks** (1.224 Wörter): zwei Kacheln nacheinander
+
+**Navigationslogik:**
+- Zurück aus Training → Startscreen (Stufe wechseln)
+- Zurück vom Startscreen → spielewelt.html
+- Header zeigt: `Stufe X · Y gelöst`
+
+**Datenbasis:** `data/quasselkiste_data.js` — 1.880 Pfade (1 korrupter = 1.879 aktiv nach Filter), davon 656 × 1-Schritt, 1.224 × 2-Schritt.
+
+**Nächste Ausbaustufen (geplant):**
+- Stufe 3: Kategorien-Filter nach Themenbereich
+- Fortschritts-Tracking: welche Wörter bereits gelernt
+
+**MTI-Analyse:** Vollständige Dokumentation in `app/ANALYSE_MTI_QUASSELKISTE.md`.
+- Datei `KG-30-05-2026.mti` = Komplett-Backup Tobii Accent (426 MB, Deflate)
+- ChoiceTrainer = externe App auf dem Tobii Accent (`%ProgramFiles%\LifeTool\ChoiceTrainer AAC\...`)
+- Kein extrahierbarer ChoiceTrainer-Inhalt — App muss auf dem Gerät direkt genutzt werden
+
+---
+
 ## Grammatik-Werkstatt Auto-Weiter (seit 17.05.2026)
 
 Nach jeder Antwort läuft folgende Sequenz ab:
@@ -587,3 +613,5 @@ Claude darf **niemals** Kerndateien (`dwell.js`, `error_handler.js`, `geraete.js
 | 2026-05-25 | Quasselkiste Machbarkeitsanalyse: aktuelle Datenbasis hat nur 1- u. 2-Schritt-Pfade, 20 Tiles fehlen, Ebene-2–4-Piktogramme nicht vorhanden. Blocker: vollständiger Export vom Tobii Accent nötig. Pfad-Training pausiert. |
 | 2026-05-31 | Grammatik: Freischaltungslogik entfernt (alle Einheiten immer offen); Stufe-0-Einheiten E-00–E-02 gelöscht (28 Aufgaben); Admin-Panel vereinfacht (nur Reset); Grammatik Stufe 8 (E-39–E-42, 40 Aufgaben: Pronomen ich/du/er/sie/es/wir/ihr/mein/dein) |
 | 2026-05-31 | Quasselkiste: 20 fehlende Tiles aus MTC PRC extrahiert (60/60 Tiles komplett); Lupe=FINDEN@, dem=dem@; Icon-Cache-Format vollständig dekodiert; Pfad-Training zeigt jetzt Tile-Bilder (quasselkiste_training_mod.js + CSS aktualisiert) |
+| 2026-05-31 | Pfad-Training: Stufenauswahl implementiert (Stufe 1 = 656 Ein-Klick-Pfade, Stufe 2 = 1.224 Zwei-Klick-Pfade); Startscreen mit Dwell-Buttons; Zurück-Logik Training→Startscreen→spielewelt |
+| 2026-05-31 | MTI-Analyse (KG-30-05-2026.mti): Format dekodiert (Deflate ab Byte 24, UTF-16 XML); ChoiceTrainer = externe App, nicht eingebettet; ZZ!W60_PA = NuVoice-Grammatiksystem (26 Präpositionen); Analyse in ANALYSE_MTI_QUASSELKISTE.md |
