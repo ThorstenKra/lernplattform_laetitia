@@ -188,9 +188,18 @@ function bauGrid(){
     el.style.background = f.bg || "#FFFFFF";
     el.tabIndex = 0;
 
+    var imgEl = document.createElement("img");
+    imgEl.className = "kachel-img";
+    imgEl.src = "./tiles/tile_r" + f.r + "c" + f.c + ".png";
+    imgEl.alt = f.name || "";
+    imgEl.setAttribute("draggable", "false");
+    el.appendChild(imgEl);
+
     var nameEl = document.createElement("div");
     nameEl.className = "kachel-name";
     nameEl.textContent = f.name || "";
+    nameEl.style.display = "none";
+    imgEl.onerror = (function(n){ return function(){ this.style.display="none"; n.style.display=""; }; }(nameEl));
     el.appendChild(nameEl);
 
     var svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
