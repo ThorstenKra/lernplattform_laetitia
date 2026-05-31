@@ -5,7 +5,6 @@
 var STORAGE_KEY = "laetitia_grammatik_v1";
 
 var STUFE_NAMEN = {
-  0: "Stufe 0 — Satz und Wort",
   1: "Stufe 1 — Nomen, Verben, Adjektive",
   2: "Stufe 2 — Artikel der / die / das",
   3: "Stufe 3 — Sätze bauen",
@@ -24,12 +23,6 @@ function ladeStand(){
 
 function einheitAbgeschlossen(id, stand){
   return !!(stand[id] && stand[id].abgeschlossen);
-}
-
-function stufeFertig(stufe, stand){
-  return GRAMMATIK_EINHEITEN
-    .filter(function(e){ return e.stufe === stufe; })
-    .every(function(e){ return einheitAbgeschlossen(e.id, stand); });
 }
 
 function baueUebersicht(){
@@ -53,7 +46,7 @@ function baueUebersicht(){
       bereich.appendChild(gridEl);
     }
 
-    var freigegeben = (einheit.stufe === 0) || stufeFertig(einheit.stufe - 1, stand);
+    var freigegeben = true;
     var gemeistert  = einheitAbgeschlossen(einheit.id, stand);
     var quote       = stand[einheit.id] ? stand[einheit.id].besteQuote : 0;
     var istGold     = gemeistert && quote >= 0.8;
@@ -94,18 +87,6 @@ function baueUebersicht(){
   });
 }
 
-function schalteStufeFrei(stufe){
-  var stand = ladeStand();
-  GRAMMATIK_EINHEITEN.forEach(function(e){
-    if(e.stufe !== stufe) return;
-    if(!stand[e.id]) stand[e.id] = {};
-    stand[e.id].abgeschlossen = true;
-    if(!stand[e.id].besteQuote) stand[e.id].besteQuote = 1;
-  });
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(stand)); }catch(ex){}
-  location.reload();
-}
-
 function initAdmin(){
   var headerEl = document.querySelector(".header");
   if(!headerEl) return;
@@ -137,22 +118,9 @@ function initAdmin(){
       "max-width:340px;width:92%;max-height:80vh;overflow-y:auto;";
 
     var titel = document.createElement("p");
-    titel.textContent = "🔧 Admin — Stufe freigeben";
+    titel.textContent = "🔧 Admin";
     titel.style.cssText = "font-size:17px;font-weight:1000;color:#7c3aed;margin-bottom:14px;";
     panel.appendChild(titel);
-
-    var stufen = [];
-    var seen = {};
-    GRAMMATIK_EINHEITEN.forEach(function(e){
-      if(!seen[e.stufe]){ seen[e.stufe] = true; stufen.push(e.stufe); }
-    });
-    stufen.forEach(function(st){
-      panel.appendChild(btn(
-        "✅ " + (STUFE_NAMEN[st] || "Stufe " + st) + " freigeben",
-        "border-color:#7c3aed;background:#f5f3ff;color:#4c1d95;",
-        function(){ schalteStufeFrei(st); document.body.removeChild(overlay); }
-      ));
-    });
 
     panel.appendChild(btn(
       "🗑️ Alle Fortschritte löschen",

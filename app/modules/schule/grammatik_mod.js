@@ -34,17 +34,6 @@ function speichereStand(stand){
   try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(stand)); }catch(e){}
 }
 
-function einheitAbgeschlossen(id){
-  var stand = ladeStand();
-  return stand[id] && stand[id].abgeschlossen;
-}
-
-function einheitFreigegeben(index){
-  if(index === 0) return true;
-  var vorgaenger = GRAMMATIK_EINHEITEN[index - 1];
-  return einheitAbgeschlossen(vorgaenger.id);
-}
-
 // ── TTS (Goldstandard) ───────────────────────────────────────────
 function sprich(text, danach){
   try{
@@ -167,8 +156,7 @@ window.GrammatikMod = {
     zeigeErklaerung();
   },
 
-  ladeStand:          ladeStand,
-  einheitFreigegeben: einheitFreigegeben
+  ladeStand: ladeStand
 };
 
 // ── Erklär-Screen ────────────────────────────────────────────────
