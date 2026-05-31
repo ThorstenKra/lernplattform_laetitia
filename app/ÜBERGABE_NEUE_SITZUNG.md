@@ -110,15 +110,16 @@ Erreichbar: `schule.html` → Grammatik-Button → `grammatik.html`
 - **Alle Einheiten immer zugänglich** — keine Freischaltlogik
 - **Admin-Panel:** 3 Sekunden auf den Header halten → „Alle Fortschritte löschen"
 
-## Quasselkiste / NuVoice-Emulation — Stand 23. Mai 2026
+## Quasselkiste / NuVoice-Emulation — Stand 31. Mai 2026
 
 Erreichbar: `spielewelt.html` → 🗣️ Quasselkiste 60 / 🎯 Pfad-Training
 
 | Datei | Inhalt | Status |
 |---|---|---|
 | `quasselkiste.html` + `quasselkiste_mod.js` | 6×10 Raster, Pfad-Aufbau, TTS | ✅ getestet |
-| `quasselkiste_training.html` + `quasselkiste_training_mod.js` | Zielwort → Pfad suchen, Hinweis, Score | ✅ getestet |
+| `quasselkiste_training.html` + `quasselkiste_training_mod.js` | Zielwort → Pfad suchen, Hinweis, Score, **Tile-Bilder** | ✅ |
 | `data/quasselkiste_data.js` | 60 Kacheln + 1.862 Pfade (bereinigt) | ✅ |
+| `tiles/tile_r*.png` | **60/60 Tiles** — aus MTC PRC extrahiert | ✅ |
 
 **Bekannte Einschränkung:** 311 mehrdeutige Pfade (MINSPEAK-Eigenheit) — Emulation zeigt ersten Treffer.
 
@@ -157,9 +158,6 @@ Eingetragene Bücher: Das Fliegende Kamel (60 Tracks), Jaguar und NEINguar (54 T
 ---
 
 ## 🔴 Offene Aufgaben — Hochpriorität
-
-**🔴 Quasselkiste: NuVoice-Export vom Tobii Accent durchführen**
-Vollständige Vokabeldaten (4 Ebenen, alle Piktogramme) exportieren → dann Emulation + Pfad-Training
 
 **Grammatik-Werkstatt: Stufe 9+ (E-43+) — nächster Block**
 Thema: Satzzeichen — Einheiten noch nicht geplant
@@ -262,6 +260,8 @@ Dann Edge komplett neu starten.
 | Grammatik: Stufe-0-Einheiten E-00–E-02 entfernt | ✅ 28 Aufgaben (Satz/Wort) gelöscht — zu elementar |
 | Grammatik: Admin-Panel vereinfacht | ✅ Nur noch „Alle Fortschritte löschen" |
 | Grammatik Stufe 8 (E-39–E-42) | ✅ 40 Aufgaben: Pronomen ich/du/er/sie/es/wir/ihr + mein/dein |
+| Quasselkiste: 20 fehlende Tiles extrahiert | ✅ 60/60 Tiles aus MTC PRC — Lupe=FINDEN@, dem=dem@ |
+| Pfad-Training: Tile-Bilder eingebaut | ✅ Training zeigt jetzt echte Kachelbilder statt nur Text |
 
 ---
 
@@ -275,35 +275,18 @@ Dann Edge komplett neu starten.
 | Admin-Panel Freischaltung | ✅ 3 Sek. Header halten → Panel mit Stufen-Freischalt-Buttons + Reset |
 | Quasselkiste: NuVoice-Emulation Machbarkeitsanalyse | ⚠️ Datenbasis unvollständig — siehe unten |
 
-### 🔴 Quasselkiste — Analyse 25. Mai 2026 (HIER WEITERMACHEN)
+### ✅ Quasselkiste — Analyse 25. Mai + Abschluss 31. Mai 2026
 
-**Kontext:** Vor dem Pfad-Training muss die NuVoice-Emulation vollständig und fehlerfrei sein.
-
-**Analyseergebnis — aktuelle Datenlage:**
+**Analyseergebnis (25. Mai):**
 
 | Was | Befund |
 |---|---|
-| Pfade gesamt | 1.880 — davon nur 1- und 2-Schritt-Pfade |
-| 3-Schritt-Pfade (Ebene 3) | **0 — fehlen komplett** |
-| 4-Schritt-Pfade (Ebene 4) | **0 — fehlen komplett** |
-| Einzigartige Ebene-2-Seiten | 37 (aus vorhandenen Daten ableitbar) |
-| Tile-Bilder (Ebene 1) | **40 von 60** — 20 fehlen (Zeile 6 + Spalten 9–10) |
-| Piktogramme Ebene 2–4 | **Nicht vorhanden** |
-| NuVoice-Installationsverzeichnis | Nur App-Shell + UI-Chrome — keine Vokabeldaten |
+| Pfade gesamt | 1.880 — nur 1- und 2-Schritt-Pfade (EQK60-Vokabular hat keine 3/4-Schritt-Pfade) |
+| 3/4-Schritt-Pfade | 0 — gibt es im EQK60-Vokabular grundsätzlich nicht |
+| Tile-Bilder (Ebene 1) | **60/60** ✅ — aus MTI-Analyse + MTC PRC extrahiert (31. Mai) |
+| Piktogramme Ebene 2–4 | Nicht relevant — kein 2. Overlay-Layer in EQK60 |
 
-**Fehlende Tile-Bilder (Ebene 1):**
-Zeile 6: Maus, Baby, Bett, TV, Freibad, Dieb, Idee, wandern, das, den
-Spalten 9–10, Zeilen 1–5: Fussball, (leer), ihr, Sie, Talker, Lupe, der, des, die, dem
-
-**Ursache:** Die vollständigen Vokabeldaten (4 Ebenen, alle Piktogramme) liegen auf dem **Tobii Accent 1400**, nicht auf diesem PC.
-
-**Nächster Schritt (vom Benutzer durchzuführen):**
-Vollständigen Export der NuVoice-Vokabulardaten vom Tobii Accent 1400:
-- Alle Pfade (1- bis 4-Schritt)
-- Alle Piktogramm-Bilder aller Ebenen
-→ Danach: Vollständige Emulation und Pfad-Training programmieren
-
-**Entscheidung:** Pfad-Training pausiert, bis die Emulation vollständig ist.
+**Abschluss (31. Mai):** Alle 20 fehlenden Tiles aus NuVoice Icon-Cache (MTC 53x44.prc) extrahiert. Lupe = FINDEN@-Icon, dem = dem@-Icon. Emulation vollständig. Pfad-Training aktiv.
 
 ## Sitzungsprotokoll 23. Mai 2026
 

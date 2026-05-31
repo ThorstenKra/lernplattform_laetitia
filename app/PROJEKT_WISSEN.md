@@ -549,7 +549,6 @@ Dann Edge komplett neu starten.
 ## Offene Aufgaben
 
 ### 🔴 Dringend
-- **Quasselkiste: NuVoice-Export vom Tobii Accent** → vollständige Vokabeldaten (4 Ebenen + alle Piktogramme) exportieren. Danach: Emulation + Pfad-Training. Analyse 25.05.2026 — siehe unten.
 - **Grammatik Stufe 9+:** E-43+ (Satzzeichen — Einheiten noch nicht geplant)
 - **Bluetooth-Modul aktivieren:** `Install-Module AudioDeviceCmdlets` (einmalig als Admin)
 - **taucher_lies** Crop-Werte korrigieren (aktuell Schätzwert)
@@ -587,3 +586,4 @@ Claude darf **niemals** Kerndateien (`dwell.js`, `error_handler.js`, `geraete.js
 | 2026-05-25 | Grammatik: Stufen-basierte Freischaltung; STUFE_NAMEN 4–7; Grammatik Stufe 7 (E-35–E-38, 40 Aufgaben: Kasus); Admin-Panel |
 | 2026-05-25 | Quasselkiste Machbarkeitsanalyse: aktuelle Datenbasis hat nur 1- u. 2-Schritt-Pfade, 20 Tiles fehlen, Ebene-2–4-Piktogramme nicht vorhanden. Blocker: vollständiger Export vom Tobii Accent nötig. Pfad-Training pausiert. |
 | 2026-05-31 | Grammatik: Freischaltungslogik entfernt (alle Einheiten immer offen); Stufe-0-Einheiten E-00–E-02 gelöscht (28 Aufgaben); Admin-Panel vereinfacht (nur Reset); Grammatik Stufe 8 (E-39–E-42, 40 Aufgaben: Pronomen ich/du/er/sie/es/wir/ihr/mein/dein) |
+| 2026-05-31 | Quasselkiste: 20 fehlende Tiles aus MTC PRC extrahiert (60/60 Tiles komplett); Lupe=FINDEN@, dem=dem@; Icon-Cache-Format vollständig dekodiert; Pfad-Training zeigt jetzt Tile-Bilder (quasselkiste_training_mod.js + CSS aktualisiert) |
