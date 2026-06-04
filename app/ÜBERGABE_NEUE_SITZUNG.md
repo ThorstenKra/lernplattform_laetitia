@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 4. Juni 2026 (Sitzung 3)*
+*Stand: 4. Juni 2026 (Sitzung 3 — Abschluss)*
 
 ---
 
@@ -196,8 +196,25 @@ Eingetragene Bücher: Das Fliegende Kamel (60 Tracks), Jaguar und NEINguar (54 T
 
 ## 🔴 Offene Aufgaben — Hochpriorität
 
-**Pfad-Training: Modus 2 (Freies Erkunden) — nächster Schritt**
-Modus 1 (geführt) fertig und getestet. Nächste Ausbaustufe: Modus 2 — jeder Erstklick öffnet Ebene 2 (auch falscher), Versuch-und-Irrtum wie echtes NuVoice. Dann Stufe 3 (Kategorien-Filter).
+**Pfad-Training: Ausstehende Tests Modus 1 — direkt nächster Schritt**
+
+Folgende Tests noch nicht durchgeführt (run_tests.ps1 erweitern):
+
+| Test | Was zu prüfen ist |
+|---|---|
+| Hinweis-Button | 3 Falschklicks → `.hinweis`-Klasse auf richtiger Kachel gesetzt |
+| Hinweis-Zähler reset | Nach richtigem Klick: fehlerCount zurückgesetzt, kein Hinweis mehr |
+| Weiter-Button | Überspringt Aufgabe, Ebene 1 wiederhergestellt, neue Aufgabe geladen |
+| Zurück Training→Startscreen | aktStufe=0, Startscreen sichtbar, Grid versteckt |
+| Zurück Startscreen→spielewelt | URL-Navigation korrekt |
+| 60 Tiles gerendert | Alle 60 .kachel-Elemente im DOM vorhanden |
+| Tile-Bild-Fallback | Bei fehlendem PNG: .kachel-name eingeblendet |
+| Auto-Seite Zweitschritt | Nach richtigem Erstklick: Seite wechselt zur Seite des Zweitschritts |
+| Ebene-2-Reset bei Seitenwechsel | ▌▌▌ während Ebene 2 aktiv → Ebene 1 wiederhergestellt |
+| Stufe 2 mit r=1-Erstschritt | Auto-Nav wenn Erstschritt auf S2 liegt (Hallo, Cool) |
+
+Nach Abschluss dieser Tests: **Modus 2 (Freies Erkunden)** implementieren.
+Jeder Erstklick öffnet Ebene 2 (auch falscher) — Versuch-und-Irrtum wie echtes NuVoice.
 
 **Grammatik-Werkstatt: Stufe 9+ (E-43+) — nächster Block**
 Thema: Satzzeichen — Einheiten noch nicht geplant

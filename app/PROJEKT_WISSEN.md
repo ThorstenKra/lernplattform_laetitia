@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Projekt-Wissen
-*Stand: 4. Juni 2026 (Sitzung 3)*
+*Stand: 4. Juni 2026 (Sitzung 3 — Abschluss)*
 
 ## System
 
@@ -464,7 +464,13 @@ Erreichbar: `spielewelt.html` → 🎯 Pfad-Training → `quasselkiste_training.
 **Datenbasis:** `data/quasselkiste_data.js` — 1.880 Pfade, davon 656 × 1-Schritt, 1.224 × 2-Schritt.
 - r1c1 korrigiert: „Start" → „Standard"
 
+**Automatisierte Tests (run_tests.ps1 im Projektstamm):**
+- 35 Tests in 6 Phasen via Edge DevTools Protocol (--remote-debugging-port=9222)
+- Ergebnis: 31/35 PASS — 4 FAIL = Datenbasis-Ambiguität (311 Doppelpfade, MINSPEAK-Eigenheit)
+- Noch ausstehend (nächste Sitzung): Hinweis-Button, Weiter, Zurück-Navigation, Tile-Fallback, Auto-Seite Zweitschritt, Ebene-2-Reset bei Seitenwechsel, r=1-Erstschritt
+
 **Nächste Ausbaustufen:**
+- **Ausstehende Tests Modus 1** abschließen (run_tests.ps1 erweitern)
 - **Modus 2** (Freies Erkunden): Jeder Erstklick öffnet Ebene 2 (auch falscher) — Versuch-und-Irrtum wie echtes NuVoice
 - Stufe 3: Kategorien-Filter nach Themenbereich
 - Fortschritts-Tracking: welche Wörter bereits gelernt
