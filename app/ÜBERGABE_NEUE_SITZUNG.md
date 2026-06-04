@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 31. Mai 2026 (Sitzung 2)*
+*Stand: 4. Juni 2026*
 
 ---
 
@@ -267,6 +267,15 @@ attrib +P "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/*.*" /S /
 Dann Edge komplett neu starten.
 
 **Hinweis:** `.exe`, `.bat`, Mediendateien (MP3, JPG, PNG, …) stehen in `.gitignore` und bleiben lokal.
+
+---
+
+## Sitzungsprotokoll 4. Juni 2026
+
+| Was | Ergebnis |
+|---|---|
+| Startseite: Einstellungen-Button gesperrt | ✅ `display:none` + aus Dwell entfernt + `html/body overflow:hidden touch-action:none` |
+| Commit | ✅ 8db6018 — deployed + gepinnt |
 
 ---
 

@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Projekt-Wissen
-*Stand: 31. Mai 2026*
+*Stand: 4. Juni 2026*
 
 ## System
 
@@ -615,3 +615,4 @@ Claude darf **niemals** Kerndateien (`dwell.js`, `error_handler.js`, `geraete.js
 | 2026-05-31 | Quasselkiste: 20 fehlende Tiles aus MTC PRC extrahiert (60/60 Tiles komplett); Lupe=FINDEN@, dem=dem@; Icon-Cache-Format vollständig dekodiert; Pfad-Training zeigt jetzt Tile-Bilder (quasselkiste_training_mod.js + CSS aktualisiert) |
 | 2026-05-31 | Pfad-Training: Stufenauswahl implementiert (Stufe 1 = 656 Ein-Klick-Pfade, Stufe 2 = 1.224 Zwei-Klick-Pfade); Startscreen mit Dwell-Buttons; Zurück-Logik Training→Startscreen→spielewelt |
 | 2026-05-31 | MTI-Analyse (KG-30-05-2026.mti): Format dekodiert (Deflate ab Byte 24, UTF-16 XML); ChoiceTrainer = externe App, nicht eingebettet; ZZ!W60_PA = NuVoice-Grammatiksystem (26 Präpositionen); Analyse in ANALYSE_MTI_QUASSELKISTE.md |
+| 2026-06-04 | index.html: Einstellungen-Button per `display:none` ausgeblendet + aus Dwell-Selektor entfernt; `html { overflow:hidden; }` + `touch-action:none` auf body — verhindert Touch-Swipe in verdeckten Statusbar-Bereich auf Tobii |
