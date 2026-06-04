@@ -34,6 +34,16 @@ body{
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 #statsAnzeige{ font-size:14px; font-weight:900; color:#aaa; white-space:nowrap; }
+#btnSeite{
+  flex-shrink:0; height:36px; padding:0 10px;
+  background:#1e3a5f; border:2px solid #3b82f6; border-radius:8px;
+  color:#93c5fd; font-size:13px; font-weight:1000; cursor:pointer;
+  display:flex; align-items:center; gap:5px; white-space:nowrap;
+  position:relative;
+}
+#btnSeite:hover{ background:#1e40af; }
+#btnSeite .dwell-ring-svg{ width:36px; height:36px; }
+#btnSeite .dwell-ring-svg circle{ stroke:#3b82f6; }
 
 /* ── Grid ────────────────────────────────────────────────────────────────── */
 #grid{
@@ -106,6 +116,14 @@ body{
   animation:dwellRing var(--dwell-duration,.9s) linear forwards;
 }
 
+/* ── Ebene 2 ─────────────────────────────────────────────────────────────── */
+.kachel.ebene2-treffer .kachel-img{ opacity:1; }
+.kachel.ebene2-treffer .kachel-name{ display:block !important; font-size:clamp(8px,1vw,13px); font-weight:1000; color:#111; background:rgba(255,255,255,0.85); padding:1px 2px; }
+.kachel.ebene2-leer{ opacity:0.18; pointer-events:none; }
+
+/* ── Kachel unsichtbar (falsche Seite) ───────────────────────────────────── */
+.kachel.kachel-unsichtbar{ visibility:hidden; pointer-events:none; }
+
 /* ── Nav-Leiste ──────────────────────────────────────────────────────────── */
 .nav-leiste{
   flex-shrink:0; height:72px;
@@ -175,6 +193,10 @@ body{
   <div id="headerTitel">🎯 Pfad-Training</div>
   <div id="zielAnzeige">–</div>
   <div id="statsAnzeige"></div>
+  <button id="btnSeite" style="display:none">
+    <span>▌▌▌</span><span id="seiteLabel">S 1</span>
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+  </button>
 </div>
 
 <!-- Start-Screen -->
