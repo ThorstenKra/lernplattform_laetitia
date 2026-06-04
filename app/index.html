@@ -216,11 +216,14 @@ if(!localStorage.getItem("laetitia_welcome_spoken")){
   window.addEventListener("load", function(){
     setTimeout(function(){
       try{
-        var u = new SpeechSynthesisUtterance("Hallo Lätitia! Was möchten wir heute machen?");
+        var u = new SpeechSynthesisUtterance("Hallo Lätitzia! Was möchten wir heute machen?");
         u.lang = "de-DE"; u.rate = 0.92;
         var vv = speechSynthesis.getVoices();
-        var de = vv.find(function(v){ return v.name.indexOf("Katja") >= 0; })
+        var de = vv.find(function(v){ return v.name === "Microsoft Katja Online (Natural) - German (Germany)"; })
+              || vv.find(function(v){ return v.name === "Microsoft Katja - German (Germany)"; })
+              || vv.find(function(v){ return v.name.indexOf("Katja") >= 0; })
               || vv.find(function(v){ return v.name.indexOf("Microsoft") >= 0 && v.lang.startsWith("de") && v.name.indexOf("Hedda") < 0; })
+              || vv.find(function(v){ return v.name.indexOf("Microsoft") >= 0 && v.lang.startsWith("de"); })
               || vv.find(function(v){ return v.lang.startsWith("de"); });
         if(de) u.voice = de;
         if(window.LaetitiaSprich){ window.LaetitiaSprich.wrap(u, null); } else { speechSynthesis.speak(u); }
