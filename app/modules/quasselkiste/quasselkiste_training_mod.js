@@ -196,23 +196,28 @@ function zeigeEbene2(r1, c1){
     }
   });
 
-  document.querySelectorAll(".kachel:not(.kachel-unsichtbar)").forEach(function(el){
+  document.querySelectorAll(".kachel").forEach(function(el){
     var r = parseInt(el.getAttribute("data-r"));
     var c = parseInt(el.getAttribute("data-c"));
     var k = r + "_" + c;
     var nameEl = el.querySelector(".kachel-name");
+    var istUnsichtbar = el.classList.contains("kachel-unsichtbar");
 
     el.classList.remove("ebene2-treffer","ebene2-leer","hinweis");
 
     if(r === r1 && c === c1){
-      // Erste Kachel: bleibt als "richtig" markiert
+      // Erste Kachel: sichtbar halten auch wenn auf anderer Seite
+      el.classList.remove("kachel-unsichtbar");
     } else if(zweiteMap[k] !== undefined){
+      // Gueltiger Zweitschritt: immer anzeigen, auch wenn auf anderer Seite
+      el.classList.remove("kachel-unsichtbar");
       el.classList.add("ebene2-treffer");
       if(nameEl){
         nameEl.textContent = zweiteMap[k];
         nameEl.style.display = "";
       }
-    } else {
+    } else if(!istUnsichtbar){
+      // Nur sichtbare Kacheln dimmen — unsichtbare (andere Seite) bleiben versteckt
       el.classList.add("ebene2-leer");
     }
   });
@@ -261,7 +266,7 @@ function startTraining(stufe){
   $("grid").style.display = "grid";
   $("navLeiste").style.display = "";
   var sb = $("btnSeite");
-  if(sb) sb.style.display = stufe === 2 ? "" : "none"; // Seiten-Button nur bei Stufe 2
+  if(sb) sb.style.display = ""; // Seiten-Button in allen Stufen
   aktualisiereSeiteAnzeige();
   aktualisiereKachelSichtbarkeit();
   rebindDwell();
@@ -281,8 +286,8 @@ function neuesWort(){
   fehlerCount = 0;
   aktEbene    = 1;
 
-  // Bei Stufe 2: automatisch zur Seite der ersten Kachel navigieren
-  if(aktStufe === 2 && entry.pfad.length >= 1){
+  // Automatisch zur richtigen Seite navigieren (alle Stufen)
+  if(entry.pfad.length >= 1){
     navigiereZuKachel(entry.pfad[0].r, entry.pfad[0].c);
   }
 
