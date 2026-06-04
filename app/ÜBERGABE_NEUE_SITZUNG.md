@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 4. Juni 2026 (Sitzung 2)*
+*Stand: 4. Juni 2026 (Sitzung 3)*
 
 ---
 
@@ -138,6 +138,12 @@ Erreichbar: `spielewelt.html` → 🗣️ Quasselkiste 60 / 🎯 Pfad-Training
 - Richtiger Erstklick → Zweitschritte hervorgehoben (Zielwort eingeblendet), Rest auf 18% gedimmt
 - Falscher Erstklick → roter Blitz, bleibt auf Ebene 1
 - Nach Erfolg: Ebene 1 automatisch wiederhergestellt
+
+**Automatisierte Tests (run_tests.ps1 im Projektstamm):**
+- 35 Tests in 6 Phasen via Edge DevTools Protocol
+- Ausführen: `powershell.exe -ExecutionPolicy Bypass -File .\run_tests.ps1`
+- Edge muss mit `--remote-debugging-port=9222` laufen (Testskript startet Edge nicht selbst)
+- 31/35 PASS, 4 FAIL = Datenbasis-Ambiguität (311 Doppelpfade — MINSPEAK-Eigenheit, kein Bug)
 
 **Nächste Schritte Pfad-Training:**
 - Modus 2 (Freies Erkunden): Jeder Erstklick öffnet Ebene 2 (auch falscher) — Versuch-und-Irrtum wie echtes NuVoice
@@ -283,6 +289,17 @@ attrib +P "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/*.*" /S /
 Dann Edge komplett neu starten.
 
 **Hinweis:** `.exe`, `.bat`, Mediendateien (MP3, JPG, PNG, …) stehen in `.gitignore` und bleiben lokal.
+
+---
+
+## Sitzungsprotokoll 4. Juni 2026 — Sitzung 3
+
+| Was | Ergebnis |
+|---|---|
+| Automatisierte Tests Modus 1 (35 Tests, 6 Phasen) | ✅ 31/35 PASS — 4 FAIL = Datenbasis-Ambiguität (311 Doppelpfade, kein Code-Bug) |
+| Bug: Stufe-1 Auto-Navigation fehlte | ✅ behoben — r=1-Kacheln auf S2/S3 waren in Stufe 1 nie erreichbar |
+| Bug: zeigeEbene2 übersprang unsichtbare Kacheln | ✅ behoben — Hallo (S2) fehlte als Zweitschritt wenn S1 aktiv war |
+| Commit | ✅ 1db8c5c — deployed + gepinnt |
 
 ---
 

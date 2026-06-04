@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Projekt-Wissen
-*Stand: 4. Juni 2026 (Sitzung 2)*
+*Stand: 4. Juni 2026 (Sitzung 3)*
 
 ## System
 
@@ -636,3 +636,4 @@ Claude darf **niemals** Kerndateien (`dwell.js`, `error_handler.js`, `geraete.js
 | 2026-06-04 | index.html: Einstellungen-Button per `display:none` ausgeblendet + aus Dwell-Selektor entfernt; `html { overflow:hidden; }` + `touch-action:none` auf body — verhindert Touch-Swipe in verdeckten Statusbar-Bereich auf Tobii |
 | 2026-06-04 | index.html: Begrüßungsstimme auf Katja-Goldstandard-Selektor aktualisiert; TTS-Text „Lätitzia" (zweites T = Z) |
 | 2026-06-04 | Pfad-Training Modus 1: 3-seitige Ebene-1-Navigation (▌▌▌-Button, seiten[] in data.js), Ebene-2-Visualisierung nach richtigem Erstklick; r1c1 Start→Standard korrigiert |
+| 2026-06-04 | Pfad-Training: 35 automatisierte Tests (run_tests.ps1) via Edge DevTools Protocol — 31/35 PASS; 2 Bugs behoben: Stufe-1-Auto-Navigation + zeigeEbene2 für unsichtbare Kacheln |
