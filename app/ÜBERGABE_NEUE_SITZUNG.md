@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 4. Juni 2026*
+*Stand: 4. Juni 2026 (Sitzung 2)*
 
 ---
 
@@ -128,6 +128,22 @@ Erreichbar: `spielewelt.html` → 🗣️ Quasselkiste 60 / 🎯 Pfad-Training
 | 1 | Ein Klick — direkt eine Kachel drücken | 656 |
 | 2 | Zwei Klicks — zwei Kacheln nacheinander | 1.224 |
 
+**Ebene-1-Seiten (Modus 1 implementiert):**
+- 3 Seiten der Ebene 1 per ▌▌▌-Button umschaltbar (S1→S2→S3)
+- r=2..6 (50 Kacheln): immer sichtbar auf allen Seiten
+- r=1 (10 Kacheln): seitenspezifisch (Standard: S1+2, ABC/Ja/Nein/Bilder/Wort: S1, Hallo/Cool: S2, Fussball: S1+2+3, leer: nie)
+- Automatischer Seitensprung zur richtigen Seite pro Aufgabe
+
+**Ebene-2-Visualisierung (Modus 1):**
+- Richtiger Erstklick → Zweitschritte hervorgehoben (Zielwort eingeblendet), Rest auf 18% gedimmt
+- Falscher Erstklick → roter Blitz, bleibt auf Ebene 1
+- Nach Erfolg: Ebene 1 automatisch wiederhergestellt
+
+**Nächste Schritte Pfad-Training:**
+- Modus 2 (Freies Erkunden): Jeder Erstklick öffnet Ebene 2 (auch falscher) — Versuch-und-Irrtum wie echtes NuVoice
+- Stufe 3: Kategorien-Filter nach Themenbereich
+- Fortschritts-Tracking
+
 **Flow:** Startscreen → Stufenauswahl → Training. Zurück aus Training → Startscreen (nicht spielewelt).
 
 **Bekannte Einschränkung:** 311 mehrdeutige Pfade (MINSPEAK-Eigenheit) — Emulation zeigt ersten Treffer.
@@ -174,8 +190,8 @@ Eingetragene Bücher: Das Fliegende Kamel (60 Tracks), Jaguar und NEINguar (54 T
 
 ## 🔴 Offene Aufgaben — Hochpriorität
 
-**Pfad-Training: Stufe 3 (Kategorien-Filter) — nächster Schritt**
-Stufe 1 + 2 fertig. Nächste Ausbaustufe: Filter nach Themenbereich (Verben, Pronomen, Alltagswörter) oder Fortschritts-Tracking (welche Wörter bereits gelernt).
+**Pfad-Training: Modus 2 (Freies Erkunden) — nächster Schritt**
+Modus 1 (geführt) fertig und getestet. Nächste Ausbaustufe: Modus 2 — jeder Erstklick öffnet Ebene 2 (auch falscher), Versuch-und-Irrtum wie echtes NuVoice. Dann Stufe 3 (Kategorien-Filter).
 
 **Grammatik-Werkstatt: Stufe 9+ (E-43+) — nächster Block**
 Thema: Satzzeichen — Einheiten noch nicht geplant
@@ -270,12 +286,25 @@ Dann Edge komplett neu starten.
 
 ---
 
-## Sitzungsprotokoll 4. Juni 2026
+## Sitzungsprotokoll 4. Juni 2026 — Sitzung 2
+
+| Was | Ergebnis |
+|---|---|
+| Pfad-Training: Ebene-1-Seiten implementiert | ✅ 3 Seiten (▌▌▌-Button), r=1-Kacheln per Seite ein-/ausgeblendet |
+| Pfad-Training: Ebene-2-Visualisierung | ✅ Nach richtigem Erstklick: gültige Zweitschritte hervorgehoben, Rest gedimmt |
+| Pfad-Training: Auto-Navigation | ✅ Springt automatisch zur richtigen Seite pro Aufgabe |
+| quasselkiste_data.js: r1c1 korrigiert | ✅ „Start" → „Standard", seiten[] an alle r=1-Kacheln |
+| Commit | ✅ 272c173 — deployed + gepinnt |
+
+---
+
+## Sitzungsprotokoll 4. Juni 2026 — Sitzung 1
 
 | Was | Ergebnis |
 |---|---|
 | Startseite: Einstellungen-Button gesperrt | ✅ `display:none` + aus Dwell entfernt + `html/body overflow:hidden touch-action:none` |
-| Commit | ✅ 8db6018 — deployed + gepinnt |
+| Begrüßungsstimme: Katja-Goldstandard | ✅ Vollständiger Selektor + Aussprache „Lätitzia" (zweites T = Z) |
+| Commit | ✅ c5563a6 — deployed + gepinnt |
 
 ---
 

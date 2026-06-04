@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Projekt-Wissen
-*Stand: 4. Juni 2026*
+*Stand: 4. Juni 2026 (Sitzung 2)*
 
 ## System
 
@@ -432,22 +432,40 @@ Prüfung 9 meldet jede Datei als ERR, die in OneDrive fehlt oder veraltet ist. L
 
 ---
 
-## Pfad-Training (seit 31.05.2026)
+## Pfad-Training (seit 31.05.2026, Modus 1 seit 04.06.2026)
 
 Erreichbar: `spielewelt.html` → 🎯 Pfad-Training → `quasselkiste_training.html`
 
 **Startscreen** mit zwei Dwell-Buttons vor dem Training:
 - **Stufe 1 — Ein Klick** (656 Wörter): direkt eine Kachel drücken
-- **Stufe 2 — Zwei Klicks** (1.224 Wörter): zwei Kacheln nacheinander
+- **Stufe 2 — Zwei Klicks** (1.224 Wörter): zwei Kacheln nacheinander + Ebene-2-Visualisierung
 
 **Navigationslogik:**
 - Zurück aus Training → Startscreen (Stufe wechseln)
 - Zurück vom Startscreen → spielewelt.html
-- Header zeigt: `Stufe X · Y gelöst`
+- Header zeigt: `Stufe X · Y gelöst` + Seiten-Button `▌▌▌ S X` (nur Stufe 2)
 
-**Datenbasis:** `data/quasselkiste_data.js` — 1.880 Pfade (1 korrupter = 1.879 aktiv nach Filter), davon 656 × 1-Schritt, 1.224 × 2-Schritt.
+**Ebene-1-Seiten-Struktur:**
+- Ebene 1 hat 3 Seiten (wie echtes NuVoice — zu viele Icons für eine Seite)
+- r=2..6 (50 Kacheln): auf allen 3 Seiten sichtbar
+- r=1 (10 Kacheln) mit `seiten`-Array in quasselkiste_data.js:
+  - Standard (r1c1): [1,2] — Bilder (r1c7): [1]
+  - ABC (r1c2): [1] — Wort (r1c8): [1,2]
+  - Ja (r1c3): [1] — Fussball (r1c9): [1,2,3]
+  - Nein (r1c4): [1] — leer (r1c10): []
+  - Hallo (r1c5): [2] — Cool (r1c6): [2]
+- Automatischer Seitensprung zur richtigen Seite bei neuer Aufgabe
 
-**Nächste Ausbaustufen (geplant):**
+**Ebene-2-Visualisierung (Modus 1 — geführt):**
+- Richtiger Erstklick → Zweitschritte hervorgehoben + Zielwort eingeblendet, Rest 18% gedimmt
+- Falscher Erstklick → roter Blitz, bleibt auf Ebene 1 (kein Ebene-2-Wechsel)
+- Nach Erfolg → Ebene 1 wiederhergestellt, nächste Aufgabe
+
+**Datenbasis:** `data/quasselkiste_data.js` — 1.880 Pfade, davon 656 × 1-Schritt, 1.224 × 2-Schritt.
+- r1c1 korrigiert: „Start" → „Standard"
+
+**Nächste Ausbaustufen:**
+- **Modus 2** (Freies Erkunden): Jeder Erstklick öffnet Ebene 2 (auch falscher) — Versuch-und-Irrtum wie echtes NuVoice
 - Stufe 3: Kategorien-Filter nach Themenbereich
 - Fortschritts-Tracking: welche Wörter bereits gelernt
 
@@ -616,3 +634,5 @@ Claude darf **niemals** Kerndateien (`dwell.js`, `error_handler.js`, `geraete.js
 | 2026-05-31 | Pfad-Training: Stufenauswahl implementiert (Stufe 1 = 656 Ein-Klick-Pfade, Stufe 2 = 1.224 Zwei-Klick-Pfade); Startscreen mit Dwell-Buttons; Zurück-Logik Training→Startscreen→spielewelt |
 | 2026-05-31 | MTI-Analyse (KG-30-05-2026.mti): Format dekodiert (Deflate ab Byte 24, UTF-16 XML); ChoiceTrainer = externe App, nicht eingebettet; ZZ!W60_PA = NuVoice-Grammatiksystem (26 Präpositionen); Analyse in ANALYSE_MTI_QUASSELKISTE.md |
 | 2026-06-04 | index.html: Einstellungen-Button per `display:none` ausgeblendet + aus Dwell-Selektor entfernt; `html { overflow:hidden; }` + `touch-action:none` auf body — verhindert Touch-Swipe in verdeckten Statusbar-Bereich auf Tobii |
+| 2026-06-04 | index.html: Begrüßungsstimme auf Katja-Goldstandard-Selektor aktualisiert; TTS-Text „Lätitzia" (zweites T = Z) |
+| 2026-06-04 | Pfad-Training Modus 1: 3-seitige Ebene-1-Navigation (▌▌▌-Button, seiten[] in data.js), Ebene-2-Visualisierung nach richtigem Erstklick; r1c1 Start→Standard korrigiert |
