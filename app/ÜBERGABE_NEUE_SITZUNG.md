@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 5. Juni 2026 (Sitzung 5 — Abschluss)*
+*Stand: 5. Juni 2026 (Sitzung 6 — Abschluss)*
 
 ---
 
@@ -196,10 +196,18 @@ Eingetragene Bücher: Das Fliegende Kamel (60 Tracks), Jaguar und NEINguar (54 T
 
 ## 🔴 Offene Aufgaben — Hochpriorität
 
-**Pfad-Training: Modus 2 (Freies Erkunden) — direkt nächster Schritt**
+**Ebene-2-Test: test_ebene2_alle.ps1 abschließen — direkt nächster Schritt**
 
-Alle Modus-1-Tests abgeschlossen (Sitzung 4). Optische Anpassungen abgeschlossen (Sitzung 5).
-Testergebnis: 40/57 PASS — alle 15 FAIL = Datenbasis-Ambiguität (311 Doppelpfade MINSPEAK, kein Code-Bug).
+Skript fertig, ABER letzter Lauf wurde durch mehrere parallele Zombie-Prozesse blockiert.
+Vor dem nächsten Lauf:
+1. Chrome mit genau **einem** Quasselkiste-Training-Tab öffnen
+2. Tab einmal **F5** neu laden (alle alten JS-Evaluierungen beenden)
+3. Dann: `powershell -ExecutionPolicy Bypass -File test_ebene2_alle.ps1`
+
+Strategie des Skripts: Klickt ersten ungetesteten Erstschritt für das aktuelle Wort.
+Öffnet Ebene 2 nicht → verwirft Klick, nächste Iteration. Kein btnHinweis nötig.
+
+**Pfad-Training: Modus 2 (Freies Erkunden) — nach Ebene-2-Test**
 
 Nächster Schritt: **Modus 2 (Freies Erkunden)** implementieren.
 Jeder Erstklick öffnet Ebene 2 (auch falscher) — Versuch-und-Irrtum wie echtes NuVoice.
@@ -294,6 +302,21 @@ attrib +P "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/*.*" /S /
 Dann Edge komplett neu starten.
 
 **Hinweis:** `.exe`, `.bat`, Mediendateien (MP3, JPG, PNG, …) stehen in `.gitignore` und bleiben lokal.
+
+---
+
+## Sitzungsprotokoll 5. Juni 2026 — Sitzung 6
+
+| Was | Ergebnis |
+|---|---|
+| `Laetitia_Entwicklung_starten.bat` Encoding-Bug | ✅ behoben — Ü war als Windows-1252 korrupt (UTF-8-Datei), neu mit korrekter Codepage geschrieben |
+| analyse_optik.ps1 — Visueller Qualitätstest (11 Kriterien, CDP) | ✅ erstellt + committed (9ca9ac8) — Browser-Rendering einwandfrei, 5 reine Artefakte |
+| analyse_optik.ps1 — Ebene-2-Spot-Check-Bug | ✅ behoben — „Finde: "-Prefix fehlte beim Wort-Lookup; Ebene 2 zeigt 13/13 Treffer korrekt |
+| test_ebene2_alle.ps1 — Ebene-2-Test alle Erstschritte | ⚠️ Skript fertig, letzter Lauf blockiert (3 parallele Zombie-Prozesse + 3 Chrome-Tabs) |
+| Erster Testlauf (fehlerhafter Algorithmus) | 33/37 Erstschritte, 27 ABWEICHUNG — alle wegen falschem Erstschritt-Lookup (.find() statt tatsächlichem Training-Pfad), kein echter Bug |
+| Algorithmus-Fix | ✅ Klick-und-Prüfen-Strategie: Ebene 2 öffnet nicht → verwerfen + retry |
+
+**Nächste Sitzung beginnt mit:** Chrome F5, ein Training-Tab, dann `test_ebene2_alle.ps1`
 
 ---
 
