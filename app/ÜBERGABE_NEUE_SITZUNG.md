@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 4. Juni 2026 (Sitzung 3 — Abschluss)*
+*Stand: 5. Juni 2026 (Sitzung 5 — Abschluss)*
 
 ---
 
@@ -117,7 +117,7 @@ Erreichbar: `spielewelt.html` → 🗣️ Quasselkiste 60 / 🎯 Pfad-Training
 | Datei | Inhalt | Status |
 |---|---|---|
 | `quasselkiste.html` + `quasselkiste_mod.js` | 6×10 Raster, Pfad-Aufbau, TTS | ✅ getestet |
-| `quasselkiste_training.html` + `quasselkiste_training_mod.js` | **Stufenauswahl + Pfad-Training** | ✅ |
+| `quasselkiste_training.html` + `quasselkiste_training_mod.js` | **Stufenauswahl + Pfad-Training** | ✅ inkl. visueller Fixes S5 |
 | `data/quasselkiste_data.js` | 60 Kacheln + 1.862 Pfade (bereinigt) | ✅ |
 | `tiles/tile_r*.png` | **60/60 Tiles** — aus MTC PRC extrahiert | ✅ |
 | `ANALYSE_MTI_QUASSELKISTE.md` | MTI-Analyse-Ergebnisse (KG-30-05-2026.mti) | ✅ |
@@ -198,7 +198,8 @@ Eingetragene Bücher: Das Fliegende Kamel (60 Tracks), Jaguar und NEINguar (54 T
 
 **Pfad-Training: Modus 2 (Freies Erkunden) — direkt nächster Schritt**
 
-Alle Modus-1-Tests abgeschlossen (Sitzung 4, 5. Juni 2026). Testergebnis: 40/57 PASS — alle 15 FAIL = Datenbasis-Ambiguität (311 Doppelpfade MINSPEAK, kein Code-Bug).
+Alle Modus-1-Tests abgeschlossen (Sitzung 4). Optische Anpassungen abgeschlossen (Sitzung 5).
+Testergebnis: 40/57 PASS — alle 15 FAIL = Datenbasis-Ambiguität (311 Doppelpfade MINSPEAK, kein Code-Bug).
 
 Nächster Schritt: **Modus 2 (Freies Erkunden)** implementieren.
 Jeder Erstklick öffnet Ebene 2 (auch falscher) — Versuch-und-Irrtum wie echtes NuVoice.
@@ -293,6 +294,22 @@ attrib +P "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/*.*" /S /
 Dann Edge komplett neu starten.
 
 **Hinweis:** `.exe`, `.bat`, Mediendateien (MP3, JPG, PNG, …) stehen in `.gitignore` und bleiben lokal.
+
+---
+
+## Sitzungsprotokoll 5. Juni 2026 — Sitzung 5
+
+| Was | Ergebnis |
+|---|---|
+| compare_tiles.ps1: Kachel-Bildabgleich (60 Tiles vs. data.js) | ✅ 56/60 OK — 4 BG-Abweichungen an r1c1/c2/c7/c8 (Screenshot-Vorschau-Bereich, kein Fehler) |
+| Visuell: Schwarzer Block versteckter r1-Kacheln (S1: Hallo/Cool) | ✅ behoben — `.kachel-unsichtbar` zeigt weiße Leerzelle statt Body-Hintergrund (commit 4e8fa7b) |
+| Visuell: Reihen-Proportionen an Original angepasst | ✅ `grid-template-rows: 214fr 121fr×5` statt `repeat(6,1fr)` — r1 nun 1,77× höher (commit 6fe095b) |
+| Deployment + Browser-Test (CDP Screenshots) | ✅ Seite 1 und Seite 2 verifiziert |
+| Commits | ✅ 4e8fa7b + 6fe095b |
+
+**Noch offene optische Unterschiede (nicht kritisch):**
+- Weißen Leerzellen bei r1c5/c6 auf S1 sind sichtbar (unvermeidlich mit CSS-Grid-Ansatz)
+- Dark-Screenshot-Vorschau-Bereich in r1c7 (Bilder) und r1c8 (Wort) — Teil des Tile-Designs
 
 ---
 
