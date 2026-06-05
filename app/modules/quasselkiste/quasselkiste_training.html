@@ -122,7 +122,8 @@ body{
 .kachel.ebene2-leer{ opacity:0.18; pointer-events:none; }
 
 /* ── Kachel unsichtbar (falsche Seite) ───────────────────────────────────── */
-.kachel.kachel-unsichtbar{ visibility:hidden; pointer-events:none; }
+.kachel.kachel-unsichtbar{ pointer-events:none; background:#ffffff !important; }
+.kachel.kachel-unsichtbar > *{ display:none; }
 
 /* ── Nav-Leiste ──────────────────────────────────────────────────────────── */
 .nav-leiste{
