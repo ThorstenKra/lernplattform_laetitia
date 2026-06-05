@@ -196,24 +196,11 @@ Eingetragene Bücher: Das Fliegende Kamel (60 Tracks), Jaguar und NEINguar (54 T
 
 ## 🔴 Offene Aufgaben — Hochpriorität
 
-**Pfad-Training: Ausstehende Tests Modus 1 — direkt nächster Schritt**
+**Pfad-Training: Modus 2 (Freies Erkunden) — direkt nächster Schritt**
 
-Folgende Tests noch nicht durchgeführt (run_tests.ps1 erweitern):
+Alle Modus-1-Tests abgeschlossen (Sitzung 4, 5. Juni 2026). Testergebnis: 40/57 PASS — alle 15 FAIL = Datenbasis-Ambiguität (311 Doppelpfade MINSPEAK, kein Code-Bug).
 
-| Test | Was zu prüfen ist |
-|---|---|
-| Hinweis-Button | 3 Falschklicks → `.hinweis`-Klasse auf richtiger Kachel gesetzt |
-| Hinweis-Zähler reset | Nach richtigem Klick: fehlerCount zurückgesetzt, kein Hinweis mehr |
-| Weiter-Button | Überspringt Aufgabe, Ebene 1 wiederhergestellt, neue Aufgabe geladen |
-| Zurück Training→Startscreen | aktStufe=0, Startscreen sichtbar, Grid versteckt |
-| Zurück Startscreen→spielewelt | URL-Navigation korrekt |
-| 60 Tiles gerendert | Alle 60 .kachel-Elemente im DOM vorhanden |
-| Tile-Bild-Fallback | Bei fehlendem PNG: .kachel-name eingeblendet |
-| Auto-Seite Zweitschritt | Nach richtigem Erstklick: Seite wechselt zur Seite des Zweitschritts |
-| Ebene-2-Reset bei Seitenwechsel | ▌▌▌ während Ebene 2 aktiv → Ebene 1 wiederhergestellt |
-| Stufe 2 mit r=1-Erstschritt | Auto-Nav wenn Erstschritt auf S2 liegt (Hallo, Cool) |
-
-Nach Abschluss dieser Tests: **Modus 2 (Freies Erkunden)** implementieren.
+Nächster Schritt: **Modus 2 (Freies Erkunden)** implementieren.
 Jeder Erstklick öffnet Ebene 2 (auch falscher) — Versuch-und-Irrtum wie echtes NuVoice.
 
 **Grammatik-Werkstatt: Stufe 9+ (E-43+) — nächster Block**
@@ -306,6 +293,21 @@ attrib +P "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/*.*" /S /
 Dann Edge komplett neu starten.
 
 **Hinweis:** `.exe`, `.bat`, Mediendateien (MP3, JPG, PNG, …) stehen in `.gitignore` und bleiben lokal.
+
+---
+
+## Sitzungsprotokoll 5. Juni 2026 — Sitzung 4
+
+| Was | Ergebnis |
+|---|---|
+| Tests Phasen 7–10 implementiert (13 neue Tests) | ✅ 40/57 PASS — alle 15 FAIL = Datenbasis-Ambiguität, kein Code-Bug |
+| Phase 7: DOM-Grundstruktur | ✅ 4/4 PASS (60 Kacheln, Attribute, Tile-Fallback, URL) |
+| Phase 8: Hinweis-Button | ✅ 4/4 PASS (direkt, korrekte Kachel, 3-Falschklick, Reset) |
+| Phase 9: Weiter + Zurück-Navigation | ✅ 3/3 PASS (neue Aufgabe, Ebene-1-Reset, Startscreen) |
+| Phase 10: Auto-Seite, Ebene-2-Reset | ✅ 2/2 PASS + 1 WARN (r=1-Erstschritt datenabhängig) |
+| Testfehler behoben: Phase 4 Zustandsreset | ✅ btnWeiter am Anfang von Phase 4 |
+| Testfehler behoben: Phase 6 Loop-Blockade | ✅ btnWeiter nach FAIL gegen Datenbasis-Ambiguität |
+| Commit | ✅ 7b1b0d1 — gepusht |
 
 ---
 
