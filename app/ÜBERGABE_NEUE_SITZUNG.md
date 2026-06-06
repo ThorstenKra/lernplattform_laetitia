@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 5. Juni 2026 (Sitzung 6 — Abschluss)*
+*Stand: 6. Juni 2026 (Sitzung 7 — Abschluss)*
 
 ---
 
@@ -196,18 +196,7 @@ Eingetragene Bücher: Das Fliegende Kamel (60 Tracks), Jaguar und NEINguar (54 T
 
 ## 🔴 Offene Aufgaben — Hochpriorität
 
-**Ebene-2-Test: test_ebene2_alle.ps1 abschließen — direkt nächster Schritt**
-
-Skript fertig, ABER letzter Lauf wurde durch mehrere parallele Zombie-Prozesse blockiert.
-Vor dem nächsten Lauf:
-1. Chrome mit genau **einem** Quasselkiste-Training-Tab öffnen
-2. Tab einmal **F5** neu laden (alle alten JS-Evaluierungen beenden)
-3. Dann: `powershell -ExecutionPolicy Bypass -File test_ebene2_alle.ps1`
-
-Strategie des Skripts: Klickt ersten ungetesteten Erstschritt für das aktuelle Wort.
-Öffnet Ebene 2 nicht → verwirft Klick, nächste Iteration. Kein btnHinweis nötig.
-
-**Pfad-Training: Modus 2 (Freies Erkunden) — nach Ebene-2-Test**
+**Pfad-Training: Modus 2 (Freies Erkunden) — nächster Schritt**
 
 Nächster Schritt: **Modus 2 (Freies Erkunden)** implementieren.
 Jeder Erstklick öffnet Ebene 2 (auch falscher) — Versuch-und-Irrtum wie echtes NuVoice.
@@ -302,6 +291,18 @@ attrib +P "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/*.*" /S /
 Dann Edge komplett neu starten.
 
 **Hinweis:** `.exe`, `.bat`, Mediendateien (MP3, JPG, PNG, …) stehen in `.gitignore` und bleiben lokal.
+
+---
+
+## Sitzungsprotokoll 6. Juni 2026 — Sitzung 7
+
+| Was | Ergebnis |
+|---|---|
+| test_ebene2_alle.ps1 — Ebene-2-Test alle Erstschritte | ✅ 33/37 OK, 0 ABWEICHUNG — 4 seltene Positionen strukturell identisch zu r2c8 (OK) |
+| Self-Loop-Bug im Testalgorithmus | ✅ soll-Berechnung: -1 wenn Erstschritt-Kachel auch Zweitschritt ist |
+| UTF-8-BOM-Bug (PS 5.1 Umlaut-Regex) | ✅ BOM hinzugefügt — ä/ö/ü in wortOk() jetzt korrekt gelesen |
+| Race-Condition-Fix (Treffer-Polling) | ✅ Polling statt fixem 700ms-Wait; Word-Change-Polling statt 110ms-Skip |
+| Commit test_ebene2_alle.ps1 | ✅ 0c59a9b |
 
 ---
 
