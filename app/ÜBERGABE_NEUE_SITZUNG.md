@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 6. Juni 2026 (Sitzung 9 — Abschluss)*
+*Stand: 6. Juni 2026 (Sitzung 10 — Abschluss)*
 
 ---
 
@@ -128,12 +128,13 @@ Erreichbar: `spielewelt.html` → 🗣️ Quasselkiste 60 / 🎯 Pfad-Training
 | 1 | Ein Klick — direkt eine Kachel drücken | 656 |
 | 2 | Zwei Klicks — zwei Kacheln nacheinander | 1.224 |
 
-**Grid-Layout (aktuell nach S8+S9):**
+**Grid-Layout (aktuell nach S8+S10):**
 - `grid-template-rows: 60fr 152fr 152fr 152fr 152fr 152fr`
 - r1 (60fr): kompakt — nie Erstschritt, nur Zweitschritt in 129 Pfaden (Hallo/Ja/Nein/Fussball/ABC)
 - r2–r6 (152fr each): +18% größer als vorher (112px statt 95px auf 732px-Bildschirm)
-- `.kachel-img`: `object-fit:contain; object-position:bottom center` — Label bündig unten in allen Reihen
-- r5-Tiles (Apfel–dem): auf 189×121px Canvas erweitert, Label von oben nach unten verschoben (S9)
+- `.kachel-img`: `object-fit:contain` — kein `object-position` (bricht r6 + Artikel-Tiles)
+- r5-Tiles (Apfel–Bad): 189×121px, Symbol via Bounding-Box extrahiert, Label unten (fix_r5_labels_v3.py, S10)
+- r5c9/c10 (die/dem): 189×121px Artikel-Tiles unverändert (Kreis-Design aus S7)
 - r6-Tiles (Maus–wandern): Labels mit 27pt Calibri Bold neu generiert (bak2-Symbol 1.2×, S8)
 
 **Ebene-1-Seiten (Modus 1 implementiert):**
@@ -299,6 +300,18 @@ attrib +P "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/*.*" /S /
 Dann Edge komplett neu starten.
 
 **Hinweis:** `.exe`, `.bat`, Mediendateien (MP3, JPG, PNG, …) stehen in `.gitignore` und bleiben lokal.
+
+---
+
+## Sitzungsprotokoll 6. Juni 2026 — Sitzung 10
+
+| Was | Ergebnis |
+|---|---|
+| Schadenbehebung nach S9-Batch-Fix | ✅ r1–r4 aus `.bak_alle` wiederhergestellt (39 Tiles) |
+| `object-position:bottom center` entfernt | ✅ CSS-Revert (4510fa0) — hatte r6 + Artikel-Tiles (die/dem/das/den) verbrochen |
+| r5-Tiles: Label-Fix v3 | ✅ fix_r5_labels_v3.py: label_end dynamisch, Bounding-Box ohne Randpixel (X_MARGIN=3), weißer 189×121px-Canvas, 20pt Calibri Bold Label unten (4940378) |
+| Backups | `.bak_s9` (r5 NuVoice-Original), `.bak_alle` (r1–r4 NuVoice-Original) vorhanden |
+| Skripte committed | `fix_r5_labels_v2.py`, `fix_r5_labels_v3.py`, `restore_bak_alle.py`, `restore_r5_baks9.py` |
 
 ---
 
