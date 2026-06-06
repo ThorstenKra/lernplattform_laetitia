@@ -304,6 +304,8 @@ Dann Edge komplett neu starten.
 | Race-Condition-Fix (Treffer-Polling) | ✅ Polling statt fixem 700ms-Wait; Word-Change-Polling statt 110ms-Skip |
 | Commit test_ebene2_alle.ps1 | ✅ 0c59a9b |
 | Tile-Symbole vergrößert (10 weiße Tiles) | ✅ r6c1–c8, r3c9, r1c9: Leerraum gecroppt, Seitenverhältnis erhalten, deployed |
+| Artikel-Tiles korrigiert (6 Tiles) | ✅ r4-r6 c9+c10 (der/die/das/des/dem/den): war abstr. MINSPEAK-Symbol, jetzt Wort im Kreis wie Original |
+| Tobii-Vergleich | ✅ 60/60 Tiles visuell verifiziert — identisch mit Original |
 
 ---
 
