@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 6. Juni 2026 (Sitzung 8 — Abschluss)*
+*Stand: 6. Juni 2026 (Sitzung 9 — Abschluss)*
 
 ---
 
@@ -117,7 +117,7 @@ Erreichbar: `spielewelt.html` → 🗣️ Quasselkiste 60 / 🎯 Pfad-Training
 | Datei | Inhalt | Status |
 |---|---|---|
 | `quasselkiste.html` + `quasselkiste_mod.js` | 6×10 Raster, Pfad-Aufbau, TTS | ✅ getestet |
-| `quasselkiste_training.html` + `quasselkiste_training_mod.js` | **Stufenauswahl + Pfad-Training** | ✅ inkl. Grid-Layout + Label-Fix S8 |
+| `quasselkiste_training.html` + `quasselkiste_training_mod.js` | **Stufenauswahl + Pfad-Training** | ✅ inkl. Grid-Layout + Label-Fix S8+S9 |
 | `data/quasselkiste_data.js` | 60 Kacheln + 1.862 Pfade (bereinigt) | ✅ |
 | `tiles/tile_r*.png` | **60/60 Tiles** — aus MTC PRC extrahiert | ✅ |
 | `ANALYSE_MTI_QUASSELKISTE.md` | MTI-Analyse-Ergebnisse (KG-30-05-2026.mti) | ✅ |
@@ -128,12 +128,13 @@ Erreichbar: `spielewelt.html` → 🗣️ Quasselkiste 60 / 🎯 Pfad-Training
 | 1 | Ein Klick — direkt eine Kachel drücken | 656 |
 | 2 | Zwei Klicks — zwei Kacheln nacheinander | 1.224 |
 
-**Grid-Layout (aktuell nach S8):**
+**Grid-Layout (aktuell nach S8+S9):**
 - `grid-template-rows: 60fr 152fr 152fr 152fr 152fr 152fr`
 - r1 (60fr): kompakt — nie Erstschritt, nur Zweitschritt in 129 Pfaden (Hallo/Ja/Nein/Fussball/ABC)
 - r2–r6 (152fr each): +18% größer als vorher (112px statt 95px auf 732px-Bildschirm)
-- `.kachel-img`: `object-fit:contain` — verhindert Überscaling der 189×79px r5-Tiles
-- r6-Tiles (Maus–wandern): Labels mit 27pt Calibri Bold neu generiert (bak2-Symbol 1.2×)
+- `.kachel-img`: `object-fit:contain; object-position:bottom center` — Label bündig unten in allen Reihen
+- r5-Tiles (Apfel–dem): auf 189×121px Canvas erweitert, Label von oben nach unten verschoben (S9)
+- r6-Tiles (Maus–wandern): Labels mit 27pt Calibri Bold neu generiert (bak2-Symbol 1.2×, S8)
 
 **Ebene-1-Seiten (Modus 1 implementiert):**
 - 3 Seiten der Ebene 1 per ▌▌▌-Button umschaltbar (S1→S2→S3)
@@ -298,6 +299,16 @@ attrib +P "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/*.*" /S /
 Dann Edge komplett neu starten.
 
 **Hinweis:** `.exe`, `.bat`, Mediendateien (MP3, JPG, PNG, …) stehen in `.gitignore` und bleiben lokal.
+
+---
+
+## Sitzungsprotokoll 6. Juni 2026 — Sitzung 9
+
+| Was | Ergebnis |
+|---|---|
+| r5-Tiles: Label oben → unten | ✅ NuVoice r5-Originale (189×79px) hatten Label oben. Canvas auf 189×121px erweitert, Label unten neu gezeichnet (fix_r5_labels.py, Calibri Bold 17pt) |
+| CSS: `object-position:bottom center` | ✅ Label aller Reihen jetzt bündig am unteren Zellenrand |
+| Commit | ✅ a4315fa — gepusht |
 
 ---
 
