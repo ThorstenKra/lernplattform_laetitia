@@ -1,4 +1,4 @@
-# test_ebene2_alle.ps1 -- Ebene-2-Test fuer alle Erstschritte (Stufe 2)
+﻿# test_ebene2_alle.ps1 -- Ebene-2-Test fuer alle Erstschritte (Stufe 2)
 # Voraussetzung: Chrome mit --remote-debugging-port=9222
 #                Quasselkiste-Training-Tab offen
 
@@ -91,7 +91,7 @@ $js = @'
   // So werden schrittweise alle Erstschritte gefunden ohne btnHinweis.
   var tested={};
   var results=[];
-  var MAX=800;
+  var MAX=1200;
   var iter=0;
 
   for(; iter<MAX && Object.keys(tested).length<totalErst; iter++){
@@ -100,11 +100,17 @@ $js = @'
 
     var keys=wortMap[wort];
     if(!keys||keys.length===0){
-      document.getElementById("btnWeiter").click(); await wait(110); continue;
+      document.getElementById("btnWeiter").click();
+      for(var _t0=0;_t0<2000;_t0+=80){await wait(80);
+        var _nw0=((document.getElementById("zielAnzeige")||{}).textContent||"").trim().replace(/^Finde:\s*/,"");
+        if(_nw0!==wort)break;} continue;
     }
     // Alle Erstschritte dieses Worts schon getestet?
     if(keys.every(function(k){return !!tested[k];})){
-      document.getElementById("btnWeiter").click(); await wait(110); continue;
+      document.getElementById("btnWeiter").click();
+      for(var _t1=0;_t1<2000;_t1+=80){await wait(80);
+        var _nw1=((document.getElementById("zielAnzeige")||{}).textContent||"").trim().replace(/^Finde:\s*/,"");
+        if(_nw1!==wort)break;} continue;
     }
 
     // Ersten ungetesteten Erstschritt suchen
@@ -112,30 +118,48 @@ $js = @'
     for(var ki=0;ki<keys.length;ki++){
       if(!tested[keys[ki]]){ek=keys[ki];break;}
     }
-    if(!ek){ document.getElementById("btnWeiter").click(); await wait(110); continue; }
+    if(!ek){
+      document.getElementById("btnWeiter").click();
+      for(var _t2=0;_t2<2000;_t2+=80){await wait(80);
+        var _nw2=((document.getElementById("zielAnzeige")||{}).textContent||"").trim().replace(/^Finde:\s*/,"");
+        if(_nw2!==wort)break;} continue;
+    }
 
     var parts=ek.split("_");
     var eR=parseInt(parts[0]); var eC=parseInt(parts[1]);
     var el=document.querySelector(".kachel[data-r='"+eR+"'][data-c='"+eC+"']");
     if(!el||el.classList.contains("kachel-unsichtbar")){
       // Kachel nicht sichtbar (falsche Seite) -- uebernaechstes Mal wieder versuchen
-      document.getElementById("btnWeiter").click(); await wait(110); continue;
+      document.getElementById("btnWeiter").click();
+      for(var _t3=0;_t3<2000;_t3+=80){await wait(80);
+        var _nw3=((document.getElementById("zielAnzeige")||{}).textContent||"").trim().replace(/^Finde:\s*/,"");
+        if(_nw3!==wort)break;} continue;
     }
 
-    el.click(); await wait(700);
-
-    var treffer=document.querySelectorAll(".kachel.ebene2-treffer").length;
-    var leer=document.querySelectorAll(".kachel.ebene2-leer").length;
+    el.click();
+    // Polling: sobald ebene2-treffer erscheinen (400ms nach Klick), sofort lesen
+    var treffer=0; var leer=0;
+    for(var _tp=0;_tp<600;_tp+=30){
+      await wait(30);
+      treffer=document.querySelectorAll(".kachel.ebene2-treffer").length;
+      leer=document.querySelectorAll(".kachel.ebene2-leer").length;
+      if(treffer>0||leer>0) break;
+    }
 
     if(treffer===0&&leer===0){
       // Klick war falsch (Training hatte anderen Erstschritt erwartet) -- nicht markieren
-      document.getElementById("btnWeiter").click(); await wait(400); continue;
+      document.getElementById("btnWeiter").click();
+      for(var _t4=0;_t4<2000;_t4+=80){await wait(80);
+        var _nw4=((document.getElementById("zielAnzeige")||{}).textContent||"").trim().replace(/^Finde:\s*/,"");
+        if(_nw4!==wort)break;} continue;
     }
 
     // Ebene-2 hat geoeffnet -- Ergebnis aufzeichnen
     var labVis=Array.from(document.querySelectorAll(".kachel.ebene2-treffer .kachel-name"))
       .filter(function(n){return window.getComputedStyle(n).display!=="none";}).length;
-    var soll=erstMap[ek]?Object.keys(erstMap[ek].soll).length:0;
+    var sollRaw=erstMap[ek]?Object.keys(erstMap[ek].soll).length:0;
+    var selfLoop=erstMap[ek]&&(erstMap[ek].soll[ek]!==undefined);
+    var soll=selfLoop?sollRaw-1:sollRaw;
 
     tested[ek]=true;
     results.push({
@@ -144,7 +168,10 @@ $js = @'
       ok:(treffer===soll&&labVis===treffer)
     });
 
-    document.getElementById("btnWeiter").click(); await wait(400);
+    document.getElementById("btnWeiter").click();
+    for(var _t5=0;_t5<2000;_t5+=80){await wait(80);
+      var _nw5=((document.getElementById("zielAnzeige")||{}).textContent||"").trim().replace(/^Finde:\s*/,"");
+      if(_nw5!==wort)break;}
   }
 
   var untested=Object.keys(erstMap)
@@ -161,7 +188,7 @@ $js = @'
 })()
 '@
 
-$raw = DevEval $wsUrl 21 $js 300000
+$raw = DevEval $wsUrl 21 $js 900000
 
 if (!$raw) { Write-Host "FEHLER: Keine Antwort vom Browser."; exit 1 }
 
