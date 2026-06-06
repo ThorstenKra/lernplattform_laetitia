@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 6. Juni 2026 (Sitzung 10 — Abschluss)*
+*Stand: 6. Juni 2026 (Sitzung 11 — Abschluss)*
 
 ---
 
@@ -117,7 +117,7 @@ Erreichbar: `spielewelt.html` → 🗣️ Quasselkiste 60 / 🎯 Pfad-Training
 | Datei | Inhalt | Status |
 |---|---|---|
 | `quasselkiste.html` + `quasselkiste_mod.js` | 6×10 Raster, Pfad-Aufbau, TTS | ✅ getestet |
-| `quasselkiste_training.html` + `quasselkiste_training_mod.js` | **Stufenauswahl + Pfad-Training** | ✅ inkl. Grid-Layout + Label-Fix S8+S9 |
+| `quasselkiste_training.html` + `quasselkiste_training_mod.js` | **Stufenauswahl + Pfad-Training** | ✅ inkl. Grid-Layout + Label-Fix S8+S10 |
 | `data/quasselkiste_data.js` | 60 Kacheln + 1.862 Pfade (bereinigt) | ✅ |
 | `tiles/tile_r*.png` | **60/60 Tiles** — aus MTC PRC extrahiert | ✅ |
 | `ANALYSE_MTI_QUASSELKISTE.md` | MTI-Analyse-Ergebnisse (KG-30-05-2026.mti) | ✅ |
@@ -300,6 +300,24 @@ attrib +P "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/*.*" /S /
 Dann Edge komplett neu starten.
 
 **Hinweis:** `.exe`, `.bat`, Mediendateien (MP3, JPG, PNG, …) stehen in `.gitignore` und bleiben lokal.
+
+---
+
+## Sitzungsprotokoll 6. Juni 2026 — Sitzung 11
+
+| Was | Ergebnis |
+|---|---|
+| Fehlersuche Pfad-Training: Test-Infrastruktur analysiert | ✅ run_tests.ps1 (10 Phasen) + test_ebene2_alle.ps1 (37 Erstschritte) vorhanden |
+| 5 ungetestete Szenarien identifiziert | ✅ falscher Zweitschritt, Weiter in Ebene 2, Hinweis in Ebene 2, fehlerCount-Reset, kachel-name-Text |
+| test_luecken.ps1 erstellt (L1–L5) | ✅ Lücken-Tests committed — noch nicht ausgeführt (Edge-CDP-Problem) |
+| run_tests.ps1: DevEval-Robustheit | ✅ CancellationTokenSource → CancellationToken.None (wie test_ebene2_alle.ps1) — behebt Timeout-Abbrüche |
+| CDP Ghost-Evaluation Bug entdeckt | ⚠️ Stop-Process während awaitPromise:true → CDP-Session dauerhaft blockiert. Edge muss komplett neu gestartet werden. Nie mit Stop-Process abbrechen! |
+| Tests ausgeführt | ⬜ Phase 1 OK (7/7 PASS), Phase 2+ nicht ausgeführt — Edge neu starten für nächste Sitzung |
+
+**Nächste Sitzung beginnt mit:**
+1. Edge mit CDP starten: `start msedge --remote-debugging-port=9222 "<training-url>"`
+2. `powershell.exe -ExecutionPolicy Bypass -File .\run_tests.ps1` laufen lassen (nicht abbrechen!)
+3. Danach `powershell.exe -ExecutionPolicy Bypass -File .\test_luecken.ps1`
 
 ---
 

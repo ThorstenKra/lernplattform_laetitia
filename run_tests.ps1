@@ -1,17 +1,29 @@
 Add-Type -AssemblyName System.Web.Extensions
 
 function DevEval($wsUrl, $id, $expr, $ms=8000){
-    $ws=[System.Net.WebSockets.ClientWebSocket]::new()
-    $cts=[System.Threading.CancellationTokenSource]::new($ms+3000)
-    $ws.ConnectAsync([uri]$wsUrl,$cts.Token).Wait()
-    $ser=[System.Web.Script.Serialization.JavaScriptSerializer]::new()
-    $p=[System.Text.Encoding]::UTF8.GetBytes('{"id":'+$id+',"method":"Runtime.evaluate","params":{"expression":'+$ser.Serialize($expr)+',"awaitPromise":true,"timeout":'+$ms+'}}')
-    $ws.SendAsync([ArraySegment[byte]]$p,[System.Net.WebSockets.WebSocketMessageType]::Text,$true,$cts.Token).Wait()
-    $all=[System.Collections.Generic.List[byte]]::new()
-    $buf=New-Object byte[] 65536
-    do{$r=$ws.ReceiveAsync([ArraySegment[byte]]$buf,$cts.Token).GetAwaiter().GetResult();for($i=0;$i-lt$r.Count;$i++){$all.Add($buf[$i])}}while(!$r.EndOfMessage)
-    $ws.CloseAsync([System.Net.WebSockets.WebSocketCloseStatus]::NormalClosure,"",$cts.Token).Wait()
-    return ([System.Text.Encoding]::UTF8.GetString($all.ToArray())|ConvertFrom-Json).result.result.value
+    $ws  = [System.Net.WebSockets.ClientWebSocket]::new()
+    $tok = [System.Threading.CancellationToken]::None
+    $ws.ConnectAsync([uri]$wsUrl, $tok).Wait()
+    $ser = [System.Web.Script.Serialization.JavaScriptSerializer]::new()
+    $req = '{"id":' + $id + ',"method":"Runtime.evaluate","params":{"expression":' `
+         + $ser.Serialize($expr) + ',"awaitPromise":true,"timeout":' + $ms + '}}'
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($req)
+    $ws.SendAsync([ArraySegment[byte]]$bytes, [System.Net.WebSockets.WebSocketMessageType]::Text, $true, $tok).Wait()
+    $buf  = New-Object byte[] 131072
+    $done = $false
+    $found = $null
+    while (!$done) {
+        $all = [System.Collections.Generic.List[byte]]::new()
+        do {
+            $res = $ws.ReceiveAsync([ArraySegment[byte]]$buf, $tok).GetAwaiter().GetResult()
+            for ($i = 0; $i -lt $res.Count; $i++) { $all.Add($buf[$i]) }
+        } while (!$res.EndOfMessage)
+        if ($res.MessageType -eq [System.Net.WebSockets.WebSocketMessageType]::Close) { $done = $true; break }
+        $msg = [System.Text.Encoding]::UTF8.GetString($all.ToArray()) | ConvertFrom-Json
+        if ($msg.id -eq $id) { $found = $msg.result.result.value; $done = $true }
+    }
+    try { $ws.CloseAsync([System.Net.WebSockets.WebSocketCloseStatus]::NormalClosure, "", $tok).Wait() } catch {}
+    return $found
 }
 
 $tabs=Invoke-RestMethod "http://localhost:9222/json"
