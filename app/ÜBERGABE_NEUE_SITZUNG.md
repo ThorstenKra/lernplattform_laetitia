@@ -303,6 +303,7 @@ Dann Edge komplett neu starten.
 | UTF-8-BOM-Bug (PS 5.1 Umlaut-Regex) | ✅ BOM hinzugefügt — ä/ö/ü in wortOk() jetzt korrekt gelesen |
 | Race-Condition-Fix (Treffer-Polling) | ✅ Polling statt fixem 700ms-Wait; Word-Change-Polling statt 110ms-Skip |
 | Commit test_ebene2_alle.ps1 | ✅ 0c59a9b |
+| Tile-Symbole vergrößert (10 weiße Tiles) | ✅ r6c1–c8, r3c9, r1c9: Leerraum gecroppt, Seitenverhältnis erhalten, deployed |
 
 ---
 
