@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 6. Juni 2026 (Sitzung 11 — Abschluss)*
+*Stand: 7. Juni 2026 (Sitzung 12 — Abschluss)*
 
 ---
 
@@ -74,17 +74,29 @@ Claude beschränkt sich auf entscheidungsrelevante Ausgaben. Einzelschritte, Üb
 | `schule_liesmal3_data.js` | ✅ vollständig |
 | `test_suite.html` | ✅ JS-Checks laufen, HTML-Checks brauchen Edge-Flag |
 
-## Grammatik-Werkstatt — Stand 31. Mai 2026
+## Grammatik-Werkstatt — Stand 7. Juni 2026
 
 Erreichbar: `schule.html` → Grammatik-Button → `grammatik.html`
 
+**Navigations-Hierarchie (3 Ebenen, neu seit Sitzung 12):**
+1. `grammatik.html` — Stufen-Auswahl: 4 Kacheln Grundlagen 🌱 / Fortgeschrittene 🌿 / Profi 🌳 / Champion 🏆 (2x2-Grid, kein Scrollen)
+2. `grammatik_kategorie.html?kat=<id>` — Lektionsraster der Kategorie, 4-Spalten-Grid, Zeilenzahl dynamisch (`Math.ceil(anzahl/4)`), kein Scrollen
+3. `grammatik_spiel.html?einheit=E-XX&kat=<id>` — Spielseite; „Zurück" führt dank `kat`-Parameter zur richtigen Kategorie-Seite zurück
+
 | Datei | Inhalt | Version |
 |---|---|---|
-| `grammatik.html` | Einheiten-Übersicht, Fortschrittsanzeige | ✅ |
-| `grammatik_spiel.html` | Spielseite (URL-param `?einheit=E-03`) — Lese/Aktions-Layout | v2 ✅ |
-| `grammatik_data.js` | 36 Einheiten, 360 Aufgaben (E-03–E-42) | ✅ |
-| `grammatik_mod.js` | Engine: `window.GrammatikMod.starteEinheit(id)` — Auto-Weiter | v3 ✅ |
-| `grammatik_uebersicht.js` | `window.GrammatikUebersicht.baueUebersicht()` | ✅ |
+| `grammatik.html` | Stufen-Auswahl (4 Kategorie-Kacheln, 2x2-Grid) | ✅ NEU |
+| `grammatik_kategorie.html` + `.js` | Lektionsraster je Kategorie (`?kat=<id>`), 4-Spalten-Grid | ✅ NEU |
+| `grammatik_spiel.html` | Spielseite (`?einheit=E-XX&kat=...`) — Lese-/Aktions-Trennung in allen 5 Aufgabentypen | v3 ✅ |
+| `grammatik_data.js` | 44 Einheiten, 440 Aufgaben (E-03–E-46) | ✅ |
+| `grammatik_mod.js` | Engine: `window.GrammatikMod.starteEinheit(id)` — Auto-Weiter, `leseHtml()` mit optionalem `extraHtml`-Parameter | v3 ✅ |
+| `grammatik_uebersicht.js` | `window.GrammatikUebersicht.baueUebersicht()` — baut die 4 Kategorie-Kacheln | ✅ |
+
+**Kategorie→Stufen-Mapping** (in grammatik_uebersicht.js + grammatik_kategorie.js dupliziert):
+- grundlagen = Stufe 1+2 (E-03–E-14, 12 Einheiten)
+- fortgeschrittene = Stufe 3+4 (E-15–E-26, 12 Einheiten)
+- profi = Stufe 5+6 (E-27–E-34, 8 Einheiten)
+- champion = Stufe 7+8+9 (E-35–E-46, 12 Einheiten) — Stufe 9 wurde Sitzung 12 ergänzt und der Champion-Kategorie zugeschlagen
 
 **Lernpfad-Stand:**
 
@@ -98,10 +110,11 @@ Erreichbar: `schule.html` → Grammatik-Button → `grammatik.html`
 | 6 | E-31–E-34 | Groß-/Kleinschreibung | 40 | ✅ |
 | 7 | E-35–E-38 | Kasus (Wer-/Wen-Fall) | 40 | ✅ |
 | 8 | E-39–E-42 | Pronomen | 40 | ✅ |
-| **9–13** | **E-43+** | **Satzzeichen, …** | — | ⬜ nächster Block |
+| 9 | E-43–E-46 | Satzzeichen (Punkt/Fragezeichen/Ausrufezeichen + gemischte Übung) | 40 | ✅ NEU |
+| **10+** | **E-47+** | — | — | ⬜ noch nicht geplant |
 
 **Grammatik-Werkstatt Features:**
-- Lesebereich (grau, `pointer-events:none`) oben — Frage + Satz sind PASSIV
+- Lesebereich (grau, `pointer-events:none`) oben — Frage + Satz + Vergleichsinhalte (Optionen/Wörter) sind PASSIV
 - Trennstreifen „👆 Deine Antwort" als sichtbare Grenze
 - Aktionsbereich (weiß, dwell-aktiv) unten — nur Buttons
 - Nach Antwort: Buttons vollständig ausgeblendet (`display:none`)
@@ -109,6 +122,8 @@ Erreichbar: `schule.html` → Grammatik-Button → `grammatik.html`
 - Weiter-Button bleibt für sofortiges Vorwärts
 - **Alle Einheiten immer zugänglich** — keine Freischaltlogik
 - **Admin-Panel:** 3 Sekunden auf den Header halten → „Alle Fortschritte löschen"
+
+**Lese-/Aktions-Trennungs-Fix (Sitzung 12):** ab_wahl/abc_wahl/wort_button zeigten Vergleichsinhalte (Optionstexte bzw. Satz-Wörter) vorher NUR auf den Dwell-Buttons — bei Augensteuerung ein Risiko (Hingucken zum Lesen löst Klick aus). Fix: `leseHtml()` um optionalen `extraHtml`-Parameter erweitert; Optionen erscheinen zusätzlich als „A: … / B: …" im passiven Lesebereich (`.lese-optionen`), Wort-Sätze als zusammengesetzter `.lese-satz`. Reiner Code-Fix in `grammatik_mod.js` + CSS — keine Änderung an `grammatik_data.js` nötig.
 
 ## Quasselkiste / NuVoice-Emulation — Stand 31. Mai 2026
 
@@ -189,12 +204,25 @@ Erreichbar: `spielewelt.html` → 🗣️ Quasselkiste 60 / 🎯 Pfad-Training
 7. Not-Overlay mit `← Zurück zur Startseite` + Dwell + TTS
 8. **NEU: Link-Navigator-Guard** — XHR-Check vor Navigation; bei fehlender Datei Overlay statt Browser-404
 
-## Werkzeuge (Projektwurzel)
+## Werkzeuge (neu seit Sitzung 12: `tests/`-Verzeichnis statt Projektwurzel)
+
+Test- und Automatisierungs-Algorithmen wurden in Sitzung 12 aus der Projektwurzel
+in ein festes `tests/`-Verzeichnis umgezogen — getrennt von einmaligen Reparatur-/
+Diagnoseskripten (bleiben in der Wurzel) und generierten Ergebnissen (Screenshots etc.):
+
+| Ort | Inhalt |
+|---|---|
+| `tests/` | Plattformweite Prüfer: `validate.ps1`, `analyse_optik.ps1`, `compare_tiles.ps1` |
+| `tests/quasselkiste/` | Modulspezifische Suiten: `run_tests.ps1`, `test_luecken.ps1`, `test_ebene2_alle.ps1`, `test_modus1.js` |
+| `tests/tools/` | Generische CDP-Automatisierung (Screenshot, Klick, Navigation via Remote-Debugging), inkl. `ws`-Abhängigkeit (`package.json`/`-lock`, `node_modules`) — wiederverwendbar für andere Module |
 
 | Datei | Zweck |
 |---|---|
-| `validate.ps1` | **9 Prüfungen** (NEU: Prüfung 9 — OneDrive-Sync-Check). Ausführen: `powershell.exe -ExecutionPolicy Bypass -File .\validate.ps1` |
+| `tests/validate.ps1` | **9 Prüfungen** (Prüfung 9 — OneDrive-Sync-Check). Ausführen: `powershell.exe -ExecutionPolicy Bypass -File .\tests\validate.ps1` |
+| `tests/quasselkiste/run_tests.ps1` | 53 Tests Pfad-Training (0 FAIL nach Sitzung-12-Fixes). Ausführen: `powershell.exe -ExecutionPolicy Bypass -File .\tests\quasselkiste\run_tests.ps1` |
 | `app/pruefung.html` | Browser-Runtime-Check: LaetitiaAttachDwell, TTS-Stimme, localStorage. Im Edge öffnen nach Deployment. |
+
+**$PSScriptRoot-Pfade angepasst:** `validate.ps1`, `analyse_optik.ps1`, `compare_tiles.ps1` nutzen jetzt `Split-Path -Parent` für das neue Verzeichnislevel — Funktionsfähigkeit nach Verschiebung verifiziert.
 
 ## Hörbuch-Modul (app/modules/hoerbuch/)
 
@@ -210,8 +238,8 @@ Eingetragene Bücher: Das Fliegende Kamel (60 Tracks), Jaguar und NEINguar (54 T
 Nächster Schritt: **Modus 2 (Freies Erkunden)** implementieren.
 Jeder Erstklick öffnet Ebene 2 (auch falscher) — Versuch-und-Irrtum wie echtes NuVoice.
 
-**Grammatik-Werkstatt: Stufe 9+ (E-43+) — nächster Block**
-Thema: Satzzeichen — Einheiten noch nicht geplant
+**Grammatik-Werkstatt: Stufe 10+ (E-47+) — nächster Block**
+Thema noch offen — Stufe 9 (Satzzeichen, E-43–E-46) wurde Sitzung 12 abgeschlossen.
 
 **Bluetooth-Umschaltung:**
 Einziger offener Schritt — als Administrator ausführen:
@@ -233,7 +261,7 @@ Dann `lernwelt_starten.exe` neu starten → Audio-Dialog testen.
 - Mathe-Hefte digitalisieren (PDFs vorhanden) → `schule_mathe_data.js`
 - Sachkunde-Bilder für 7 fehlende Themen ergänzen
 - `stats.js` in weitere Spielseiten einbinden (Regel 15 vollständig umsetzen)
-- Grammatik Stufe 9+ (E-43+): Satzzeichen
+- Grammatik Stufe 10+ (E-47+): Thema noch offen
 
 ---
 
@@ -274,8 +302,8 @@ GitHub: `https://github.com/ThorstenKra/lernplattform_laetitia`
 
 Nach jeder Arbeitssitzung:
 ```powershell
-powershell.exe -ExecutionPolicy Bypass -File .\validate.ps1   # erst prüfen
-git add app/pfad/zur/datei.js                                 # gezielt stagen
+powershell.exe -ExecutionPolicy Bypass -File .\tests\validate.ps1   # erst pruefen (neuer Pfad seit Sitzung 12)
+git add app/pfad/zur/datei.js                                       # gezielt stagen
 git commit -m "Kurze Beschreibung"
 git push
 ```
@@ -300,6 +328,25 @@ attrib +P "C:/Users/ThorstenLavinia/OneDrive/2026_05_12_Lernsystem/app/*.*" /S /
 Dann Edge komplett neu starten.
 
 **Hinweis:** `.exe`, `.bat`, Mediendateien (MP3, JPG, PNG, …) stehen in `.gitignore` und bleiben lokal.
+
+---
+
+## Sitzungsprotokoll 7. Juni 2026 — Sitzung 12
+
+| Was | Ergebnis |
+|---|---|
+| Tests: Self-Loop- + Datenbasis-Ambiguität-Fixes | ✅ run_tests.ps1 53/53 PASS (vorher 15 FAIL), test_luecken.ps1 14/14 PASS (vorher 1 FAIL) — Phase 3 filtert Erstschritt-Kachel aus erwarteten Treffern, Phase 5/6 + L3 erkennen Wörter mit mehreren Pfad-Einträgen und überspringen sie statt fehlzuschlagen (commit 2694aa5) |
+| Testumgebung neu sortiert | ✅ Neues `tests/`-Verzeichnis angelegt: `tests/quasselkiste/` (modulspez. Suiten), `tests/tools/` (generische CDP-Automatisierung inkl. ws/node_modules), `tests/` (plattformweite Prüfer validate.ps1/analyse_optik.ps1/compare_tiles.ps1). $PSScriptRoot-Pfade angepasst, Funktionsfähigkeit nach Verschiebung verifiziert (commit 86df18d) |
+| Grammatik: 4-Stufen-Navigation (Grundlagen/Fortgeschr./Profi/Champion) | ✅ Neue 3-Ebenen-Hierarchie `grammatik.html` → `grammatik_kategorie.html?kat=...` → `grammatik_spiel.html` — alle Lektionen je Kategorie ohne Scrollen erreichbar (4-Spalten-Grid, Zeilenzahl dynamisch via `Math.ceil(anzahl/4)`); neue Dateien `grammatik_kategorie.html` + `.js` (commit e51413e) |
+| Grammatik: Lese-/Klick-Trennung in allen 5 Aufgabentypen | ✅ ab_wahl/abc_wahl/wort_button (255/400 Aufgaben) zeigten Vergleichsinhalte vorher nur auf Dwell-Buttons — jetzt zusätzlich im passiven Lesebereich (`leseHtml()` um `extraHtml`-Parameter erweitert, neues CSS `.lese-optionen`/`.lese-satz`). Reiner Code-Fix, keine Änderung an grammatik_data.js (commit e51413e) |
+| Goldstandard-Regel-Check | ✅ Alle 17 Regeln geprüft — konform |
+| Live-Test in Edge (CDP, OneDrive-Deployment) | ✅ Stufen-Auswahl, Kategorie-Raster (Grundlagen, Champion), Spielseiten mit Lese-/Klick-Trennung — alle Screenshots verifiziert, kein Scrollen, Inhalte identisch zur Dev-Version |
+| Grammatik: 4 neue Lektionen E-43–E-46 (Stufe 9, Satzzeichen) | ✅ Der Punkt / Das Fragezeichen / Das Ausrufezeichen / Welches Satzzeichen? — 40 Aufgaben, alle 5 Typen, Lese-/Klick-Trennung. Stufe 9 der Champion-Kategorie zugeordnet (`stufen:[7,8] → [7,8,9]`, jetzt 12 Lektionen E-35–E-46) (commit f06b0d9) |
+| Deployment + Live-Test neue Lektionen | ✅ Nach OneDrive kopiert (Diff bestätigt MD5-identisch), Champion-Übersicht (12 Lektionen, kein Scrollen) + Lektion E-45 live in Edge verifiziert |
+
+**Commits (alle gepusht):** 2694aa5, 86df18d, e51413e, f06b0d9
+
+**Grammatik-Werkstatt jetzt:** 44 Einheiten, 440 Aufgaben (E-03–E-46), Stufen 1–9 vollständig.
 
 ---
 
