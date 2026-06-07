@@ -79,7 +79,7 @@ function rebindDwell(){
   if(_dwell && typeof _dwell.cancelDwell === "function") _dwell.cancelDwell();
   _dwellMs = parseInt(localStorage.getItem("laetitia_dwell_ms"))       || 900;
   _graceMs = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
-  _dwell = loadDwell()(".kachel:not(.kachel-unsichtbar):not(.ebene2-leer), .nav-btn, #btnSeite", {
+  _dwell = loadDwell()(".kachel:not(.kachel-unsichtbar):not(.ebene2-leer), .nav-btn", {
     dwellMs: _dwellMs, leaveGrace: _graceMs,
     onActivate: function(el){
       if(el.getAttribute("aria-disabled") === "true") return;
@@ -363,7 +363,6 @@ function starteModus0(){
   $("navLeiste").style.display = "";
   var sb = $("btnSeite"); if(sb) sb.style.display = "";
   var za = $("zielAnzeige"); if(za) za.textContent = "–";
-  var st = $("statsAnzeige"); if(st) st.textContent = "Modus 0 · Frei sprechen";
   zeigeNavFrei();
   aktualisiereSeiteAnzeige();
   clearHighlights();
@@ -378,7 +377,6 @@ function zeigeStartScreen(){
   $("navLeiste").style.display = "none";
   var sb = $("btnSeite"); if(sb) sb.style.display = "none";
   var za = $("zielAnzeige"); if(za) za.textContent = "Wähle eine Stufe";
-  var st = $("statsAnzeige"); if(st) st.textContent = "";
   aktStufe = 0; aktModus = "training"; aktSeite = 1; aktEbene = 1;
   geloest = 0; zielEintrag = null; freiEbene2Map = {};
   clearHighlights();
@@ -430,9 +428,7 @@ function neuesWort(){
 
 function aktualisiereZiel(){
   var el = $("zielAnzeige");
-  if(el) el.textContent = zielEintrag ? "Finde: " + zielEintrag.wort : "–";
-  var st = $("statsAnzeige");
-  if(st) st.textContent = "Stufe " + aktStufe + " · " + geloest + " gelöst";
+  if(el) el.textContent = zielEintrag ? "Finde: " + zielEintrag.wort + " (" + geloest + " gelöst)" : "–";
 }
 
 // ── Kachel angeklickt ────────────────────────────────────────────────────────
