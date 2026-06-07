@@ -2,7 +2,7 @@
 # Aufruf: powershell.exe -ExecutionPolicy Bypass -File .\validate.ps1
 # Erfordert: PowerShell 5.1+  (ASCII-only -- kein UTF-8 BOM noetig)
 
-param([string]$Root = $PSScriptRoot)
+param([string]$Root = (Split-Path $PSScriptRoot -Parent))
 $ErrorActionPreference = "SilentlyContinue"
 
 $nErr = 0; $nWrn = 0; $nOk = 0

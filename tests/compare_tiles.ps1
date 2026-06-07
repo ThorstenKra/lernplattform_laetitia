@@ -1,8 +1,9 @@
 ﻿# compare_tiles.ps1 -- Quasselkiste Kacheln: Abgleich data.js vs. tile-Bilder
 Add-Type -AssemblyName System.Drawing
 
-$tileDir  = Join-Path $PSScriptRoot "app\modules\quasselkiste\tiles"
-$dataFile = Join-Path $PSScriptRoot "app\modules\quasselkiste\data\quasselkiste_data.js"
+$root     = Split-Path $PSScriptRoot -Parent
+$tileDir  = Join-Path $root "app\modules\quasselkiste\tiles"
+$dataFile = Join-Path $root "app\modules\quasselkiste\data\quasselkiste_data.js"
 
 $raw = Get-Content $dataFile -Raw -Encoding UTF8
 $pattern = '\{r:(\d+),\s*c:\s*(\d+),\s*name:"([^"]*)",\s*bg:"([^"]+)"(?:[^}]*seiten:\[([^\]]*)\])?'

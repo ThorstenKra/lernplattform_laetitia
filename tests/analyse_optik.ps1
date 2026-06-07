@@ -11,7 +11,7 @@
 Add-Type -AssemblyName System.Drawing
 Add-Type -AssemblyName System.Web.Extensions
 
-$root     = $PSScriptRoot
+$root     = Split-Path $PSScriptRoot -Parent
 $tileDir  = Join-Path $root "app\modules\quasselkiste\tiles"
 $dataJs   = Join-Path $root "app\modules\quasselkiste\data\quasselkiste_data.js"
 $trainRel = "app\modules\quasselkiste\quasselkiste_training.html"
