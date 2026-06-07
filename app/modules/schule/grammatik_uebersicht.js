@@ -8,7 +8,7 @@ var KATEGORIEN = [
   { id:"grundlagen",       titel:"Grundlagen",       emoji:"🌱", stufen:[1,2] },
   { id:"fortgeschrittene", titel:"Fortgeschrittene", emoji:"🌿", stufen:[3,4] },
   { id:"profi",            titel:"Profi",            emoji:"🌳", stufen:[5,6] },
-  { id:"champion",         titel:"Champion",         emoji:"🏆", stufen:[7,8] }
+  { id:"champion",         titel:"Champion",         emoji:"🏆", stufen:[7,8,9] }
 ];
 
 function ladeStand(){

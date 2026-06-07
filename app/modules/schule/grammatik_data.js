@@ -4129,6 +4129,428 @@ var GRAMMATIK_EINHEITEN = [
         erklaerung: "Ihre Katze — sie gehört Maria."
       }
     ]
+  },
+
+  {
+    id: "E-43",
+    titel: "Der Punkt",
+    emoji: "🔵",
+    stufe: 9,
+    erklaerung_tts: "Ein Satz, der etwas erzählt, ist ein Aussagesatz. Er endet mit einem Punkt. Der Punkt zeigt: Hier ist der Satz zu Ende.",
+    erklaerung_merksatz: "Aussagesatz endet mit einem Punkt:\n\nDie Sonne scheint.\nDas ist ein Aussagesatz — er endet mit einem Punkt .",
+    aufgaben: [
+      {
+        typ: "ja_nein",
+        frage: "Stimmt das?",
+        satz: "Ein Satz, der etwas erzählt, endet mit einem Punkt.",
+        tts: "Stimmt das? — Ein Satz, der etwas erzählt, endet mit einem Punkt.",
+        richtig: "ja",
+        erklaerung: "Ja! Das ist ein Aussagesatz — er endet mit einem Punkt."
+      },
+      {
+        typ: "ja_nein",
+        frage: "Stimmt das?",
+        satz: "'Die Katze schläft' ist eine Frage.",
+        tts: "Stimmt das? — Die Katze schläft. Ist das eine Frage?",
+        richtig: "nein",
+        erklaerung: "Nein, das ist ein Aussagesatz. Er erzählt etwas und endet mit einem Punkt."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welches Satzzeichen passt ans Satzende?",
+        satz: "Der Hund läuft über die Wiese ___",
+        tts: "Welches Satzzeichen passt ans Satzende? — Der Hund läuft über die Wiese.",
+        option_a: ".",
+        option_b: "?",
+        richtig: "a",
+        erklaerung: "Der Satz erzählt etwas — er ist ein Aussagesatz und endet mit einem Punkt."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welches Satzzeichen passt ans Satzende?",
+        satz: "Die Kinder spielen im Garten ___",
+        tts: "Welches Satzzeichen passt ans Satzende? — Die Kinder spielen im Garten.",
+        option_a: "?",
+        option_b: ".",
+        richtig: "b",
+        erklaerung: "Der Satz erzählt etwas — also kommt ein Punkt ans Ende."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welches Satzzeichen passt ans Satzende?",
+        satz: "Das Auto steht vor dem Haus ___",
+        tts: "Welches Satzzeichen passt ans Satzende? — Das Auto steht vor dem Haus.",
+        option_a: ".",
+        option_b: "!",
+        richtig: "a",
+        erklaerung: "Ein ruhiger Aussagesatz endet mit einem Punkt, nicht mit einem Ausrufezeichen."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welches Satzzeichen passt?",
+        satz: "Die Sonne geht unter ___",
+        tts: "Welches Satzzeichen passt? — Die Sonne geht unter.",
+        option_a: ".",
+        option_b: "?",
+        option_c: "!",
+        richtig: "a",
+        erklaerung: "Der Satz erzählt ruhig etwas — das ist ein Aussagesatz mit Punkt."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welches Satzzeichen passt?",
+        satz: "Die Vögel singen im Baum ___",
+        tts: "Welches Satzzeichen passt? — Die Vögel singen im Baum.",
+        option_a: "!",
+        option_b: "?",
+        option_c: ".",
+        richtig: "c",
+        erklaerung: "Ein Aussagesatz endet mit einem Punkt."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort steht direkt vor dem Punkt?",
+        tts: "Welches Wort steht direkt vor dem Punkt? — Der Junge liest ein Buch.",
+        woerter: ["Der", "Junge", "liest", "ein", "Buch", "."],
+        richtig: 4,
+        erklaerung: "'Buch' steht direkt vor dem Punkt — danach ist der Satz zu Ende."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt das Satzzeichen am Ende?",
+        satz: "Die Blumen blühen im Garten.",
+        tts: "Stimmt das Satzzeichen am Ende? — Die Blumen blühen im Garten.",
+        richtig: "richtig",
+        erklaerung: "Ja! Das ist ein Aussagesatz — der Punkt am Ende stimmt."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt das Satzzeichen am Ende?",
+        satz: "Wir gehen heute schwimmen?",
+        tts: "Stimmt das Satzzeichen am Ende? — Wir gehen heute schwimmen?",
+        richtig: "falsch",
+        erklaerung: "Nein! Der Satz erzählt etwas — er braucht einen Punkt, kein Fragezeichen."
+      }
+    ]
+  },
+
+  {
+    id: "E-44",
+    titel: "Das Fragezeichen",
+    emoji: "❓",
+    stufe: 9,
+    erklaerung_tts: "Ein Satz, der etwas fragt, ist ein Fragesatz. Er endet mit einem Fragezeichen. Zum Beispiel: Spielst du mit mir? Das Fragezeichen zeigt: Hier wird etwas gefragt.",
+    erklaerung_merksatz: "Fragesatz endet mit einem Fragezeichen:\n\nSpielst du mit mir?\nDas ist eine Frage — sie endet mit einem Fragezeichen ?",
+    aufgaben: [
+      {
+        typ: "ja_nein",
+        frage: "Stimmt das?",
+        satz: "Ein Satz, der etwas fragt, endet mit einem Fragezeichen.",
+        tts: "Stimmt das? — Ein Satz, der etwas fragt, endet mit einem Fragezeichen.",
+        richtig: "ja",
+        erklaerung: "Ja! Fragesätze enden mit einem Fragezeichen."
+      },
+      {
+        typ: "ja_nein",
+        frage: "Stimmt das?",
+        satz: "'Wo ist mein Ball?' ist ein Aussagesatz.",
+        tts: "Stimmt das? — Wo ist mein Ball? Ist das ein Aussagesatz?",
+        richtig: "nein",
+        erklaerung: "Nein, das ist eine Frage — sie endet mit einem Fragezeichen."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welches Satzzeichen passt ans Satzende?",
+        satz: "Kommst du heute mit ___",
+        tts: "Welches Satzzeichen passt ans Satzende? — Kommst du heute mit.",
+        option_a: "?",
+        option_b: ".",
+        richtig: "a",
+        erklaerung: "Der Satz fragt etwas — also kommt ein Fragezeichen ans Ende."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welches Satzzeichen passt ans Satzende?",
+        satz: "Wie heißt du ___",
+        tts: "Welches Satzzeichen passt ans Satzende? — Wie heißt du.",
+        option_a: ".",
+        option_b: "?",
+        richtig: "b",
+        erklaerung: "Das ist eine Frage — sie braucht ein Fragezeichen."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welches Satzzeichen passt ans Satzende?",
+        satz: "Magst du Schokolade ___",
+        tts: "Welches Satzzeichen passt ans Satzende? — Magst du Schokolade.",
+        option_a: "?",
+        option_b: "!",
+        richtig: "a",
+        erklaerung: "Das ist eine Frage — kein Ausrufezeichen, sondern ein Fragezeichen."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welches Satzzeichen passt?",
+        satz: "Was machst du gerade ___",
+        tts: "Welches Satzzeichen passt? — Was machst du gerade.",
+        option_a: ".",
+        option_b: "!",
+        option_c: "?",
+        richtig: "c",
+        erklaerung: "Eine Frage endet immer mit einem Fragezeichen."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welches Satzzeichen passt?",
+        satz: "Wo wohnst du ___",
+        tts: "Welches Satzzeichen passt? — Wo wohnst du.",
+        option_a: "?",
+        option_b: ".",
+        option_c: "!",
+        richtig: "a",
+        erklaerung: "Das ist eine Frage — sie endet mit einem Fragezeichen."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort steht direkt vor dem Fragezeichen?",
+        tts: "Welches Wort steht direkt vor dem Fragezeichen? — Spielst du heute mit mir?",
+        woerter: ["Spielst", "du", "heute", "mit", "mir", "?"],
+        richtig: 4,
+        erklaerung: "'mir' steht direkt vor dem Fragezeichen — danach endet die Frage."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt das Satzzeichen am Ende?",
+        satz: "Wann beginnt das Spiel?",
+        tts: "Stimmt das Satzzeichen am Ende? — Wann beginnt das Spiel?",
+        richtig: "richtig",
+        erklaerung: "Ja! Das ist eine Frage — das Fragezeichen am Ende stimmt."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt das Satzzeichen am Ende?",
+        satz: "Hast du meine Tasche gesehen.",
+        tts: "Stimmt das Satzzeichen am Ende? — Hast du meine Tasche gesehen.",
+        richtig: "falsch",
+        erklaerung: "Nein! Der Satz fragt etwas — er braucht ein Fragezeichen, keinen Punkt."
+      }
+    ]
+  },
+
+  {
+    id: "E-45",
+    titel: "Das Ausrufezeichen",
+    emoji: "❗",
+    stufe: 9,
+    erklaerung_tts: "Ein Satz, der ruft oder auffordert, endet oft mit einem Ausrufezeichen. Zum Beispiel: Pass auf! oder Komm schnell her! Das Ausrufezeichen zeigt: Das ist wichtig oder laut gemeint.",
+    erklaerung_merksatz: "Ausruf oder Aufforderung endet mit einem Ausrufezeichen:\n\nPass auf!\nKomm her!\nDas Ausrufezeichen zeigt: laut oder wichtig!",
+    aufgaben: [
+      {
+        typ: "ja_nein",
+        frage: "Stimmt das?",
+        satz: "Ein Satz wie 'Vorsicht!' endet mit einem Ausrufezeichen.",
+        tts: "Stimmt das? — Vorsicht! Endet dieser Satz mit einem Ausrufezeichen?",
+        richtig: "ja",
+        erklaerung: "Ja! Das ist ein Ausruf — er endet mit einem Ausrufezeichen."
+      },
+      {
+        typ: "ja_nein",
+        frage: "Stimmt das?",
+        satz: "'Räum dein Zimmer auf!' ist eine ruhige Frage.",
+        tts: "Stimmt das? — Räum dein Zimmer auf! Ist das eine ruhige Frage?",
+        richtig: "nein",
+        erklaerung: "Nein, das ist eine Aufforderung — sie endet mit einem Ausrufezeichen."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welches Satzzeichen passt ans Satzende?",
+        satz: "Pass auf, der Ball kommt ___",
+        tts: "Welches Satzzeichen passt ans Satzende? — Pass auf, der Ball kommt.",
+        option_a: "!",
+        option_b: ".",
+        richtig: "a",
+        erklaerung: "Das ist ein Ausruf — er braucht ein Ausrufezeichen."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welches Satzzeichen passt ans Satzende?",
+        satz: "Komm schnell her ___",
+        tts: "Welches Satzzeichen passt ans Satzende? — Komm schnell her.",
+        option_a: "?",
+        option_b: "!",
+        richtig: "b",
+        erklaerung: "Das ist eine Aufforderung — sie endet mit einem Ausrufezeichen."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Welches Satzzeichen passt ans Satzende?",
+        satz: "Hilfe, das Haus brennt ___",
+        tts: "Welches Satzzeichen passt ans Satzende? — Hilfe, das Haus brennt.",
+        option_a: "!",
+        option_b: "?",
+        richtig: "a",
+        erklaerung: "Ein lauter Hilferuf endet mit einem Ausrufezeichen."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welches Satzzeichen passt?",
+        satz: "Sei leise ___",
+        tts: "Welches Satzzeichen passt? — Sei leise.",
+        option_a: "?",
+        option_b: ".",
+        option_c: "!",
+        richtig: "c",
+        erklaerung: "Eine Aufforderung endet mit einem Ausrufezeichen."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welches Satzzeichen passt?",
+        satz: "Was für ein toller Tag ___",
+        tts: "Welches Satzzeichen passt? — Was für ein toller Tag.",
+        option_a: "!",
+        option_b: "?",
+        option_c: ".",
+        richtig: "a",
+        erklaerung: "Das ist ein Ausruf der Freude — er endet mit einem Ausrufezeichen."
+      },
+      {
+        typ: "wort_button",
+        frage: "Welches Wort steht direkt vor dem Ausrufezeichen?",
+        tts: "Welches Wort steht direkt vor dem Ausrufezeichen? — Lauf schnell nach Hause!",
+        woerter: ["Lauf", "schnell", "nach", "Hause", "!"],
+        richtig: 3,
+        erklaerung: "'Hause' steht direkt vor dem Ausrufezeichen — danach endet der Ausruf."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt das Satzzeichen am Ende?",
+        satz: "Achtung, hier ist es glatt!",
+        tts: "Stimmt das Satzzeichen am Ende? — Achtung, hier ist es glatt!",
+        richtig: "richtig",
+        erklaerung: "Ja! Das ist ein Warnruf — das Ausrufezeichen passt."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt das Satzzeichen am Ende?",
+        satz: "Mach sofort die Tür zu?",
+        tts: "Stimmt das Satzzeichen am Ende? — Mach sofort die Tür zu?",
+        richtig: "falsch",
+        erklaerung: "Nein! Das ist eine Aufforderung — sie braucht ein Ausrufezeichen, kein Fragezeichen."
+      }
+    ]
+  },
+
+  {
+    id: "E-46",
+    titel: "Welches Satzzeichen?",
+    emoji: "🧩",
+    stufe: 9,
+    erklaerung_tts: "Jetzt üben wir alle drei zusammen: Punkt, Fragezeichen und Ausrufezeichen. Erzählt der Satz etwas? Dann ein Punkt. Fragt der Satz? Dann ein Fragezeichen. Ruft der Satz oder fordert er auf? Dann ein Ausrufezeichen.",
+    erklaerung_merksatz: "Punkt . — der Satz erzählt\nFragezeichen ? — der Satz fragt\nAusrufezeichen ! — der Satz ruft oder fordert auf",
+    aufgaben: [
+      {
+        typ: "abc_wahl",
+        frage: "Welches Satzzeichen passt?",
+        satz: "Die Blätter fallen von den Bäumen ___",
+        tts: "Welches Satzzeichen passt? — Die Blätter fallen von den Bäumen.",
+        option_a: ".",
+        option_b: "?",
+        option_c: "!",
+        richtig: "a",
+        erklaerung: "Der Satz erzählt etwas — also ein Punkt."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welches Satzzeichen passt?",
+        satz: "Wann kommt der Bus ___",
+        tts: "Welches Satzzeichen passt? — Wann kommt der Bus.",
+        option_a: "!",
+        option_b: ".",
+        option_c: "?",
+        richtig: "c",
+        erklaerung: "Der Satz fragt etwas — also ein Fragezeichen."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welches Satzzeichen passt?",
+        satz: "Lauf, der Bus fährt gleich ___",
+        tts: "Welches Satzzeichen passt? — Lauf, der Bus fährt gleich.",
+        option_a: "?",
+        option_b: "!",
+        option_c: ".",
+        richtig: "b",
+        erklaerung: "Das ist eine dringende Aufforderung — also ein Ausrufezeichen."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welches Satzzeichen passt?",
+        satz: "Die Katze sitzt auf dem Dach ___",
+        tts: "Welches Satzzeichen passt? — Die Katze sitzt auf dem Dach.",
+        option_a: "!",
+        option_b: ".",
+        option_c: "?",
+        richtig: "b",
+        erklaerung: "Der Satz erzählt ruhig etwas — also ein Punkt."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welches Satzzeichen passt?",
+        satz: "Wie spät ist es ___",
+        tts: "Welches Satzzeichen passt? — Wie spät ist es.",
+        option_a: ".",
+        option_b: "!",
+        option_c: "?",
+        richtig: "c",
+        erklaerung: "Eine Frage endet mit einem Fragezeichen."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Welches Satzzeichen passt?",
+        satz: "Pass auf die Stufe auf ___",
+        tts: "Welches Satzzeichen passt? — Pass auf die Stufe auf.",
+        option_a: "?",
+        option_b: "!",
+        option_c: ".",
+        richtig: "b",
+        erklaerung: "Eine Warnung endet mit einem Ausrufezeichen."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Erzählt der Satz etwas, oder fragt er?",
+        satz: "'Der Zug fährt um acht Uhr ab.'",
+        tts: "Erzählt der Satz etwas, oder fragt er? — Der Zug fährt um acht Uhr ab.",
+        option_a: "Er erzählt etwas → Punkt",
+        option_b: "Er fragt etwas → Fragezeichen",
+        richtig: "a",
+        erklaerung: "Der Satz erzählt — er endet mit einem Punkt."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Erzählt der Satz etwas, oder fragt er?",
+        satz: "'Wer hat den Kuchen gebacken?'",
+        tts: "Erzählt der Satz etwas, oder fragt er? — Wer hat den Kuchen gebacken?",
+        option_a: "Er erzählt etwas → Punkt",
+        option_b: "Er fragt etwas → Fragezeichen",
+        richtig: "b",
+        erklaerung: "Der Satz fragt — er endet mit einem Fragezeichen."
+      },
+      {
+        typ: "ja_nein",
+        frage: "Stimmt das?",
+        satz: "'Wie schön das Feuerwerk ist!' ist ein Ausruf mit Ausrufezeichen.",
+        tts: "Stimmt das? — Wie schön das Feuerwerk ist! Ist das ein Ausruf mit Ausrufezeichen?",
+        richtig: "ja",
+        erklaerung: "Ja! Das ist ein Ausruf der Begeisterung — das Ausrufezeichen passt."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Stimmt das Satzzeichen am Ende?",
+        satz: "Welche Farbe hat dein Fahrrad.",
+        tts: "Stimmt das Satzzeichen am Ende? — Welche Farbe hat dein Fahrrad.",
+        richtig: "falsch",
+        erklaerung: "Nein! Der Satz fragt etwas — er braucht ein Fragezeichen, keinen Punkt."
+      }
+    ]
   }
 
 ];
