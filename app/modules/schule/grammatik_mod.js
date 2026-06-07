@@ -104,13 +104,14 @@ function verbergeAntwortButtons(){
 }
 
 // ── HTML-Bausteine ───────────────────────────────────────────────
-function leseHtml(frage, satz){
+function leseHtml(frage, satz, extraHtml){
   var satzBlock = satz
     ? "<div class=\"lese-satz\">" + esc(satz) + "</div>"
     : "";
   return "<div class=\"lese-bereich\">" +
     "<div class=\"lese-frage\">" + esc(frage) + "</div>" +
     satzBlock +
+    (extraHtml || "") +
     "</div>" +
     "<div class=\"trenn-streifen\"><span class=\"trenn-label\">👆 Deine Antwort</span></div>" +
     "<div class=\"aktions-bereich\" id=\"aktionsBereich\">";
@@ -244,8 +245,13 @@ function rendereJaNein(container, aufgabe){
 
 // ── Typ: A / B Wahl ──────────────────────────────────────────────
 function rendereAbWahl(container, aufgabe){
+  var optionenHtml =
+    "<div class=\"lese-optionen\">" +
+      "<span class=\"lese-options-eintrag\"><b>A</b> " + esc(aufgabe.option_a) + "</span>" +
+      "<span class=\"lese-options-eintrag\"><b>B</b> " + esc(aufgabe.option_b) + "</span>" +
+    "</div>";
   container.innerHTML =
-    leseHtml(aufgabe.frage, aufgabe.satz || null) +
+    leseHtml(aufgabe.frage, aufgabe.satz || null, optionenHtml) +
       "<div class=\"antwort-zweier\">" +
         "<button class=\"antwort-btn\" id=\"btnA\" onclick=\"window._GrammAntwort('a')\">" + esc(aufgabe.option_a) + RING + "</button>" +
         "<button class=\"antwort-btn\" id=\"btnB\" onclick=\"window._GrammAntwort('b')\">" + esc(aufgabe.option_b) + RING + "</button>" +
@@ -261,8 +267,14 @@ function rendereAbWahl(container, aufgabe){
 
 // ── Typ: A / B / C Wahl ──────────────────────────────────────────
 function rendereAbcWahl(container, aufgabe){
+  var optionenHtml =
+    "<div class=\"lese-optionen\">" +
+      "<span class=\"lese-options-eintrag\"><b>A</b> " + esc(aufgabe.option_a) + "</span>" +
+      "<span class=\"lese-options-eintrag\"><b>B</b> " + esc(aufgabe.option_b) + "</span>" +
+      "<span class=\"lese-options-eintrag\"><b>C</b> " + esc(aufgabe.option_c) + "</span>" +
+    "</div>";
   container.innerHTML =
-    leseHtml(aufgabe.frage, aufgabe.satz || null) +
+    leseHtml(aufgabe.frage, aufgabe.satz || null, optionenHtml) +
       "<div class=\"antwort-dreier\">" +
         "<button class=\"antwort-btn\" id=\"btnA\" onclick=\"window._GrammAntwort('a')\">" + esc(aufgabe.option_a) + RING + "</button>" +
         "<button class=\"antwort-btn\" id=\"btnB\" onclick=\"window._GrammAntwort('b')\">" + esc(aufgabe.option_b) + RING + "</button>" +
@@ -285,8 +297,9 @@ function rendereWortButton(container, aufgabe){
       esc(wort) + RING + "</button>";
   });
 
+  var satzText = aufgabe.woerter.join(" ");
   container.innerHTML =
-    leseHtml(aufgabe.frage, null) +
+    leseHtml(aufgabe.frage, satzText) +
       "<div class=\"wort-reihe\">" + btnHtml + "</div>" +
       "<div class=\"feedback-zeile\" id=\"feedbackZeile\"></div>" +
     leseHtmlEnde();

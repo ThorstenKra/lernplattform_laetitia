@@ -1,19 +1,15 @@
-// grammatik_uebersicht.js — Einheiten-Übersicht und Fortschrittsanzeige
+// grammatik_uebersicht.js — Schwierigkeitsstufen-Auswahl (Grundlagen/Fortgeschrittene/Profi/Champion)
 
 (function(){
 
 var STORAGE_KEY = "laetitia_grammatik_v1";
 
-var STUFE_NAMEN = {
-  1: "Stufe 1 — Nomen, Verben, Adjektive",
-  2: "Stufe 2 — Artikel der / die / das",
-  3: "Stufe 3 — Sätze bauen",
-  4: "Stufe 4 — Konjugation Gegenwart",
-  5: "Stufe 5 — Singular & Plural",
-  6: "Stufe 6 — Groß- und Kleinschreibung",
-  7: "Stufe 7 — Wer-Fall und Wen-Fall",
-  8: "Stufe 8 — Pronomen"
-};
+var KATEGORIEN = [
+  { id:"grundlagen",       titel:"Grundlagen",       emoji:"🌱", stufen:[1,2] },
+  { id:"fortgeschrittene", titel:"Fortgeschrittene", emoji:"🌿", stufen:[3,4] },
+  { id:"profi",            titel:"Profi",            emoji:"🌳", stufen:[5,6] },
+  { id:"champion",         titel:"Champion",         emoji:"🏆", stufen:[7,8] }
+];
 
 function ladeStand(){
   try{
@@ -28,47 +24,25 @@ function einheitAbgeschlossen(id, stand){
 
 function baueUebersicht(){
   var stand   = ladeStand();
-  var bereich = document.getElementById("einheitenBereich");
+  var bereich = document.getElementById("kategorienBereich");
   if(!bereich) return;
   bereich.innerHTML = "";
 
-  var aktStufe = -1;
-  var gridEl   = null;
-
-  GRAMMATIK_EINHEITEN.forEach(function(einheit, index){
-    if(einheit.stufe !== aktStufe){
-      aktStufe = einheit.stufe;
-      var label = document.createElement("div");
-      label.className = "stufe-label";
-      label.textContent = STUFE_NAMEN[aktStufe] || ("Stufe " + aktStufe);
-      bereich.appendChild(label);
-      gridEl = document.createElement("div");
-      gridEl.className = "einheiten-grid";
-      bereich.appendChild(gridEl);
-    }
-
-    var freigegeben = true;
-    var gemeistert  = einheitAbgeschlossen(einheit.id, stand);
-    var quote       = stand[einheit.id] ? stand[einheit.id].besteQuote : 0;
-    var istGold     = gemeistert && quote >= 0.8;
-
-    var statusEmoji = gemeistert ? (istGold ? "⭐" : "✓") : (freigegeben ? "▶" : "🔒");
-    var klasse = "einheit-btn" +
-      (gemeistert ? " gemeistert" : (freigegeben ? " verfuegbar" : " gesperrt"));
+  KATEGORIEN.forEach(function(kat){
+    var einheiten = GRAMMATIK_EINHEITEN.filter(function(e){ return kat.stufen.indexOf(e.stufe) !== -1; });
+    var gemeistert = einheiten.filter(function(e){ return einheitAbgeschlossen(e.id, stand); }).length;
 
     var btn = document.createElement("a");
-    btn.className = klasse;
-    btn.setAttribute("data-id", einheit.id);
-    if(freigegeben){
-      btn.href = "./grammatik_spiel.html?einheit=" + einheit.id;
-    }
+    btn.className = "kategorie-btn verfuegbar";
+    btn.setAttribute("data-kat", kat.id);
+    btn.href = "./grammatik_kategorie.html?kat=" + kat.id;
     btn.innerHTML =
       "<svg class=\"dwell-ring-svg\" viewBox=\"0 0 70 70\"><circle cx=\"35\" cy=\"35\" r=\"30\"/></svg>" +
-      "<div class=\"einheit-status\">" + statusEmoji + "</div>" +
-      "<div class=\"einheit-id\">" + einheit.id + "</div>" +
-      "<div class=\"einheit-label\">" + einheit.titel + "</div>";
+      "<div class=\"kategorie-emoji\">" + kat.emoji + "</div>" +
+      "<div class=\"kategorie-titel\">" + kat.titel + "</div>" +
+      "<div class=\"kategorie-sub\">" + gemeistert + " / " + einheiten.length + " gemeistert</div>";
 
-    gridEl.appendChild(btn);
+    bereich.appendChild(btn);
   });
 
   var gesamt   = GRAMMATIK_EINHEITEN.length;
@@ -79,10 +53,9 @@ function baueUebersicht(){
   var attach    = window.LaetitiaAttachDwell || function(){ return {cancelDwell:function(){}}; };
   var dwellMs    = parseInt(localStorage.getItem("laetitia_dwell_ms"))    || 900;
   var leaveGrace = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
-  attach("a.einheit-btn.verfuegbar, a.einheit-btn.gemeistert, a.zurueckBtn", {
+  attach("a.kategorie-btn, a.zurueckBtn", {
     dwellMs: dwellMs, leaveGrace: leaveGrace,
     onActivate: function(el){
-      if(el.classList.contains("gesperrt")) return;
       try{ el.click(); }catch(e){}
     }
   });

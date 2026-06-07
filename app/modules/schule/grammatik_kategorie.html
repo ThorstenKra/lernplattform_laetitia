@@ -32,33 +32,38 @@ body{
 .header-titel{ font-size:20px; font-weight:1000; color:var(--akzent); }
 .header-sub{ font-size:13px; font-weight:800; color:var(--muted); margin-left:auto; }
 
-/* Schwierigkeitsstufen-Raster */
-.kategorien-bereich{
-  flex:1; min-height:0; padding:14px;
+/* Einheiten-Raster -- alles passt ohne Scrollen in den Viewport */
+.einheiten-bereich{
+  flex:1; min-height:0; padding:12px;
   display:grid;
-  grid-template-columns:1fr 1fr;
-  grid-template-rows:1fr 1fr;
-  gap:14px;
+  grid-template-columns:repeat(4, 1fr);
+  gap:10px;
 }
-.kategorie-btn{
+.einheit-btn{
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:10px; padding:14px;
-  background:var(--panel); border:3px solid var(--border);
+  gap:6px; padding:10px;
+  background:var(--panel); border:2px solid var(--border);
   border-radius:var(--radius); box-shadow:var(--shadow);
   text-decoration:none; color:var(--text); font-weight:1000;
   user-select:none; cursor:pointer; position:relative; transition:none;
+  overflow:hidden;
 }
-.kategorie-btn.verfuegbar{ border-color:var(--lila); background:var(--lila-bg); }
-.kategorie-btn:hover{
-  transform:scale(1.02); outline:3px solid var(--akzent); background:var(--akzent-bg);
+.einheit-btn.verfuegbar{
+  border-color:var(--lila); background:var(--lila-bg);
 }
-.kategorie-btn.dwell-active{
-  transform:scale(1.03) !important; outline:3px solid var(--akzent) !important;
+.einheit-btn.gemeistert{
+  border-color:var(--gruen); background:var(--gruen-bg);
+}
+.einheit-btn:hover{
+  transform:scale(1.03); outline:3px solid var(--akzent); background:var(--akzent-bg);
+}
+.einheit-btn.dwell-active{
+  transform:scale(1.04) !important; outline:3px solid var(--akzent) !important;
   background:var(--akzent-bg) !important; transition:none !important;
 }
-.kategorie-emoji{ font-size:clamp(36px,6vw,64px); }
-.kategorie-titel{ font-size:clamp(20px,3vw,30px); }
-.kategorie-sub{ font-size:clamp(12px,1.6vw,16px); color:var(--muted); font-weight:800; }
+.einheit-id{ font-size:clamp(9px,1vw,11px); font-weight:1000; color:var(--muted); }
+.einheit-label{ font-size:clamp(11px,1.4vw,14px); text-align:center; font-weight:1000; line-height:1.25; }
+.einheit-status{ font-size:clamp(15px,2vw,20px); }
 
 /* Zurück */
 .zurueck-leiste{ padding:8px 12px; flex-shrink:0; }
@@ -92,30 +97,32 @@ a.zurueckBtn .dwell-ring-svg circle{ stroke:#8b5cf6; }
 <body>
 
 <div class="header">
-  <span class="header-emoji">📝</span>
-  <span class="header-titel">Grammatik-Werkstatt</span>
-  <span class="header-sub" id="headerSub">Schwierigkeitsstufe wählen</span>
+  <span class="header-emoji" id="headerEmoji">📝</span>
+  <span class="header-titel" id="headerTitel">Grammatik-Werkstatt</span>
+  <span class="header-sub" id="headerSub">Einheit wählen</span>
 </div>
 
-<div class="kategorien-bereich" id="kategorienBereich">
+<div class="einheiten-bereich" id="einheitenBereich">
   <!-- wird per JS befüllt -->
 </div>
 
 <div class="zurueck-leiste">
-  <a class="zurueckBtn" href="./schule.html" id="btnZurueck">
+  <a class="zurueckBtn" href="./grammatik.html" id="btnZurueck">
     <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
-    ← Zurück zur Schule
+    ← Zurück zur Auswahl
   </a>
 </div>
 
 <script src="../../core/dwell.js"></script>
 <script src="../../core/error_handler.js"></script>
 <script src="./grammatik_data.js"></script>
-<script src="./grammatik_uebersicht.js"></script>
+<script src="./grammatik_kategorie.js"></script>
 <script>
-try{ localStorage.setItem("laetitia_return_url_v1", new URL("./grammatik.html", window.location.href).href); }catch(e){}
-window.GrammatikUebersicht.baueUebersicht();
-window.GrammatikUebersicht.initAdmin();
+try{
+  var _kat = new URLSearchParams(window.location.search).get("kat") || "grundlagen";
+  localStorage.setItem("laetitia_return_url_v1", new URL("./grammatik_kategorie.html?kat=" + _kat, window.location.href).href);
+}catch(e){}
+window.GrammatikKategorie.baueKategorie();
 </script>
 </body>
 </html>
