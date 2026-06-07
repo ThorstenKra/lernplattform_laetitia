@@ -301,6 +301,9 @@ function zeigeEbene2Frei(r1, c1, combosMap){
       el.classList.add("ebene2-leer");
     }
   });
+  var f1 = felder.find(function(x){ return x.r === r1 && x.c === c1; });
+  var pfadEl = $("pfadAnzeige");
+  if(pfadEl) pfadEl.textContent = (f1 ? f1.name : "") + " →";
   rebindDwell();
 }
 
@@ -321,6 +324,8 @@ function loescheFrei(){
   aktualisiereKachelSichtbarkeit();
   var za = $("zielAnzeige");
   if(za) za.textContent = "–";
+  var pfadEl = $("pfadAnzeige");
+  if(pfadEl) pfadEl.textContent = "";
   rebindDwell();
 }
 
@@ -363,6 +368,7 @@ function starteModus0(){
   $("navLeiste").style.display = "";
   var sb = $("btnSeite"); if(sb) sb.style.display = "";
   var za = $("zielAnzeige"); if(za) za.textContent = "–";
+  var pfadEl = $("pfadAnzeige"); if(pfadEl) pfadEl.textContent = "";
   zeigeNavFrei();
   aktualisiereSeiteAnzeige();
   clearHighlights();
@@ -377,6 +383,7 @@ function zeigeStartScreen(){
   $("navLeiste").style.display = "none";
   var sb = $("btnSeite"); if(sb) sb.style.display = "none";
   var za = $("zielAnzeige"); if(za) za.textContent = "Wähle eine Stufe";
+  var pfadEl = $("pfadAnzeige"); if(pfadEl) pfadEl.textContent = "";
   aktStufe = 0; aktModus = "training"; aktSeite = 1; aktEbene = 1;
   geloest = 0; zielEintrag = null; freiEbene2Map = {};
   clearHighlights();
