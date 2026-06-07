@@ -13,15 +13,25 @@ var pfade   = (window.QUASSELKISTE_PFADE || []).filter(function(p){
          p.wort.indexOf("Mfrag") < 0 &&
          /^[a-zA-ZäöüÄÖÜß\s\-]+$/.test(p.wort);
 });
+// Modus 0: 1:1-Filter wie quasselkiste_mod.js (erlaubt Satzzeichen, laengere Woerter)
+var pfadeFrei = (window.QUASSELKISTE_PFADE || []).filter(function(p){
+  return p.wort && p.wort.length >= 2 && p.wort.length <= 60 &&
+         p.wort.indexOf("Ôßþ") < 0 &&
+         p.wort.indexOf("WIZARD") < 0 &&
+         p.wort.indexOf("Mfrag") < 0 &&
+         /^[a-zA-ZäöüÄÖÜß\s\-!?,'.äöüÄÖÜß]+$/.test(p.wort);
+});
 var felder      = window.QUASSELKISTE_FELDER || [];
 var aktivePfade = [];
 var aktStufe    = 0;
+var aktModus    = "training"; // "training" | "frei" (Modus 0 = 1:1-Quasselkiste)
 var aktSeite    = 1;       // Aktuelle Seite der Ebene 1 (1, 2 oder 3)
 var aktEbene    = 1;       // 1 = Hauptebene, 2 = Zweite Ebene
 var zielEintrag = null;
 var aktSchritt  = 0;
 var fehlerCount = 0;
 var geloest     = 0;
+var freiEbene2Map = {};    // Modus 0: "r_c" -> wort fuer gueltige Zweitschritte
 var _attach     = null;
 var _dwell      = null;
 var _dwellMs    = 900;
@@ -241,6 +251,126 @@ function zeigeEbene1Wiederher(){
   rebindDwell();
 }
 
+// ── Modus 0: 1:1-Quasselkiste (frei sprechen, kein Training) ────────────────
+function zeigeNavTraining(){
+  var bh = $("btnHinweis"), bw = $("btnWeiter"), bl = $("btnLoesche"), bs = $("btnSpreche");
+  if(bh) bh.style.display = "";
+  if(bw) bw.style.display = "";
+  if(bl) bl.style.display = "none";
+  if(bs) bs.style.display = "none";
+}
+
+function zeigeNavFrei(){
+  var bh = $("btnHinweis"), bw = $("btnWeiter"), bl = $("btnLoesche"), bs = $("btnSpreche");
+  if(bh) bh.style.display = "none";
+  if(bw) bw.style.display = "none";
+  if(bl) bl.style.display = "";
+  if(bs) bs.style.display = "";
+}
+
+function holeZweiteSchritteFrei(r, c){
+  var map = {};
+  pfadeFrei.forEach(function(p){
+    if(p.pfad.length === 2 && p.pfad[0].r === r && p.pfad[0].c === c){
+      var k = p.pfad[1].r + "_" + p.pfad[1].c;
+      if(!map[k]) map[k] = p.wort;
+    }
+  });
+  return map;
+}
+
+function zeigeEbene2Frei(r1, c1, combosMap){
+  aktEbene = 2;
+  freiEbene2Map = combosMap;
+  document.querySelectorAll(".kachel").forEach(function(el){
+    var r = parseInt(el.getAttribute("data-r"));
+    var c = parseInt(el.getAttribute("data-c"));
+    var k = r + "_" + c;
+    var nameEl = el.querySelector(".kachel-name");
+    var istUnsichtbar = el.classList.contains("kachel-unsichtbar");
+
+    el.classList.remove("ebene2-treffer","ebene2-leer","hinweis");
+
+    if(r === r1 && c === c1){
+      el.classList.remove("kachel-unsichtbar");
+    } else if(combosMap[k] !== undefined){
+      el.classList.remove("kachel-unsichtbar");
+      el.classList.add("ebene2-treffer");
+      if(nameEl){ nameEl.textContent = combosMap[k]; nameEl.style.display = ""; }
+    } else if(!istUnsichtbar){
+      el.classList.add("ebene2-leer");
+    }
+  });
+  rebindDwell();
+}
+
+function loescheFrei(){
+  aktEbene = 1;
+  freiEbene2Map = {};
+  document.querySelectorAll(".kachel").forEach(function(el){
+    var r = parseInt(el.getAttribute("data-r"));
+    var c = parseInt(el.getAttribute("data-c"));
+    var f = felder.find(function(x){ return x.r===r && x.c===c; });
+    var nameEl = el.querySelector(".kachel-name");
+    el.classList.remove("ebene2-treffer","ebene2-leer","richtig","falsch","hinweis");
+    if(nameEl){
+      nameEl.textContent = f ? (f.name||"") : "";
+      nameEl.style.display = "none";
+    }
+  });
+  aktualisiereKachelSichtbarkeit();
+  var za = $("zielAnzeige");
+  if(za) za.textContent = "–";
+  rebindDwell();
+}
+
+function kachelKlickFrei(r, c){
+  var f = felder.find(function(x){ return x.r === r && x.c === c; });
+  if(!f) return;
+
+  if(aktEbene === 1){
+    sprich(f.name || "");
+    var combosMap = holeZweiteSchritteFrei(r, c);
+
+    if(Object.keys(combosMap).length > 0){
+      zeigeEbene2Frei(r, c, combosMap);
+    } else {
+      var za = $("zielAnzeige");
+      if(za) za.textContent = f.name || "–";
+    }
+  } else {
+    var wort = freiEbene2Map[r + "_" + c];
+    if(wort){
+      sprich(wort);
+      var za = $("zielAnzeige");
+      if(za) za.textContent = wort;
+      setTimeout(loescheFrei, 2200);
+    } else {
+      loescheFrei();
+    }
+  }
+}
+
+function starteModus0(){
+  aktStufe      = 0;
+  aktModus      = "frei";
+  aktSeite      = 1;
+  aktEbene      = 1;
+  zielEintrag   = null;
+  freiEbene2Map = {};
+  $("startScreen").style.display = "none";
+  $("grid").style.display = "grid";
+  $("navLeiste").style.display = "";
+  var sb = $("btnSeite"); if(sb) sb.style.display = "";
+  var za = $("zielAnzeige"); if(za) za.textContent = "–";
+  var st = $("statsAnzeige"); if(st) st.textContent = "Modus 0 · Frei sprechen";
+  zeigeNavFrei();
+  aktualisiereSeiteAnzeige();
+  clearHighlights();
+  aktualisiereKachelSichtbarkeit();
+  rebindDwell();
+}
+
 // ── Start-Screen ─────────────────────────────────────────────────────────────
 function zeigeStartScreen(){
   $("startScreen").style.display = "";
@@ -249,14 +379,15 @@ function zeigeStartScreen(){
   var sb = $("btnSeite"); if(sb) sb.style.display = "none";
   var za = $("zielAnzeige"); if(za) za.textContent = "Wähle eine Stufe";
   var st = $("statsAnzeige"); if(st) st.textContent = "";
-  aktStufe = 0; aktSeite = 1; aktEbene = 1;
-  geloest = 0; zielEintrag = null;
+  aktStufe = 0; aktModus = "training"; aktSeite = 1; aktEbene = 1;
+  geloest = 0; zielEintrag = null; freiEbene2Map = {};
   clearHighlights();
   rebindDwellStart();
 }
 
 function startTraining(stufe){
   aktStufe    = stufe;
+  aktModus    = "training";
   aktSeite    = 1;
   aktEbene    = 1;
   geloest     = 0;
@@ -267,6 +398,7 @@ function startTraining(stufe){
   $("navLeiste").style.display = "";
   var sb = $("btnSeite");
   if(sb) sb.style.display = ""; // Seiten-Button in allen Stufen
+  zeigeNavTraining();
   aktualisiereSeiteAnzeige();
   aktualisiereKachelSichtbarkeit();
   rebindDwell();
@@ -387,7 +519,8 @@ function bauGrid(){
     el.appendChild(svg);
 
     el.addEventListener("click", function(){
-      kachelKlick(f.r, f.c);
+      if(aktModus === "frei") kachelKlickFrei(f.r, f.c);
+      else kachelKlick(f.r, f.c);
     });
     grid.appendChild(el);
   });
@@ -401,6 +534,8 @@ function init(){
   if(btnS1) btnS1.addEventListener("click", function(){ startTraining(1); });
   var btnS2 = $("btnStufe2");
   if(btnS2) btnS2.addEventListener("click", function(){ startTraining(2); });
+  var btnM0 = $("btnModus0");
+  if(btnM0) btnM0.addEventListener("click", starteModus0);
 
   var btnSite = $("btnSeite");
   if(btnSite) btnSite.addEventListener("click", wechsleSeite);
@@ -415,12 +550,21 @@ function init(){
   var btnZ = $("btnZurueck");
   if(btnZ) btnZ.addEventListener("click", function(e){
     e.preventDefault();
-    if(aktStufe > 0){
+    if(aktStufe > 0 || aktModus === "frei"){
       zeigeStartScreen();
     } else {
       try{ window.location.href = new URL("../../spielewelt.html", window.location.href).href; }
       catch(ex){ history.back(); }
     }
+  });
+
+  var btnL = $("btnLoesche");
+  if(btnL) btnL.addEventListener("click", loescheFrei);
+
+  var btnSp = $("btnSpreche");
+  if(btnSp) btnSp.addEventListener("click", function(){
+    var za = $("zielAnzeige");
+    if(za && za.textContent && za.textContent !== "–") sprich(za.textContent);
   });
 
   var btnH = $("btnHinweis");

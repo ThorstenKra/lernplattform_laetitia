@@ -142,6 +142,8 @@ body{
 .nav-btn-zurueck{ background:var(--lila-bg); border-color:var(--lila); color:var(--lila-dark); }
 .nav-btn-hinweis{ background:#fef3c7; border-color:#f59e0b; color:#92400e; }
 .nav-btn-weiter { background:var(--gruen-bg); border-color:var(--gruen); color:#14532d; }
+.nav-btn-loeschen{ background:#fee2e2; border-color:#ef4444; color:#991b1b; }
+.nav-btn-sprechen{ background:var(--blau-bg); border-color:var(--blau); color:#1e3a8a; }
 .nav-btn:hover,.nav-btn:focus{ filter:brightness(.9); outline:3px solid currentColor; }
 .nav-btn[aria-disabled="true"]{ opacity:.35; pointer-events:none; }
 .nav-btn .dwell-ring-svg{ width:52px; height:52px; }
@@ -167,6 +169,7 @@ body{
 }
 #btnStufe1{ background:#172554; border-color:#3b82f6; color:#93c5fd; }
 #btnStufe2{ background:#14532d; border-color:#16a34a; color:#86efac; }
+#btnModus0{ background:#451a03; border-color:#f59e0b; color:#fde68a; }
 .stufe-btn:hover{ filter:brightness(1.15); }
 .stufe-btn.dwell-active{ transform:scale(1.02) !important; outline:3px solid currentColor !important; transition:none !important; }
 .stufe-nr{ font-size:clamp(15px,2vw,20px); font-weight:1000; pointer-events:none; }
@@ -214,6 +217,11 @@ body{
     <span class="stufe-info">1 224 Wörter · zwei Kacheln nacheinander drücken</span>
     <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
   </button>
+  <button id="btnModus0" class="stufe-btn">
+    <span class="stufe-nr">Modus 0 — Frei sprechen</span>
+    <span class="stufe-info">Quasselkiste 60 · frei kommunizieren ohne Vorgabe</span>
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+  </button>
   <a id="startZurueck" href="">
     ← Zurück
     <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
@@ -234,6 +242,14 @@ body{
   <button class="nav-btn nav-btn-weiter" id="btnWeiter">
     <span class="btnLabel">⏭ Weiter</span>
     <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#16a34a"/></svg>
+  </button>
+  <button class="nav-btn nav-btn-loeschen" id="btnLoesche" style="display:none">
+    <span class="btnLabel">✕ Löschen</span>
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#ef4444"/></svg>
+  </button>
+  <button class="nav-btn nav-btn-sprechen" id="btnSpreche" style="display:none">
+    <span class="btnLabel">🔊 Sprechen</span>
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#3b82f6"/></svg>
   </button>
 </div>
 
