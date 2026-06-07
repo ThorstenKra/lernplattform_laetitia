@@ -75,12 +75,17 @@ function loadDwell(){
   return _attach;
 }
 
-function rebindDwell(){
+function rebindDwell(skipHoverRecheck){
   if(_dwell && typeof _dwell.cancelDwell === "function") _dwell.cancelDwell();
   _dwellMs = parseInt(localStorage.getItem("laetitia_dwell_ms"))       || 900;
   _graceMs = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
   _dwell = loadDwell()(".kachel:not(.kachel-unsichtbar):not(.ebene2-leer), .nav-btn", {
     dwellMs: _dwellMs, leaveGrace: _graceMs,
+    skipHoverRecheck: !!skipHoverRecheck,
+    // Bei Bildschirmwechseln vom Start-Screen (komplett neues Layout) laenger
+    // schuetzen, damit die zufaellig an der alten Blickposition liegende Kachel
+    // nicht durch natuerliches Blickzittern sofort ausgeloest wird
+    protectMs: skipHoverRecheck ? 1800 : undefined,
     onActivate: function(el){
       if(el.getAttribute("aria-disabled") === "true") return;
       try{ el.click(); }catch(e){}
@@ -373,7 +378,9 @@ function starteModus0(){
   aktualisiereSeiteAnzeige();
   clearHighlights();
   aktualisiereKachelSichtbarkeit();
-  rebindDwell();
+  // skipHoverRecheck: Blick/Cursor lag auf #btnModus0 -- die Kachel an dieser
+  // Stelle im neuen Grid ist zufaellig und darf nicht sofort aktiviert werden
+  rebindDwell(true);
 }
 
 // ── Start-Screen ─────────────────────────────────────────────────────────────
@@ -406,7 +413,9 @@ function startTraining(stufe){
   zeigeNavTraining();
   aktualisiereSeiteAnzeige();
   aktualisiereKachelSichtbarkeit();
-  rebindDwell();
+  // skipHoverRecheck: Blick/Cursor lag auf #btnStufe1/#btnStufe2 -- die Kachel an
+  // dieser Stelle im neuen Grid ist zufaellig und darf nicht sofort aktiviert werden
+  rebindDwell(true);
   neuesWort();
 }
 

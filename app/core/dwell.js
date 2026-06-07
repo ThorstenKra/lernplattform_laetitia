@@ -32,8 +32,13 @@ var S = window._LDwellState;
 
 // Schutzzeit setzen — verhindert sofortige Auslösung nach Seitenwechsel
 // Wird von cancelDwell() und beim ersten Laden aufgerufen
+// Verlaengert die Schutzzeit nur (nie verkuerzen): sonst kann ein nachlaufender
+// Klick-Handler (z.B. der interne Klick-Handler eines Stufen-Buttons, der nach
+// einem Screen-Wechsel feuert) eine laengere, bewusst gesetzte Schutzzeit
+// ueberschreiben und so eine zu fruehe Dwell-Ausloesung ermoeglichen.
 function setProtection(ms){
-  S.protectUntil = Date.now() + (ms || 1200);
+  var until = Date.now() + (ms || 1200);
+  if(until > S.protectUntil) S.protectUntil = until;
 }
 
 function isDisabled(el){
@@ -162,6 +167,10 @@ function attachDwell(selector, opts){
   if(typeof opts.dwellMs    === "number") S.dwellMs    = opts.dwellMs;
   if(typeof opts.leaveGrace === "number") S.leaveGrace = opts.leaveGrace;
   if(typeof opts.onActivate === "function") S.onActivate = opts.onActivate;
+  // Laengere Schutzzeit fuer Bildschirmwechsel mit komplett neuem Layout
+  // (siehe skipHoverRecheck) -- gibt dem Kind Zeit, sich neu zu orientieren,
+  // bevor ein zufaellig an der alten Blickposition liegendes Element ausloest.
+  if(typeof opts.protectMs === "number") setProtection(opts.protectMs);
 
   if(!S.onActivate){
     S.onActivate = function(el){
@@ -235,8 +244,9 @@ function attachDwell(selector, opts){
       el.addEventListener("click", function(){
         if(isDisabled(el)) return;
         clearRing();
-        // Schutzzeit kurz zurücksetzen damit Dwell nach Klick nicht sofort auslöst
-        S.protectUntil = Date.now() + 500;
+        // Schutzzeit kurz setzen, damit Dwell nach Klick nicht sofort auslöst
+        // (verlaengert ggf. nur eine laengere, bereits gesetzte Schutzzeit -- siehe setProtection)
+        setProtection(500);
       });
 
       el.addEventListener("focus", function(){
@@ -249,15 +259,20 @@ function attachDwell(selector, opts){
 
   // Hover-Recheck: nach Schutzzeit prüfen ob Blick bereits auf einem Element ist.
   // Tobii sendet kein erneutes pointerenter wenn Blick nach rebindDwell() nicht weggeht.
-  setTimeout(function(){
-    if(S.target || Date.now() < S.protectUntil) return;
-    try{
-      var all = document.querySelectorAll(selector);
-      for(var i=0;i<all.length;i++){
-        if(all[i].matches && all[i].matches(":hover")){ startDwell(all[i]); break; }
-      }
-    }catch(e){}
-  }, 1300);
+  // opts.skipHoverRecheck: bei Bildschirmwechseln mit komplett neuem Layout (z.B.
+  // Start-Bildschirm -> Grid) liegt die alte Blick-/Cursorposition auf einem voellig
+  // beliebigen neuen Element -- der Recheck wuerde es faelschlich sofort aktivieren.
+  if(!opts.skipHoverRecheck){
+    setTimeout(function(){
+      if(S.target || Date.now() < S.protectUntil) return;
+      try{
+        var all = document.querySelectorAll(selector);
+        for(var i=0;i<all.length;i++){
+          if(all[i].matches && all[i].matches(":hover")){ startDwell(all[i]); break; }
+        }
+      }catch(e){}
+    }, 1300);
+  }
 
   return { cancelDwell: cancelDwell };
 }
