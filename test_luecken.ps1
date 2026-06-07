@@ -217,8 +217,10 @@ $vL3 = DevEval $wsUrl 13 @'
   for(var i=0;i<8;i++){
     document.getElementById("btnWeiter").click();await wait(1800);
     var ziel=(document.getElementById("zielAnzeige")||{textContent:""}).textContent.replace("Finde: ","").trim();
-    var aktP=s2p.find(function(p){return p.wort===ziel;});
-    if(!aktP){continue;}
+    var zielTreffer=s2p.filter(function(p){return p.wort===ziel;});
+    if(zielTreffer.length===0){continue;}
+    if(zielTreffer.length>1){continue;} // Datenbasis-Ambiguitaet: s2p.find() koennte anderen Pfad-Eintrag liefern als der App-zufaellige zielEintrag
+    var aktP=zielTreffer[0];
 
     var p0=aktP.pfad[0];
     if(p0.r===1){

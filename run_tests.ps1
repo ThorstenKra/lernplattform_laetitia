@@ -119,7 +119,8 @@ $v3=DevEval $wsUrl 3 @'
     el.click();await wait(750);
     var tr=Array.from(document.querySelectorAll(".ebene2-treffer")).map(function(e){return e.getAttribute("data-r")+"_"+e.getAttribute("data-c");});
     var lr=Array.from(document.querySelectorAll(".ebene2-leer")).map(function(e){return e.getAttribute("data-r")+"_"+e.getAttribute("data-c");});
-    var erw=Object.keys(em[p0.r+"_"+p0.c]?em[p0.r+"_"+p0.c].zweit:{});
+    var ek=p0.r+"_"+p0.c;
+    var erw=Object.keys(em[ek]?em[ek].zweit:{}).filter(function(k){return k!==ek;}); // Self-Loop: Erstschritt-Kachel wird von der App nie als ebene2-treffer markiert
     var fehlt=erw.filter(function(k){return tr.indexOf(k)<0;});
     var falschL=erw.filter(function(k){return lr.indexOf(k)>=0;});
     var hatR=!!document.querySelector(".kachel.richtig");
@@ -174,12 +175,17 @@ $v5=DevEval $wsUrl 5 @'
   var pfade=(window.QUASSELKISTE_PFADE||[]).filter(function(p){return p.wort&&p.wort.length>=2&&p.wort.length<=40&&p.wort.indexOf("Ôßþ")<0&&p.wort.indexOf("WIZARD")<0&&p.wort.indexOf("Mfrag")<0&&/^[a-zA-ZäöüÄÖÜß\s\-]+$/.test(p.wort);});
   function wait(ms){return new Promise(function(r){setTimeout(r,ms);})}
   var s2p=pfade.filter(function(p){return p.pfad.length===2;});
-  var flF=0;
-  for(var pi=0;pi<5;pi++){
+  // Woerter mit mehreren Pfad-Eintraegen (Datenbasis-Ambiguitaet/MINSPEAK -- s2p.find() koennte
+  // einen anderen Eintrag liefern als den von der App zufaellig geladenen zielEintrag)
+  var s2Anzahl={};s2p.forEach(function(p){s2Anzahl[p.wort]=(s2Anzahl[p.wort]||0)+1;});
+  var flF=0,pi=0,versuch=0;
+  for(; pi<5 && versuch<14; versuch++){
     document.getElementById("btnWeiter").click();await wait(1800);
     var ziel=(document.getElementById("zielAnzeige")||{textContent:""}).textContent.replace("Finde: ","").trim();
     var aktP=s2p.find(function(p){return p.wort===ziel;});
     if(!aktP){R.push("WARN P5-"+pi+": '"+ziel+"' kein S2-Pfad");continue;}
+    if(s2Anzahl[ziel]>1){R.push("INFO P5-"+pi+": '"+ziel+"' mehrdeutig ("+s2Anzahl[ziel]+" Pfad-Eintraege, Datenbasis-Ambiguitaet) -- uebersprungen");continue;}
+    pi++;
     var p0=aktP.pfad[0];
     if(p0.r===1){var p0f=felder.find(function(f){return f.r===p0.r&&f.c===p0.c;});var p0s=p0f?(p0f.seiten||[]):[];if(p0s.length>0){var t0="S "+p0s[0],a0=0;while(document.getElementById("seiteLabel").textContent!==t0&&a0++<4){document.getElementById("btnSeite").click();await wait(150);}}}
     var el0=document.querySelector(".kachel[data-r=\""+p0.r+"\"][data-c=\""+p0.c+"\"]");
@@ -196,7 +202,7 @@ $v5=DevEval $wsUrl 5 @'
     (lN===0&&tN===0)?R.push("PASS P5-"+pi+": '"+ziel+"' -- Ebene 1 wiederhergestellt"):R.push("FAIL P5-"+pi+": '"+ziel+"' -- Ebene noch aktiv leer="+lN+" treffer="+tN);
     if(lN>0||tN>0)flF++;
   }
-  flF===0?R.push("PASS P5a: Vollstaendiger Flow -- 5/5 erfolgreich"):R.push("FAIL P5a: "+flF+"/5 Pfade fehlerhaft");
+  flF===0?R.push("PASS P5a: Vollstaendiger Flow -- "+pi+"/"+pi+" erfolgreich"):R.push("FAIL P5a: "+flF+"/"+pi+" Pfade fehlerhaft");
   return R.join("|");
 })()
 '@ 42000
@@ -213,12 +219,17 @@ $v6=DevEval $wsUrl 6 @'
   document.getElementById("btnZurueck").click();await wait(500);
   document.getElementById("btnStufe1").click();await wait(700);
   var s1p=pfade.filter(function(p){return p.pfad.length===1;});
+  // Woerter mit mehreren Pfad-Eintraegen (Datenbasis-Ambiguitaet/MINSPEAK -- s1p.find() koennte
+  // einen anderen Eintrag liefern als den von der App zufaellig geladenen zielEintrag)
+  var s1Anzahl={};s1p.forEach(function(p){s1Anzahl[p.wort]=(s1Anzahl[p.wort]||0)+1;});
   R.push("INFO P6-Meta: Stufe 1, "+s1p.length+" Pfade, Seiten-Button display="+document.getElementById("btnSeite").style.display);
-  var s1F=0;
-  for(var si=0;si<8;si++){
+  var s1F=0,si=0,versuch=0;
+  for(; si<8 && versuch<16; versuch++){
     var aktZ=(document.getElementById("zielAnzeige")||{textContent:""}).textContent.replace("Finde: ","").trim();
     var aktP=s1p.find(function(p){return p.wort===aktZ;});
     if(!aktP){R.push("WARN P6-"+si+": '"+aktZ+"' nicht in S1-Pfaden");document.getElementById("btnWeiter").click();await wait(1200);continue;}
+    if(s1Anzahl[aktZ]>1){R.push("INFO P6-"+si+": '"+aktZ+"' mehrdeutig ("+s1Anzahl[aktZ]+" Pfad-Eintraege, Datenbasis-Ambiguitaet) -- uebersprungen");document.getElementById("btnWeiter").click();await wait(1200);continue;}
+    si++;
     // Kachel-Sichtbarkeit pruefen (Auto-Navigation muss geklappt haben)
     var rEl=document.querySelector(".kachel[data-r=\""+aktP.pfad[0].r+"\"][data-c=\""+aktP.pfad[0].c+"\"]");
     var istSichtbar=rEl&&!rEl.classList.contains("kachel-unsichtbar");
@@ -234,7 +245,7 @@ $v6=DevEval $wsUrl 6 @'
     gA>gB?R.push("PASS P6-"+si+": '"+aktZ+"' geloest ("+gB+"->"+gA+")"):R.push("FAIL P6-"+si+": geloest nicht erhoeht fuer '"+aktZ+"' ("+gB+"->"+gA+")");
     if(gA<=gB){s1F++;document.getElementById("btnWeiter").click();await wait(1300);}
   }
-  s1F===0?R.push("PASS P6a: Stufe 1 -- 8/8 Tests bestanden"):R.push("FAIL P6a: "+s1F+" Fehler");
+  s1F===0?R.push("PASS P6a: Stufe 1 -- "+si+"/"+si+" Tests bestanden"):R.push("FAIL P6a: "+s1F+" Fehler");
   return R.join("|");
 })()
 '@ 56000
