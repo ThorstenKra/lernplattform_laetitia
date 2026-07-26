@@ -164,6 +164,7 @@ body{
 #btnStufe1{ background:#172554; border-color:#3b82f6; color:#93c5fd; }
 #btnStufe2{ background:#14532d; border-color:#16a34a; color:#86efac; }
 #btnModus0{ background:#451a03; border-color:#f59e0b; color:#fde68a; }
+#btnModus2{ background:#042f2e; border-color:#14b8a6; color:#99f6e4; }
 .stufe-btn:hover{ filter:brightness(1.15); }
 .stufe-btn.dwell-active{ transform:scale(1.02) !important; outline:3px solid currentColor !important; transition:none !important; }
 .stufe-nr{ font-size:clamp(15px,2vw,20px); font-weight:1000; pointer-events:none; }
@@ -204,6 +205,11 @@ body{
   <button id="btnStufe2" class="stufe-btn">
     <span class="stufe-nr">Stufe 2 — Zwei Klicks</span>
     <span class="stufe-info">1 224 Wörter · zwei Kacheln nacheinander drücken</span>
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+  </button>
+  <button id="btnModus2" class="stufe-btn">
+    <span class="stufe-nr">Modus 2 — Freies Erkunden</span>
+    <span class="stufe-info">1 224 Wörter · probiere und entdecke selbst</span>
     <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
   </button>
   <button id="btnModus0" class="stufe-btn">

@@ -256,6 +256,89 @@ function zeigeEbene1Wiederher(){
   rebindDwell();
 }
 
+// ── Modus 2: Freies Erkunden ─────────────────────────────────────────────────
+function kachelKlickErkunden(r, c){
+  var f = felder.find(function(x){ return x.r===r && x.c===c; });
+  if(!f) return;
+
+  if(aktEbene === 1){
+    var zweiteMap = {};
+    aktivePfade.forEach(function(p){
+      if(p.pfad.length === 2 && p.pfad[0].r === r && p.pfad[0].c === c){
+        var k = p.pfad[1].r + "_" + p.pfad[1].c;
+        if(!zweiteMap[k]) zweiteMap[k] = p.wort;
+      }
+    });
+
+    if(Object.keys(zweiteMap).length > 0){
+      sprich(f.name || "");
+      aktSchritt = 1;
+      setTimeout(function(){
+        zeigeEbene2(r, c);
+        var pfadEl = $("pfadAnzeige");
+        if(pfadEl) pfadEl.textContent = (f.name || "") + " →";
+      }, 400);
+    } else {
+      markiereFalsch(r, c);
+    }
+  } else {
+    var el = kachelEl(r, c);
+    if(!el || !el.classList.contains("ebene2-treffer")){
+      aktSchritt = 0;
+      zeigeEbene1Wiederher();
+      var pfadEl = $("pfadAnzeige"); if(pfadEl) pfadEl.textContent = "";
+      return;
+    }
+
+    var erwartet = zielEintrag ? zielEintrag.pfad[1] : null;
+    if(erwartet && r === erwartet.r && c === erwartet.c){
+      markiereRichtig(r, c);
+      clearHinweis();
+      geloest++;
+      aktualisiereZiel();
+      var pfadEl = $("pfadAnzeige"); if(pfadEl) pfadEl.textContent = "";
+      sprich(zielEintrag.tts || zielEintrag.wort);
+      setTimeout(function(){
+        spieleErfolg();
+        setTimeout(function(){
+          aktSchritt = 0;
+          zeigeEbene1Wiederher();
+          neuesWort();
+        }, 1800);
+      }, 500);
+    } else {
+      var nameEl = el.querySelector(".kachel-name");
+      if(nameEl && nameEl.textContent) sprich(nameEl.textContent);
+      markiereFalsch(r, c);
+      setTimeout(function(){
+        aktSchritt = 0;
+        zeigeEbene1Wiederher();
+        var pfadEl = $("pfadAnzeige"); if(pfadEl) pfadEl.textContent = "";
+      }, 900);
+    }
+  }
+}
+
+function starteModus2(){
+  aktStufe    = 2;
+  aktModus    = "erkunden";
+  aktSeite    = 1;
+  aktEbene    = 1;
+  aktSchritt  = 0;
+  geloest     = 0;
+  zielEintrag = null;
+  aktivePfade = pfade.filter(function(p){ return p.pfad.length === 2; });
+  $("startScreen").style.display = "none";
+  $("grid").style.display = "grid";
+  $("navLeiste").style.display = "";
+  var sb = $("btnSeite"); if(sb) sb.style.display = "";
+  zeigeNavTraining();
+  aktualisiereSeiteAnzeige();
+  aktualisiereKachelSichtbarkeit();
+  rebindDwell(true);
+  neuesWort();
+}
+
 // ── Modus 0: 1:1-Quasselkiste (frei sprechen, kein Training) ────────────────
 function zeigeNavTraining(){
   var bh = $("btnHinweis"), bw = $("btnWeiter"), bl = $("btnLoesche"), bs = $("btnSpreche");
@@ -431,6 +514,7 @@ function neuesWort(){
   aktSchritt  = 0;
   fehlerCount = 0;
   aktEbene    = 1;
+  var pfadElN = $("pfadAnzeige"); if(pfadElN) pfadElN.textContent = "";
 
   // Automatisch zur richtigen Seite navigieren (alle Stufen)
   if(entry.pfad.length >= 1){
@@ -532,6 +616,7 @@ function bauGrid(){
 
     el.addEventListener("click", function(){
       if(aktModus === "frei") kachelKlickFrei(f.r, f.c);
+      else if(aktModus === "erkunden") kachelKlickErkunden(f.r, f.c);
       else kachelKlick(f.r, f.c);
     });
     grid.appendChild(el);
@@ -546,6 +631,8 @@ function init(){
   if(btnS1) btnS1.addEventListener("click", function(){ startTraining(1); });
   var btnS2 = $("btnStufe2");
   if(btnS2) btnS2.addEventListener("click", function(){ startTraining(2); });
+  var btnM2 = $("btnModus2");
+  if(btnM2) btnM2.addEventListener("click", starteModus2);
   var btnM0 = $("btnModus0");
   if(btnM0) btnM0.addEventListener("click", starteModus0);
 
@@ -580,7 +667,16 @@ function init(){
   });
 
   var btnH = $("btnHinweis");
-  if(btnH) btnH.addEventListener("click", zeigeHinweis);
+  if(btnH) btnH.addEventListener("click", function(){
+    if(aktModus === "erkunden" && aktEbene === 2){
+      aktSchritt = 0;
+      zeigeEbene1Wiederher();
+      var pfadEl = $("pfadAnzeige"); if(pfadEl) pfadEl.textContent = "";
+      setTimeout(zeigeHinweis, 300);
+    } else {
+      zeigeHinweis();
+    }
+  });
 
   var btnW = $("btnWeiter");
   if(btnW) btnW.addEventListener("click", function(){
