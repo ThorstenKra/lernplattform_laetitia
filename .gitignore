@@ -1,5 +1,9 @@
 node_modules/
 
+# Telegram-Bridge: Secrets und Laufzeitdaten
+telegram_bridge/config.json
+telegram_bridge/nachrichten/
+
 # Lokale Binärdateien (nicht auf GitHub)
 *.exe
 *.bat

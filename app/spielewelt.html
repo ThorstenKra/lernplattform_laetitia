@@ -148,6 +148,12 @@ a.modBtn.is-disabled{ pointer-events:none; opacity:0.45; }
       <div class="mod-badge ok">bereit</div>
     </a>
 
+    <a class="modBtn" href="./modules/nachrichten/nachrichten.html" id="btnNachrichten">
+      <div class="mod-emoji">💬</div>
+      <div class="mod-label">Nachrichten</div>
+      <div class="mod-badge" id="nachrichtenBadge">lädt…</div>
+    </a>
+
   </div>
   <div class="zurueck-leiste">
     <a class="zurueckBtn" href="./index.html" id="btnZurueck">← Zurück zur Startseite</a>
@@ -173,6 +179,28 @@ try{
   var _retAbs = new URL("./spielewelt.html", window.location.href).href;
   localStorage.setItem("laetitia_return_url_v1", _retAbs);
 }catch(e){}
+
+// Nachrichten-Badge: ungelesene Nachrichten von Bridge laden (optional)
+(function(){
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET","http://127.0.0.1:3737/inbox",true);
+  xhr.timeout = 3000;
+  xhr.onload = function(){
+    try{
+      var liste = JSON.parse(xhr.responseText);
+      var neu = liste.filter(function(n){ return !n.gelesen; }).length;
+      var badge = document.getElementById("nachrichtenBadge");
+      if(!badge) return;
+      if(neu > 0){ badge.textContent = neu + " neu"; badge.className = "mod-badge ok"; }
+      else { badge.textContent = "bereit"; badge.className = "mod-badge ok"; }
+    }catch(e){}
+  };
+  xhr.onerror = xhr.ontimeout = function(){
+    var badge = document.getElementById("nachrichtenBadge");
+    if(badge){ badge.textContent = "offline"; badge.className = "mod-badge"; }
+  };
+  try{ xhr.send(); }catch(e){}
+})();
 
 // Dwell direkt mit pointerenter (wie Eierjagd-Muster)
 var dwellMs = parseInt(localStorage.getItem("laetitia_dwell_ms")) || 900;

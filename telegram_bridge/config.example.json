@@ -1,0 +1,24 @@
+{
+  "_anleitung": [
+    "1. Kopiere diese Datei nach config.json",
+    "2. Erstelle einen Bot via Telegram @BotFather und trage den Token ein",
+    "3. Fuege den Bot einer Gruppe hinzu und schicke eine Testnachricht",
+    "4. Starte bridge.js einmal -- er gibt die Chat-ID in der Konsole aus",
+    "5. Trage die Chat-ID in erlaubteChatIds und antwortChatId ein"
+  ],
+  "token": "DEIN_BOT_TOKEN_VON_BOTFATHER",
+  "erlaubteChatIds": [-1001234567890],
+  "antwortChatId": -1001234567890,
+  "nachrichtenOrdner": "C:/Users/ThorstenLavinia/Laetitia_Nachrichten",
+  "port": 3737,
+  "antwortOptionen": [
+    { "text": "Ich liebe dich!",   "emoji": "❤️" },
+    { "text": "Das freut mich!",   "emoji": "😊" },
+    { "text": "Ja, gerne!",        "emoji": "👍" },
+    { "text": "Das ist schade.",   "emoji": "😢" },
+    { "text": "Super!",            "emoji": "🎉" },
+    { "text": "Ich vermisse dich!","emoji": "🤗" },
+    { "text": "Das ist lustig!",   "emoji": "😂" },
+    { "text": "Ich auch!",         "emoji": "🙋" }
+  ]
+}

@@ -1,0 +1,236 @@
+<!doctype html>
+<!-- depth:2 — Pfade: ../../core/ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Nachrichten</title>
+<style>
+:root{
+  --lila:#8b5cf6; --lila-bg:#ede9fe; --lila-dark:#4c1d95;
+  --gruen:#16a34a; --gruen-bg:#dcfce7;
+  --rot:#ef4444;   --rot-bg:#fee2e2;
+  --grau-bg:#f8fafc; --grau-rand:#cbd5e1;
+  --text:#0f172a;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:#f1f5f9; height:100vh; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+
+/* ── Kopfleiste ─────────────────────────────────────────────────────────────── */
+#kopfLeiste{
+  flex-shrink:0; padding:10px 14px;
+  background:#fff; border-bottom:2px solid var(--grau-rand);
+  display:flex; align-items:center; gap:10px;
+}
+#kopfTitel{
+  font-size:20px; font-weight:1000; color:var(--lila-dark); flex:1;
+}
+#neuBadge{
+  background:var(--rot); color:#fff;
+  border-radius:999px; padding:2px 10px;
+  font-size:13px; font-weight:1000; display:none;
+}
+
+/* ── Haupt-Bereich ──────────────────────────────────────────────────────────── */
+#hauptBereich{
+  flex:1; min-height:0; overflow:hidden;
+  display:flex; flex-direction:column;
+  padding:10px 12px; gap:8px;
+}
+
+/* ── Status-Screens ─────────────────────────────────────────────────────────── */
+.status-screen{
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:14px; text-align:center;
+}
+.status-emoji{ font-size:52px; }
+.status-text{ font-size:22px; font-weight:1000; color:var(--text); }
+.status-sub{ font-size:16px; color:#64748b; }
+
+/* ── Nachrichten-Liste ──────────────────────────────────────────────────────── */
+#listeContainer{ flex:1; min-height:0; display:flex; flex-direction:column; gap:8px; }
+
+.nachricht-item{
+  width:100%; min-height:80px; border-radius:14px;
+  border:2px solid var(--grau-rand); background:#fff;
+  display:flex; align-items:center; gap:12px;
+  padding:12px 14px; cursor:pointer; position:relative;
+  text-align:left; font-family:inherit; transition:none;
+}
+.nachricht-item:hover,.nachricht-item:focus{ background:var(--lila-bg); border-color:var(--lila); outline:none; }
+.nachricht-item.dwell-active{ transform:scale(1.02) !important; outline:3px solid var(--lila) !important; transition:none !important; }
+.nachricht-item.ungelesen{ border-left:5px solid var(--lila); }
+
+.ni-dot{ width:11px; height:11px; border-radius:50%; background:var(--lila); flex-shrink:0; }
+.ni-dot.gelesen{ background:transparent; }
+.ni-typ{ font-size:24px; flex-shrink:0; }
+.ni-rechts{ flex:1; min-width:0; }
+.ni-kopf{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+.ni-von{ font-size:17px; font-weight:1000; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ni-ts{ font-size:13px; color:#94a3b8; white-space:nowrap; flex-shrink:0; }
+.ni-vorschau{ font-size:14px; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:3px; }
+
+/* ── Nachricht öffnen ───────────────────────────────────────────────────────── */
+#nachrichtContainer{
+  flex:1; min-height:0; display:flex; flex-direction:column; gap:10px;
+}
+#nachrichtKopf{
+  background:#fff; border:2px solid var(--grau-rand);
+  border-radius:14px; padding:12px 14px;
+  display:flex; flex-direction:column; gap:3px; flex-shrink:0;
+}
+#nachrichtVon{ font-size:18px; font-weight:1000; color:var(--lila-dark); }
+#nachrichtTs{ font-size:13px; color:#94a3b8; }
+
+#nachrichtMedia{
+  flex:1; min-height:0; border-radius:14px; overflow:hidden;
+  background:#000; display:flex; align-items:center; justify-content:center;
+}
+#nachrichtMedia img{ max-width:100%; max-height:100%; object-fit:contain; }
+#nachrichtMedia video{ max-width:100%; max-height:100%; }
+#nachrichtMedia audio{ width:100%; }
+
+#nachrichtText{
+  background:#fff; border:2px solid var(--grau-rand);
+  border-radius:14px; padding:14px 16px;
+  font-size:20px; font-weight:700; color:var(--text);
+  line-height:1.5; flex-shrink:0;
+}
+
+/* ── Antwort-Auswahl ────────────────────────────────────────────────────────── */
+#antwortContainer{ flex:1; min-height:0; display:flex; flex-direction:column; gap:8px; }
+#antwortHeader{
+  font-size:15px; font-weight:1000; color:var(--lila-dark);
+  text-transform:uppercase; letter-spacing:.05em;
+  padding:4px 2px; flex-shrink:0;
+}
+#antwortGrid{
+  flex:1; min-height:0; display:grid;
+  grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:8px;
+}
+.antwort-btn{
+  border-radius:14px; border:2px solid var(--grau-rand); background:#fff;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:6px; cursor:pointer; position:relative; transition:none; font-family:inherit;
+}
+.antwort-btn:hover,.antwort-btn:focus{ background:var(--lila-bg); border-color:var(--lila); outline:none; }
+.antwort-btn.dwell-active{ transform:scale(1.03) !important; outline:3px solid var(--lila) !important; transition:none !important; }
+.ab-emoji{ font-size:30px; pointer-events:none; }
+.ab-text{ font-size:14px; font-weight:1000; color:var(--text); text-align:center; padding:0 8px; pointer-events:none; }
+
+/* ── Bestätigung ────────────────────────────────────────────────────────────── */
+#bestaetigungContainer{
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:16px; text-align:center;
+}
+#bestaetigungText{ font-size:26px; font-weight:1000; color:var(--gruen); }
+
+/* ── Nav-Leiste (unten) ─────────────────────────────────────────────────────── */
+.nav-leiste{
+  flex-shrink:0; display:flex; gap:8px; padding:8px 12px;
+  background:#fff; border-top:2px solid var(--grau-rand);
+}
+.nav-btn{
+  flex:1; min-height:70px; border-radius:14px;
+  font-size:16px; font-weight:1000;
+  cursor:pointer; position:relative;
+  display:flex; align-items:center; justify-content:center;
+  gap:6px; transition:none; border:2px solid;
+  text-decoration:none; font-family:inherit; background:none;
+}
+.nav-btn-zurueck{ background:var(--lila-bg); border-color:var(--lila); color:var(--lila-dark); }
+.nav-btn-zurueck:hover{ background:#ddd6fe; }
+.nav-btn-antwort{ background:var(--gruen-bg); border-color:var(--gruen); color:#14532d; }
+.nav-btn-antwort:hover{ background:#bbf7d0; }
+.nav-btn-seite{ background:#f1f5f9; border-color:#94a3b8; color:#475569; flex:0 0 auto; min-width:80px; }
+.nav-btn[style*="display:none"]{ display:none !important; }
+.nav-btn.dwell-active{ transform:scale(1.02) !important; outline:3px solid currentColor !important; transition:none !important; }
+
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  pointer-events:none; z-index:10; width:48px; height:48px;
+}
+.dwell-ring-svg circle{
+  fill:none; stroke-width:4; stroke-dasharray:220; stroke-dashoffset:220;
+  transform:rotate(-90deg); transform-origin:35px 35px; opacity:0;
+}
+.dwell-ring-svg circle.animating{ opacity:1; animation:dwellRing var(--dwell-duration,.9s) linear forwards; }
+</style>
+</head>
+<body>
+
+<div id="kopfLeiste">
+  <div id="kopfTitel">💬 Nachrichten</div>
+  <div id="neuBadge"></div>
+</div>
+
+<div id="hauptBereich">
+
+  <!-- Laden -->
+  <div id="ladenScreen" class="status-screen">
+    <div class="status-emoji">⏳</div>
+    <div class="status-text">Verbinde…</div>
+  </div>
+
+  <!-- Offline -->
+  <div id="offlineScreen" class="status-screen" style="display:none">
+    <div class="status-emoji">📡</div>
+    <div class="status-text">Keine Verbindung</div>
+    <div class="status-sub">Bitte die Telegram-Bridge starten</div>
+  </div>
+
+  <!-- Liste -->
+  <div id="listeContainer" style="display:none"></div>
+
+  <!-- Nachricht öffnen -->
+  <div id="nachrichtContainer" style="display:none">
+    <div id="nachrichtKopf">
+      <div id="nachrichtVon"></div>
+      <div id="nachrichtTs"></div>
+    </div>
+    <div id="nachrichtMedia" style="display:none"></div>
+    <div id="nachrichtText" style="display:none"></div>
+  </div>
+
+  <!-- Antwort wählen -->
+  <div id="antwortContainer" style="display:none">
+    <div id="antwortHeader">👆 Deine Antwort</div>
+    <div id="antwortGrid"></div>
+  </div>
+
+  <!-- Bestätigung -->
+  <div id="bestaetigungContainer" style="display:none">
+    <div class="status-emoji">✅</div>
+    <div id="bestaetigungText">Gesendet!</div>
+  </div>
+
+</div>
+
+<div class="nav-leiste" id="navLeiste">
+  <button class="nav-btn nav-btn-zurueck" id="btnZurueck">
+    ← Zurück
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#8b5cf6"/></svg>
+  </button>
+  <button class="nav-btn nav-btn-seite" id="btnSeite" style="display:none">
+    ▶ Mehr
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#94a3b8"/></svg>
+  </button>
+  <button class="nav-btn nav-btn-antwort" id="btnAntwort" style="display:none">
+    💬 Antworten
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#16a34a"/></svg>
+  </button>
+</div>
+
+<script src="../../core/dwell.js"></script>
+<script src="../../core/error_handler.js"></script>
+<script src="./nachrichten_mod.js"></script>
+<script>
+  window.NachrichtenMod && window.NachrichtenMod.init();
+</script>
+</body>
+</html>
