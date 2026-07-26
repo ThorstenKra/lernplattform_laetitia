@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 26. Juli 2026 (Sitzung 13 — Abschluss)*
+*Stand: 26. Juli 2026 (Sitzung 13 — Ende)*
 
 ---
 
@@ -265,6 +265,20 @@ Bridge läuft dann auf `http://127.0.0.1:3737`. Konsole offen lassen.
 4. Diese Zahl in `config.json` bei `erlaubteChatIds: [XXXXXXXXX]` und `antwortChatId: XXXXXXXXX` eintragen
 5. Bridge neu starten
 
+**Nova (KI-Gesprächspartnerin) — Groq Key fehlt noch**
+
+Modul vollständig implementiert (commit `175ea9a`, Sitzung 13). **Einziger fehlender Schritt vor dem ersten Test: Groq Key eintragen.**
+
+Setup-Status:
+- ✅ `app/modules/ki_gespraech/ki_gespraech.html` + `ki_gespraech_mod.js`
+- ✅ `app/modules/ki_gespraech/persona.json` (Nova-Charakter, editierbar)
+- ✅ `app/modules/ki_gespraech/gedaechtnis.json` (wird nach jedem Gespräch aktualisiert)
+- ✅ `app/listener.ps1` v5 — `/chat` + `/chat/abschliessen` via Groq llama-3.1-70b
+- ✅ Spielewelt: ✨ Nova-Button vorhanden
+- ⬜ **Groq Key eintragen:** `console.groq.com` → API Keys → Create Key (kostenlos) → Key (beginnt mit `gsk_`) in `app/listener.ps1` Zeile 17 bei `$GROQ_KEY = "HIER_GROQ_KEY_EINTRAGEN"` einsetzen
+- ⬜ listener.ps1 starten: `powershell.exe -ExecutionPolicy Bypass -File app/listener.ps1`
+- ⬜ Nova in Edge testen: Spielewelt → ✨ Nova → Gespräch starten
+
 **Grammatik-Werkstatt: Stufe 10+ (E-47+) — nächster Block**
 Thema noch offen — Stufe 9 (Satzzeichen, E-43–E-46) wurde Sitzung 12 abgeschlossen.
 
@@ -386,8 +400,11 @@ Dann Edge komplett neu starten.
 | Nachrichten-Modul: Konzeption | ✅ Plattform-Vergleich (WhatsApp/Telegram/Signal/E-Mail), Architektur-Entscheidung: Telegram-Bot + lokaler Bridge-Dienst. Vollständige Kapselung — Lernplattform berührt nur Dateisystem/HTTP-localhost. |
 | Nachrichten-Modul: Implementierung | ✅ `telegram_bridge/bridge.js` (Node.js-Bot + HTTP-API), `app/modules/nachrichten/` (Posteingang, Medien-Viewer, 8 Antwort-Buttons). Commit `a3b003b`. Deployed nach OneDrive. |
 | Bridge-Setup | ✅ Bot `@laetitia_nachrichten_bot` erstellt. Token in config.json. npm install OK. Bridge verbindet sich mit Telegram. **Chat-ID noch nicht ermittelt** (Testnachricht ausstehend). |
+| Nova: KI-Gesprächspartnerin | ✅ Implementiert (commit `175ea9a`). Groq llama-3.1-70b. Gedächtnis-Mechanismus, Eltern-Zusammenfassung, persona.json. **Groq Key noch nicht eingetragen.** |
+| listener.ps1 v5 | ✅ Zwei neue Routen `/chat` + `/chat/abschliessen`. OPTIONS-Handler für POST erweitert. |
+| Sitzungsabschluss | ✅ ÜBERGABE aktualisiert, alle Commits gepusht. |
 
-**Commits (alle gepusht):** `2bbe60f` (S12-Doku), `63cb350`, `6717d22` (Modus-0-Fixes), `2db604a` (Modus 2), `a3b003b` (Nachrichten-Modul)
+**Commits (alle gepusht):** `2bbe60f` (S12-Doku), `63cb350`, `6717d22` (Modus-0-Fixes), `2db604a` (Modus 2), `a3b003b` (Nachrichten-Modul), `01c2576` (S13-Doku), `175ea9a` (Nova)
 
 ---
 
