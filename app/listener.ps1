@@ -1,4 +1,4 @@
-# listener.ps1 (v4 - Multi-Route + Audio-Umschaltung)
+# listener.ps1 (v5 - Multi-Route + Audio-Umschaltung + Groq-KI)
 # Laetitia Lernsystem
 #
 # Routen:
@@ -6,11 +6,16 @@
 #   /audio?geraet=intern  -> Windows-Audio auf internen Lautsprecher zurueck
 #   /audio?check=jbl      -> pruefen ob JBL als Wiedergabegeraet verfuegbar ("ok" | "fehler")
 #   /zurueck              -> Edge beenden, NuVoice starten (bestehende Logik)
+#   /chat                 -> POST: Nova-KI-Gespraech via Groq API
+#   /chat/abschliessen    -> POST: Gespraech speichern, Gedaechtnis + Eltern-Log aktualisieren
 
 # ── Konfiguration ─────────────────────────────────────────────────────────────
 $JBL_NAME    = "JBL Clip 5"
 $NUVOICE_EXE = "C:\Program Files (x86)\Prentke Romich Company\NuVoice\NuVoice.exe"
 $PORT        = 9999
+
+# Groq API-Key: kostenlos unter console.groq.com -> API Keys -> Create Key
+$GROQ_KEY    = "HIER_GROQ_KEY_EINTRAGEN"
 
 # ── Alte listener-Instanzen beenden (ausser sich selbst) ─────────────────────
 $self = $PID
@@ -72,6 +77,28 @@ function PruefeJbl() {
     } catch { return $false }
 }
 
+function LiesRequestBody($ctx) {
+    try {
+        $reader = New-Object System.IO.StreamReader($ctx.Request.InputStream, [System.Text.Encoding]::UTF8)
+        return $reader.ReadToEnd()
+    } catch { return "{}" }
+}
+
+function SchreibeJsonAntwort($ctx, $obj, $status = 200) {
+    try {
+        $json = $obj | ConvertTo-Json -Depth 10 -Compress
+        $buf  = [System.Text.Encoding]::UTF8.GetBytes($json)
+        $ctx.Response.StatusCode = $status
+        $ctx.Response.Headers.Add("Access-Control-Allow-Origin", "*")
+        $ctx.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        $ctx.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type")
+        $ctx.Response.ContentType = "application/json; charset=utf-8"
+        $ctx.Response.ContentLength64 = $buf.Length
+        $ctx.Response.OutputStream.Write($buf, 0, $buf.Length)
+        $ctx.Response.Close()
+    } catch {}
+}
+
 function SchreibeAntwort($ctx, $text, $status) {
     try {
         $ctx.Response.StatusCode = $status
@@ -111,7 +138,14 @@ while ($listener.IsListening) {
 
     # OPTIONS (CORS-Preflight) sofort beantworten
     if ($ctx.Request.HttpMethod -eq "OPTIONS") {
-        SchreibeAntwort $ctx "ok" 200
+        try {
+            $ctx.Response.StatusCode = 200
+            $ctx.Response.Headers.Add("Access-Control-Allow-Origin", "*")
+            $ctx.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+            $ctx.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type")
+            $ctx.Response.ContentLength64 = 0
+            $ctx.Response.Close()
+        } catch {}
         continue
     }
 
@@ -194,6 +228,131 @@ while ($listener.IsListening) {
         $form.Close()
 
         break
+    }
+
+    # ── Route: /chat ──────────────────────────────────────────────────────────
+    if ($pfad -eq "/chat" -and $ctx.Request.HttpMethod -eq "POST") {
+        try {
+            $body = LiesRequestBody $ctx | ConvertFrom-Json
+
+            $modPfad     = "$PSScriptRoot\modules\ki_gespraech"
+            $persona     = Get-Content "$modPfad\persona.json"     -Raw -Encoding UTF8 | ConvertFrom-Json
+            $gedaechtnis = Get-Content "$modPfad\gedaechtnis.json" -Raw -Encoding UTF8
+
+            $eigenschaften = ($persona.charaktereigenschaften | ForEach-Object { "- $_" }) -join "`n"
+            $grenzen       = ($persona.grenzen | ForEach-Object { "- $_" }) -join "`n"
+            $sysPrompt = @"
+Du bist $($persona.name), Laetitias freundliche Gespraechspartnerin auf einer Lernplattform.
+Charaktereigenschaften:
+$eigenschaften
+Gespraechsstil: $($persona.gespraechsstil.antwortlaenge). Sprachniveau: $($persona.gespraechsstil.sprachniveau).
+Fragetechnik: $($persona.gespraechsstil.fragetechnik).
+Wichtige Grenzen:
+$grenzen
+
+Laetitia kommuniziert per Augensteuerung. Das Tippen ist anstrengend.
+Antworte daher: kurz (max. 3 Saetze), klar, in normalem Deutsch.
+
+Gedaechtnis ueber Laetitia:
+$gedaechtnis
+
+Wichtig: Haenge am Ende jeder Antwort exakt diesen Block an (eine Zeile, kein Markdown):
+[VORSCHLAEGE]{"v":["Antwort1","Antwort2","Antwort3","Antwort4"]}[/VORSCHLAEGE]
+Die Vorschlaege sollen kurze (2-5 Woerter), passende Antwortmoeglichkeiten fuer Laetitia sein.
+"@
+
+            $msgs = [System.Collections.ArrayList]::new()
+            [void]$msgs.Add(@{ role = "system"; content = $sysPrompt })
+            if ($body.verlauf) {
+                foreach ($v in $body.verlauf) {
+                    [void]$msgs.Add(@{ role = $v.rolle; content = $v.text })
+                }
+            }
+            [void]$msgs.Add(@{ role = "user"; content = $body.nachricht })
+
+            $groqJson = @{
+                model       = "llama-3.1-70b-versatile"
+                messages    = @($msgs)
+                max_tokens  = 400
+                temperature = 0.7
+            } | ConvertTo-Json -Depth 10 -Compress
+
+            $groqResp = Invoke-RestMethod `
+                -Uri "https://api.groq.com/openai/v1/chat/completions" `
+                -Method POST `
+                -Headers @{ "Authorization" = "Bearer $GROQ_KEY" } `
+                -ContentType "application/json; charset=utf-8" `
+                -Body $groqJson `
+                -TimeoutSec 20
+
+            $roh = $groqResp.choices[0].message.content
+
+            $vorschlaege = @("Ja", "Nein", "Erzaehl mehr", "Okay")
+            if ($roh -match "(?s)\[VORSCHLAEGE\](.*?)\[/VORSCHLAEGE\]") {
+                try {
+                    $vJson = $Matches[1].Trim() | ConvertFrom-Json
+                    if ($vJson.v -and $vJson.v.Count -gt 0) {
+                        $vorschlaege = @($vJson.v | Select-Object -First 4)
+                    }
+                } catch {}
+            }
+            $antwortText = ($roh -replace "(?s)\[VORSCHLAEGE\].*?\[/VORSCHLAEGE\]", "").Trim()
+
+            SchreibeJsonAntwort $ctx @{ antwort = $antwortText; vorschlaege = $vorschlaege }
+        } catch {
+            SchreibeJsonAntwort $ctx @{ fehler = "Groq-Fehler: $($_.Exception.Message)" } 503
+        }
+        continue
+    }
+
+    # ── Route: /chat/abschliessen ─────────────────────────────────────────────
+    if ($pfad -eq "/chat/abschliessen" -and $ctx.Request.HttpMethod -eq "POST") {
+        SchreibeJsonAntwort $ctx @{ ok = $true }   # Antwort sofort senden
+
+        try {
+            $body = LiesRequestBody $ctx | ConvertFrom-Json
+            if (-not $body.verlauf -or $body.verlauf.Count -eq 0) { continue }
+
+            $modPfad      = "$PSScriptRoot\modules\ki_gespraech"
+            $gedPfad      = "$modPfad\gedaechtnis.json"
+            $logPfad      = "$modPfad\eltern_zusammenfassung.log"
+            $altesGed     = Get-Content $gedPfad -Raw -Encoding UTF8
+            $verlaufText  = ($body.verlauf | ForEach-Object {
+                $rolle = if($_.rolle -eq "user") { "Laetitia" } else { "Nova" }
+                "$rolle: $($_.text)"
+            }) -join "`n"
+
+            # Gedaechtnis aktualisieren
+            $gedPrompt = "Altes Gedaechtnis (JSON):`n$altesGed`n`nNeues Gespraech:`n$verlaufText`n`n" +
+                "Aktualisiere das Gedaechtnis kompakt (max. 400 Woerter). " +
+                "Gib NUR das aktualisierte JSON zurueck, kein Markdown, keine Erklaerung."
+            $gedResp = Invoke-RestMethod `
+                -Uri "https://api.groq.com/openai/v1/chat/completions" `
+                -Method POST `
+                -Headers @{ "Authorization" = "Bearer $GROQ_KEY" } `
+                -ContentType "application/json; charset=utf-8" `
+                -Body (@{ model = "llama-3.1-70b-versatile"; messages = @(@{ role = "user"; content = $gedPrompt }); max_tokens = 600; temperature = 0.2 } | ConvertTo-Json -Depth 5 -Compress) `
+                -TimeoutSec 20
+            $neuesGed = $gedResp.choices[0].message.content.Trim()
+            # Nur speichern wenn gueltiges JSON zurueckkam
+            $neuesGed | ConvertFrom-Json | Out-Null
+            $neuesGed | Set-Content $gedPfad -Encoding UTF8
+
+            # Eltern-Zusammenfassung
+            $datum       = Get-Date -Format "yyyy-MM-dd"
+            $elternPrompt = "Fasse dieses Gespraech in 2-3 Saetzen fuer Eltern zusammen. " +
+                "Kein Wortlaut, nur Kernpunkte und Stimmung. Format: '$datum | Text. Stimmung: X.'`n`nGespraech:`n$verlaufText"
+            $elternResp = Invoke-RestMethod `
+                -Uri "https://api.groq.com/openai/v1/chat/completions" `
+                -Method POST `
+                -Headers @{ "Authorization" = "Bearer $GROQ_KEY" } `
+                -ContentType "application/json; charset=utf-8" `
+                -Body (@{ model = "llama-3.1-70b-versatile"; messages = @(@{ role = "user"; content = $elternPrompt }); max_tokens = 150; temperature = 0.2 } | ConvertTo-Json -Depth 5 -Compress) `
+                -TimeoutSec 15
+            $elternText = $elternResp.choices[0].message.content.Trim()
+            Add-Content -Path $logPfad -Value $elternText -Encoding UTF8
+        } catch {}
+        continue
     }
 
     # ── Unbekannte Route ──────────────────────────────────────────────────────

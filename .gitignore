@@ -4,6 +4,9 @@ node_modules/
 telegram_bridge/config.json
 telegram_bridge/nachrichten/
 
+# Nova KI: persoenliche Gespraeche (Laufzeitdaten)
+app/modules/ki_gespraech/eltern_zusammenfassung.log
+
 # Lokale Binärdateien (nicht auf GitHub)
 *.exe
 *.bat
