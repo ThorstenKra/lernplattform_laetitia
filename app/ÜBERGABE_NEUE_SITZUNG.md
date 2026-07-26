@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 7. Juni 2026 (Sitzung 12 — Abschluss)*
+*Stand: 26. Juli 2026 (Sitzung 13 — Abschluss)*
 
 ---
 
@@ -233,10 +233,37 @@ Eingetragene Bücher: Das Fliegende Kamel (60 Tracks), Jaguar und NEINguar (54 T
 
 ## 🔴 Offene Aufgaben — Hochpriorität
 
-**Pfad-Training: Modus 2 (Freies Erkunden) — nächster Schritt**
+**Pfad-Training: Modus 2 — Test ausstehend**
 
-Nächster Schritt: **Modus 2 (Freies Erkunden)** implementieren.
-Jeder Erstklick öffnet Ebene 2 (auch falscher) — Versuch-und-Irrtum wie echtes NuVoice.
+Modus 2 (Freies Erkunden) ist implementiert (commit `2db604a`, Sitzung 13, 26.07.2026), aber noch **nicht in Edge getestet**.
+Testschritte: Start-Screen → „Modus 2 — Freies Erkunden" → Zielwort erscheint → beliebiger Erstklick öffnet Ebene 2 → falscher Zweitschritt spricht Wort + zurück zu Ebene 1 → richtiger Zweitschritt → Lob → nächstes Wort. Hinweis-Button aus Ebene 2: kehrt zu Ebene 1 zurück und blinkt Erstschritt.
+
+**Nachrichten-Modul (Telegram-Bridge) — Setup fast abgeschlossen**
+
+Implementiert (commit `a3b003b`, Sitzung 13, 26.07.2026). **Noch offen: Chat-ID ermitteln.**
+
+Setup-Status:
+- ✅ Bridge-Code: `telegram_bridge/bridge.js`
+- ✅ Bot erstellt: `@laetitia_nachrichten_bot`
+- ✅ Token in `telegram_bridge/config.json` eingetragen
+- ✅ `npm install` abgeschlossen (`telegram_bridge/node_modules/` vorhanden)
+- ✅ Bridge startet und verbindet sich mit Telegram
+- ⬜ **Chat-ID ermitteln:** Bot eine Testnachricht schicken → Bridge gibt Chat-ID in der Konsole aus → in `config.json` bei `erlaubteChatIds` und `antwortChatId` eintragen
+- ⬜ Bridge als Windows-Autostart konfigurieren (Aufgabenplanung oder Startup-Ordner)
+- ⬜ Modul in Edge testen (spielewelt.html → 💬 Nachrichten)
+
+**Bridge starten (für nächste Sitzung):**
+```powershell
+powershell.exe -ExecutionPolicy Bypass -c "cd 'C:/Users/ThorstenLavinia/lernplattform_laetitia/telegram_bridge'; node bridge.js"
+```
+Bridge läuft dann auf `http://127.0.0.1:3737`. Konsole offen lassen.
+
+**Chat-ID ermitteln:**
+1. Bridge starten (s. o.)
+2. In Telegram: Bot `@laetitia_nachrichten_bot` suchen → Nachricht schicken
+3. Bridge-Konsole zeigt: `[Bridge] Neue Chat-ID (bitte in config.json eintragen): XXXXXXXXX`
+4. Diese Zahl in `config.json` bei `erlaubteChatIds: [XXXXXXXXX]` und `antwortChatId: XXXXXXXXX` eintragen
+5. Bridge neu starten
 
 **Grammatik-Werkstatt: Stufe 10+ (E-47+) — nächster Block**
 Thema noch offen — Stufe 9 (Satzzeichen, E-43–E-46) wurde Sitzung 12 abgeschlossen.
@@ -347,6 +374,20 @@ Dann Edge komplett neu starten.
 **Commits (alle gepusht):** 2694aa5, 86df18d, e51413e, f06b0d9
 
 **Grammatik-Werkstatt jetzt:** 44 Einheiten, 440 Aufgaben (E-03–E-46), Stufen 1–9 vollständig.
+
+---
+
+## Sitzungsprotokoll 26. Juli 2026 — Sitzung 13
+
+| Was | Ergebnis |
+|---|---|
+| Git push + validate | ✅ 2 Commits gepusht (63cb350, 6717d22 — Modus-0-Pfad-Anzeige + Sonne-Fix). OneDrive in Sync. |
+| Pfad-Training: Modus 2 (Freies Erkunden) | ✅ Implementiert (commit `2db604a`). Jeder Erstklick öffnet Ebene 2, falscher Zweitschritt → spricht Wort + zurück, richtiger → Lob. Hinweis-Button aus Ebene 2: zurück zu E1 + Erstschritt-Blinken. **Test ausstehend.** |
+| Nachrichten-Modul: Konzeption | ✅ Plattform-Vergleich (WhatsApp/Telegram/Signal/E-Mail), Architektur-Entscheidung: Telegram-Bot + lokaler Bridge-Dienst. Vollständige Kapselung — Lernplattform berührt nur Dateisystem/HTTP-localhost. |
+| Nachrichten-Modul: Implementierung | ✅ `telegram_bridge/bridge.js` (Node.js-Bot + HTTP-API), `app/modules/nachrichten/` (Posteingang, Medien-Viewer, 8 Antwort-Buttons). Commit `a3b003b`. Deployed nach OneDrive. |
+| Bridge-Setup | ✅ Bot `@laetitia_nachrichten_bot` erstellt. Token in config.json. npm install OK. Bridge verbindet sich mit Telegram. **Chat-ID noch nicht ermittelt** (Testnachricht ausstehend). |
+
+**Commits (alle gepusht):** `2bbe60f` (S12-Doku), `63cb350`, `6717d22` (Modus-0-Fixes), `2db604a` (Modus 2), `a3b003b` (Nachrichten-Modul)
 
 ---
 
