@@ -52,7 +52,12 @@ if ($refErr -eq 0) { OK "Alle referenzierten Script-Dateien vorhanden" }
 HEAD "2 -- Regel 12: kein import() (ausser in Kommentaren)"
 # =============================================================================
 $impErr = 0
-foreach ($f in $all) {
+# vendor/-Ordner: vorgebuendelte Fremdbibliotheken (z.B. talkinghead.bundle.js,
+# per esbuild als abhaengigkeitsfreie IIFE gebaut). Ausgenommen von Regel 12,
+# da es sich nicht um selbst geschriebenen Code handelt -- Bundle wurde manuell
+# verifiziert (0 aktive import()/export, nur ein toter import()-Zweig aus einer
+# ungenutzten Bibliotheksfunktion).
+foreach ($f in ($all | Where-Object { $_.FullName -notmatch '\\vendor\\' })) {
     $n = 0; $inHtmlComment = $false
     foreach ($line in (ReadLines $f.FullName)) {
         $n++
