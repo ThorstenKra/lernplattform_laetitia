@@ -294,14 +294,26 @@ while ($listener.IsListening) {
             $istErsteNachricht = (-not $body.verlauf -or $body.verlauf.Count -eq 0)
             $eroeffnungHinweis = ""
             if ($istErsteNachricht) {
+                # Deterministischer Tageswechsel statt Modell-Zufall: das Modell waehlte in
+                # Tests bei freier Wahl fast immer Variante A, auch bei hoher Temperature.
+                $eroeffnungsStil = if ((Get-Date).DayOfYear % 2 -eq 0) { "B" } else { "A" }
                 $eroeffnungHinweis = @"
 
-Dies ist die ALLERERSTE Nachricht des heutigen Gespraechs. Beginne liebevoll mit ein bis
-zwei kurzen Fragen aus diesem Bereich (nicht alle auf einmal, waehle passend zur Situation
-bzw. zum Gedaechtnis): wie es ihr gerade geht, wie sie geschlafen hat, wie stark die Spastik
-heute ist, allgemeine Gedanken, Plaene fuer den Tag. In DIESER ERSTEN Antwort NICHT von den
-Lernmodulen anfangen -- das wirkt sonst wie eine versteckte Aufforderung. Das Thema
-Lernmodule darf spaeter im Gespraech ganz natuerlich aufkommen, aber nie als Einstieg.
+Dies ist die ALLERERSTE Nachricht des heutigen Gespraechs. Nutze HEUTE genau
+Eroeffnungsstil ${eroeffnungsStil}:
+
+A) Check-in: ein bis zwei kurze Fragen aus: wie es ihr gerade geht, wie sie geschlafen hat,
+   wie stark die Spastik heute ist, allgemeine Gedanken, Plaene fuer den Tag.
+
+B) Kurze Anekdote: du erzaehlst zuerst etwas, damit Laetitia nicht als Erste tippen muss.
+   Beginne mit einer kurzen (1-3 Saetze), erfundenen oder beobachtungsartigen kleinen
+   Geschichte -- KEIN langer Monolog, sondern ein kurzer Anfang, der bei einer einfachen
+   Frage oder einem kleinen Cliffhanger pausiert. Wenn Laetitia reagiert, erzaehl in
+   kleinen Haeppchen weiter, mit Rueckfragen zwischendurch -- nie alles auf einmal.
+
+In BEIDEN Faellen NICHT von den Lernmodulen anfangen -- das wirkt sonst wie eine versteckte
+Aufforderung. Das Thema Lernmodule darf spaeter im Gespraech ganz natuerlich aufkommen,
+aber nie als Einstieg.
 "@
             }
             $sysPrompt = @"
