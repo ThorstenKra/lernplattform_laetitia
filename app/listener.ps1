@@ -1,4 +1,4 @@
-# listener.ps1 (v5 - Multi-Route + Audio-Umschaltung + Groq-KI)
+# listener.ps1 (v6 - Multi-Route + Audio-Umschaltung + Gemini-KI)
 # Laetitia Lernsystem
 #
 # Routen:
@@ -6,7 +6,7 @@
 #   /audio?geraet=intern  -> Windows-Audio auf internen Lautsprecher zurueck
 #   /audio?check=jbl      -> pruefen ob JBL als Wiedergabegeraet verfuegbar ("ok" | "fehler")
 #   /zurueck              -> Edge beenden, NuVoice starten (bestehende Logik)
-#   /chat                 -> POST: Nova-KI-Gespraech via Groq API
+#   /chat                 -> POST: Nova-KI-Gespraech via Gemini API
 #   /chat/abschliessen    -> POST: Gespraech speichern, Gedaechtnis + Eltern-Log aktualisieren
 
 # ── Konfiguration ─────────────────────────────────────────────────────────────
@@ -14,8 +14,10 @@ $JBL_NAME    = "JBL Clip 5"
 $NUVOICE_EXE = "C:\Program Files (x86)\Prentke Romich Company\NuVoice\NuVoice.exe"
 $PORT        = 9999
 
-# Groq API-Key: kostenlos unter console.groq.com -> API Keys -> Create Key
-$GROQ_KEY    = "HIER_GROQ_KEY_EINTRAGEN"
+# Gemini API-Key: kostenlos unter aistudio.google.com -> Get API Key -> Create API Key
+$GEMINI_KEY  = "HIER_GEMINI_KEY_EINTRAGEN"
+$GEMINI_URL  = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+$GEMINI_MODEL = "gemini-flash-latest"
 
 # ── Alte listener-Instanzen beenden (ausser sich selbst) ─────────────────────
 $self = $PID
@@ -270,22 +272,22 @@ Die Vorschlaege sollen kurze (2-5 Woerter), passende Antwortmoeglichkeiten fuer 
             }
             [void]$msgs.Add(@{ role = "user"; content = $body.nachricht })
 
-            $groqJson = @{
-                model       = "llama-3.1-70b-versatile"
+            $geminiJson = @{
+                model       = $GEMINI_MODEL
                 messages    = @($msgs)
                 max_tokens  = 400
                 temperature = 0.7
             } | ConvertTo-Json -Depth 10 -Compress
 
-            $groqResp = Invoke-RestMethod `
-                -Uri "https://api.groq.com/openai/v1/chat/completions" `
+            $geminiResp = Invoke-RestMethod `
+                -Uri $GEMINI_URL `
                 -Method POST `
-                -Headers @{ "Authorization" = "Bearer $GROQ_KEY" } `
+                -Headers @{ "Authorization" = "Bearer $GEMINI_KEY" } `
                 -ContentType "application/json; charset=utf-8" `
-                -Body $groqJson `
+                -Body $geminiJson `
                 -TimeoutSec 20
 
-            $roh = $groqResp.choices[0].message.content
+            $roh = $geminiResp.choices[0].message.content
 
             $vorschlaege = @("Ja", "Nein", "Erzaehl mehr", "Okay")
             if ($roh -match "(?s)\[VORSCHLAEGE\](.*?)\[/VORSCHLAEGE\]") {
@@ -300,7 +302,7 @@ Die Vorschlaege sollen kurze (2-5 Woerter), passende Antwortmoeglichkeiten fuer 
 
             SchreibeJsonAntwort $ctx @{ antwort = $antwortText; vorschlaege = $vorschlaege }
         } catch {
-            SchreibeJsonAntwort $ctx @{ fehler = "Groq-Fehler: $($_.Exception.Message)" } 503
+            SchreibeJsonAntwort $ctx @{ fehler = "Gemini-Fehler: $($_.Exception.Message)" } 503
         }
         continue
     }
@@ -319,7 +321,7 @@ Die Vorschlaege sollen kurze (2-5 Woerter), passende Antwortmoeglichkeiten fuer 
             $altesGed     = Get-Content $gedPfad -Raw -Encoding UTF8
             $verlaufText  = ($body.verlauf | ForEach-Object {
                 $rolle = if($_.rolle -eq "user") { "Laetitia" } else { "Nova" }
-                "$rolle: $($_.text)"
+                "${rolle}: $($_.text)"
             }) -join "`n"
 
             # Gedaechtnis aktualisieren
@@ -327,11 +329,11 @@ Die Vorschlaege sollen kurze (2-5 Woerter), passende Antwortmoeglichkeiten fuer 
                 "Aktualisiere das Gedaechtnis kompakt (max. 400 Woerter). " +
                 "Gib NUR das aktualisierte JSON zurueck, kein Markdown, keine Erklaerung."
             $gedResp = Invoke-RestMethod `
-                -Uri "https://api.groq.com/openai/v1/chat/completions" `
+                -Uri $GEMINI_URL `
                 -Method POST `
-                -Headers @{ "Authorization" = "Bearer $GROQ_KEY" } `
+                -Headers @{ "Authorization" = "Bearer $GEMINI_KEY" } `
                 -ContentType "application/json; charset=utf-8" `
-                -Body (@{ model = "llama-3.1-70b-versatile"; messages = @(@{ role = "user"; content = $gedPrompt }); max_tokens = 600; temperature = 0.2 } | ConvertTo-Json -Depth 5 -Compress) `
+                -Body (@{ model = $GEMINI_MODEL; messages = @(@{ role = "user"; content = $gedPrompt }); max_tokens = 600; temperature = 0.2 } | ConvertTo-Json -Depth 5 -Compress) `
                 -TimeoutSec 20
             $neuesGed = $gedResp.choices[0].message.content.Trim()
             # Nur speichern wenn gueltiges JSON zurueckkam
@@ -343,11 +345,11 @@ Die Vorschlaege sollen kurze (2-5 Woerter), passende Antwortmoeglichkeiten fuer 
             $elternPrompt = "Fasse dieses Gespraech in 2-3 Saetzen fuer Eltern zusammen. " +
                 "Kein Wortlaut, nur Kernpunkte und Stimmung. Format: '$datum | Text. Stimmung: X.'`n`nGespraech:`n$verlaufText"
             $elternResp = Invoke-RestMethod `
-                -Uri "https://api.groq.com/openai/v1/chat/completions" `
+                -Uri $GEMINI_URL `
                 -Method POST `
-                -Headers @{ "Authorization" = "Bearer $GROQ_KEY" } `
+                -Headers @{ "Authorization" = "Bearer $GEMINI_KEY" } `
                 -ContentType "application/json; charset=utf-8" `
-                -Body (@{ model = "llama-3.1-70b-versatile"; messages = @(@{ role = "user"; content = $elternPrompt }); max_tokens = 150; temperature = 0.2 } | ConvertTo-Json -Depth 5 -Compress) `
+                -Body (@{ model = $GEMINI_MODEL; messages = @(@{ role = "user"; content = $elternPrompt }); max_tokens = 150; temperature = 0.2 } | ConvertTo-Json -Depth 5 -Compress) `
                 -TimeoutSec 15
             $elternText = $elternResp.choices[0].message.content.Trim()
             Add-Content -Path $logPfad -Value $elternText -Encoding UTF8
