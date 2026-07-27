@@ -290,12 +290,17 @@ while ($listener.IsListening) {
             $eigenschaften = ($persona.charaktereigenschaften | ForEach-Object { "- $_" }) -join "`n"
             $grenzen       = ($persona.grenzen | ForEach-Object { "- $_" }) -join "`n"
             $stimmungen    = ($persona.stimmungen.PSObject.Properties | ForEach-Object { "- $($_.Name): $($_.Value)" }) -join "`n"
+            $lebenskontext = ($persona.lebenskontext.PSObject.Properties | ForEach-Object { "- $($_.Name): $($_.Value)" }) -join "`n"
             $sysPrompt = @"
 Du bist $($persona.name), Laetitias freundliche Gespraechspartnerin auf einer Lernplattform.
 Charaktereigenschaften:
 $eigenschaften
 Gespraechsstil: $($persona.gespraechsstil.antwortlaenge). Sprachniveau: $($persona.gespraechsstil.sprachniveau).
 Fragetechnik: $($persona.gespraechsstil.fragetechnik).
+
+Wichtiger Lebenskontext (unbedingt beachten):
+$lebenskontext
+
 Wichtige Grenzen:
 $grenzen
 
@@ -307,8 +312,22 @@ $stimmungen
 Laetitia kommuniziert per Augensteuerung. Das Tippen ist anstrengend.
 Antworte daher: kurz (max. 3 Saetze), klar, in normalem Deutsch.
 
-Gedaechtnis ueber Laetitia:
+Heutiges Datum: $(Get-Date -Format "yyyy-MM-dd")
+
+Gedaechtnis ueber Laetitia (JSON, inkl. datierter vergangener Gespraeche unter
+"letzte_gespraeche", einer laufenden Routine unter "routine" und beobachteten
+Vorlieben unter "beobachtete_praeferenzen"):
 $gedaechtnis
+
+Nutze dieses Gedaechtnis aktiv:
+- Beziehe dich gelegentlich auf Themen aus "letzte_gespraeche" -- vergleiche das
+  jeweilige Datum mit dem heutigen Datum (z.B. "gestern", "vor ein paar Tagen",
+  "letzte Woche") und frage nach, ob sich etwas getan hat. Nicht in jeder Antwort,
+  aber immer wieder, damit es wirkt als wuerdest du dich wirklich erinnern.
+- Falls unter "routine" ein Ziel eingetragen ist: frag liebevoll nach dem Stand,
+  ohne Druck. Falls noch keine Routine existiert und sich ein Gespraech dafuer
+  eignet, schlage behutsam vor, gemeinsam eine kleine taegliche Routine zu finden.
+- Lass "beobachtete_praeferenzen" deinen Ton und deine Themenwahl beeinflussen.
 
 Wichtig: Haenge am Ende jeder Antwort EXAKT diesen einen Block an (eine Zeile, kein Markdown,
 kein weiterer Tag davor oder danach -- die Stimmung gehoert NUR in dieses "stimmung"-Feld,
@@ -373,9 +392,26 @@ Bei "stimmung" exakt einen der obigen Stimmungs-Namen eintragen.
             }) -join "`n"
 
             # Gedaechtnis aktualisieren
-            $gedPrompt = "Altes Gedaechtnis (JSON):`n$altesGed`n`nNeues Gespraech:`n$verlaufText`n`n" +
-                "Aktualisiere das Gedaechtnis kompakt (max. 400 Woerter). " +
-                "Gib NUR das aktualisierte JSON zurueck, kein Markdown, keine Erklaerung."
+            $heute = Get-Date -Format "yyyy-MM-dd"
+            $gedPrompt = @"
+Altes Gedaechtnis (JSON) -- Schema: ueber_laetitia (Text), interessen (Liste), wiederkehrende_themen (Liste),
+letzte_gespraeche (Liste von {"datum":"YYYY-MM-DD","zusammenfassung":"..."}), routine ({"ziel":"...","stand":"..."}),
+beobachtete_praeferenzen (Liste kurzer Notizen, worauf Laetitia im Ton/Thema gut reagiert):
+$altesGed
+
+Neues Gespraech (heute, $heute):
+$verlaufText
+
+Aktualisiere das Gedaechtnis:
+1. Fuege einen NEUEN Eintrag zu "letzte_gespraeche" hinzu: {"datum":"$heute","zusammenfassung":"1-2 Saetze Kernthema"}.
+   Bestehende Eintraege beibehalten, aber Liste auf maximal die letzten 14 Eintraege kuerzen (aelteste zuerst entfernen).
+2. "interessen" und "wiederkehrende_themen" ergaenzen falls neue erkennbar sind (keine Duplikate).
+3. Falls im Gespraech eine taegliche Routine erwaehnt, vereinbart oder verfolgt wurde: "routine" (ziel + stand) aktualisieren.
+4. Falls erkennbar ist, worauf Laetitia besonders gut reagiert hat (Humor-Art, Thema, Tonfall): kurze Notiz zu
+   "beobachtete_praeferenzen" hinzufuegen (max. 8 Eintraege insgesamt, bei Bedarf aelteste entfernen).
+5. "ueber_laetitia" nur anpassen, wenn sich wirklich etwas Grundlegendes geaendert hat.
+Gib NUR das aktualisierte JSON zurueck (exakt dieses Schema), kein Markdown, keine Erklaerung.
+"@
             $gedResp = RufeGemini @(@{ role = "user"; content = $gedPrompt }) 2000 0.2 20000
             $neuesGed = $gedResp.choices[0].message.content.Trim()
             # Nur speichern wenn gueltiges JSON zurueckkam
