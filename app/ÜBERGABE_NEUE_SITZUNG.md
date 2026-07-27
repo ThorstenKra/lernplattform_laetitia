@@ -265,19 +265,50 @@ Bridge läuft dann auf `http://127.0.0.1:3737`. Konsole offen lassen.
 4. Diese Zahl in `config.json` bei `erlaubteChatIds: [XXXXXXXXX]` und `antwortChatId: XXXXXXXXX` eintragen
 5. Bridge neu starten
 
-**Nova (KI-Gesprächspartnerin) — Groq Key fehlt noch**
+**Nova (KI-Gesprächspartnerin) — läuft, Stufe 1 Personalisierung fertig**
 
-Modul vollständig implementiert (commit `175ea9a`, Sitzung 13). **Einziger fehlender Schritt vor dem ersten Test: Groq Key eintragen.**
+Modul implementiert (commit `175ea9a`, Sitzung 13) und in Sitzung 14 (27.07.2026) auf Gemini umgestellt, deployed und live getestet.
 
 Setup-Status:
-- ✅ `app/modules/ki_gespraech/ki_gespraech.html` + `ki_gespraech_mod.js`
-- ✅ `app/modules/ki_gespraech/persona.json` (Nova-Charakter, editierbar)
+- ✅ `app/modules/ki_gespraech/ki_gespraech.html` + `ki_gespraech_mod.js` — inkl. Lautstärke-/Tempo-Regler (Stufe 1)
+- ✅ `app/modules/ki_gespraech/persona.json` — inkl. `stimmungen` (neutral/schnippisch/ruhig/aufgeregt)
 - ✅ `app/modules/ki_gespraech/gedaechtnis.json` (wird nach jedem Gespräch aktualisiert)
-- ✅ `app/listener.ps1` v5 — `/chat` + `/chat/abschliessen` via Groq llama-3.1-70b
-- ✅ Spielewelt: ✨ Nova-Button vorhanden
-- ⬜ **Groq Key eintragen:** `console.groq.com` → API Keys → Create Key (kostenlos) → Key (beginnt mit `gsk_`) in `app/listener.ps1` Zeile 17 bei `$GROQ_KEY = "HIER_GROQ_KEY_EINTRAGEN"` einsetzen
-- ⬜ listener.ps1 starten: `powershell.exe -ExecutionPolicy Bypass -File app/listener.ps1`
-- ⬜ Nova in Edge testen: Spielewelt → ✨ Nova → Gespräch starten
+- ✅ `app/listener.ps1` v6 — `/chat` + `/chat/abschliessen` via **Google Gemini** (`gemini-flash-lite-latest`, OpenAI-kompatibler Endpunkt), inkl. `RufeGemini`-Hilfsfunktion mit korrektem UTF-8-Handling
+- ✅ Spielewelt: ✨ Nova-Button vorhanden, in OneDrive deployed
+- ✅ **Groq durch Gemini ersetzt:** console.groq.com hatte am 27.07.2026 einen serverseitigen Auth-Fehler (Stytch-Backend 503) — GitHub-Login griff nicht, Bestätigungsmail kam nie an. Google AI Studio (`aistudio.google.com`) funktioniert über bestehenden Google-Account, kein neues Signup-Risiko.
+- ✅ **Modellwahl:** `gemini-flash-latest` (aktuell 3.6) hat nur 20 Anfragen/Tag Freikontingent (brandneues Modell) — auf `gemini-flash-lite-latest` umgestellt (~1.500/Tag, praxistauglich)
+- ✅ **Stufe 1 Personalisierung (27.07.2026):** Nova wählt pro Antwort eine Stimmung (`neutral`/`schnippisch`/`ruhig`/`aufgeregt`, Pflicht: `ruhig` bei ernsten Thermen) — beeinflusst Wortwahl (via System-Prompt) UND Sprechtempo/Tonhöhe (`rate`/`pitch` in `ki_gespraech_mod.js`). Live getestet: gute Note → "aufgeregt" (witzig-überschwänglich), kaputtes Stofftier → "ruhig" (einfühlsam, verweist auf Eltern), Katzen-vs-Hunde-Frage → "schnippisch" (frech-humorvoll).
+- ✅ Lautstärke-/Tempo-Regler im UI (10%-Schritte Tempo, Lautstärke wirkt nur dämpfend — Web-Speech-API deckelt bei 100%, für "lauter" nur Windows-Systemlautstärke)
+- ⬜ **Bekannte Einschränkung:** Edge-„Online (Natural)"-Stimme zeigt manchmal Stotter-Effekt (erste Silbe, dann ~5s Pause) — vermutlich Cloud-Streaming-Eigenheit der Neural-Stimme, kein Code-Bug. Noch nicht behoben, Diagnose ausstehend (ggf. Offline-„Microsoft Katja" testen).
+
+**🟡 Stufe 2 (später) — Echte Sprachausdruckskraft ("Sprachbausteine-Bank")**
+
+Web-Speech-API kennt keine echten Emotionen/Sprachstile (nur rate/pitch/volume, siehe Stufe 1). Für echte
+gefühlsbetonte Sprachmelodie (schnippisch wirklich "klingen lassen", nicht nur Tempo/Tonhöhe) würde eine
+Cloud-TTS mit Style-Steuerung gebraucht (z.B. Azure Speech SSML `mstts:express-as style="cheerful"`, oder
+ElevenLabs). Das direkt live bei jeder Nova-Antwort zu nutzen würde aber eine harte Online-Abhängigkeit
+für die reine Sprachausgabe schaffen — Risiko für Stabilität, da die ganze Plattform sonst offline-first ist.
+
+**Vorschlag (Batch-Ansatz, offline-stabil zur Laufzeit):**
+1. Kein Versuch, die von Gemini frei generierten Sätze selbst mit Cloud-TTS-Styles zu vertonen (das würde
+   Internet bei JEDER Antwort brauchen — Architekturwechsel, mehr Latenz, neue Ausfallquelle).
+2. Stattdessen: eine **kuratierte Liste kurzer Interjektionen/Reaktionsfloskeln** pro Stimmung (z.B. schnippisch:
+   "Ha, gut gekontert!", "Na sowas!", "Ehrlich jetzt?" / aufgeregt: "Krass!", "Das ist ja mega!" / ruhig: kurze
+   einfühlsame Seufzer-Phrasen) — einmalig (oder bei Erweiterung) per Batch-Skript mit einer Cloud-TTS-mit-Styles
+   erzeugen und als MP3/WAV-Dateien lokal ablegen (`app/modules/ki_gespraech/sprachbausteine/<stimmung>_NN.mp3`)
+   + ein Manifest (`sprachbausteine.json`: Stimmung → Liste verfügbarer Dateien).
+3. Zur Laufzeit (offline, kein Internet nötig außer für den Gemini-Chat-Call selbst, der ohnehin schon gebraucht
+   wird): vor der eigentlichen (weiterhin per Browser-TTS gesprochenen) Antwort wird passend zur von Gemini
+   gewählten Stimmung zufällig ein lokaler Sprachbaustein abgespielt — echte stimmliche Textur für die Einleitung,
+   der Hauptsatz bleibt zuverlässig offline/lokal.
+4. Batch-Generierung ist ein seltener Wartungsschritt (wie `grammatik_data.js` erweitern) — braucht nur bei
+   Erstellung/Erweiterung kurz Internet, die App selbst bleibt beim eigentlichen Sprechen komplett lokal.
+
+**Für die Umsetzung würde ich brauchen:**
+- Freigabe/Entscheidung für einen Cloud-TTS-Anbieter für die einmalige Batch-Erzeugung (Azure Speech kostenlos
+  im Testkontingent, oder ElevenLabs mit kostenlosem Zeichen-Kontingent/Monat)
+- Eine kuratierte Liste gewünschter Interjektionen pro Stimmung (kann ich vorschlagen, Feinschliff durch Nutzer)
+- Ggf. neuer API-Key für den gewählten Anbieter (gleiche Einmal-Hürde wie bei Groq/Gemini)
 
 **Grammatik-Werkstatt: Stufe 10+ (E-47+) — nächster Block**
 Thema noch offen — Stufe 9 (Satzzeichen, E-43–E-46) wurde Sitzung 12 abgeschlossen.

@@ -1,5 +1,5 @@
 // ki_gespraech_mod.js -- Laetitia Lernsystem
-// KI-Gespraechspartnerin Nova -- Groq API via listener.ps1 /chat
+// KI-Gespraechspartnerin Nova -- Gemini API via listener.ps1 /chat
 // REGEL 1: Kein import(), kein type="module"
 // REGEL 4: Nur gerade Anfuehrungszeichen
 
@@ -11,16 +11,53 @@ var verlauf      = [];   // [{rolle:"user"|"assistant", text:"..."}]
 var zustand      = "start";
 var _dwell       = null;
 
+// ── Lautstaerke / Tempo ────────────────────────────────────────────────────────
+var LAUT_KEY   = "laetitia_nova_lautstaerke";   // 0.3 - 1.0
+var TEMPO_KEY  = "laetitia_nova_tempo";         // 50 - 150 (Prozent)
+var LAUT_MIN = 0.3, LAUT_MAX = 1.0, LAUT_STEP = 0.1;
+var TEMPO_MIN = 50, TEMPO_MAX = 150, TEMPO_STEP = 10;
+var RATE_BASIS = 0.92; // Goldstandard-Basiswert bei Tempo = 100%
+
+// ── Stimmungen (Stufe 1 Personalisierung) ─────────────────────────────────────
+// Gemini waehlt pro Antwort eine Stimmung (siehe listener.ps1 Systemprompt);
+// hier nur grobe rate/pitch-Anpassung -- Web-Speech-API kennt keine echten
+// Emotionen/Sprachstile. Feinere Ausdruckskraft: siehe TODO in UEBERGABE.
+var STIMMUNG_PRESETS = {
+  neutral:    { rateMul: 1.00, pitch: 1.00 },
+  schnippisch:{ rateMul: 1.12, pitch: 1.12 },
+  ruhig:      { rateMul: 0.88, pitch: 0.95 },
+  aufgeregt:  { rateMul: 1.08, pitch: 1.08 }
+};
+
+function ladeLautstaerke(){
+  var v = parseFloat(localStorage.getItem(LAUT_KEY));
+  if(isNaN(v) || v < LAUT_MIN || v > LAUT_MAX) v = LAUT_MAX;
+  return v;
+}
+function ladeTempo(){
+  var t = parseInt(localStorage.getItem(TEMPO_KEY), 10);
+  if(isNaN(t) || t < TEMPO_MIN || t > TEMPO_MAX) t = 100;
+  return t;
+}
+function aktualisiereEinstellungenAnzeige(){
+  var la = $("lautAnzeige");   if(la) la.textContent = Math.round(ladeLautstaerke() * 100) + "%";
+  var ta = $("tempoAnzeige");  if(ta) ta.textContent = ladeTempo() + "%";
+}
+
 function $(id){ return document.getElementById(id); }
 
 // ── TTS ──────────────────────────────────────────────────────────────────────
-function sprich(text){
+function sprich(text, stimmung){
   try{
     speechSynthesis.cancel();
+    var preset = STIMMUNG_PRESETS[stimmung] || STIMMUNG_PRESETS.neutral;
     setTimeout(function(){
       try{
         var u = new SpeechSynthesisUtterance(String(text || ""));
-        u.lang = "de-DE"; u.rate = 0.92;
+        u.lang = "de-DE";
+        u.rate   = RATE_BASIS * (ladeTempo() / 100) * preset.rateMul;
+        u.pitch  = preset.pitch;
+        u.volume = ladeLautstaerke();
         var vv = speechSynthesis.getVoices();
         var v = vv.find(function(x){ return x.name === "Microsoft Katja Online (Natural) - German (Germany)"; })
              || vv.find(function(x){ return x.name === "Microsoft Katja - German (Germany)"; })
@@ -42,7 +79,7 @@ function rebindDwell(){
     : function(){ return { cancelDwell: function(){} }; };
   var dwellMs = parseInt(localStorage.getItem("laetitia_dwell_ms"))       || 900;
   var grace   = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
-  _dwell = attach(".vorschlag-btn, .nav-btn:not([style*='display:none']), #btnStarten", {
+  _dwell = attach(".vorschlag-btn, .nav-btn:not([style*='display:none']), #btnStarten, .einstellung-btn", {
     dwellMs: dwellMs, leaveGrace: grace,
     onActivate: function(el){
       if(el.getAttribute("aria-disabled") === "true") return;
@@ -91,7 +128,7 @@ function zeigeAbschluss(info){
   rebindDwell();
 }
 
-function zeigeGespraech(antwort, vorschlaege){
+function zeigeGespraech(antwort, vorschlaege, stimmung){
   zustand = "gespraech"; alleVerstecken();
 
   var gc = $("gespraechContainer"); if(gc) gc.style.display = "";
@@ -99,7 +136,7 @@ function zeigeGespraech(antwort, vorschlaege){
 
   var novaEl = $("novaAntwort");
   if(novaEl) novaEl.textContent = antwort;
-  sprich(antwort);
+  sprich(antwort, stimmung);
 
   var grid = $("vorschlaegeGrid");
   if(grid){
@@ -138,7 +175,7 @@ function sendeNachricht(text){
     }
     verlauf.push({ rolle: "user",      text: text });
     verlauf.push({ rolle: "assistant", text: data.antwort });
-    zeigeGespraech(data.antwort, data.vorschlaege);
+    zeigeGespraech(data.antwort, data.vorschlaege, data.stimmung);
   });
 }
 
@@ -173,6 +210,32 @@ function init(){
   var bB = $("btnBeenden");
   if(bB) bB.addEventListener("click", beendeGespraech);
 
+  var bLM = $("btnLautMinus");
+  if(bLM) bLM.addEventListener("click", function(){
+    var neu = Math.max(LAUT_MIN, Math.round((ladeLautstaerke() - LAUT_STEP) * 10) / 10);
+    localStorage.setItem(LAUT_KEY, String(neu));
+    aktualisiereEinstellungenAnzeige();
+  });
+  var bLP = $("btnLautPlus");
+  if(bLP) bLP.addEventListener("click", function(){
+    var neu = Math.min(LAUT_MAX, Math.round((ladeLautstaerke() + LAUT_STEP) * 10) / 10);
+    localStorage.setItem(LAUT_KEY, String(neu));
+    aktualisiereEinstellungenAnzeige();
+  });
+  var bTM = $("btnTempoMinus");
+  if(bTM) bTM.addEventListener("click", function(){
+    var neu = Math.max(TEMPO_MIN, ladeTempo() - TEMPO_STEP);
+    localStorage.setItem(TEMPO_KEY, String(neu));
+    aktualisiereEinstellungenAnzeige();
+  });
+  var bTP = $("btnTempoPlus");
+  if(bTP) bTP.addEventListener("click", function(){
+    var neu = Math.min(TEMPO_MAX, ladeTempo() + TEMPO_STEP);
+    localStorage.setItem(TEMPO_KEY, String(neu));
+    aktualisiereEinstellungenAnzeige();
+  });
+
+  aktualisiereEinstellungenAnzeige();
   zeigeStart();
 }
 

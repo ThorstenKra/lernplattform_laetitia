@@ -17,7 +17,7 @@ $PORT        = 9999
 # Gemini API-Key: kostenlos unter aistudio.google.com -> Get API Key -> Create API Key
 $GEMINI_KEY  = "HIER_GEMINI_KEY_EINTRAGEN"
 $GEMINI_URL  = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
-$GEMINI_MODEL = "gemini-flash-latest"
+$GEMINI_MODEL = "gemini-flash-lite-latest"
 
 # ── Alte listener-Instanzen beenden (ausser sich selbst) ─────────────────────
 $self = $PID
@@ -112,6 +112,52 @@ function SchreibeAntwort($ctx, $text, $status) {
         $ctx.Response.OutputStream.Write($buf, 0, $buf.Length)
         $ctx.Response.Close()
     } catch {}
+}
+
+# Invoke-RestMethod dekodiert UTF-8-Antworten unter PowerShell 5.1 fehlerhaft
+# (Umlaute werden zu Mojibake, z.B. "ö" -> "Ã¶"). Deshalb HttpWebRequest direkt
+# mit explizitem UTF-8-Stream-Reader fuer Request UND Response.
+function RufeGemini($messages, $maxTokens, $temperature, $timeoutMs = 20000) {
+    # reasoning_effort=low reduziert (schaltet aber nicht ab) den internen "Thinking"-
+    # Tokenverbrauch von Gemini. max_tokens deshalb grosszuegig bemessen -- sonst wird
+    # die sichtbare Antwort abgeschnitten, bevor sie geschrieben wird (finish_reason=length).
+    $bodyJson = @{
+        model            = $GEMINI_MODEL
+        messages         = @($messages)
+        max_tokens       = $maxTokens
+        temperature      = $temperature
+        reasoning_effort = "low"
+    } | ConvertTo-Json -Depth 10 -Compress
+    $bodyBytes = [System.Text.Encoding]::UTF8.GetBytes($bodyJson)
+
+    $req = [System.Net.HttpWebRequest]::Create($GEMINI_URL)
+    $req.Method = "POST"
+    $req.ContentType = "application/json; charset=utf-8"
+    $req.Timeout = $timeoutMs
+    $req.Headers.Add("Authorization", "Bearer $GEMINI_KEY")
+    $req.ContentLength = $bodyBytes.Length
+    $reqStream = $req.GetRequestStream()
+    $reqStream.Write($bodyBytes, 0, $bodyBytes.Length)
+    $reqStream.Close()
+
+    try {
+        $response = $req.GetResponse()
+    } catch [System.Net.WebException] {
+        if ($_.Exception.Response) {
+            $errReader = New-Object System.IO.StreamReader($_.Exception.Response.GetResponseStream(), [System.Text.Encoding]::UTF8)
+            $errBody = $errReader.ReadToEnd()
+            $errReader.Close()
+            throw "Gemini HTTP-Fehler: $errBody"
+        }
+        throw
+    }
+    $respStream = $response.GetResponseStream()
+    $reader    = New-Object System.IO.StreamReader($respStream, [System.Text.Encoding]::UTF8)
+    $json      = $reader.ReadToEnd()
+    $reader.Close()
+    $response.Close()
+
+    return $json | ConvertFrom-Json
 }
 
 # ── HTTP-Listener starten ─────────────────────────────────────────────────────
@@ -243,6 +289,7 @@ while ($listener.IsListening) {
 
             $eigenschaften = ($persona.charaktereigenschaften | ForEach-Object { "- $_" }) -join "`n"
             $grenzen       = ($persona.grenzen | ForEach-Object { "- $_" }) -join "`n"
+            $stimmungen    = ($persona.stimmungen.PSObject.Properties | ForEach-Object { "- $($_.Name): $($_.Value)" }) -join "`n"
             $sysPrompt = @"
 Du bist $($persona.name), Laetitias freundliche Gespraechspartnerin auf einer Lernplattform.
 Charaktereigenschaften:
@@ -252,15 +299,23 @@ Fragetechnik: $($persona.gespraechsstil.fragetechnik).
 Wichtige Grenzen:
 $grenzen
 
+Verfuegbare Stimmungen (waehle pro Antwort GENAU EINE, passend zum Gespraechsverlauf):
+$stimmungen
+"ruhig" ist PFLICHT bei ernsten/traurigen Themen. Sonst gerne haeufig "schnippisch" oder
+"aufgeregt", aber nicht in jeder einzelnen Antwort -- wirkt sonst aufgesetzt.
+
 Laetitia kommuniziert per Augensteuerung. Das Tippen ist anstrengend.
 Antworte daher: kurz (max. 3 Saetze), klar, in normalem Deutsch.
 
 Gedaechtnis ueber Laetitia:
 $gedaechtnis
 
-Wichtig: Haenge am Ende jeder Antwort exakt diesen Block an (eine Zeile, kein Markdown):
-[VORSCHLAEGE]{"v":["Antwort1","Antwort2","Antwort3","Antwort4"]}[/VORSCHLAEGE]
+Wichtig: Haenge am Ende jeder Antwort EXAKT diesen einen Block an (eine Zeile, kein Markdown,
+kein weiterer Tag davor oder danach -- die Stimmung gehoert NUR in dieses "stimmung"-Feld,
+niemals als eigener [STIMMUNG]-Tag oder aehnliches im sichtbaren Antworttext):
+[VORSCHLAEGE]{"v":["Antwort1","Antwort2","Antwort3","Antwort4"],"stimmung":"neutral"}[/VORSCHLAEGE]
 Die Vorschlaege sollen kurze (2-5 Woerter), passende Antwortmoeglichkeiten fuer Laetitia sein.
+Bei "stimmung" exakt einen der obigen Stimmungs-Namen eintragen.
 "@
 
             $msgs = [System.Collections.ArrayList]::new()
@@ -272,35 +327,28 @@ Die Vorschlaege sollen kurze (2-5 Woerter), passende Antwortmoeglichkeiten fuer 
             }
             [void]$msgs.Add(@{ role = "user"; content = $body.nachricht })
 
-            $geminiJson = @{
-                model       = $GEMINI_MODEL
-                messages    = @($msgs)
-                max_tokens  = 400
-                temperature = 0.7
-            } | ConvertTo-Json -Depth 10 -Compress
-
-            $geminiResp = Invoke-RestMethod `
-                -Uri $GEMINI_URL `
-                -Method POST `
-                -Headers @{ "Authorization" = "Bearer $GEMINI_KEY" } `
-                -ContentType "application/json; charset=utf-8" `
-                -Body $geminiJson `
-                -TimeoutSec 20
+            $geminiResp = RufeGemini $msgs 1000 0.7 20000
 
             $roh = $geminiResp.choices[0].message.content
 
             $vorschlaege = @("Ja", "Nein", "Erzaehl mehr", "Okay")
+            $stimmung    = "neutral"
             if ($roh -match "(?s)\[VORSCHLAEGE\](.*?)\[/VORSCHLAEGE\]") {
                 try {
                     $vJson = $Matches[1].Trim() | ConvertFrom-Json
                     if ($vJson.v -and $vJson.v.Count -gt 0) {
                         $vorschlaege = @($vJson.v | Select-Object -First 4)
                     }
+                    if ($vJson.stimmung -and $persona.stimmungen.PSObject.Properties.Name -contains $vJson.stimmung) {
+                        $stimmung = $vJson.stimmung
+                    }
                 } catch {}
             }
-            $antwortText = ($roh -replace "(?s)\[VORSCHLAEGE\].*?\[/VORSCHLAEGE\]", "").Trim()
+            $antwortText = ($roh -replace "(?s)\[VORSCHLAEGE\].*?\[/VORSCHLAEGE\]", "")
+            # Verteidigung gegen gelegentlich von Gemini erfundene Extra-Tags (z.B. [STIMMUNG]...[/STIMMUNG])
+            $antwortText = ($antwortText -replace "(?s)\[/?[A-Z]+\]", "").Trim()
 
-            SchreibeJsonAntwort $ctx @{ antwort = $antwortText; vorschlaege = $vorschlaege }
+            SchreibeJsonAntwort $ctx @{ antwort = $antwortText; vorschlaege = $vorschlaege; stimmung = $stimmung }
         } catch {
             SchreibeJsonAntwort $ctx @{ fehler = "Gemini-Fehler: $($_.Exception.Message)" } 503
         }
@@ -328,13 +376,7 @@ Die Vorschlaege sollen kurze (2-5 Woerter), passende Antwortmoeglichkeiten fuer 
             $gedPrompt = "Altes Gedaechtnis (JSON):`n$altesGed`n`nNeues Gespraech:`n$verlaufText`n`n" +
                 "Aktualisiere das Gedaechtnis kompakt (max. 400 Woerter). " +
                 "Gib NUR das aktualisierte JSON zurueck, kein Markdown, keine Erklaerung."
-            $gedResp = Invoke-RestMethod `
-                -Uri $GEMINI_URL `
-                -Method POST `
-                -Headers @{ "Authorization" = "Bearer $GEMINI_KEY" } `
-                -ContentType "application/json; charset=utf-8" `
-                -Body (@{ model = $GEMINI_MODEL; messages = @(@{ role = "user"; content = $gedPrompt }); max_tokens = 600; temperature = 0.2 } | ConvertTo-Json -Depth 5 -Compress) `
-                -TimeoutSec 20
+            $gedResp = RufeGemini @(@{ role = "user"; content = $gedPrompt }) 2000 0.2 20000
             $neuesGed = $gedResp.choices[0].message.content.Trim()
             # Nur speichern wenn gueltiges JSON zurueckkam
             $neuesGed | ConvertFrom-Json | Out-Null
@@ -344,16 +386,15 @@ Die Vorschlaege sollen kurze (2-5 Woerter), passende Antwortmoeglichkeiten fuer 
             $datum       = Get-Date -Format "yyyy-MM-dd"
             $elternPrompt = "Fasse dieses Gespraech in 2-3 Saetzen fuer Eltern zusammen. " +
                 "Kein Wortlaut, nur Kernpunkte und Stimmung. Format: '$datum | Text. Stimmung: X.'`n`nGespraech:`n$verlaufText"
-            $elternResp = Invoke-RestMethod `
-                -Uri $GEMINI_URL `
-                -Method POST `
-                -Headers @{ "Authorization" = "Bearer $GEMINI_KEY" } `
-                -ContentType "application/json; charset=utf-8" `
-                -Body (@{ model = $GEMINI_MODEL; messages = @(@{ role = "user"; content = $elternPrompt }); max_tokens = 150; temperature = 0.2 } | ConvertTo-Json -Depth 5 -Compress) `
-                -TimeoutSec 15
+            $elternResp = RufeGemini @(@{ role = "user"; content = $elternPrompt }) 1200 0.2 15000
             $elternText = $elternResp.choices[0].message.content.Trim()
             Add-Content -Path $logPfad -Value $elternText -Encoding UTF8
-        } catch {}
+        } catch {
+            $fehlerPfad = "$PSScriptRoot\modules\ki_gespraech\listener_fehler.log"
+            try {
+                Add-Content -Path $fehlerPfad -Value "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') | $($_.Exception.Message)" -Encoding UTF8
+            } catch {}
+        }
         continue
     }
 

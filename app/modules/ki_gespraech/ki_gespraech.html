@@ -23,6 +23,25 @@ body{
   display:flex; align-items:center;
 }
 #kopfTitel{ font-size:20px; font-weight:1000; color:var(--lila-dark); }
+#einstellungenLeiste{
+  flex-shrink:0; display:flex; flex-wrap:wrap; gap:10px;
+  padding:8px 14px; background:#fff; border-bottom:2px solid var(--grau-rand);
+}
+.einstellung-gruppe{
+  flex:1; min-width:150px; display:flex; align-items:center; gap:6px;
+  background:var(--lila-bg); border:2px solid var(--lila); border-radius:12px;
+  padding:4px 6px;
+}
+.einstellung-label{ font-size:13px; font-weight:1000; color:var(--lila-dark); flex:1; }
+.einstellung-btn{
+  min-width:44px; min-height:44px; border-radius:10px; border:2px solid var(--lila);
+  background:#fff; color:var(--lila-dark); font-size:20px; font-weight:1000;
+  cursor:pointer; position:relative; transition:none; font-family:inherit;
+  display:flex; align-items:center; justify-content:center;
+}
+.einstellung-btn:hover,.einstellung-btn:focus{ background:#ddd6fe; outline:none; }
+.einstellung-btn.dwell-active{ transform:scale(1.05) !important; outline:3px solid var(--lila) !important; transition:none !important; }
+.einstellung-wert{ font-size:14px; font-weight:1000; color:var(--lila-dark); min-width:38px; text-align:center; }
 #hauptBereich{
   flex:1; min-height:0; overflow:hidden;
   display:flex; flex-direction:column;
@@ -100,6 +119,21 @@ body{
 
 <div id="kopfLeiste">
   <div id="kopfTitel">✨ Nova — Gesprächspartnerin</div>
+</div>
+
+<div id="einstellungenLeiste">
+  <div class="einstellung-gruppe">
+    <span class="einstellung-label">🔊 Lautstärke</span>
+    <button class="einstellung-btn" id="btnLautMinus">−</button>
+    <span class="einstellung-wert" id="lautAnzeige">100%</span>
+    <button class="einstellung-btn" id="btnLautPlus">+</button>
+  </div>
+  <div class="einstellung-gruppe">
+    <span class="einstellung-label">⏱️ Tempo</span>
+    <button class="einstellung-btn" id="btnTempoMinus">−</button>
+    <span class="einstellung-wert" id="tempoAnzeige">100%</span>
+    <button class="einstellung-btn" id="btnTempoPlus">+</button>
+  </div>
 </div>
 
 <div id="hauptBereich">
