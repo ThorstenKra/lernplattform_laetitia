@@ -291,6 +291,19 @@ while ($listener.IsListening) {
             $grenzen       = ($persona.grenzen | ForEach-Object { "- $_" }) -join "`n"
             $stimmungen    = ($persona.stimmungen.PSObject.Properties | ForEach-Object { "- $($_.Name): $($_.Value)" }) -join "`n"
             $lebenskontext = ($persona.lebenskontext.PSObject.Properties | ForEach-Object { "- $($_.Name): $($_.Value)" }) -join "`n"
+            $istErsteNachricht = (-not $body.verlauf -or $body.verlauf.Count -eq 0)
+            $eroeffnungHinweis = ""
+            if ($istErsteNachricht) {
+                $eroeffnungHinweis = @"
+
+Dies ist die ALLERERSTE Nachricht des heutigen Gespraechs. Beginne liebevoll mit ein bis
+zwei kurzen Fragen aus diesem Bereich (nicht alle auf einmal, waehle passend zur Situation
+bzw. zum Gedaechtnis): wie es ihr gerade geht, wie sie geschlafen hat, wie stark die Spastik
+heute ist, allgemeine Gedanken, Plaene fuer den Tag. In DIESER ERSTEN Antwort NICHT von den
+Lernmodulen anfangen -- das wirkt sonst wie eine versteckte Aufforderung. Das Thema
+Lernmodule darf spaeter im Gespraech ganz natuerlich aufkommen, aber nie als Einstieg.
+"@
+            }
             $sysPrompt = @"
 Du bist $($persona.name), Laetitias freundliche Gespraechspartnerin auf einer Lernplattform.
 Charaktereigenschaften:
@@ -311,7 +324,7 @@ $stimmungen
 
 Laetitia kommuniziert per Augensteuerung. Das Tippen ist anstrengend.
 Antworte daher: kurz (max. 3 Saetze), klar, in normalem Deutsch.
-
+$eroeffnungHinweis
 Heutiges Datum: $(Get-Date -Format "yyyy-MM-dd")
 
 Gedaechtnis ueber Laetitia (JSON, inkl. datierter vergangener Gespraeche unter

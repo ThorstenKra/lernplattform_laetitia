@@ -16,18 +16,11 @@ var LAUT_KEY   = "laetitia_nova_lautstaerke";   // 0.3 - 1.0
 var TEMPO_KEY  = "laetitia_nova_tempo";         // 50 - 150 (Prozent)
 var LAUT_MIN = 0.3, LAUT_MAX = 1.0, LAUT_STEP = 0.1;
 var TEMPO_MIN = 50, TEMPO_MAX = 150, TEMPO_STEP = 10;
-var RATE_BASIS = 0.92; // Goldstandard-Basiswert bei Tempo = 100%
+var RATE_BASIS = 1.104; // Goldstandard-Basiswert (0.92) + 20% bei Tempo = 100%
 
-// ── Stimmungen (Stufe 1 Personalisierung) ─────────────────────────────────────
-// Gemini waehlt pro Antwort eine Stimmung (siehe listener.ps1 Systemprompt);
-// hier nur grobe rate/pitch-Anpassung -- Web-Speech-API kennt keine echten
-// Emotionen/Sprachstile. Feinere Ausdruckskraft: siehe TODO in UEBERGABE.
-var STIMMUNG_PRESETS = {
-  neutral:    { rateMul: 1.00, pitch: 1.00 },
-  schnippisch:{ rateMul: 1.12, pitch: 1.12 },
-  ruhig:      { rateMul: 0.88, pitch: 0.95 },
-  aufgeregt:  { rateMul: 1.08, pitch: 1.08 }
-};
+// Stimmung (Stufe 1) beeinflusst Wortwahl (Gemini) + Avatar-Mimik (MOOD_AVATAR),
+// NICHT mehr Tempo/Tonhoehe der Sprachausgabe -- dieselbe feste Stimme wie in den
+// Grammatik-Aufgaben (kein Pitch-Wechsel je Stimmung, wirkte inkonsistent).
 
 // ── Avatar (SVG-Gesicht, Stufe 1) ─────────────────────────────────────────────
 var MOOD_AVATAR = {
@@ -77,16 +70,14 @@ function aktualisiereEinstellungenAnzeige(){
 function $(id){ return document.getElementById(id); }
 
 // ── TTS ──────────────────────────────────────────────────────────────────────
-function sprich(text, stimmung){
+function sprich(text){
   try{
     speechSynthesis.cancel();
-    var preset = STIMMUNG_PRESETS[stimmung] || STIMMUNG_PRESETS.neutral;
     setTimeout(function(){
       try{
         var u = new SpeechSynthesisUtterance(String(text || ""));
         u.lang = "de-DE";
-        u.rate   = RATE_BASIS * (ladeTempo() / 100) * preset.rateMul;
-        u.pitch  = preset.pitch;
+        u.rate   = RATE_BASIS * (ladeTempo() / 100);
         u.volume = ladeLautstaerke();
         var vv = speechSynthesis.getVoices();
         var v = vv.find(function(x){ return x.name === "Microsoft Katja Online (Natural) - German (Germany)"; })
@@ -108,7 +99,13 @@ function sprich(text, stimmung){
 }
 
 // ── Dwell ─────────────────────────────────────────────────────────────────────
-function rebindDwell(){
+// skipRecheck: unterdrueckt dwell.js' Hover-Recheck (prueft 1.3s nach dem Rebind,
+// ob Blick/Maus bereits auf einem Element ruht, und loest sonst SOFORT einen
+// Dwell aus). Bei jeder neuen Nova-Antwort erscheinen die Vorschlag-Buttons
+// exakt an derselben Bildschirmposition wie zuvor -- ruht der Blick dort waehrend
+// des Wartens auf Nova, wuerde der Recheck einen ungewollten Phantom-Klick
+// ausloesen und Nova wuerde auf eine nie gestellte "Antwort" reagieren.
+function rebindDwell(skipRecheck){
   if(_dwell && typeof _dwell.cancelDwell === "function") _dwell.cancelDwell();
   var attach = (typeof window.LaetitiaAttachDwell === "function")
     ? window.LaetitiaAttachDwell
@@ -117,6 +114,7 @@ function rebindDwell(){
   var grace   = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
   _dwell = attach(".vorschlag-btn, .nav-btn:not([style*='display:none']), #btnStarten, .einstellung-btn", {
     dwellMs: dwellMs, leaveGrace: grace,
+    skipHoverRecheck: !!skipRecheck,
     onActivate: function(el){
       if(el.getAttribute("aria-disabled") === "true") return;
       try{ el.click(); }catch(e){}
@@ -174,7 +172,7 @@ function zeigeGespraech(antwort, vorschlaege, stimmung){
 
   var novaEl = $("novaAntwort");
   if(novaEl) novaEl.textContent = antwort;
-  sprich(antwort, stimmung);
+  sprich(antwort);
 
   var grid = $("vorschlaegeGrid");
   if(grid){
@@ -192,7 +190,9 @@ function zeigeGespraech(antwort, vorschlaege, stimmung){
       grid.appendChild(btn);
     });
   }
-  rebindDwell();
+  // skipRecheck=true: Vorschlag-Buttons erscheinen an derselben Position wie
+  // die vorherige Antwortrunde -- kein Auto-Dwell auf ruhendem Blick (siehe oben).
+  rebindDwell(true);
 }
 
 // ── Konversation ──────────────────────────────────────────────────────────────
