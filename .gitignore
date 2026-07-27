@@ -39,6 +39,11 @@ app/modules/ki_gespraech/eltern_zusammenfassung.log
 # Dokumente
 *.pdf
 
+# 3D-Avatar-Modelle (Nova) — gross, bleiben lokal/OneDrive
+*.glb
+*.vrm
+*.fbx
+
 # Betriebssystem-Artefakte
 .DS_Store
 Thumbs.db
