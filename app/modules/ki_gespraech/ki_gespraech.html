@@ -66,6 +66,14 @@ body{
 #gespraechContainer{
   flex:1; min-height:0; display:flex; flex-direction:column; gap:8px;
 }
+#novaAvatarWrap{ flex-shrink:0; display:flex; justify-content:center; }
+.nova-avatar{ width:104px; height:104px; }
+.nova-avatar.blink .nv-augen{ animation: nvBlinzeln 4.5s ease-in-out infinite; transform-origin:100px 95px; }
+@keyframes nvBlinzeln{ 0%,94%,100%{ transform:scaleY(1); } 97%{ transform:scaleY(0.1); } }
+.nova-avatar.spricht .nv-mund{ animation: nvSprechen .32s ease-in-out infinite alternate; transform-origin:100px 132px; }
+@keyframes nvSprechen{ from{ transform:scaleY(1); } to{ transform:scaleY(1.6); } }
+.nv-funke{ opacity:0; transition:opacity .3s; }
+.nova-avatar.stimmung-aufgeregt .nv-funke{ opacity:1; }
 #novaLabel{ font-size:13px; font-weight:1000; color:var(--lila-dark); text-transform:uppercase; letter-spacing:.05em; flex-shrink:0; }
 #novaAntwort{
   flex:1; min-height:0; background:#fff; border:2px solid var(--grau-rand);
@@ -154,6 +162,22 @@ body{
   </div>
 
   <div id="gespraechContainer" style="display:none">
+    <div id="novaAvatarWrap" aria-hidden="true">
+      <svg id="novaAvatar" class="nova-avatar blink" viewBox="0 0 200 200">
+        <path id="nvFunkeL" class="nv-funke" d="M40,45 l4,10 l10,4 l-10,4 l-4,10 l-4,-10 l-10,-4 l10,-4 Z" fill="#c4b5fd"/>
+        <path id="nvFunkeR" class="nv-funke" d="M158,40 l3,8 l8,3 l-8,3 l-3,8 l-3,-8 l-8,-3 l8,-3 Z" fill="#c4b5fd"/>
+        <circle cx="100" cy="100" r="75" fill="#ede9fe" stroke="#8b5cf6" stroke-width="5"/>
+        <ellipse cx="55" cy="122" rx="13" ry="8" fill="#ddd6fe" opacity="0.8"/>
+        <ellipse cx="145" cy="122" rx="13" ry="8" fill="#ddd6fe" opacity="0.8"/>
+        <g class="nv-augen">
+          <ellipse id="nvAugeL" class="nv-auge" cx="72" cy="95" rx="8" ry="11" fill="#4c1d95"/>
+          <ellipse id="nvAugeR" class="nv-auge" cx="128" cy="95" rx="8" ry="11" fill="#4c1d95"/>
+        </g>
+        <path id="nvBraueL" d="M60,78 Q75,72 90,78" stroke="#4c1d95" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path id="nvBraueR" d="M110,78 Q125,72 140,78" stroke="#4c1d95" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path id="nvMund" class="nv-mund" d="M78,130 Q100,142 122,130" stroke="#4c1d95" stroke-width="5" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
     <div id="novaLabel">Nova sagt:</div>
     <div id="novaAntwort"></div>
     <div id="vorschlaegeGrid"></div>

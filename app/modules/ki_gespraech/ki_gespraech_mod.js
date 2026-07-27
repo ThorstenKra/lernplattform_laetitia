@@ -29,6 +29,36 @@ var STIMMUNG_PRESETS = {
   aufgeregt:  { rateMul: 1.08, pitch: 1.08 }
 };
 
+// ── Avatar (SVG-Gesicht, Stufe 1) ─────────────────────────────────────────────
+var MOOD_AVATAR = {
+  neutral:     { browL: "M60,78 Q75,72 90,78", browR: "M110,78 Q125,72 140,78",
+                 mund: "M78,130 Q100,142 122,130", mundFill: "none", eyeRy: 11 },
+  schnippisch: { browL: "M58,72 Q75,58 92,74", browR: "M110,82 Q125,80 140,82",
+                 mund: "M80,132 Q96,144 112,135 Q122,130 128,124", mundFill: "none", eyeRy: 10 },
+  ruhig:       { browL: "M62,84 Q75,80 88,84", browR: "M112,84 Q125,80 138,84",
+                 mund: "M85,132 Q100,137 115,132", mundFill: "none", eyeRy: 6 },
+  aufgeregt:   { browL: "M56,68 Q75,54 94,70", browR: "M106,70 Q125,54 144,68",
+                 mund: "M72,120 Q100,114 128,120 Q126,148 100,150 Q74,148 72,120 Z", mundFill: "#4c1d95", eyeRy: 14 }
+};
+
+function wendeStimmungAufAvatar(stimmung){
+  var mood = MOOD_AVATAR[stimmung] ? stimmung : "neutral";
+  var m = MOOD_AVATAR[mood];
+  var av = $("novaAvatar");
+  if(!av) return;
+  av.setAttribute("class", "nova-avatar blink stimmung-" + mood);
+  var bl = $("nvBraueL"); if(bl) bl.setAttribute("d", m.browL);
+  var br = $("nvBraueR"); if(br) br.setAttribute("d", m.browR);
+  var mu = $("nvMund");
+  if(mu){
+    mu.setAttribute("d", m.mund);
+    mu.setAttribute("fill", m.mundFill);
+    mu.setAttribute("stroke", m.mundFill === "none" ? "#4c1d95" : "none");
+  }
+  var eL = $("nvAugeL"); if(eL) eL.setAttribute("ry", m.eyeRy);
+  var eR = $("nvAugeR"); if(eR) eR.setAttribute("ry", m.eyeRy);
+}
+
 function ladeLautstaerke(){
   var v = parseFloat(localStorage.getItem(LAUT_KEY));
   if(isNaN(v) || v < LAUT_MIN || v > LAUT_MAX) v = LAUT_MAX;
@@ -65,6 +95,12 @@ function sprich(text, stimmung){
              || vv.find(function(x){ return x.name.indexOf("Microsoft") >= 0 && x.lang.startsWith("de") && x.name.indexOf("Hedda") < 0; })
              || vv.find(function(x){ return x.lang.startsWith("de"); });
         if(v) u.voice = v;
+        var stoppSprechAnimation = function(){
+          var av = $("novaAvatar"); if(av) av.classList.remove("spricht");
+        };
+        u.onstart = function(){ var av = $("novaAvatar"); if(av) av.classList.add("spricht"); };
+        u.onend   = stoppSprechAnimation;
+        u.onerror = stoppSprechAnimation;
         speechSynthesis.speak(u);
       }catch(e){}
     }, 120);
@@ -133,6 +169,8 @@ function zeigeGespraech(antwort, vorschlaege, stimmung){
 
   var gc = $("gespraechContainer"); if(gc) gc.style.display = "";
   var bB = $("btnBeenden");         if(bB) bB.style.display = "";
+
+  wendeStimmungAufAvatar(stimmung);
 
   var novaEl = $("novaAntwort");
   if(novaEl) novaEl.textContent = antwort;
