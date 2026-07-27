@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 26. Juli 2026 (Sitzung 13 — Ende)*
+*Stand: 27. Juli 2026 (Sitzung 14 — Ende)*
 
 ---
 
@@ -265,9 +265,9 @@ Bridge läuft dann auf `http://127.0.0.1:3737`. Konsole offen lassen.
 4. Diese Zahl in `config.json` bei `erlaubteChatIds: [XXXXXXXXX]` und `antwortChatId: XXXXXXXXX` eintragen
 5. Bridge neu starten
 
-**Nova (KI-Gesprächspartnerin) — läuft, Stufe 1 Personalisierung fertig**
+**Nova (KI-Gesprächspartnerin) — läuft, inkl. 3D-Avatar (Stufe 2). Test in Edge/Tobii offen.**
 
-Modul implementiert (commit `175ea9a`, Sitzung 13) und in Sitzung 14 (27.07.2026) auf Gemini umgestellt, deployed und live getestet.
+Modul implementiert (commit `175ea9a`, Sitzung 13) und in Sitzung 14 (27.07.2026) auf Gemini umgestellt, deployed und live getestet. 3D-Avatar (VRoid+TalkingHead) ebenfalls in Sitzung 14 fertig integriert (siehe unten) — **einziger noch offener Schritt: echter Test in Edge auf dem Tobii-Gerät.**
 
 Setup-Status:
 - ✅ `app/modules/ki_gespraech/ki_gespraech.html` + `ki_gespraech_mod.js` — inkl. Lautstärke-/Tempo-Regler (Stufe 1)
@@ -284,7 +284,12 @@ Setup-Status:
 - ✅ **SVG-Avatar, Stufe 1 (27.07.2026):** Nova hat jetzt ein einfaches animiertes Vektor-Gesicht in `ki_gespraech.html` (während des Gesprächs sichtbar) — reagiert auf die von Gemini gewählte Stimmung (Augenbrauen/Mund/Augenform pro `neutral`/`schnippisch`/`ruhig`/`aufgeregt` unterschiedlich, kleine Funken-Akzente bei "aufgeregt"), blinzelt automatisch (CSS-Loop), und bewegt den Mund synchron zur Sprachausgabe (`u.onstart`/`onend` schalten eine CSS-Klasse). Design vorab visuell per Artifact-Vorschau geprüft. Rein CSS/SVG-basiert, keine neuen Abhängigkeiten, voll offline.
 - ✅ **Tempo +20%, Stimme = Grammatik-Standard, einfühlsamer Gesprächseinstieg (27.07.2026):** `RATE_BASIS` auf 1.104 erhöht (+20%). Stimmungsabhängige Tonhöhen-/Tempo-Variation aus der Sprachausgabe entfernt (Nutzer-Feedback: wirkte inkonsistent zur Grammatik-Stimme) — Stimmung beeinflusst seither nur noch Wortwahl + Avatar-Mimik, nicht mehr TTS-Parameter. Erste Nachricht jeder Sitzung: entweder Check-in (Wohlbefinden/Schlaf/Spastik/Gedanken/Tagespläne) oder kurze Anekdote (Katzen Pünktchen/Anton, Garten, Terrasse, Musikalben) — Wechsel tagesabhängig deterministisch, Lernmodul-Ermutigung nie als Einstieg.
 - ✅ **Lebenskontext präzisiert (27.07.2026):** Tagsüber ist Laetitia im Wohnzimmer (nicht im eigenen Zimmer — kann sich nicht selbst beschäftigen, braucht Betreuung), vollständig auf Unterstützung angewiesen. Neues `zuhause`-Feld in persona.json: Wohnzimmer mit Terrassenblick/Garten, Katzen Pünktchen + Anton, Musikalben auf der Lernplattform — dient als authentisches Anekdoten-Material.
-- 🟡 **Avatar Stufe 2 — Entscheidung getroffen, Umsetzung noch offen:** Nutzer möchte einen „richtigen" animierten Avatar (Körper/Mimik/Gestik), kein manuelles Rive-Rigging. Gefunden: **TalkingHead** (github.com/met4citizen/TalkingHead) — kostenlose Open-Source-JS-Bibliothek für Echtzeit-3D-Avatare mit Lippensync/Mimik/Gestik (ThreeJS/WebGL, läuft im Browser, kein Abo, u.a. für ein „KidsChat"-Projekt im Einsatz). **Entscheidung:** Fantasie-Avatar via **VRoid Studio** (kostenloser Anime-Charakter-Editor) statt Foto-Avatar via Avaturn. **Stimme:** vorerst Katja behalten → nur angenäherte Mundbewegung statt exakter Lippensync (die bräuchte Wort-Zeitstempel, die Katja nicht liefert), Körpersprache/Gestik trotzdem voll animiert. **Für später vorgemerkt:** falls doch präzise Lippensync gewünscht — Nova (nur Nova, nicht Grammatik) auf Google Cloud TTS (kostenlos bis 4 Mio. Zeichen/Monat) oder TalkingHeads eigenes kostenloses lokales „HeadTTS" umstellen; würde Novas Stimme wieder von Grammatik unterscheiden. **Nächster Schritt:** gemeinsamer Durchlauf durch VRoid Studio (Nutzer gestaltet/klickt selbst, Claude leitet an — freihändige Zeichen-Tools lassen sich nicht zuverlässig per Browser-Automation bedienen), danach Blender-Konvertierung zu TalkingHead-kompatiblem Rig + volle Code-Integration.
+- ✅ **Avatar Stufe 2 — fertig integriert (27.07.2026, commit `6806f2f`):** Fantasie-Avatar in **VRoid Studio** erstellt (Nutzer hat selbst gestaltet, Claude hat angeleitet), in **Blender** über VRM-1.0-Export + drei Python-Skripte (Bone-Rename, Eyes, Shapekeys — alle in `app/modules/ki_gespraech/avatar_blender_scripts/`) ins TalkingHead-kompatible Rig konvertiert (Mixamo-Bones + 124 ARKit/Oculus-Blendshapes, verifiziert). Finales Modell `nova_avatar.glb` (~16MB, gitignored, liegt lokal + in OneDrive). **TalkingHead** (github.com/met4citizen/TalkingHead) + three.js@0.180.0 per esbuild zu einem abhängigkeitsfreien IIFE-Bundle vorgebündelt (`app/modules/ki_gespraech/vendor/talkinghead.bundle.js`, Regel-1-konform: kein `import()`/`type=module` zur Laufzeit). **Stimme weiterhin Katja-TTS** — nur angenäherte Mundbewegung per `setFixedValue("jawOpen",...)`-Toggle während der Sprachausgabe, keine exakte Lippensync (siehe „für später vorgemerkt" unten). Stimmungen (Gemini-Feld `stimmung`) steuern TalkingHeads eingebaute Moods (`neutral/happy/angry/sad/fear/disgust/love/sleep`) über `setMood()`.
+  - **Zwei Integrationsbugs gefunden + behoben:** (1) esbuild ersetzt `import.meta` im IIFE-Format durch `{}` — TalkingHeads interner `new URL(..., import.meta.url)`-Aufruf warf dadurch eine `Invalid URL`-Exception und `window.TalkingHead` wurde nie gesetzt. Unsichtbar in der Konsole, weil `error_handler.js`s globaler `window.onerror`-Handler die Standard-Fehlerausgabe unterdrückt — der eigentliche Fehler war nur über `window.LaetitiaFehler.logs()` (das interne Fehler-Log) sichtbar. Fix: esbuild-Option `define: {"import.meta.url":"self.location.href"}` beim Bundle-Bau. (2) Der Avatar-Container ist beim `initAvatar()`-Aufruf noch `display:none` (Startbildschirm) — TalkingHeads `ResizeObserver` bekam dadurch Größe 0×0 und der Canvas blieb leer, auch nachdem das Gespräch sichtbar wurde. Fix: TalkingHeads öffentliche `onResize()`-Methode wird jetzt manuell in `zeigeGespraech()` nachgetriggert, sobald der Container sichtbar wird.
+  - Verifiziert über einen lokalen Test-Webserver (da `file://`-Seiten für Browser-Automatisierungs-Tools nicht direkt erreichbar sind): keine Fehler mehr im Log, Canvas rendert mit korrekter Größe, vollständiger Gesprächsdurchlauf (Gemini-Antwort + Katja-TTS + Avatar-Mimik) fehlerfrei.
+  - `validate.ps1` musste angepasst werden: das vorgebündelte Bundle enthält einen toten `import()`-Zweig in einer ungenutzten Bibliotheksfunktion (kein eigener Code) — `vendor/`-Ordner ist jetzt von der Regel-12-Prüfung ausgenommen (commit `7e9487d`). Alle 9 Prüfungen wieder grün (nur bekannte Alt-Warnungen: Inline-Script-Backlog Regel 18, 1 vorbestehende `.png` im Projekt-Root).
+  - **Einziger noch offener Schritt: echter Test in Edge auf dem Tobii-Gerät** — visuelle Prüfung des Avatars + Dwell-Verhalten während eines echten Gesprächs. Bisher nur über den lokalen Test-Webserver verifiziert (Canvas-Größe/Fehlerfreiheit), noch nicht visuell im echten Edge/Tobii-Setup angeschaut.
+  - **Für später vorgemerkt:** Falls präzise Lippensync gewünscht wird — Nova (nur Nova, nicht Grammatik) auf Google Cloud TTS (kostenlos bis 4 Mio. Zeichen/Monat, liefert Wort-Zeitstempel) oder TalkingHeads eigenes kostenloses lokales „HeadTTS" (Kokoro-Stimmen, WebGPU) umstellen — würde Novas Stimme wieder von Grammatiks Stimme unterscheiden, Tradeoff noch nicht entschieden.
 - ⬜ **Bekannte Einschränkung:** Edge-„Online (Natural)"-Stimme zeigt manchmal Stotter-Effekt (erste Silbe, dann ~5s Pause) — vermutlich Cloud-Streaming-Eigenheit der Neural-Stimme, kein Code-Bug. Noch nicht behoben, Diagnose ausstehend (ggf. Offline-„Microsoft Katja" testen).
 
 **🟡 Stufe 2 (später) — Echte Sprachausdruckskraft ("Sprachbausteine-Bank")**
@@ -425,6 +430,25 @@ Dann Edge komplett neu starten.
 **Commits (alle gepusht):** 2694aa5, 86df18d, e51413e, f06b0d9
 
 **Grammatik-Werkstatt jetzt:** 44 Einheiten, 440 Aufgaben (E-03–E-46), Stufen 1–9 vollständig.
+
+---
+
+## Sitzungsprotokoll 27. Juli 2026 — Sitzung 14
+
+| Was | Ergebnis |
+|---|---|
+| Nova: Groq → Gemini | ✅ console.groq.com hatte serverseitigen Auth-Fehler (Stytch 503) — auf Google Gemini API umgestellt (`gemini-flash-lite-latest`), listener.ps1 v6, manuelles UTF-8-Decoding gegen Mojibake, Autostart via Task Scheduler eingerichtet |
+| Nova: Stufe-1-Personalisierung, Gedächtnis, Charaktervertiefung | ✅ Stimmungen (neutral/schnippisch/ruhig/aufgeregt), datiertes Gedächtnis + Routine-Tracking, 4 neue Charakterdimensionen, kritischer Dwell-Hover-Recheck-Bug behoben (Phantom-Klick-Endlosschleife) |
+| Nova: Avatar Stufe 1 (SVG) → Stufe 2 (3D) | ✅ SVG-Avatar zunächst gebaut, dann durch echten 3D-Avatar ersetzt: VRoid Studio (Nutzer gestaltet, Claude leitet an) → Blender-Konvertierung (VRM 1.0 → TalkingHead-Rig, 3 Python-Skripte) → TalkingHead+three.js als esbuild-IIFE-Bundle → Code-Integration in `ki_gespraech_mod.js`/`ki_gespraech.html` |
+| Avatar-Integration: 2 Bugs gefunden+behoben | ✅ (1) esbuild `import.meta`→`{}` im IIFE-Format brach TalkingHeads internen `new URL(...)`-Aufruf (per `define` gefixt), Fehler war durch `error_handler.js`s `window.onerror` in der Konsole unsichtbar — nur über `window.LaetitiaFehler.logs()` gefunden. (2) Avatar-Container war beim Initialisieren `display:none` → Canvas blieb 0×0, TalkingHeads `onResize()` wird jetzt manuell nachgetriggert |
+| validate.ps1: vendor/-Ausnahme | ✅ Regel-12-Prüfung ignoriert jetzt `vendor/`-Ordner (vorgebündelte Fremdbibliotheken) — 0 Fehler, alle 9 Prüfungen grün |
+| Deployment | ✅ Alle Nova-Dateien + Bundle nach OneDrive kopiert und gepinnt |
+| Aufräumen | ✅ Temporärer Build-Ordner `scratch_talkinghead_inspect/` entfernt, lokaler Test-Webserver gestoppt |
+| Sitzungsabschluss | ✅ ÜBERGABE aktualisiert, Nova-Memory aktualisiert, alle Commits gepusht |
+
+**Commits (alle gepusht):** `175ea9a`+diverse (Gemini-Umstellung, Personalisierung, Dwell-Fix, SVG-Avatar — vor dieser Protokoll-Zusammenfassung entstanden), `bb70828` (Lebenskontext + Avatar-Stufe-2-Plan), `6806f2f` (3D-Avatar-Integration), `7e9487d` (validate.ps1 vendor-Ausnahme)
+
+**Nächste Sitzung beginnt mit:** Nova im echten Edge auf dem Tobii-Gerät testen — 3D-Avatar visuell prüfen (rendert er korrekt? Mimik/Stimmungswechsel sichtbar? Mundbewegung während TTS?) und Dwell-Verhalten während eines vollständigen Gesprächs bestätigen. Falls das funktioniert: Avatar Stufe 2 vollständig abgeschlossen. Danach ggf. Nachrichten-Modul-Chat-ID oder Pfad-Training-Modus-2-Test weiterführen (siehe unten, beide noch offen aus Sitzung 13).
 
 ---
 
