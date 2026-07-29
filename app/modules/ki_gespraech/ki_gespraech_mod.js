@@ -113,7 +113,8 @@ function aktualisiereEinstellungenAnzeige(){
 function $(id){ return document.getElementById(id); }
 
 // ── TTS ──────────────────────────────────────────────────────────────────────
-function sprich(text){
+// danach (optional): wird nach TTS-Ende aufgerufen (z.B. Geschichten-Auto-Weiter)
+function sprich(text, danach){
   try{
     speechSynthesis.cancel();
     setTimeout(function(){
@@ -130,12 +131,12 @@ function sprich(text){
              || vv.find(function(x){ return x.lang.startsWith("de"); });
         if(v) u.voice = v;
         u.onstart = starteSprechAnimation;
-        u.onend   = stoppeSprechAnimation;
-        u.onerror = stoppeSprechAnimation;
+        u.onend   = function(){ stoppeSprechAnimation(); if(danach) danach(); };
+        u.onerror = function(){ stoppeSprechAnimation(); if(danach) danach(); };
         speechSynthesis.speak(u);
-      }catch(e){}
+      }catch(e){ if(danach) danach(); }
     }, 120);
-  }catch(e){}
+  }catch(e){ if(danach) danach(); }
 }
 
 // ── Dwell ─────────────────────────────────────────────────────────────────────
@@ -152,7 +153,7 @@ function rebindDwell(skipRecheck){
     : function(){ return { cancelDwell: function(){} }; };
   var dwellMs = parseInt(localStorage.getItem("laetitia_dwell_ms"))       || 900;
   var grace   = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
-  _dwell = attach(".vorschlag-btn, .nav-btn:not([style*='display:none']), #btnStarten, .einstellung-btn", {
+  _dwell = attach(".vorschlag-btn, .nav-btn:not([style*='display:none']), #btnStarten, #btnGeschichten, .einstellung-btn, .geschichte-btn, .tasten-btn, #btnEigeneAntwort, #btnTastaturFertig, #btnTastaturLoeschen", {
     dwellMs: dwellMs, leaveGrace: grace,
     skipHoverRecheck: !!skipRecheck,
     onActivate: function(el){
@@ -178,10 +179,14 @@ function apiFetch(pfad, daten, cb){
 
 // ── Screens ───────────────────────────────────────────────────────────────────
 function alleVerstecken(){
-  ["startScreen","ladenScreen","gespraechContainer","abschlussScreen"].forEach(function(id){
+  ["startScreen","ladenScreen","geschichtenAuswahlScreen","gespraechContainer","abschlussScreen"].forEach(function(id){
     var el = $(id); if(el) el.style.display = "none";
   });
   var bB = $("btnBeenden"); if(bB) bB.style.display = "none";
+  var bW = $("btnGeschichteWeiter"); if(bW) bW.style.display = "none";
+  var bE = $("btnEigeneAntwort"); if(bE) bE.style.display = "none";
+  schliesseTastatur();
+  stoppeGeschichteTimer();
 }
 
 function zeigeStart(){
@@ -231,6 +236,8 @@ function zeigeGespraech(antwort, vorschlaege, stimmung){
       grid.appendChild(btn);
     });
   }
+  var bE = $("btnEigeneAntwort");
+  if(bE) bE.style.display = "";
   // skipRecheck=true: Vorschlag-Buttons erscheinen an derselben Position wie
   // die vorherige Antwortrunde -- kein Auto-Dwell auf ruhendem Blick (siehe oben).
   rebindDwell(true);
@@ -266,8 +273,171 @@ function beendeGespraech(){
   });
 }
 
+function beendeAktuellesFenster(){
+  if(zustand === "geschichte"){ beendeGeschichte(); return; }
+  beendeGespraech();
+}
+
+// ── Geschichten ────────────────────────────────────────────────────────────────
+// Nova liest jeden Abschnitt vor. Abschnitte mit "frage" zeigen Antwort-
+// Vorschlaege als kleine Gespraechsanregung (rein lokal, kein Gemini-Aufruf --
+// Story-Inhalte bleiben offline). Abschnitte ohne "frage" gehen nach kurzer
+// Pause automatisch weiter (wie Grammatik-Werkstatt Auto-Weiter).
+var aktGeschichte   = null;
+var aktAbschnitt    = 0;
+var geschichteTimer = null;
+
+function stoppeGeschichteTimer(){
+  if(geschichteTimer){ clearTimeout(geschichteTimer); geschichteTimer = null; }
+}
+
+function zeigeGeschichtenAuswahl(){
+  zustand = "geschichten_auswahl"; alleVerstecken();
+  aktGeschichte = null; aktAbschnitt = 0;
+  var el = $("geschichtenAuswahlScreen"); if(el) el.style.display = "";
+  var liste = $("geschichtenListe");
+  if(liste){
+    liste.innerHTML = "";
+    var geschichten = Array.isArray(window.GESCHICHTEN) ? window.GESCHICHTEN : [];
+    geschichten.forEach(function(g){
+      var btn = document.createElement("button");
+      btn.className = "geschichte-btn";
+      btn.innerHTML = "<span class='geschichte-emoji' style='pointer-events:none'>" + (g.emoji || "📖") + "</span>"
+        + "<span style='pointer-events:none'>" + g.titel + "</span>"
+        + "<svg class='dwell-ring-svg' viewBox='0 0 70 70'>"
+        + "<circle cx='35' cy='35' r='30' style='stroke:#8b5cf6'/></svg>";
+      btn.addEventListener("click", function(){ starteGeschichte(g); });
+      liste.appendChild(btn);
+    });
+  }
+  rebindDwell();
+}
+
+function starteGeschichte(geschichte){
+  aktGeschichte = geschichte;
+  aktAbschnitt = 0;
+  zeigeAbschnitt();
+}
+
+function zeigeAbschnitt(){
+  stoppeGeschichteTimer();
+  var abschnitt = aktGeschichte ? aktGeschichte.abschnitte[aktAbschnitt] : null;
+  if(!abschnitt){ zeigeGeschichtenAuswahl(); return; }
+
+  zustand = "geschichte"; alleVerstecken();
+  var gc = $("gespraechContainer"); if(gc) gc.style.display = "";
+  var bB = $("btnBeenden");         if(bB) bB.style.display = "";
+  aktualisiereAvatarGroesse();
+  wendeStimmungAufAvatar("neutral");
+
+  var text = abschnitt.text + (abschnitt.frage ? (" " + abschnitt.frage) : "");
+  var novaEl = $("novaAntwort"); if(novaEl) novaEl.textContent = text;
+
+  var grid = $("vorschlaegeGrid");
+  if(grid) grid.innerHTML = "";
+
+  if(abschnitt.frage && Array.isArray(abschnitt.vorschlaege)){
+    sprich(text);
+    abschnitt.vorschlaege.slice(0, 4).forEach(function(v){
+      var btn = document.createElement("button");
+      btn.className = "vorschlag-btn";
+      btn.innerHTML = "<span style='pointer-events:none'>" + v + "</span>"
+        + "<svg class='dwell-ring-svg' viewBox='0 0 70 70'>"
+        + "<circle cx='35' cy='35' r='30' style='stroke:#8b5cf6'/></svg>";
+      btn.addEventListener("click", function(){ weiterInGeschichte(); });
+      if(grid) grid.appendChild(btn);
+    });
+  } else {
+    var bW = $("btnGeschichteWeiter"); if(bW) bW.style.display = "";
+    sprich(text, function(){
+      geschichteTimer = setTimeout(weiterInGeschichte, 3000);
+    });
+  }
+  rebindDwell(true);
+}
+
+function weiterInGeschichte(){
+  stoppeGeschichteTimer();
+  var abschnitt = aktGeschichte ? aktGeschichte.abschnitte[aktAbschnitt] : null;
+  if(!abschnitt || abschnitt.ende){ zeigeGeschichtenAuswahl(); return; }
+  aktAbschnitt++;
+  zeigeAbschnitt();
+}
+
+function beendeGeschichte(){
+  speechSynthesis.cancel();
+  stoppeGeschichteTimer();
+  zeigeGeschichtenAuswahl();
+}
+
+// ── Eigene Antwort (Bildschirmtastatur) ─────────────────────────────────────────
+var TASTEN_REIHEN = [
+  ["Q","W","E","R","T","Z","U","I","O","P"],
+  ["A","S","D","F","G","H","J","K","L","Ö","Ä"],
+  ["Y","X","C","V","B","N","M","Ü","ß"]
+];
+var tastaturText = "";
+
+function baueTastatur(){
+  var el = $("tastaturTasten");
+  if(!el) return;
+  el.innerHTML = "";
+  TASTEN_REIHEN.forEach(function(reihe){
+    reihe.forEach(function(taste){
+      var btn = document.createElement("button");
+      btn.className = "tasten-btn";
+      btn.textContent = taste;
+      btn.addEventListener("click", function(){
+        tastaturText += taste.toLowerCase();
+        aktualisiereTastaturAnzeige();
+      });
+      el.appendChild(btn);
+    });
+  });
+  var leer = document.createElement("button");
+  leer.className = "tasten-btn";
+  leer.style.gridColumn = "1 / -1";
+  leer.textContent = "Leerzeichen";
+  leer.addEventListener("click", function(){
+    tastaturText += " ";
+    aktualisiereTastaturAnzeige();
+  });
+  el.appendChild(leer);
+}
+
+function aktualisiereTastaturAnzeige(){
+  var el = $("tastaturAnzeige");
+  if(el) el.textContent = tastaturText || "…";
+}
+
+function oeffneTastatur(){
+  tastaturText = "";
+  aktualisiereTastaturAnzeige();
+  var el = $("tastaturOverlay"); if(el) el.style.display = "flex";
+  rebindDwell(true);
+}
+
+function schliesseTastatur(){
+  var el = $("tastaturOverlay");
+  if(el) el.style.display = "none";
+}
+
+function tastaturLoeschen(){
+  tastaturText = tastaturText.slice(0, -1);
+  aktualisiereTastaturAnzeige();
+}
+
+function tastaturBestaetigen(){
+  var text = tastaturText.trim();
+  schliesseTastatur();
+  if(text){ sendeNachricht(text); }
+  else { rebindDwell(true); }
+}
+
 // ── Navigation ─────────────────────────────────────────────────────────────────
 function zurueck(){
+  if(zustand === "geschichte"){ beendeGeschichte(); return; }
+  if(zustand === "geschichten_auswahl"){ zeigeStart(); return; }
   if(zustand === "gespraech" || zustand === "laden"){
     beendeGespraech(); return;
   }
@@ -287,7 +457,23 @@ function init(){
   if(bZ) bZ.addEventListener("click", zurueck);
 
   var bB = $("btnBeenden");
-  if(bB) bB.addEventListener("click", beendeGespraech);
+  if(bB) bB.addEventListener("click", beendeAktuellesFenster);
+
+  var bG = $("btnGeschichten");
+  if(bG) bG.addEventListener("click", zeigeGeschichtenAuswahl);
+
+  var bGW = $("btnGeschichteWeiter");
+  if(bGW) bGW.addEventListener("click", weiterInGeschichte);
+
+  var bEA = $("btnEigeneAntwort");
+  if(bEA) bEA.addEventListener("click", oeffneTastatur);
+
+  var bTL = $("btnTastaturLoeschen");
+  if(bTL) bTL.addEventListener("click", tastaturLoeschen);
+
+  var bTF = $("btnTastaturFertig");
+  if(bTF) bTF.addEventListener("click", tastaturBestaetigen);
+  baueTastatur();
 
   var bLM = $("btnLautMinus");
   if(bLM) bLM.addEventListener("click", function(){

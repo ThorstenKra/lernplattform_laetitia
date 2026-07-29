@@ -63,6 +63,15 @@ body{
 }
 #btnStarten:hover,#btnStarten:focus{ background:#ddd6fe; outline:4px solid var(--lila); }
 #btnStarten.dwell-active{ transform:scale(1.02) !important; outline:3px solid var(--lila) !important; transition:none !important; }
+#btnGeschichten{
+  min-height:72px; width:min(320px,90%);
+  border-radius:18px; border:3px solid var(--lila);
+  background:#fff; color:var(--lila-dark);
+  font-size:19px; font-weight:1000; cursor:pointer;
+  position:relative; transition:none; font-family:inherit;
+}
+#btnGeschichten:hover,#btnGeschichten:focus{ background:var(--lila-bg); outline:4px solid var(--lila); }
+#btnGeschichten.dwell-active{ transform:scale(1.02) !important; outline:3px solid var(--lila) !important; transition:none !important; }
 #gespraechContainer{
   flex:1; min-height:0; display:flex; flex-direction:column; gap:8px;
 }
@@ -90,6 +99,55 @@ body{
 }
 .vorschlag-btn:hover,.vorschlag-btn:focus{ background:var(--lila-bg); border-color:var(--lila); outline:none; }
 .vorschlag-btn.dwell-active{ transform:scale(1.03) !important; outline:3px solid var(--lila) !important; transition:none !important; }
+#btnEigeneAntwort{
+  flex-shrink:0; min-height:56px; border-radius:14px;
+  border:2px solid var(--lila); background:var(--lila-bg); color:var(--lila-dark);
+  font-size:15px; font-weight:1000; cursor:pointer; position:relative;
+  transition:none; font-family:inherit;
+}
+#btnEigeneAntwort:hover,#btnEigeneAntwort:focus{ background:#ddd6fe; outline:none; }
+#btnEigeneAntwort.dwell-active{ transform:scale(1.02) !important; outline:3px solid var(--lila) !important; transition:none !important; }
+
+.geschichten-liste{
+  flex:1; min-height:0; overflow-y:auto;
+  display:flex; flex-direction:column; gap:10px; padding:4px;
+}
+.geschichte-btn{
+  min-height:84px; border-radius:16px; border:3px solid var(--lila);
+  background:var(--lila-bg); color:var(--lila-dark);
+  font-size:19px; font-weight:1000; cursor:pointer; position:relative;
+  transition:none; font-family:inherit; display:flex; align-items:center;
+  gap:12px; padding:0 18px; text-align:left;
+}
+.geschichte-btn:hover,.geschichte-btn:focus{ background:#ddd6fe; outline:none; }
+.geschichte-btn.dwell-active{ transform:scale(1.015) !important; outline:3px solid var(--lila) !important; transition:none !important; }
+.geschichte-emoji{ font-size:32px; pointer-events:none; }
+
+#tastaturOverlay{
+  position:fixed; inset:0; background:rgba(15,23,42,.92); z-index:100;
+  display:flex; flex-direction:column; padding:14px; gap:10px;
+}
+#tastaturAnzeige{
+  flex-shrink:0; min-height:60px; background:#fff; border-radius:14px;
+  padding:12px 16px; font-size:22px; font-weight:700; color:var(--text);
+  display:flex; align-items:center; overflow-wrap:anywhere;
+}
+#tastaturTasten{
+  flex:1; min-height:0; display:grid; gap:6px;
+  grid-template-columns:repeat(10,1fr); grid-auto-rows:1fr;
+}
+.tasten-btn{
+  border-radius:10px; border:2px solid var(--grau-rand); background:#fff;
+  color:var(--text); font-size:18px; font-weight:1000; cursor:pointer;
+  position:relative; transition:none; font-family:inherit;
+  display:flex; align-items:center; justify-content:center;
+}
+.tasten-btn:hover,.tasten-btn:focus{ background:var(--lila-bg); border-color:var(--lila); outline:none; }
+.tasten-btn.dwell-active{ transform:scale(1.05) !important; outline:3px solid var(--lila) !important; transition:none !important; }
+#tastaturAktionen{ flex-shrink:0; display:flex; gap:8px; height:64px; }
+#tastaturAktionen .tasten-btn{ flex:1; font-size:15px; }
+#btnTastaturFertig{ background:#dcfce7; border-color:#16a34a; color:#166534; }
+#btnTastaturLoeschen{ background:#fee2e2; border-color:#ef4444; color:#7f1d1d; }
 .nav-leiste{
   flex-shrink:0; display:flex; gap:8px; padding:8px 12px;
   background:#fff; border-top:2px solid var(--grau-rand);
@@ -149,11 +207,20 @@ body{
       Gespräch starten
       <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#8b5cf6"/></svg>
     </button>
+    <button id="btnGeschichten">
+      📖 Geschichten
+      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#8b5cf6"/></svg>
+    </button>
   </div>
 
   <div id="ladenScreen" class="status-screen" style="display:none">
     <div class="status-emoji">⏳</div>
     <div class="status-text">Nova denkt nach…</div>
+  </div>
+
+  <div id="geschichtenAuswahlScreen" class="status-screen" style="display:none">
+    <div class="status-text" style="margin-bottom:6px;">📖 Welche Geschichte?</div>
+    <div class="geschichten-liste" id="geschichtenListe"></div>
   </div>
 
   <div id="gespraechContainer" style="display:none">
@@ -163,6 +230,10 @@ body{
     <div id="novaLabel">Nova sagt:</div>
     <div id="novaAntwort"></div>
     <div id="vorschlaegeGrid"></div>
+    <button id="btnEigeneAntwort" style="display:none">
+      ✏️ Ich möchte selbst antworten
+      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#8b5cf6"/></svg>
+    </button>
   </div>
 
   <div id="abschlussScreen" class="status-screen" style="display:none">
@@ -178,15 +249,29 @@ body{
     ← Zurück
     <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#8b5cf6"/></svg>
   </button>
+  <button class="nav-btn nav-btn-weiter" id="btnGeschichteWeiter" style="display:none;background:#dcfce7;border-color:#16a34a;color:#166534;">
+    ➡️ Weiter
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#16a34a"/></svg>
+  </button>
   <button class="nav-btn nav-btn-beenden" id="btnBeenden" style="display:none">
     ✕ Gespräch beenden
     <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#ef4444"/></svg>
   </button>
 </div>
 
+<div id="tastaturOverlay" style="display:none">
+  <div id="tastaturAnzeige"></div>
+  <div id="tastaturTasten"></div>
+  <div id="tastaturAktionen">
+    <button class="tasten-btn" id="btnTastaturLoeschen">⌫ Löschen</button>
+    <button class="tasten-btn" id="btnTastaturFertig">✓ Fertig</button>
+  </div>
+</div>
+
 <script src="../../core/dwell.js"></script>
 <script src="../../core/error_handler.js"></script>
 <script src="./vendor/talkinghead.bundle.js"></script>
+<script src="./geschichten_data.js"></script>
 <script src="./ki_gespraech_mod.js"></script>
 <script>
   window.KiGespraechMod && window.KiGespraechMod.init();
