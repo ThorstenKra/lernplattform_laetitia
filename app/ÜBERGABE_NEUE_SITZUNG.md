@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 29. Juli 2026 (Sitzung 15 — Zwischenstand, Sitzung läuft ggf. weiter)*
+*Stand: 29. Juli 2026 (Sitzung 15 — abgeschlossen)*
 
 ---
 
@@ -267,7 +267,7 @@ Nutzer möchte das KI-Gesprächskonzept von einer einzelnen Partnerin (Nova) zu 
 - **Nova:** `persona.json` um `rolle` + `eroeffnung.{a,b}` ergänzt (vorher PowerShell-Code); `ki_gespraech_mod.js` sendet jetzt `agent:"ki_gespraech"` mit. Verhalten unverändert, nur die Datenquelle für den Opening-Stil hat sich verschoben.
 - **Neuer Agent „Milo" (Eule, Lernbegleiter):** `app/modules/ki_agenten/milo/` — `persona.json`, `milo.html` (SVG-Avatar, teal/grün, kein 3D), `milo_mod.js`. MVP-Fachgebiet: Grammatik-Werkstatt. `sammleLernkontext()` liest bei der ersten Nachricht echte Daten aus `window.LaetitiaStats` (`schwacheAufgaben`, `levelEmpfehlungen`, `musterWarnung`) und reicht sie als `kontext` an den Listener weiter, damit Milos Eröffnung konkret auf echten Fortschritt Bezug nimmt statt generisch zu klingen. `registry.js` + `spielewelt.html`-Kachel (🦉) ergänzt.
 - **✅ Live-Test beider Agenten in Edge (nach dem Bugfix):** Milo und Nova je komplett durchgespielt (Start → Eröffnung → Vorschlag-Klick → Folgeantwort → Milo zusätzlich Eigene-Antwort-Tastatur → Beenden → Abschluss-Screen). `gemeinsames_gedaechtnis.json` korrekt befüllt (Umlaute korrekt, `"agent"`-Feld korrekt), danach auf leeres Template zurückgesetzt. `validate.ps1`: 0 Fehler, Prüfung 9 (OneDrive-Sync) OK. **Zwischenzeitlicher Fehlalarm:** mehrere parallel abgesetzte Test-Requests gegen den einfädigen Listener erzeugten einen Warteschlangen-Stau, der wie ein hängender Request aussah — ein einzelner isolierter Klick funktionierte in jedem Test sofort korrekt, also kein echter App-Bug.
-- ⬜ **Commit steht noch aus** — Rückfrage beim Nutzer, ob jetzt committed/gepusht werden soll.
+- ✅ **Committed + gepusht** (commit `0d9d11d`).
 
 ---
 
@@ -498,7 +498,7 @@ Dann Edge komplett neu starten.
 
 ---
 
-## Sitzungsprotokoll 29. Juli 2026 — Sitzung 15 (Zwischenstand)
+## Sitzungsprotokoll 29. Juli 2026 — Sitzung 15
 
 | Was | Ergebnis |
 |---|---|
@@ -518,11 +518,11 @@ Dann Edge komplett neu starten.
 | **Kritischer Bug gefunden + behoben:** `/chat/abschliessen` speicherte nie etwas | 🐛 Beim Testen der neuen Architektur entdeckt: `SchreibeJsonAntwort` (schließt die Response) wurde vor `LiesRequestBody` aufgerufen → Request-Body war beim Lesen immer leer → `$body.verlauf.Count -eq 0` griff immer → die komplette Gedächtnis-Update-Logik wurde seit jeher übersprungen. Das erklärt vermutlich, warum Novas altes `gedaechtnis.json` nie echte Inhalte angesammelt hatte. Fix: Body wird jetzt vor dem Response-Close gelesen. Mit Live-Test bestätigt: `gemeinsames_gedaechtnis.json` wird jetzt korrekt mit agent-getaggten Einträgen befüllt. |
 | Milo + Nova: Live-Test in Edge (neue Architektur) | ✅ Beide Agenten komplett durchgetestet (lokaler Test-Webserver + Browser-Automatisierung): Start → Eröffnung (Milo: echter Lernkontext-Bezug; Nova: Anekdote mit „Kater Anton") → Vorschlag-Klick → Folgeantwort → bei Milo zusätzlich Eigene-Antwort-Tastatur (öffnet korrekt) → Beenden → Abschluss-Screen → `gemeinsames_gedaechtnis.json` korrekt aktualisiert (inkl. Umlaute, korrektes `"agent"`-Feld). Memory-Datei danach auf leeres Template zurückgesetzt (Repo + OneDrive). **Zwischenzeitlicher Fehlalarm:** ein einzelner isolierter Klick funktionierte immer einwandfrei; nur als mehrere Test-Requests parallel gegen den (synchron/einfädigen) Listener liefen, entstand ein Warteschlangen-Stau, der wie ein Hänger aussah — kein echter App-Bug. |
 
-**Commits (alle gepusht):** `9363d76` (Nova-Lipsync-Fix), `9794f78` (Doku-Update), `30e8a72` (Doku Pfad-Training), `0c2af15` (Nova Tastatur + Geschichten), `a2102fc`/`e868231`/`821cee5` (Rule-13-Backlog, 48 Dateien), `12f1e18` (Doku), `1415f0e` (Fabu-Agent)
+**Commits (alle gepusht):** `9363d76` (Nova-Lipsync-Fix), `9794f78` (Doku-Update), `30e8a72` (Doku Pfad-Training), `0c2af15` (Nova Tastatur + Geschichten), `a2102fc`/`e868231`/`821cee5` (Rule-13-Backlog, 48 Dateien), `12f1e18` (Doku), `1415f0e` (Fabu-Agent), `9e90b99` (Fabu Umlaut-Fix), `7191630` (Doku Fabu-Test), `e1d6941` (Doku Nova-Test), `0d9d11d` (Zwei-Ebenen-Gedächtnis + Milo-Agent)
 
-**Noch offen / nicht committed:** Die Änderungen für Zwei-Ebenen-Gedächtnis + Eltern-Log-Entfernung + Milo (siehe Zeilen oben) sind implementiert, deployed nach OneDrive und live end-to-end getestet (`validate.ps1`: 0 Fehler, Prüfung 9 OK), aber **noch nicht committed** — Rückfrage beim Nutzer steht aus.
+**Sitzungsabschluss:** Alle Änderungen dieser Sitzung committed + gepusht, nach OneDrive deployed und gepinnt, `validate.ps1` grün (0 Fehler, 1 unabhängige Alt-Warnung `bad_ref_zoom2.png`). Git-Arbeitsverzeichnis sauber (`git status`: nothing to commit).
 
-**Hinweis für Weiterarbeit:** Diese Sitzung ist ggf. noch nicht abgeschlossen — falls sie ohne regulären Sitzungsabschluss endet, oben stehende Tabelle ist der verlässliche Zwischenstand. Nächste konkrete Schritte: (1) Tobii-Gerätetest (Avatar-Anzeige + Dwell) — **bewusst auf spätere Sitzung verschoben**, (2) neuen Telegram-Bot-Token vom Nutzer erfragen und eintragen, (3) Pfad-Training Modus 2 — kurze manuelle Erfolgsfall-Bestätigung (optional, Code bereits verifiziert), (4) Multi-Agenten-System weiter ausbauen (Coach-Agent-Inhalte vertiefen, Registry an UI anbinden, Gruppengespräche zu 3-4), (5) Commit für die Zwei-Ebenen-Gedächtnis/Milo-Änderungen ausstehend.
+**Nächste konkrete Schritte für die Folgesitzung:** (1) Tobii-Gerätetest (Avatar-Anzeige + Dwell) — **bewusst auf spätere Sitzung verschoben**, (2) neuen Telegram-Bot-Token vom Nutzer erfragen und eintragen, (3) Pfad-Training Modus 2 — kurze manuelle Erfolgsfall-Bestätigung (optional, Code bereits verifiziert), (4) Multi-Agenten-System weiter ausbauen (Coach-Agent-Inhalte vertiefen, Registry an UI anbinden, Gruppengespräche zu 3-4).
 
 ---
 

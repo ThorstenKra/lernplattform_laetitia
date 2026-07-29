@@ -603,7 +603,6 @@ Dann Edge komplett neu starten.
 - **Bluetooth-Modul aktivieren:** `Install-Module AudioDeviceCmdlets` (einmalig als Admin)
 - **taucher_lies** Crop-Werte korrigieren (aktuell Schätzwert)
 - **Neues Lies-mal-3-Buch** → 6 Comic-Seiten (S. 2, 8, 14, 16, 22, 28) fotografieren → hochladen
-- **Rule-13-Backlog:** 48 HTML-Dateien mit Inline-`<script>` > 20 Zeilen — schrittweise auslagern
 
 ### 🟡 Mittelfristig
 - Mathe-Hefte (Mathe1/2/3.pdf) → Aufgaben digitalisieren → `schule_mathe_data.js`
