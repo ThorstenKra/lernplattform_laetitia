@@ -49,7 +49,8 @@ function initAvatar(){
       avatarMood: "neutral",
       cameraRotateEnable: false,
       cameraPanEnable: false,
-      cameraZoomEnable: false
+      cameraZoomEnable: false,
+      lipsyncModules: []
     });
     novaHead.showAvatar({ url: AVATAR_URL, body: "F", avatarMood: "neutral" })
       .then(function(){ novaHeadBereit = true; aktualisiereAvatarGroesse(); })
