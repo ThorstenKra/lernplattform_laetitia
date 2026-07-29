@@ -28,5 +28,14 @@ window.KI_AGENTEN = [
     farbe: "#d97706",
     pfad: "./fabu/fabu.html",
     personaPfad: "./fabu/persona.json"
+  },
+  {
+    id: "milo",
+    name: "Milo",
+    rolle: "Lernbegleiter",
+    emoji: "🦉",
+    farbe: "#0d9488",
+    pfad: "./milo/milo.html",
+    personaPfad: "./milo/persona.json"
   }
 ];

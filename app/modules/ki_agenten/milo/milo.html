@@ -1,0 +1,229 @@
+<!doctype html>
+<!-- depth:3 — Pfade: ../../../core/ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Milo</title>
+<style>
+:root{
+  --gruen:#0d9488; --gruen-bg:#ccfbf1; --gruen-dark:#134e4a;
+  --rot:#ef4444;  --rot-bg:#fee2e2;
+  --grau-rand:#cbd5e1; --text:#0f172a;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:#f0fdfa; height:100vh; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+#kopfLeiste{
+  flex-shrink:0; padding:10px 14px;
+  background:#fff; border-bottom:2px solid var(--grau-rand);
+  display:flex; align-items:center;
+}
+#kopfTitel{ font-size:20px; font-weight:1000; color:var(--gruen-dark); }
+#hauptBereich{
+  flex:1; min-height:0; overflow:hidden;
+  display:flex; flex-direction:column;
+  padding:10px 12px; gap:8px;
+}
+.status-screen{
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:14px; text-align:center;
+}
+.status-emoji{ font-size:52px; }
+.status-text{ font-size:24px; font-weight:1000; color:var(--text); }
+.status-sub{ font-size:16px; color:#64748b; }
+#btnStarten{
+  min-height:84px; width:min(320px,90%);
+  border-radius:18px; border:3px solid var(--gruen);
+  background:var(--gruen-bg); color:var(--gruen-dark);
+  font-size:22px; font-weight:1000; cursor:pointer;
+  position:relative; transition:none; font-family:inherit;
+}
+#btnStarten:hover,#btnStarten:focus{ background:#99f6e4; outline:4px solid var(--gruen); }
+#btnStarten.dwell-active{ transform:scale(1.02) !important; outline:3px solid var(--gruen) !important; transition:none !important; }
+#gespraechContainer{
+  flex:1; min-height:0; display:flex; flex-direction:column; gap:8px;
+}
+#miloAvatarWrap{ flex-shrink:0; display:flex; justify-content:center; }
+.milo-avatar{ width:104px; height:104px; }
+.milo-avatar.blink .ml-augen{ animation: mlBlinzeln 4.5s ease-in-out infinite; transform-origin:100px 100px; }
+@keyframes mlBlinzeln{ 0%,94%,100%{ transform:scaleY(1); } 97%{ transform:scaleY(0.1); } }
+.milo-avatar.spricht .ml-mund{ animation: mlSprechen .32s ease-in-out infinite alternate; transform-origin:100px 148px; }
+@keyframes mlSprechen{ from{ transform:scaleY(1); } to{ transform:scaleY(1.6); } }
+.ml-funke{ opacity:0; transition:opacity .3s; }
+.milo-avatar.stimmung-aufgeregt .ml-funke{ opacity:1; }
+#miloLabel{ font-size:13px; font-weight:1000; color:var(--gruen-dark); text-transform:uppercase; letter-spacing:.05em; flex-shrink:0; }
+#miloAntwort{
+  flex:1; min-height:0; background:#fff; border:2px solid var(--grau-rand);
+  border-radius:14px; padding:14px 16px;
+  font-size:22px; font-weight:700; color:var(--text);
+  line-height:1.5; overflow-y:auto;
+}
+#vorschlaegeGrid{
+  display:grid; grid-template-columns:1fr 1fr;
+  grid-template-rows:1fr 1fr; gap:8px;
+  flex-shrink:0; height:148px;
+}
+.vorschlag-btn{
+  border-radius:14px; border:2px solid var(--grau-rand); background:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; font-weight:1000; color:var(--text);
+  cursor:pointer; position:relative; transition:none; font-family:inherit;
+  text-align:center; padding:0 8px;
+}
+.vorschlag-btn:hover,.vorschlag-btn:focus{ background:var(--gruen-bg); border-color:var(--gruen); outline:none; }
+.vorschlag-btn.dwell-active{ transform:scale(1.03) !important; outline:3px solid var(--gruen) !important; transition:none !important; }
+#btnEigeneAntwort{
+  flex-shrink:0; min-height:56px; border-radius:14px;
+  border:2px solid var(--gruen); background:var(--gruen-bg); color:var(--gruen-dark);
+  font-size:15px; font-weight:1000; cursor:pointer; position:relative;
+  transition:none; font-family:inherit;
+}
+#btnEigeneAntwort:hover,#btnEigeneAntwort:focus{ background:#99f6e4; outline:none; }
+#btnEigeneAntwort.dwell-active{ transform:scale(1.02) !important; outline:3px solid var(--gruen) !important; transition:none !important; }
+
+#tastaturOverlay{
+  position:fixed; inset:0; background:rgba(15,23,42,.92); z-index:100;
+  display:flex; flex-direction:column; padding:14px; gap:10px;
+}
+#tastaturAnzeige{
+  flex-shrink:0; min-height:60px; background:#fff; border-radius:14px;
+  padding:12px 16px; font-size:22px; font-weight:700; color:var(--text);
+  display:flex; align-items:center; overflow-wrap:anywhere;
+}
+#tastaturTasten{
+  flex:1; min-height:0; display:grid; gap:6px;
+  grid-template-columns:repeat(10,1fr); grid-auto-rows:1fr;
+}
+.tasten-btn{
+  border-radius:10px; border:2px solid var(--grau-rand); background:#fff;
+  color:var(--text); font-size:18px; font-weight:1000; cursor:pointer;
+  position:relative; transition:none; font-family:inherit;
+  display:flex; align-items:center; justify-content:center;
+}
+.tasten-btn:hover,.tasten-btn:focus{ background:var(--gruen-bg); border-color:var(--gruen); outline:none; }
+.tasten-btn.dwell-active{ transform:scale(1.05) !important; outline:3px solid var(--gruen) !important; transition:none !important; }
+#tastaturAktionen{ flex-shrink:0; display:flex; gap:8px; height:64px; }
+#tastaturAktionen .tasten-btn{ flex:1; font-size:15px; }
+#btnTastaturFertig{ background:#dcfce7; border-color:#16a34a; color:#166534; }
+#btnTastaturLoeschen{ background:#fee2e2; border-color:#ef4444; color:#7f1d1d; }
+.nav-leiste{
+  flex-shrink:0; display:flex; gap:8px; padding:8px 12px;
+  background:#fff; border-top:2px solid var(--grau-rand);
+}
+.nav-btn{
+  flex:1; min-height:70px; border-radius:14px;
+  font-size:16px; font-weight:1000; cursor:pointer; position:relative;
+  display:flex; align-items:center; justify-content:center;
+  gap:6px; transition:none; border:2px solid;
+  text-decoration:none; font-family:inherit; background:none;
+}
+.nav-btn-zurueck{ background:var(--gruen-bg); border-color:var(--gruen); color:var(--gruen-dark); }
+.nav-btn-zurueck:hover{ background:#99f6e4; }
+.nav-btn-beenden{ background:var(--rot-bg); border-color:var(--rot); color:#7f1d1d; }
+.nav-btn-beenden:hover{ background:#fecaca; }
+.nav-btn.dwell-active{ transform:scale(1.02) !important; outline:3px solid currentColor !important; transition:none !important; }
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  pointer-events:none; z-index:10; width:48px; height:48px;
+}
+.dwell-ring-svg circle{
+  fill:none; stroke-width:4; stroke-dasharray:220; stroke-dashoffset:220;
+  transform:rotate(-90deg); transform-origin:35px 35px; opacity:0;
+}
+.dwell-ring-svg circle.animating{ opacity:1; animation:dwellRing var(--dwell-duration,.9s) linear forwards; }
+</style>
+</head>
+<body>
+
+<div id="kopfLeiste">
+  <div id="kopfTitel">🦉 Milo — Lernbegleiter</div>
+</div>
+
+<div id="hauptBereich">
+
+  <div id="startScreen" class="status-screen">
+    <div class="status-emoji">🦉</div>
+    <div class="status-text">Milo ist da</div>
+    <div class="status-sub">Dein Lernbegleiter für die Grammatik-Werkstatt</div>
+    <button id="btnStarten">
+      Gespräch starten
+      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#0d9488"/></svg>
+    </button>
+  </div>
+
+  <div id="ladenScreen" class="status-screen" style="display:none">
+    <div class="status-emoji">⏳</div>
+    <div class="status-text">Milo denkt nach…</div>
+  </div>
+
+  <div id="gespraechContainer" style="display:none">
+    <div id="miloAvatarWrap" aria-hidden="true">
+      <svg id="miloAvatar" class="milo-avatar blink" viewBox="0 0 200 200">
+        <path id="mlOhrL" d="M55,60 L40,15 L82,50 Z" fill="#0d9488" stroke="#134e4a" stroke-width="4" stroke-linejoin="round"/>
+        <path id="mlOhrR" d="M145,60 L160,15 L118,50 Z" fill="#0d9488" stroke="#134e4a" stroke-width="4" stroke-linejoin="round"/>
+        <path id="mlFunkeL" class="ml-funke" d="M40,50 l4,10 l10,4 l-10,4 l-4,10 l-4,-10 l-10,-4 l10,-4 Z" fill="#5eead4"/>
+        <path id="mlFunkeR" class="ml-funke" d="M158,45 l3,8 l8,3 l-8,3 l-3,8 l-3,-8 l-8,-3 l8,-3 Z" fill="#5eead4"/>
+        <circle cx="100" cy="105" r="75" fill="#ccfbf1" stroke="#0d9488" stroke-width="5"/>
+        <circle id="mlAugenringL" cx="72" cy="100" r="26" fill="#fff" stroke="#0d9488" stroke-width="3"/>
+        <circle id="mlAugenringR" cx="128" cy="100" r="26" fill="#fff" stroke="#0d9488" stroke-width="3"/>
+        <g class="ml-augen">
+          <circle id="mlAugeL" cx="72" cy="100" r="13" fill="#134e4a"/>
+          <circle id="mlAugeR" cx="128" cy="100" r="13" fill="#134e4a"/>
+        </g>
+        <path id="mlBraueL" d="M55,74 Q72,66 90,74" stroke="#134e4a" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path id="mlBraueR" d="M110,74 Q128,66 145,74" stroke="#134e4a" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path id="mlSchnabel" d="M92,128 Q100,144 108,128 Q100,136 92,128 Z" fill="#f59e0b" stroke="#b45309" stroke-width="2"/>
+        <path id="mlMund" class="ml-mund" d="M85,150 Q100,158 115,150" stroke="#134e4a" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.55"/>
+      </svg>
+    </div>
+    <div id="miloLabel">Milo sagt:</div>
+    <div id="miloAntwort"></div>
+    <div id="vorschlaegeGrid"></div>
+    <button id="btnEigeneAntwort" style="display:none">
+      ✏️ Ich möchte selbst antworten
+      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#0d9488"/></svg>
+    </button>
+  </div>
+
+  <div id="abschlussScreen" class="status-screen" style="display:none">
+    <div class="status-emoji">✅</div>
+    <div class="status-text">Gespräch beendet</div>
+    <div class="status-sub" id="abschlussInfo">Zusammenfassung wird gespeichert…</div>
+  </div>
+
+</div>
+
+<div class="nav-leiste">
+  <button class="nav-btn nav-btn-zurueck" id="btnZurueck">
+    ← Zurück
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#0d9488"/></svg>
+  </button>
+  <button class="nav-btn nav-btn-beenden" id="btnBeenden" style="display:none">
+    ✕ Gespräch beenden
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#ef4444"/></svg>
+  </button>
+</div>
+
+<div id="tastaturOverlay" style="display:none">
+  <div id="tastaturAnzeige"></div>
+  <div id="tastaturTasten"></div>
+  <div id="tastaturAktionen">
+    <button class="tasten-btn" id="btnTastaturLoeschen">⌫ Löschen</button>
+    <button class="tasten-btn" id="btnTastaturFertig">✓ Fertig</button>
+  </div>
+</div>
+
+<script src="../../../core/dwell.js"></script>
+<script src="../../../core/error_handler.js"></script>
+<script src="../../../core/stats.js"></script>
+<script src="./milo_mod.js"></script>
+<script>
+  window.MiloMod && window.MiloMod.init();
+</script>
+</body>
+</html>

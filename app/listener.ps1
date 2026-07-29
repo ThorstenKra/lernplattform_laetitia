@@ -1,4 +1,4 @@
-# listener.ps1 (v6 - Multi-Route + Audio-Umschaltung + Gemini-KI)
+# listener.ps1 (v7 - Multi-Route + Audio-Umschaltung + Multi-Agenten-Gemini-KI)
 # Laetitia Lernsystem
 #
 # Routen:
@@ -6,8 +6,18 @@
 #   /audio?geraet=intern  -> Windows-Audio auf internen Lautsprecher zurueck
 #   /audio?check=jbl      -> pruefen ob JBL als Wiedergabegeraet verfuegbar ("ok" | "fehler")
 #   /zurueck              -> Edge beenden, NuVoice starten (bestehende Logik)
-#   /chat                 -> POST: Nova-KI-Gespraech via Gemini API
-#   /chat/abschliessen    -> POST: Gespraech speichern, Gedaechtnis + Eltern-Log aktualisieren
+#   /chat                 -> POST: KI-Gespraech via Gemini API. body.agent waehlt den
+#                             Modulordner unter modules\ (Standard "ki_gespraech" = Nova,
+#                             z.B. "ki_agenten/milo" fuer weitere Agenten). Jeder Agent
+#                             bringt seine eigene persona.json mit (Charakter, Eroeffnung,
+#                             Grenzen). body.kontext (optional) liefert zusaetzliche
+#                             strukturierte Fakten (z.B. Lernfortschritt), die in den
+#                             Prompt uebernommen werden.
+#   /chat/abschliessen    -> POST: Gespraech speichern, GEMEINSAMES Gedaechtnis
+#                             (modules\ki_agenten\gemeinsames_gedaechtnis.json) aktualisieren.
+#                             Alle Agenten teilen sich dieses eine Gedaechtnis -- so "lernt"
+#                             jeder Agent auch aus Gespraechen, die andere Agenten gefuehrt
+#                             haben. Keine Eltern-Zusammenfassung mehr (entfernt 29.07.2026).
 
 # ── Konfiguration ─────────────────────────────────────────────────────────────
 $JBL_NAME    = "JBL Clip 5"
@@ -283,75 +293,73 @@ while ($listener.IsListening) {
         try {
             $body = LiesRequestBody $ctx | ConvertFrom-Json
 
-            $modPfad     = "$PSScriptRoot\modules\ki_gespraech"
-            $persona     = Get-Content "$modPfad\persona.json"     -Raw -Encoding UTF8 | ConvertFrom-Json
-            $gedaechtnis = Get-Content "$modPfad\gedaechtnis.json" -Raw -Encoding UTF8
+            $agent       = if ($body.agent) { [string]$body.agent -replace '/', '\' } else { "ki_gespraech" }
+            $modPfad     = "$PSScriptRoot\modules\$agent"
+            $gedPfad     = "$PSScriptRoot\modules\ki_agenten\gemeinsames_gedaechtnis.json"
+            $persona     = Get-Content "$modPfad\persona.json" -Raw -Encoding UTF8 | ConvertFrom-Json
+            $gedaechtnis = Get-Content $gedPfad -Raw -Encoding UTF8
 
             $eigenschaften = ($persona.charaktereigenschaften | ForEach-Object { "- $_" }) -join "`n"
             $grenzen       = ($persona.grenzen | ForEach-Object { "- $_" }) -join "`n"
             $stimmungen    = ($persona.stimmungen.PSObject.Properties | ForEach-Object { "- $($_.Name): $($_.Value)" }) -join "`n"
-            $lebenskontext = ($persona.lebenskontext.PSObject.Properties | ForEach-Object { "- $($_.Name): $($_.Value)" }) -join "`n"
+            $rolle         = if ($persona.rolle) { $persona.rolle } else { "Gespraechspartnerin" }
+
+            $lebenskontextBlock = ""
+            if ($persona.lebenskontext) {
+                $lebenskontext = ($persona.lebenskontext.PSObject.Properties | ForEach-Object { "- $($_.Name): $($_.Value)" }) -join "`n"
+                $lebenskontextBlock = "`nWichtiger Lebenskontext (unbedingt beachten):`n$lebenskontext`n"
+            }
+
             $istErsteNachricht = (-not $body.verlauf -or $body.verlauf.Count -eq 0)
             $eroeffnungHinweis = ""
-            if ($istErsteNachricht) {
-                # Deterministischer Tageswechsel statt Modell-Zufall: das Modell waehlte in
-                # Tests bei freier Wahl fast immer Variante A, auch bei hoher Temperature.
-                $eroeffnungsStil = if ((Get-Date).DayOfYear % 2 -eq 0) { "B" } else { "A" }
-                $eroeffnungHinweis = @"
-
-Dies ist die ALLERERSTE Nachricht des heutigen Gespraechs. Nutze HEUTE genau
-Eroeffnungsstil ${eroeffnungsStil}:
-
-A) Check-in: ein bis zwei kurze Fragen aus: wie es ihr gerade geht, wie sie geschlafen hat,
-   wie stark die Spastik heute ist, allgemeine Gedanken, Plaene fuer den Tag.
-
-B) Kurze Anekdote: du erzaehlst zuerst etwas, damit Laetitia nicht als Erste tippen muss.
-   Nutze bevorzugt Material aus ihrem echten Zuhause (siehe "zuhause" im Lebenskontext
-   oben) -- z.B. was die Katzen Puenktchen oder Anton wieder angestellt haben, ob eine
-   Maus vor der Terrassentuer lag, was gerade im Garten zu sehen ist, ein Lied von ihrer
-   Musikalben-Liste. Nur wenn nichts davon passt, eine kleine erfundene Geschichte.
-   KEIN langer Monolog, sondern ein kurzer Anfang (1-3 Saetze), der bei einer einfachen
-   Frage oder einem kleinen Cliffhanger pausiert. Wenn Laetitia reagiert, erzaehl in
-   kleinen Haeppchen weiter, mit Rueckfragen zwischendurch -- nie alles auf einmal.
-
-In BEIDEN Faellen NICHT von den Lernmodulen anfangen -- das wirkt sonst wie eine versteckte
-Aufforderung. Das Thema Lernmodule darf spaeter im Gespraech ganz natuerlich aufkommen,
-aber nie als Einstieg.
-"@
+            if ($istErsteNachricht -and $persona.eroeffnung) {
+                # persona.eroeffnung ist entweder ein einzelner Text, oder ein Objekt
+                # {a:"...", b:"..."} fuer tagesabhaengige Abwechslung. Deterministischer
+                # Tageswechsel statt Modell-Zufall: das Modell waehlt bei freier Wahl in
+                # Tests fast immer Variante A, auch bei hoher Temperature.
+                $eroeffnungText = $persona.eroeffnung
+                if ($persona.eroeffnung.a -and $persona.eroeffnung.b) {
+                    $eroeffnungText = if ((Get-Date).DayOfYear % 2 -eq 0) { $persona.eroeffnung.b } else { $persona.eroeffnung.a }
+                }
+                $eroeffnungHinweis = "`n`nDies ist die ALLERERSTE Nachricht des heutigen Gespraechs.`n$eroeffnungText`n"
             }
+
+            $kontextBlock = ""
+            if ($body.kontext) {
+                $kontextBlock = "`n`nAktueller Lernfortschritt (strukturierte Fakten, von der App ermittelt):`n$($body.kontext)`nNutze diese Fakten aktiv, um konkret und persoenlich zu coachen -- nenne wenn passend echte Themen daraus.`n"
+            }
+
             $sysPrompt = @"
-Du bist $($persona.name), Laetitias freundliche Gespraechspartnerin auf einer Lernplattform.
+Du bist $($persona.name), Laetitias $rolle auf einer Lernplattform.
 Charaktereigenschaften:
 $eigenschaften
 Gespraechsstil: $($persona.gespraechsstil.antwortlaenge). Sprachniveau: $($persona.gespraechsstil.sprachniveau).
-Fragetechnik: $($persona.gespraechsstil.fragetechnik).
-
-Wichtiger Lebenskontext (unbedingt beachten):
-$lebenskontext
-
+$lebenskontextBlock
 Wichtige Grenzen:
 $grenzen
 
 Verfuegbare Stimmungen (waehle pro Antwort GENAU EINE, passend zum Gespraechsverlauf):
 $stimmungen
-"ruhig" ist PFLICHT bei ernsten/traurigen Themen. Sonst gerne haeufig "schnippisch" oder
-"aufgeregt", aber nicht in jeder einzelnen Antwort -- wirkt sonst aufgesetzt.
+"ruhig" ist PFLICHT bei ernsten/traurigen Themen. Sonst gerne haeufig andere Stimmungen,
+aber nicht in jeder einzelnen Antwort -- wirkt sonst aufgesetzt.
 
 Laetitia kommuniziert per Augensteuerung. Das Tippen ist anstrengend.
 Antworte daher: kurz (max. 3 Saetze), klar, in normalem Deutsch.
-$eroeffnungHinweis
+$eroeffnungHinweis$kontextBlock
 Heutiges Datum: $(Get-Date -Format "yyyy-MM-dd")
 
-Gedaechtnis ueber Laetitia (JSON, inkl. datierter vergangener Gespraeche unter
-"letzte_gespraeche", einer laufenden Routine unter "routine" und beobachteten
-Vorlieben unter "beobachtete_praeferenzen"):
+Gemeinsames Gedaechtnis ueber Laetitia (JSON, wird von ALLEN KI-Charakteren auf dieser
+Plattform geteilt -- inkl. datierter vergangener Gespraeche unter "letzte_gespraeche"
+mit Angabe welcher Charakter dabei war, einer laufenden Routine unter "routine" und
+beobachteten Vorlieben unter "beobachtete_praeferenzen"):
 $gedaechtnis
 
 Nutze dieses Gedaechtnis aktiv:
-- Beziehe dich gelegentlich auf Themen aus "letzte_gespraeche" -- vergleiche das
-  jeweilige Datum mit dem heutigen Datum (z.B. "gestern", "vor ein paar Tagen",
-  "letzte Woche") und frage nach, ob sich etwas getan hat. Nicht in jeder Antwort,
-  aber immer wieder, damit es wirkt als wuerdest du dich wirklich erinnern.
+- Beziehe dich gelegentlich auf Themen aus "letzte_gespraeche" -- auch auf Gespraeche mit
+  ANDEREN Charakteren, nicht nur mit dir selbst (z.B. "Fabu hat mir erzaehlt, dass..."). Vergleiche
+  das jeweilige Datum mit dem heutigen Datum (z.B. "gestern", "vor ein paar Tagen", "letzte
+  Woche") und frage nach, ob sich etwas getan hat. Nicht in jeder Antwort, aber immer wieder,
+  damit es wirkt als wuerdest du dich wirklich erinnern.
 - Falls unter "routine" ein Ziel eingetragen ist: frag liebevoll nach dem Stand,
   ohne Druck. Falls noch keine Routine existiert und sich ein Gespraech dafuer
   eignet, schlage behutsam vor, gemeinsam eine kleine taegliche Routine zu finden.
@@ -403,40 +411,52 @@ Bei "stimmung" exakt einen der obigen Stimmungs-Namen eintragen.
     }
 
     # ── Route: /chat/abschliessen ─────────────────────────────────────────────
+    # Aktualisiert NUR das gemeinsame Gedaechtnis (kein Eltern-Log mehr, entfernt
+    # 29.07.2026 -- reduziert auf einen Gemini-Aufruf statt zwei).
     if ($pfad -eq "/chat/abschliessen" -and $ctx.Request.HttpMethod -eq "POST") {
+        # WICHTIG: Body MUSS vor SchreibeJsonAntwort gelesen werden -- das Schliessen
+        # der Response reisst sonst den Request-Stream mit runter, LiesRequestBody
+        # liefert danach nur noch einen leeren Body (--> $body.verlauf.Count immer 0).
+        $bodyRoh = LiesRequestBody $ctx
         SchreibeJsonAntwort $ctx @{ ok = $true }   # Antwort sofort senden
 
         try {
-            $body = LiesRequestBody $ctx | ConvertFrom-Json
+            $body = $bodyRoh | ConvertFrom-Json
             if (-not $body.verlauf -or $body.verlauf.Count -eq 0) { continue }
 
-            $modPfad      = "$PSScriptRoot\modules\ki_gespraech"
-            $gedPfad      = "$modPfad\gedaechtnis.json"
-            $logPfad      = "$modPfad\eltern_zusammenfassung.log"
-            $altesGed     = Get-Content $gedPfad -Raw -Encoding UTF8
-            $verlaufText  = ($body.verlauf | ForEach-Object {
-                $rolle = if($_.rolle -eq "user") { "Laetitia" } else { "Nova" }
+            $agent   = if ($body.agent) { [string]$body.agent -replace '/', '\' } else { "ki_gespraech" }
+            $modPfad = "$PSScriptRoot\modules\$agent"
+            $persona = Get-Content "$modPfad\persona.json" -Raw -Encoding UTF8 | ConvertFrom-Json
+            $gedPfad = "$PSScriptRoot\modules\ki_agenten\gemeinsames_gedaechtnis.json"
+            $altesGed    = Get-Content $gedPfad -Raw -Encoding UTF8
+            $verlaufText = ($body.verlauf | ForEach-Object {
+                $rolle = if($_.rolle -eq "user") { "Laetitia" } else { $persona.name }
                 "${rolle}: $($_.text)"
             }) -join "`n"
 
-            # Gedaechtnis aktualisieren
             $heute = Get-Date -Format "yyyy-MM-dd"
             $gedPrompt = @"
-Altes Gedaechtnis (JSON) -- Schema: ueber_laetitia (Text), interessen (Liste), wiederkehrende_themen (Liste),
-letzte_gespraeche (Liste von {"datum":"YYYY-MM-DD","zusammenfassung":"..."}), routine ({"ziel":"...","stand":"..."}),
-beobachtete_praeferenzen (Liste kurzer Notizen, worauf Laetitia im Ton/Thema gut reagiert):
+Altes GEMEINSAMES Gedaechtnis (JSON, wird von mehreren KI-Charakteren zusammen genutzt) --
+Schema: ueber_laetitia (Text), interessen (Liste), wiederkehrende_themen (Liste),
+letzte_gespraeche (Liste von {"datum":"YYYY-MM-DD","agent":"Name","zusammenfassung":"..."}),
+routine ({"ziel":"...","stand":"..."}), beobachtete_praeferenzen (Liste kurzer Notizen,
+worauf Laetitia im Ton/Thema gut reagiert):
 $altesGed
 
-Neues Gespraech (heute, $heute):
+Neues Gespraech (heute, $heute, mit $($persona.name)):
 $verlaufText
 
 Aktualisiere das Gedaechtnis:
-1. Fuege einen NEUEN Eintrag zu "letzte_gespraeche" hinzu: {"datum":"$heute","zusammenfassung":"1-2 Saetze Kernthema"}.
-   Bestehende Eintraege beibehalten, aber Liste auf maximal die letzten 14 Eintraege kuerzen (aelteste zuerst entfernen).
+1. Fuege einen NEUEN Eintrag zu "letzte_gespraeche" hinzu:
+   {"datum":"$heute","agent":"$($persona.name)","zusammenfassung":"1-2 Saetze Kernthema"}.
+   Bestehende Eintraege beibehalten, aber Liste auf maximal die letzten 20 Eintraege kuerzen
+   (aelteste zuerst entfernen).
 2. "interessen" und "wiederkehrende_themen" ergaenzen falls neue erkennbar sind (keine Duplikate).
-3. Falls im Gespraech eine taegliche Routine erwaehnt, vereinbart oder verfolgt wurde: "routine" (ziel + stand) aktualisieren.
-4. Falls erkennbar ist, worauf Laetitia besonders gut reagiert hat (Humor-Art, Thema, Tonfall): kurze Notiz zu
-   "beobachtete_praeferenzen" hinzufuegen (max. 8 Eintraege insgesamt, bei Bedarf aelteste entfernen).
+3. Falls im Gespraech eine taegliche Routine erwaehnt, vereinbart oder verfolgt wurde: "routine"
+   (ziel + stand) aktualisieren.
+4. Falls erkennbar ist, worauf Laetitia besonders gut reagiert hat (Humor-Art, Thema, Tonfall):
+   kurze Notiz zu "beobachtete_praeferenzen" hinzufuegen (max. 8 Eintraege insgesamt, bei Bedarf
+   aelteste entfernen).
 5. "ueber_laetitia" nur anpassen, wenn sich wirklich etwas Grundlegendes geaendert hat.
 Gib NUR das aktualisierte JSON zurueck (exakt dieses Schema), kein Markdown, keine Erklaerung.
 "@
@@ -445,16 +465,8 @@ Gib NUR das aktualisierte JSON zurueck (exakt dieses Schema), kein Markdown, kei
             # Nur speichern wenn gueltiges JSON zurueckkam
             $neuesGed | ConvertFrom-Json | Out-Null
             $neuesGed | Set-Content $gedPfad -Encoding UTF8
-
-            # Eltern-Zusammenfassung
-            $datum       = Get-Date -Format "yyyy-MM-dd"
-            $elternPrompt = "Fasse dieses Gespraech in 2-3 Saetzen fuer Eltern zusammen. " +
-                "Kein Wortlaut, nur Kernpunkte und Stimmung. Format: '$datum | Text. Stimmung: X.'`n`nGespraech:`n$verlaufText"
-            $elternResp = RufeGemini @(@{ role = "user"; content = $elternPrompt }) 1200 0.2 15000
-            $elternText = $elternResp.choices[0].message.content.Trim()
-            Add-Content -Path $logPfad -Value $elternText -Encoding UTF8
         } catch {
-            $fehlerPfad = "$PSScriptRoot\modules\ki_gespraech\listener_fehler.log"
+            $fehlerPfad = "$PSScriptRoot\modules\ki_agenten\listener_fehler.log"
             try {
                 Add-Content -Path $fehlerPfad -Value "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') | $($_.Exception.Message)" -Encoding UTF8
             } catch {}
