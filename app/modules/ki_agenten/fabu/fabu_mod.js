@@ -1,11 +1,11 @@
 // fabu_mod.js -- Laetitia Lernsystem
-// Fabu -- Geschichtenerzaehler-Agent (Multi-Agenten-System, erster Agent)
+// Fabu -- Geschichtenerzähler-Agent (Multi-Agenten-System, erster Agent)
 // REGEL 1: Kein import(), kein type="module"
-// REGEL 4: Nur gerade Anfuehrungszeichen
+// REGEL 4: Nur gerade Anführungszeichen
 //
 // Rein lokal, kein Gemini-Aufruf -- Fabus Bibliothek (geschichten_data.js)
 // treibt Vorlesen + Diskussionsfragen komplett offline. Siehe persona.json
-// fuer Charakter/Adaptionsregel.
+// für Charakter/Adaptionsregel.
 
 (function(){
 "use strict";

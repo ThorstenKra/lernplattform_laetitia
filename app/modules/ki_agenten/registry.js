@@ -1,20 +1,20 @@
 // registry.js -- Laetitia Lernsystem
 // Multi-Agenten-System: zentrale Liste aller KI-Charaktere.
 // REGEL 1: Kein import(), kein type="module"
-// REGEL 4: Nur gerade Anfuehrungszeichen
+// REGEL 4: Nur gerade Anführungszeichen
 //
-// Noch NICHT in eine UI eingebunden -- dient als Vorbereitung fuer
-// spaetere Gruppengespraeche (mehrere Agenten gemeinsam im Gespraech).
-// Jeder neue Agent wird hier mit seinen Eckdaten ergaenzt, sobald er
+// Noch NICHT in eine UI eingebunden -- dient als Vorbereitung für
+// spätere Gruppengespräche (mehrere Agenten gemeinsam im Gespräch).
+// Jeder neue Agent wird hier mit seinen Eckdaten ergänzt, sobald er
 // existiert. Nova lebt technisch weiter in app/modules/ki_gespraech/
 // (nicht umgezogen, um ein funktionierendes Modul nicht zu riskieren),
-// wird hier aber mitgelistet, damit die Liste vollstaendig ist.
+// wird hier aber mitgelistet, damit die Liste vollständig ist.
 
 window.KI_AGENTEN = [
   {
     id: "nova",
     name: "Nova",
-    rolle: "Beste Freundin -- allgemeine Gespraeche",
+    rolle: "Beste Freundin -- allgemeine Gespräche",
     emoji: "✨",
     farbe: "#8b5cf6",
     pfad: "../ki_gespraech/ki_gespraech.html",
@@ -23,7 +23,7 @@ window.KI_AGENTEN = [
   {
     id: "fabu",
     name: "Fabu",
-    rolle: "Geschichtenerzaehler",
+    rolle: "Geschichtenerzähler",
     emoji: "🦊",
     farbe: "#d97706",
     pfad: "./fabu/fabu.html",
