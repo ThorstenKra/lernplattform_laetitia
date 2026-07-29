@@ -231,6 +231,20 @@ Eingetragene Bücher: Das Fliegende Kamel (60 Tracks), Jaguar und NEINguar (54 T
 
 ---
 
+## 🆕 Multi-Agenten-System — Konzept (Nutzer-Vision, 29.07.2026, Planungsphase)
+
+Nutzer möchte das KI-Gesprächskonzept von einer einzelnen Partnerin (Nova) zu mehreren spezialisierten KI-Agenten ausbauen:
+
+- **Jeder Agent:** eigener Name, eigener Charakter/Persönlichkeit, eigener 3D-Avatar, eigenes Fachgebiet
+- **Nova** wird zur „besten Freundin" für allgemeine Gespräche (bestehende Rolle bleibt)
+- **Neue Rollen (Beispiele des Nutzers):** Geschichtenerzähler-Agent, Lehrer/Lernbegleiter-Agent („Coach")
+- **Fachwissen-Bibliotheken:** jeder Agent bekommt eine eigene, über die Zeit wachsende Wissens-/Inhaltssammlung passend zu seinem Fachgebiet — Nutzer möchte hierzu Vorschläge zu Struktur (technisch) und Inhalt (didaktisch/inhaltlich), die sich gut erweitern lässt
+- **Gruppengespräche:** Die Agenten sollen auch gemeinsam auftreten können — Gespräche zu dritt/viert/mehreren, bei denen die Avatare untereinander UND mit Laetitia sprechen
+
+**Stand:** Reine Konzeptphase, noch keine Architektur-Entscheidung getroffen. Wichtige offene Fragen für die nächste Sitzung: Reihenfolge der Umsetzung (welcher Agent zuerst), Umgang mit dem manuellen 3D-Avatar-Erstellungsaufwand pro Agent (VRoid+Blender-Pipeline war für Nova bereits mehrere Sitzungen Arbeit), Gemini-Freikontingent-Verbrauch bei mehreren gleichzeitig aktiven KI-Stimmen in einem Gruppengespräch, technisches Konzept für Turn-Taking zwischen mehreren KI-Personas in einer Unterhaltung.
+
+---
+
 ## 🔴 Offene Aufgaben — Hochpriorität
 
 **Pfad-Training: Modus 2 — Edge-Test durchgeführt (29.07.2026), funktioniert wie dokumentiert**
@@ -304,9 +318,9 @@ Setup-Status:
   - **Für später vorgemerkt:** Falls präzise Lippensync gewünscht wird — Nova (nur Nova, nicht Grammatik) auf Google Cloud TTS (kostenlos bis 4 Mio. Zeichen/Monat, liefert Wort-Zeitstempel) oder TalkingHeads eigenes kostenloses lokales „HeadTTS" (Kokoro-Stimmen, WebGPU) umstellen — würde Novas Stimme wieder von Grammatiks Stimme unterscheiden, Tradeoff noch nicht entschieden.
 - ⬜ **Bekannte Einschränkung:** Edge-„Online (Natural)"-Stimme zeigt manchmal Stotter-Effekt (erste Silbe, dann ~5s Pause) — vermutlich Cloud-Streaming-Eigenheit der Neural-Stimme, kein Code-Bug. Noch nicht behoben, Diagnose ausstehend (ggf. Offline-„Microsoft Katja" testen).
 
-**🔴 Echter Tobii-Gerätetest (29.07.2026) — Avatar zeigt sich nicht, Ursache vermutet, Nutzer-Check ausstehend**
+**🔴 Echter Tobii-Gerätetest — Avatar zeigt sich nicht, Ursache vermutet, Test bewusst auf spätere Sitzung verschoben (Nutzerentscheidung 29.07.2026)**
 
-Erster echter Test direkt am Tobii-Gerät: **Avatar wird nicht angezeigt**, kein Fehler-Overlay. Wahrscheinlichste Ursache: `nova_avatar.glb` (16 MB, gitignored, liegt nur in OneDrive) ist auf dem Tobii-Gerät evtl. noch nicht vollständig synchronisiert — `novaHead.showAvatar(...).catch(...)` in `ki_gespraech_mod.js` schluckt einen Ladefehler still (setzt nur `novaHeadBereit=false`, kein sichtbarer Fehler), was exakt zum beobachteten Symptom passt.
+Erster echter Test direkt am Tobii-Gerät: **Avatar wird nicht angezeigt**, kein Fehler-Overlay. Wahrscheinlichste Ursache: `nova_avatar.glb` (16 MB, gitignored, liegt nur in OneDrive) ist auf dem Tobii-Gerät evtl. noch nicht vollständig synchronisiert — `novaHead.showAvatar(...).catch(...)` in `ki_gespraech_mod.js` schluckt einen Ladefehler still (setzt nur `novaHeadBereit=false`, kein sichtbarer Fehler), was exakt zum beobachteten Symptom passt. **Nutzer hat entschieden, den Tobii-Gerätetest auf eine spätere Sitzung zu verschieben** (Gerät aktuell nicht verfügbar) — kein aktiver Blocker, einfach zurückgestellt.
 **Nächster Schritt (braucht den Nutzer, am Tobii-Gerät):** Im Explorer zu `OneDrive/2026_05_12_Lernsystem/app/modules/ki_gespraech/nova_avatar.glb` navigieren — grüner Haken (lokal vollständig) oder Wolke (nur online)? Falls Wolke: „Immer auf diesem Gerät behalten" + Download abwarten, dann erneut testen. Falls die Datei bereits vollständig lokal ist, könnte es an begrenzter GPU/WebGL-Leistung des Tobii-Geräts liegen (härteres Problem, dann Rückfall auf SVG-Avatar Stufe 1 erwägen).
 
 **Lautstärke-Frage beantwortet:** 100 % ist eine harte technische Obergrenze (`SpeechSynthesisUtterance.volume` der Web-Speech-API deckelt bei 1.0) — der Regler in Nova ist schon am Maximum. Für mehr Lautstärke nur Windows-Systemlautstärke/Lautsprecher-Hardware.
@@ -472,10 +486,11 @@ Dann Edge komplett neu starten.
 | Nova: Eigene Antwort per Tastatur | ✅ Implementiert (commit `0c2af15`). Dwell-taugliche Bildschirmtastatur als Alternative zu den 4 Antwort-Vorschlägen im normalen Gespräch. |
 | Nova: Geschichten-Modul (Stufe 1) | ✅ Implementiert (commit `0c2af15`). Abschnittsweises Vorlesen mit Pausen + Diskussions-Vorschlägen, komplett lokal/offline. Erste Geschichte „Der Fluss und die Schlange" — kindgerechte Adaption von Quirogas „A la deriva" (Original zu belastend, siehe Detail-Eintrag oben bei Nova). Noch nicht live in Edge getestet. |
 | Rule-13-Backlog (Regel 18) | ✅ **Komplett abgeschlossen.** Alle 48 HTML-Dateien mit Inline-`<script>` > 20 Zeilen in externe `*_mod.js`-Dateien ausgelagert — reine Struktur-Änderung, kein Verhaltenswechsel. `validate.ps1` Regel 18 vollständig grün. Details siehe unten bei „Rule-13-Backlog". |
+| Rule-13-Backlog: Stichproben-Test in Edge | ✅ 8 Module aus verschiedenen Clustern live getestet (index.html, labyrinth.html [704 Zeilen, größte Datei], schach/koenig.html, eierjagd.html, einstellungen.html [inkl. onclick-Test], malen/kleckse.html, schule_mathe.html, statistik.html) — alle fehlerfrei, Interaktion (Klicks, Zustandswechsel) funktioniert überall. Kein Edge-Live-Test der Nova-Tastatur/Geschichten-Feature mehr offen von dieser Liste, aber die zwei Nova-Features selbst (commit `0c2af15`) sind separat noch nicht getestet (s.u.). |
 
 **Commits (alle gepusht):** `9363d76` (Nova-Lipsync-Fix), `9794f78` (Doku-Update), `30e8a72` (Doku Pfad-Training), `0c2af15` (Nova Tastatur + Geschichten), `a2102fc`/`e868231`/`821cee5` (Rule-13-Backlog, 48 Dateien)
 
-**Hinweis für Weiterarbeit:** Diese Sitzung ist ggf. noch nicht abgeschlossen — falls sie ohne regulären Sitzungsabschluss endet, oben stehende Tabelle ist der verlässliche Zwischenstand. Nächste konkrete Schritte: (1) Sync-Status von `nova_avatar.glb` auf dem Tobii-Gerät prüfen, (2) neuen Telegram-Bot-Token vom Nutzer erfragen und eintragen, (3) Geschichten-Modul + Eigene-Antwort-Tastatur in Edge testen (noch nicht live verifiziert), (4) Pfad-Training Modus 2 — kurze manuelle Erfolgsfall-Bestätigung (optional, Code bereits verifiziert).
+**Hinweis für Weiterarbeit:** Diese Sitzung ist ggf. noch nicht abgeschlossen — falls sie ohne regulären Sitzungsabschluss endet, oben stehende Tabelle ist der verlässliche Zwischenstand. Nächste konkrete Schritte: (1) Tobii-Gerätetest (Avatar-Anzeige + Dwell) — **bewusst auf spätere Sitzung verschoben**, (2) neuen Telegram-Bot-Token vom Nutzer erfragen und eintragen, (3) Geschichten-Modul + Eigene-Antwort-Tastatur in Edge testen (noch nicht live verifiziert, im Gegensatz zum Rule-13-Backlog), (4) Pfad-Training Modus 2 — kurze manuelle Erfolgsfall-Bestätigung (optional, Code bereits verifiziert), (5) **NEU: Multi-Agenten-System** — siehe neuer Abschnitt unten, Planungsphase.
 
 ---
 
