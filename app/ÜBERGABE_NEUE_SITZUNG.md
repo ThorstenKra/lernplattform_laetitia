@@ -360,7 +360,7 @@ Dann `lernwelt_starten.exe` neu starten → Audio-Dialog testen.
 - `taucher_lies`: Schätzwerte in BILD_CROP → exakt neu croppen
 - Neues Buch: Seiten 2, 8, 14, 16, 22, 28 fotografieren → hochladen
 
-**Rule-13-Backlog:** 48 HTML-Dateien mit Inline-`<script>` > 20 Zeilen. validate.ps1 meldet als WRN. Schrittweise abarbeiten.
+**Rule-13-Backlog: ✅ abgeschlossen (29.07.2026, commits `a2102fc`, `e868231`, `821cee5`).** Alle 48 HTML-Dateien mit Inline-`<script>` > 20 Zeilen in externe `*_mod.js`-Dateien ausgelagert (reine Struktur-Änderung, kein Verhaltenswechsel). `validate.ps1` Regel 18 vollständig grün. Extraktion per Skript (identischer Regex wie validate.ps1), jede Datei mit `node --check` syntaxgeprüft, alle `onclick`-Attribute auf globale Scope-Kompatibilität geprüft (keine IIFE-Konflikte gefunden). Deployed nach OneDrive, gepinnt.
 
 ---
 
@@ -471,8 +471,9 @@ Dann Edge komplett neu starten.
 | Nova: Lautstärke-Frage | ✅ Beantwortet: 100% ist harte Web-Speech-API-Obergrenze, Regler bereits am Maximum. Mehr nur über Windows-Systemlautstärke. |
 | Nova: Eigene Antwort per Tastatur | ✅ Implementiert (commit `0c2af15`). Dwell-taugliche Bildschirmtastatur als Alternative zu den 4 Antwort-Vorschlägen im normalen Gespräch. |
 | Nova: Geschichten-Modul (Stufe 1) | ✅ Implementiert (commit `0c2af15`). Abschnittsweises Vorlesen mit Pausen + Diskussions-Vorschlägen, komplett lokal/offline. Erste Geschichte „Der Fluss und die Schlange" — kindgerechte Adaption von Quirogas „A la deriva" (Original zu belastend, siehe Detail-Eintrag oben bei Nova). Noch nicht live in Edge getestet. |
+| Rule-13-Backlog (Regel 18) | ✅ **Komplett abgeschlossen.** Alle 48 HTML-Dateien mit Inline-`<script>` > 20 Zeilen in externe `*_mod.js`-Dateien ausgelagert — reine Struktur-Änderung, kein Verhaltenswechsel. `validate.ps1` Regel 18 vollständig grün. Details siehe unten bei „Rule-13-Backlog". |
 
-**Commits (alle gepusht):** `9363d76` (Nova-Lipsync-Fix), `9794f78` (Doku-Update), `30e8a72` (Doku Pfad-Training), `0c2af15` (Nova Tastatur + Geschichten)
+**Commits (alle gepusht):** `9363d76` (Nova-Lipsync-Fix), `9794f78` (Doku-Update), `30e8a72` (Doku Pfad-Training), `0c2af15` (Nova Tastatur + Geschichten), `a2102fc`/`e868231`/`821cee5` (Rule-13-Backlog, 48 Dateien)
 
 **Hinweis für Weiterarbeit:** Diese Sitzung ist ggf. noch nicht abgeschlossen — falls sie ohne regulären Sitzungsabschluss endet, oben stehende Tabelle ist der verlässliche Zwischenstand. Nächste konkrete Schritte: (1) Sync-Status von `nova_avatar.glb` auf dem Tobii-Gerät prüfen, (2) neuen Telegram-Bot-Token vom Nutzer erfragen und eintragen, (3) Geschichten-Modul + Eigene-Antwort-Tastatur in Edge testen (noch nicht live verifiziert), (4) Pfad-Training Modus 2 — kurze manuelle Erfolgsfall-Bestätigung (optional, Code bereits verifiziert).
 
