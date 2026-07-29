@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 27. Juli 2026 (Sitzung 14 — Ende)*
+*Stand: 29. Juli 2026 (Sitzung 15 — Zwischenstand, Sitzung läuft ggf. weiter)*
 
 ---
 
@@ -238,19 +238,23 @@ Eingetragene Bücher: Das Fliegende Kamel (60 Tracks), Jaguar und NEINguar (54 T
 Modus 2 (Freies Erkunden) ist implementiert (commit `2db604a`, Sitzung 13, 26.07.2026), aber noch **nicht in Edge getestet**.
 Testschritte: Start-Screen → „Modus 2 — Freies Erkunden" → Zielwort erscheint → beliebiger Erstklick öffnet Ebene 2 → falscher Zweitschritt spricht Wort + zurück zu Ebene 1 → richtiger Zweitschritt → Lob → nächstes Wort. Hinweis-Button aus Ebene 2: kehrt zu Ebene 1 zurück und blinkt Erstschritt.
 
-**Nachrichten-Modul (Telegram-Bridge) — Setup fast abgeschlossen**
+**Nachrichten-Modul (Telegram-Bridge) — 🔴 blockiert: Bot-Token ungültig**
 
-Implementiert (commit `a3b003b`, Sitzung 13, 26.07.2026). **Noch offen: Chat-ID ermitteln.**
+Implementiert (commit `a3b003b`, Sitzung 13, 26.07.2026). **Chat-ID-Ermittlung am 29.07.2026 versucht — gescheitert, neuer Blocker gefunden.**
+
+**Befund (29.07.2026):** Bridge lokal gestartet (`node bridge.js` im Vordergrund als Hintergrundprozess — Achtung: `node bridge.js &` gefolgt vom Beenden des Shell-Aufrufs killt den Prozess wieder, `node bridge.js` muss selbst der laufende Hintergrund-Befehl sein). Bridge-Log: `[Bridge] Bot-Verbindung fehlgeschlagen: ETELEGRAM: 401 Unauthorized`. Direkt gegen die Telegram-API geprüft (`https://api.telegram.org/bot<TOKEN>/getMe`) → ebenfalls `401 Unauthorized`. **Der Token in `telegram_bridge/config.json` wird von Telegram selbst abgelehnt — kein Bridge-Bug.** Mögliche Ursachen: Token in BotFather neu generiert/widerrufen, Bot gelöscht, oder Tippfehler beim Eintragen in Sitzung 13. Chat-ID-Ermittlung ist dadurch komplett blockiert (Bridge kann sich gar nicht erst mit Telegram verbinden, bevor überhaupt eine Testnachricht ankommen könnte).
 
 Setup-Status:
 - ✅ Bridge-Code: `telegram_bridge/bridge.js`
 - ✅ Bot erstellt: `@laetitia_nachrichten_bot`
-- ✅ Token in `telegram_bridge/config.json` eingetragen
+- ⚠️ Token in `telegram_bridge/config.json` eingetragen, aber **von Telegram als ungültig zurückgewiesen (401)** — neuer Token nötig
 - ✅ `npm install` abgeschlossen (`telegram_bridge/node_modules/` vorhanden)
-- ✅ Bridge startet und verbindet sich mit Telegram
-- ⬜ **Chat-ID ermitteln:** Bot eine Testnachricht schicken → Bridge gibt Chat-ID in der Konsole aus → in `config.json` bei `erlaubteChatIds` und `antwortChatId` eintragen
+- ❌ Bridge verbindet sich NICHT mit Telegram (Token-Problem, s.o.)
+- ⬜ **Chat-ID ermitteln:** blockiert bis neuer Token eingetragen ist
 - ⬜ Bridge als Windows-Autostart konfigurieren (Aufgabenplanung oder Startup-Ordner)
 - ⬜ Modul in Edge testen (spielewelt.html → 💬 Nachrichten)
+
+**Nächster Schritt (braucht den Nutzer):** In Telegram den Chat mit **@BotFather** öffnen → `/mybots` → `@laetitia_nachrichten_bot` → **API Token** anzeigen lassen (oder `/token` für einen neuen, falls der Bot noch existiert; falls der Bot nicht mehr existiert, neu mit `/newbot` anlegen). Neuen Token an Claude geben → wird in `config.json` eingetragen → Bridge neu starten → dann wie unten weiter.
 
 **Bridge starten (für nächste Sitzung):**
 ```powershell
@@ -258,7 +262,7 @@ powershell.exe -ExecutionPolicy Bypass -c "cd 'C:/Users/ThorstenLavinia/lernplat
 ```
 Bridge läuft dann auf `http://127.0.0.1:3737`. Konsole offen lassen.
 
-**Chat-ID ermitteln:**
+**Chat-ID ermitteln (sobald Token gültig ist):**
 1. Bridge starten (s. o.)
 2. In Telegram: Bot `@laetitia_nachrichten_bot` suchen → Nachricht schicken
 3. Bridge-Konsole zeigt: `[Bridge] Neue Chat-ID (bitte in config.json eintragen): XXXXXXXXX`
@@ -431,6 +435,20 @@ Dann Edge komplett neu starten.
 **Commits (alle gepusht):** 2694aa5, 86df18d, e51413e, f06b0d9
 
 **Grammatik-Werkstatt jetzt:** 44 Einheiten, 440 Aufgaben (E-03–E-46), Stufen 1–9 vollständig.
+
+---
+
+## Sitzungsprotokoll 29. Juli 2026 — Sitzung 15 (Zwischenstand)
+
+| Was | Ergebnis |
+|---|---|
+| Nova-Avatar: Absturz-Bug gefunden + behoben | ✅ Erster echter Edge-Test (via lokalem Test-Webserver + Browser-Automatisierung, Katja Online (Natural) bestätigt verfügbar) zeigte sofortigen Absturz beim Laden. Ursache: TalkingHead-Konstruktor lädt standardmäßig 3 Lipsync-Sprachmodule (`lipsync-en/fi/lt.mjs`) per `import()` nach, die nie ins Bundle übernommen wurden; `import()` ohne `.catch()` → 3 unhandled promise rejections → `error_handler.js` wertet das als Absturz. Fix: `lipsyncModules: []` beim Konstruieren (Nova nutzt kein eingebautes Lipsync, nur manuelles `jawOpen`-Toggle). Danach voller Gesprächsdurchlauf fehlerfrei (Start → Avatar rendert → Anekdoten-Opener → Antwort-Klick → Gemini-Antwort → Gespräch beenden → Speichern). `validate.ps1`: 0 Fehler. Committed (`9363d76`), deployed nach OneDrive, Doku aktualisiert (`9794f78`). |
+| Nova-Avatar: Dwell-Test am echten Tobii-Gerät | ⬜ **Noch offen** — Browser-Automatisierung testet nur per Klick, nicht per Augensteuerung. Steht weiterhin aus. |
+| Nachrichten-Modul: Chat-ID-Ermittlung versucht | 🔴 **Blockiert, neuer Befund:** Bridge lokal gestartet → `[Bridge] Bot-Verbindung fehlgeschlagen: ETELEGRAM: 401 Unauthorized`. Direkt gegen Telegram-API geprüft (`getMe`-Endpunkt) → ebenfalls 401. Der Bot-Token in `telegram_bridge/config.json` ist ungültig (Bridge-Code ist nicht die Ursache). Nächster Schritt braucht den Nutzer: neuen Token über @BotFather in Telegram holen (Details siehe unten bei „Nachrichten-Modul"). |
+
+**Commits (alle gepusht):** `9363d76` (Nova-Lipsync-Fix), `9794f78` (Doku-Update)
+
+**Hinweis für Weiterarbeit:** Diese Sitzung ist ggf. noch nicht abgeschlossen — falls sie ohne regulären Sitzungsabschluss endet, oben stehende Tabelle ist der verlässliche Zwischenstand. Nächste konkrete Schritte: (1) neuen Telegram-Bot-Token vom Nutzer erfragen und eintragen, (2) Nova-Dwell-Test am Tobii-Gerät.
 
 ---
 
