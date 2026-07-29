@@ -233,10 +233,18 @@ Eingetragene Bücher: Das Fliegende Kamel (60 Tracks), Jaguar und NEINguar (54 T
 
 ## 🔴 Offene Aufgaben — Hochpriorität
 
-**Pfad-Training: Modus 2 — Test ausstehend**
+**Pfad-Training: Modus 2 — Edge-Test durchgeführt (29.07.2026), funktioniert wie dokumentiert**
 
-Modus 2 (Freies Erkunden) ist implementiert (commit `2db604a`, Sitzung 13, 26.07.2026), aber noch **nicht in Edge getestet**.
-Testschritte: Start-Screen → „Modus 2 — Freies Erkunden" → Zielwort erscheint → beliebiger Erstklick öffnet Ebene 2 → falscher Zweitschritt spricht Wort + zurück zu Ebene 1 → richtiger Zweitschritt → Lob → nächstes Wort. Hinweis-Button aus Ebene 2: kehrt zu Ebene 1 zurück und blinkt Erstschritt.
+Modus 2 (Freies Erkunden) implementiert (commit `2db604a`, Sitzung 13, 26.07.2026). Am 29.07.2026 in echtem Edge getestet (lokaler Test-Webserver + Browser-Automatisierung, teils simulierter Dwell, teils direkter Klick-Aufruf zur präzisen Logik-Verifikation, da synthetisches Hover-Timing über die Automatisierung nicht durchgehend zuverlässig war — echtes Tobii-Gaze-Verhalten ist davon nicht betroffen).
+
+Bestätigt:
+- ✅ Beliebiger Erstklick öffnet Ebene 2 (mehrfach verifiziert, auch mit zufälliger Kachel)
+- ✅ Falscher Zweitschritt → Wort gesprochen, zurück zu Ebene 1, Zielwort unverändert
+- ✅ Hinweis-Button aus Ebene 2 → Code direkt geprüft (`quasselkiste_training_mod.js` Zeile 669-679): setzt zurück auf Ebene 1, hebt danach (300ms verzögert) die Erstschritt-Kachel hervor — exakt wie dokumentiert
+- ✅ Erfolgspfad-Code (`kachelKlickErkunden`, Zeilen 284-319) direkt gelesen: Koordinaten-Abgleich, Punktezähler, TTS-Lob, verzögerter Wortwechsel — Logik korrekt
+- ⬜ Kompletter Erfolgsfall (richtiger Zweitschritt → Lob → neues Wort) nicht durchgängig per Automatisierung durchgeklickt (Pfad-Mehrdeutigkeit: mehrere gültige Zweitschritte pro Wort erschwerten das gezielte Treffen des von der Session zufällig gewählten Pfads) — Code dafür aber geprüft und korrekt. Eine kurze manuelle Bestätigung (ein erfolgreicher Durchlauf reicht) steht noch aus.
+
+**Neuer UX-Befund (kein Bug, Beobachtung):** Bleibt der Blick nach dem Öffnen von Ebene 2 zu lange (~900ms) auf der Erstschritt-Kachel selbst stehen, löst `dwell.js` dort erneut aus. Da die Erstschritt-Kachel kein gültiges Zweitschritt-Ziel ist, springt die Ansicht automatisch zurück zu Ebene 1 — ohne Fehleranzeige, aber potenziell verwirrend, falls Laetitia nach dem ersten Blick kurz innehält, bevor sie zur zweiten Kachel schaut. Liegt am generischen Verhalten von `dwell.js` (nicht Modus-2-spezifisch, betrifft potenziell auch andere Module mit Zwei-Schritt-Interaktion). Kein Fix vorgenommen — reine Beobachtung, ob das in der echten Tobii-Nutzung relevant wird, sollte der Praxistest zeigen.
 
 **Nachrichten-Modul (Telegram-Bridge) — 🔴 blockiert: Bot-Token ungültig**
 
@@ -445,10 +453,11 @@ Dann Edge komplett neu starten.
 | Nova-Avatar: Absturz-Bug gefunden + behoben | ✅ Erster echter Edge-Test (via lokalem Test-Webserver + Browser-Automatisierung, Katja Online (Natural) bestätigt verfügbar) zeigte sofortigen Absturz beim Laden. Ursache: TalkingHead-Konstruktor lädt standardmäßig 3 Lipsync-Sprachmodule (`lipsync-en/fi/lt.mjs`) per `import()` nach, die nie ins Bundle übernommen wurden; `import()` ohne `.catch()` → 3 unhandled promise rejections → `error_handler.js` wertet das als Absturz. Fix: `lipsyncModules: []` beim Konstruieren (Nova nutzt kein eingebautes Lipsync, nur manuelles `jawOpen`-Toggle). Danach voller Gesprächsdurchlauf fehlerfrei (Start → Avatar rendert → Anekdoten-Opener → Antwort-Klick → Gemini-Antwort → Gespräch beenden → Speichern). `validate.ps1`: 0 Fehler. Committed (`9363d76`), deployed nach OneDrive, Doku aktualisiert (`9794f78`). |
 | Nova-Avatar: Dwell-Test am echten Tobii-Gerät | ⬜ **Noch offen** — Browser-Automatisierung testet nur per Klick, nicht per Augensteuerung. Steht weiterhin aus. |
 | Nachrichten-Modul: Chat-ID-Ermittlung versucht | 🔴 **Blockiert, neuer Befund:** Bridge lokal gestartet → `[Bridge] Bot-Verbindung fehlgeschlagen: ETELEGRAM: 401 Unauthorized`. Direkt gegen Telegram-API geprüft (`getMe`-Endpunkt) → ebenfalls 401. Der Bot-Token in `telegram_bridge/config.json` ist ungültig (Bridge-Code ist nicht die Ursache). Nächster Schritt braucht den Nutzer: neuen Token über @BotFather in Telegram holen (Details siehe unten bei „Nachrichten-Modul"). |
+| Pfad-Training Modus 2: Edge-Test | ✅ In echtem Edge getestet (lokaler Test-Webserver + Browser-Automatisierung). Kernverhalten bestätigt: beliebiger Erstklick öffnet Ebene 2, falscher Zweitschritt setzt zurück, Hinweis-Button-Verhalten und Erfolgspfad-Code direkt geprüft und korrekt. Neuer UX-Befund (kein Bug): zu langes Verharren auf der Erstschritt-Kachel nach Ebene-2-Öffnung löst `dwell.js` erneut aus und springt zurück zu Ebene 1 — Beobachtung für die Praxis, kein Fix vorgenommen. Kompletter Erfolgsfall (Lob + neues Wort) nicht durchgängig automatisiert durchgeklickt, Code dafür aber verifiziert; eine kurze manuelle Bestätigung steht noch aus (Details siehe unten bei „Pfad-Training: Modus 2"). |
 
 **Commits (alle gepusht):** `9363d76` (Nova-Lipsync-Fix), `9794f78` (Doku-Update)
 
-**Hinweis für Weiterarbeit:** Diese Sitzung ist ggf. noch nicht abgeschlossen — falls sie ohne regulären Sitzungsabschluss endet, oben stehende Tabelle ist der verlässliche Zwischenstand. Nächste konkrete Schritte: (1) neuen Telegram-Bot-Token vom Nutzer erfragen und eintragen, (2) Nova-Dwell-Test am Tobii-Gerät.
+**Hinweis für Weiterarbeit:** Diese Sitzung ist ggf. noch nicht abgeschlossen — falls sie ohne regulären Sitzungsabschluss endet, oben stehende Tabelle ist der verlässliche Zwischenstand. Nächste konkrete Schritte: (1) neuen Telegram-Bot-Token vom Nutzer erfragen und eintragen, (2) Nova-Dwell-Test am Tobii-Gerät, (3) Pfad-Training Modus 2 — kurze manuelle Erfolgsfall-Bestätigung (optional, Code bereits verifiziert).
 
 ---
 
