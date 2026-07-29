@@ -113,7 +113,7 @@ function aktualisiereEinstellungenAnzeige(){
 function $(id){ return document.getElementById(id); }
 
 // ── TTS ──────────────────────────────────────────────────────────────────────
-// danach (optional): wird nach TTS-Ende aufgerufen (z.B. Geschichten-Auto-Weiter)
+// danach (optional): wird nach TTS-Ende aufgerufen
 function sprich(text, danach){
   try{
     speechSynthesis.cancel();
@@ -153,7 +153,7 @@ function rebindDwell(skipRecheck){
     : function(){ return { cancelDwell: function(){} }; };
   var dwellMs = parseInt(localStorage.getItem("laetitia_dwell_ms"))       || 900;
   var grace   = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
-  _dwell = attach(".vorschlag-btn, .nav-btn:not([style*='display:none']), #btnStarten, #btnGeschichten, .einstellung-btn, .geschichte-btn, .tasten-btn, #btnEigeneAntwort, #btnTastaturFertig, #btnTastaturLoeschen", {
+  _dwell = attach(".vorschlag-btn, .nav-btn:not([style*='display:none']), #btnStarten, .einstellung-btn, .tasten-btn, #btnEigeneAntwort, #btnTastaturFertig, #btnTastaturLoeschen", {
     dwellMs: dwellMs, leaveGrace: grace,
     skipHoverRecheck: !!skipRecheck,
     onActivate: function(el){
@@ -179,14 +179,12 @@ function apiFetch(pfad, daten, cb){
 
 // ── Screens ───────────────────────────────────────────────────────────────────
 function alleVerstecken(){
-  ["startScreen","ladenScreen","geschichtenAuswahlScreen","gespraechContainer","abschlussScreen"].forEach(function(id){
+  ["startScreen","ladenScreen","gespraechContainer","abschlussScreen"].forEach(function(id){
     var el = $(id); if(el) el.style.display = "none";
   });
   var bB = $("btnBeenden"); if(bB) bB.style.display = "none";
-  var bW = $("btnGeschichteWeiter"); if(bW) bW.style.display = "none";
   var bE = $("btnEigeneAntwort"); if(bE) bE.style.display = "none";
   schliesseTastatur();
-  stoppeGeschichteTimer();
 }
 
 function zeigeStart(){
@@ -273,103 +271,6 @@ function beendeGespraech(){
   });
 }
 
-function beendeAktuellesFenster(){
-  if(zustand === "geschichte"){ beendeGeschichte(); return; }
-  beendeGespraech();
-}
-
-// ── Geschichten ────────────────────────────────────────────────────────────────
-// Nova liest jeden Abschnitt vor. Abschnitte mit "frage" zeigen Antwort-
-// Vorschlaege als kleine Gespraechsanregung (rein lokal, kein Gemini-Aufruf --
-// Story-Inhalte bleiben offline). Abschnitte ohne "frage" gehen nach kurzer
-// Pause automatisch weiter (wie Grammatik-Werkstatt Auto-Weiter).
-var aktGeschichte   = null;
-var aktAbschnitt    = 0;
-var geschichteTimer = null;
-
-function stoppeGeschichteTimer(){
-  if(geschichteTimer){ clearTimeout(geschichteTimer); geschichteTimer = null; }
-}
-
-function zeigeGeschichtenAuswahl(){
-  zustand = "geschichten_auswahl"; alleVerstecken();
-  aktGeschichte = null; aktAbschnitt = 0;
-  var el = $("geschichtenAuswahlScreen"); if(el) el.style.display = "";
-  var liste = $("geschichtenListe");
-  if(liste){
-    liste.innerHTML = "";
-    var geschichten = Array.isArray(window.GESCHICHTEN) ? window.GESCHICHTEN : [];
-    geschichten.forEach(function(g){
-      var btn = document.createElement("button");
-      btn.className = "geschichte-btn";
-      btn.innerHTML = "<span class='geschichte-emoji' style='pointer-events:none'>" + (g.emoji || "📖") + "</span>"
-        + "<span style='pointer-events:none'>" + g.titel + "</span>"
-        + "<svg class='dwell-ring-svg' viewBox='0 0 70 70'>"
-        + "<circle cx='35' cy='35' r='30' style='stroke:#8b5cf6'/></svg>";
-      btn.addEventListener("click", function(){ starteGeschichte(g); });
-      liste.appendChild(btn);
-    });
-  }
-  rebindDwell();
-}
-
-function starteGeschichte(geschichte){
-  aktGeschichte = geschichte;
-  aktAbschnitt = 0;
-  zeigeAbschnitt();
-}
-
-function zeigeAbschnitt(){
-  stoppeGeschichteTimer();
-  var abschnitt = aktGeschichte ? aktGeschichte.abschnitte[aktAbschnitt] : null;
-  if(!abschnitt){ zeigeGeschichtenAuswahl(); return; }
-
-  zustand = "geschichte"; alleVerstecken();
-  var gc = $("gespraechContainer"); if(gc) gc.style.display = "";
-  var bB = $("btnBeenden");         if(bB) bB.style.display = "";
-  aktualisiereAvatarGroesse();
-  wendeStimmungAufAvatar("neutral");
-
-  var text = abschnitt.text + (abschnitt.frage ? (" " + abschnitt.frage) : "");
-  var novaEl = $("novaAntwort"); if(novaEl) novaEl.textContent = text;
-
-  var grid = $("vorschlaegeGrid");
-  if(grid) grid.innerHTML = "";
-
-  if(abschnitt.frage && Array.isArray(abschnitt.vorschlaege)){
-    sprich(text);
-    abschnitt.vorschlaege.slice(0, 4).forEach(function(v){
-      var btn = document.createElement("button");
-      btn.className = "vorschlag-btn";
-      btn.innerHTML = "<span style='pointer-events:none'>" + v + "</span>"
-        + "<svg class='dwell-ring-svg' viewBox='0 0 70 70'>"
-        + "<circle cx='35' cy='35' r='30' style='stroke:#8b5cf6'/></svg>";
-      btn.addEventListener("click", function(){ weiterInGeschichte(); });
-      if(grid) grid.appendChild(btn);
-    });
-  } else {
-    var bW = $("btnGeschichteWeiter"); if(bW) bW.style.display = "";
-    sprich(text, function(){
-      geschichteTimer = setTimeout(weiterInGeschichte, 3000);
-    });
-  }
-  rebindDwell(true);
-}
-
-function weiterInGeschichte(){
-  stoppeGeschichteTimer();
-  var abschnitt = aktGeschichte ? aktGeschichte.abschnitte[aktAbschnitt] : null;
-  if(!abschnitt || abschnitt.ende){ zeigeGeschichtenAuswahl(); return; }
-  aktAbschnitt++;
-  zeigeAbschnitt();
-}
-
-function beendeGeschichte(){
-  speechSynthesis.cancel();
-  stoppeGeschichteTimer();
-  zeigeGeschichtenAuswahl();
-}
-
 // ── Eigene Antwort (Bildschirmtastatur) ─────────────────────────────────────────
 var TASTEN_REIHEN = [
   ["Q","W","E","R","T","Z","U","I","O","P"],
@@ -436,8 +337,6 @@ function tastaturBestaetigen(){
 
 // ── Navigation ─────────────────────────────────────────────────────────────────
 function zurueck(){
-  if(zustand === "geschichte"){ beendeGeschichte(); return; }
-  if(zustand === "geschichten_auswahl"){ zeigeStart(); return; }
   if(zustand === "gespraech" || zustand === "laden"){
     beendeGespraech(); return;
   }
@@ -457,13 +356,7 @@ function init(){
   if(bZ) bZ.addEventListener("click", zurueck);
 
   var bB = $("btnBeenden");
-  if(bB) bB.addEventListener("click", beendeAktuellesFenster);
-
-  var bG = $("btnGeschichten");
-  if(bG) bG.addEventListener("click", zeigeGeschichtenAuswahl);
-
-  var bGW = $("btnGeschichteWeiter");
-  if(bGW) bGW.addEventListener("click", weiterInGeschichte);
+  if(bB) bB.addEventListener("click", beendeGespraech);
 
   var bEA = $("btnEigeneAntwort");
   if(bEA) bEA.addEventListener("click", oeffneTastatur);
