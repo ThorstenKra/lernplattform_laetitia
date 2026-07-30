@@ -247,12 +247,12 @@ Nutzer möchte das KI-Gesprächskonzept von einer einzelnen Partnerin (Nova) zu 
 - Neues Modul `app/modules/ki_agenten/fabu/` — warmherziger, ruhiger Fuchs-Charakter, eigenes animiertes SVG-Gesicht (Amber-Farbschema, Fuchsohren, Blinzeln + Sprechanimation — technische Vorlage: Novas frühere SVG-Avatar-Stufe-1 aus commit `aa7d034`)
 - `persona.json`: Charakterbeschreibung + **explizite Adaptionsregel** für belastende Vorlagen-Inhalte (Präzedenzfall „Der Fluss und die Schlange" / Quiroga-Adaption dort dokumentiert, damit künftige Sitzungen den Maßstab kennen)
 - **Geschichten-Feature von Nova zu Fabu verschoben:** `geschichten_data.js` (inkl. „Der Fluss und die Schlange") liegt jetzt bei Fabu, nicht mehr bei Nova. Nova hat den „📖 Geschichten"-Button + zugehörige Screens/Funktionen wieder verloren — ist jetzt wieder reine Gesprächspartnerin für allgemeine Themen, wie vom Nutzer vorgesehen. Die „Eigene Antwort"-Tastatur (Sitzung 15, vorheriger Abschnitt) bleibt bei Nova unverändert.
-- `app/modules/ki_agenten/registry.js`: leichte Liste beider Agenten (Nova + Fabu) mit Metadaten (Name, Rolle, Farbe, Pfad) — **noch nicht in eine UI eingebunden**, dient als Vorbereitung für spätere Gruppengespräche
+- `app/modules/ki_agenten/registry.js`: leichte Liste beider Agenten (Nova + Fabu) mit Metadaten (Name, Rolle, Farbe, Pfad) — **seit 30.07.2026 in eine UI eingebunden** (siehe Abschnitt weiter unten), dient weiterhin als Vorbereitung für spätere Gruppengespräche
 - `spielewelt.html`: neue 🦊-Kachel neben Nova
 - **✅ Umlaut-Bug gefunden + behoben (commit `9e90b99`):** `geschichten_data.js`, `persona.json` und `registry.js` verwendeten fälschlich ASCII-Transliterationen (Naehe, grossen, Fuss, ...) statt echter Umlaute -- betraf Schriftbild UND TTS-Aussprache. `fabu.html`/`fabu_mod.js` waren bereits korrekt. Vom Nutzer selbst bemerkt beim Live-Test.
 - **✅ Vollständiger End-zu-Ende-Test erfolgreich (29.07.2026):** Komplette Geschichte "Der Fluss und die Schlange" von Start bis Ende in echtem Edge durchgespielt -- alle 5 Abschnitte (Diskussionsfragen mit Vorschlägen, Erzähl-Abschnitte mit korrektem Auto-Weiter nach TTS+3s), Umlaute überall korrekt dargestellt, Avatar wechselt korrekt zu "freude"-Stimmung beim letzten Abschnitt, sauberes Zurückkehren zur Geschichtenauswahl am Ende, keine Konsolen-Fehler. Ein einmaliger "Doppelsprung" (Abschnitt übersprungen) trat bei einem frühen Versuch auf, ließ sich aber durch zwei unabhängige, kontrollierte Wiederholungstests (reiner JS-Klick UND echter Maus-Klick, je exakt ein Fortschritt) als Aussetzer der instabilen Browser-Erweiterung entlarven, nicht als App-Bug -- App-Logik ist nachweislich korrekt.
 - **✅ Nova live nachgetestet (29.07.2026):** Vollständiger Gesprächsdurchlauf in echtem Edge -- 3D-Avatar, Gemini-Anekdoteneinstieg, 4 Vorschläge, **„Eigene Antwort"-Tastatur komplett getestet** (Text mit Umlaut-Taste getippt, „✓ Fertig" gesendet, Gemini antwortet korrekt, neue Vorschläge + Tastatur-Button erscheinen wieder), „Gespräch beenden" speichert sauber. Keine Konsolen-Fehler. „📖 Geschichten"-Button korrekt entfernt. Einziger Aussetzer unterwegs: Browser-Tab zeigte kurzzeitig eine gecachte alte Version (kein `btnEigeneAntwort` im DOM) -- nach Hard-Reload (Strg+Umschalt+R) korrekt, kein Code-Bug.
-- ⬜ **Nächste Schritte:** (1) Coach-Agent planen, (2) Bibliotheksformat für den Coach-Agenten konkretisieren (Anbindung an `LaetitiaStats`), (3) irgendwann: `registry.js` tatsächlich in eine Auswahl-UI einbinden, Grundkonzept für Gruppengespräche (Turn-Taking, Gemini-Freikontingent-Verbrauch bei mehreren gleichzeitigen KI-Stimmen).
+- ✅ **Alle drei ursprünglich offenen Schritte erledigt (30.07.2026):** (1) `registry.js` in Auswahl-UI eingebunden, (2) Milos Bibliothek vertieft (Grammatik-Merksätze + Mathe/Lesen-Anbindung), (3) Grundkonzept für Gruppengespräche erarbeitet — alle drei Abschnitte weiter unten.
 
 **Hinweis zur Browser-Erweiterung in dieser Sitzung:** Mehrfach unerwartet getrennt bzw. `Runtime.evaluate`/Screenshot-Timeouts, obwohl die Seite selbst nachweislich reagierte (einzelne, nicht gebündelte JS-Aufrufe liefen zuverlässig; ein `await`+`setTimeout` kombiniert mit `speechSynthesis`-Aufrufen in einem einzigen gebündelten Aufruf löste die Timeouts aus). Vermutlich eine Eigenheit der Browser-Erweiterung/CDP-Verbindung in Kombination mit TTS, kein App-Bug — für künftige Tests: TTS-auslösende Interaktionen einzeln (nicht gebündelt mit await/setTimeout) auswerten.
 
@@ -268,6 +268,43 @@ Nutzer möchte das KI-Gesprächskonzept von einer einzelnen Partnerin (Nova) zu 
 - **Neuer Agent „Milo" (Eule, Lernbegleiter):** `app/modules/ki_agenten/milo/` — `persona.json`, `milo.html` (SVG-Avatar, teal/grün, kein 3D), `milo_mod.js`. MVP-Fachgebiet: Grammatik-Werkstatt. `sammleLernkontext()` liest bei der ersten Nachricht echte Daten aus `window.LaetitiaStats` (`schwacheAufgaben`, `levelEmpfehlungen`, `musterWarnung`) und reicht sie als `kontext` an den Listener weiter, damit Milos Eröffnung konkret auf echten Fortschritt Bezug nimmt statt generisch zu klingen. `registry.js` + `spielewelt.html`-Kachel (🦉) ergänzt.
 - **✅ Live-Test beider Agenten in Edge (nach dem Bugfix):** Milo und Nova je komplett durchgespielt (Start → Eröffnung → Vorschlag-Klick → Folgeantwort → Milo zusätzlich Eigene-Antwort-Tastatur → Beenden → Abschluss-Screen). `gemeinsames_gedaechtnis.json` korrekt befüllt (Umlaute korrekt, `"agent"`-Feld korrekt), danach auf leeres Template zurückgesetzt. `validate.ps1`: 0 Fehler, Prüfung 9 (OneDrive-Sync) OK. **Zwischenzeitlicher Fehlalarm:** mehrere parallel abgesetzte Test-Requests gegen den einfädigen Listener erzeugten einen Warteschlangen-Stau, der wie ein hängender Request aussah — ein einzelner isolierter Klick funktionierte in jedem Test sofort korrekt, also kein echter App-Bug.
 - ✅ **Committed + gepusht** (commit `0d9d11d`).
+
+### ✅ Registry an Auswahl-UI angebunden (30.07.2026, commit `552d753`)
+
+Neue Seite `app/modules/ki_agenten/ki_agenten.html` + `ki_agenten_uebersicht.js` rendert alle Agenten dynamisch aus `registry.js` (Emoji/Name/Rolle/Farbe je Kachel) statt drei fest verdrahteter Nova/Fabu/Milo-Kacheln in `spielewelt.html`. Diese wurden durch eine einzige „🤝 KI-Freunde"-Kachel ersetzt. Zurück-Navigation aller drei Agenten (`fabu_mod.js`, `milo_mod.js`, `ki_gespraech_mod.js`) führt jetzt konsistent zurück zu `ki_agenten.html` statt direkt zu `spielewelt.html` (Muster wie bei Grammatik: Spiel→Kategorie→Übersicht). **Neue Agenten erscheinen künftig automatisch in der Auswahl, sobald sie in `registry.js` ergänzt werden — keine weitere UI-Arbeit nötig.** Live in Edge getestet (lokaler Test-Webserver + Browser-Automatisierung), 0 Konsolenfehler, `validate.ps1` grün, deployed.
+
+### ✅ Milo: Fachwissen-Bibliothek vertieft (30.07.2026, commit `f9d9379`)
+
+`milo_mod.js` bindet jetzt `grammatik_data.js` mit ein und reichert `sammleLernkontext()` an: zu schwachen Grammatik-Aufgaben wird der passende `erklaerung_merksatz` aus der jeweiligen Einheit nachgeschlagen und im `kontext`-Feld an den Listener mitgeschickt. Dadurch kann Milo inhaltlich konkret helfen statt nur die Fehlerquote zu kennen — z.B. „Bei Wer-Fall/Wen-Fall hast du's zuletzt öfter vertauscht — weißt du noch, Wer-Fall fragt 'wer', Wen-Fall 'wen'?" statt nur pauschal zu loben. Per Live-Test mit echtem Gemini-Call bestätigt (Milo griff „Wer-Fall" korrekt aus dem injizierten Merksatz auf).
+
+Als Vorarbeit wurde `stats.js` zusätzlich in `schule_mathe.html`/`schule_mathe_mod.js` und `schule_lesen.html`/`schule_lesen_mod.js` eingebunden (Regel 15 nachgeholt, vorher trackte nur Grammatik) — `sammleLernkontext()` meldet jetzt auch dort schwache Aufgaben generisch (ohne Merksatz-Anreicherung, da Mathe/Lesen keine thematischen Merksätze wie Grammatik haben). Mathe- und Lesen-Sessions speichern Stats nachweislich korrekt (live getestet).
+
+**Beobachtung (nicht weiter untersucht):** beim Testen erschienen einmalig 2 statt 1 Eintrag in `gemeinsames_gedaechtnis.json` nach einem einzelnen Gesprächsdurchlauf — Ursache nicht geklärt (evtl. Testartefakt durch die Browser-Automatisierung), Datei wurde danach auf das leere Template zurückgesetzt. Falls das in einer echten Sitzung wieder auffällt, lohnt sich ein Blick auf `/chat/abschliessen` in `listener.ps1`.
+
+### 📐 Gruppengespräche — Konzept (30.07.2026, Planungsphase, noch nicht implementiert)
+
+Umsetzung der ursprünglichen Vision „Avatare sprechen untereinander UND mit Laetitia" (siehe oben). Kernentscheidungen mit dem Nutzer abgestimmt:
+
+**Technischer Ausgangspunkt:** `listener.ps1` verarbeitet Anfragen einfädig (`while ($listener.IsListening) { $ctx = $listener.GetContext() ... }`, kein Threading/Runspaces). Parallele Gemini-Aufrufe mehrerer Agenten gleichzeitig sind technisch ohnehin nicht möglich — die Umsetzung ist also eine reine Reihenfolge-Frage, kein Nebenläufigkeits-Problem.
+
+**MVP-Umfang:** gleich alle 3 Agenten (Nova + Fabu + Milo), nicht erst mit 2 starten.
+
+**Rederecht:** Laetitia wählt selbst, an wen sie sich richtet (Klick/Dwell auf einen Avatar oder eine Vorschlag-Kachel) — einfachste Technik, volle Kontrolle für sie, passt zur bestehenden Dwell-Steuerung. Kein Moderator-Agent, kein starres Round-Robin.
+
+**Agent-zu-Agent-Dialog — Mittelweg-Modell („kurzer Schlagabtausch, dann fest zurück an Laetitia"):**
+- Nach Laetitias Beitrag darf der antwortende Agent bis zu **2 Züge** an einen anderen Agenten richten (echtes kurzes Hin-und-Her, mehr als ein Satz) — danach erscheinen zwingend wieder Laetitias Antwortvorschläge, unabhängig davon was das Modell „möchte". Kein endloses Ping-Pong, kein unbegrenzter Gemini-Quota-Verbrauch.
+- Technisch: das bestehende `[VORSCHLAEGE]{...}[/VORSCHLAEGE]`-Antwortformat bekommt ein neues Feld, z.B. `"naechster":"fabu"` oder `"naechster":"laetitia"` — das Modell entscheidet pro Zug, der Server erzwingt aber den Deckel bei 2 Zügen.
+- Während die Agenten kurz unter sich reden (automatisch ablaufend, wie Grammatik-Auto-Weiter), bleibt ein Button **„Ich möchte was sagen"** sichtbar — Laetitia kann jederzeit dazwischen springen. Kein Interrupt eines laufenden Gemini-Calls nötig, der Einstiegspunkt ist immer zwischen zwei Zügen.
+
+**Geplantes Datenmodell:** gemeinsamer `verlauf` mit Sprecher-Attribution statt pro-Agent-Verlauf — jeder Eintrag `{rolle, text, agent}`. Jeder Agent sieht beim Antworten die volle Runde inkl. wer was gesagt hat, nicht nur einen Ausschnitt.
+
+**Geplante Backend-Änderung:** `/chat`-Route erweitern (nicht neu bauen) um `teilnehmer: [...]` — der System-Prompt bekommt zusätzlich „Diese anderen Charaktere sind auch dabei: X, Y" plus deren Kurzrollen, damit ein Agent sie beim Namen nennen kann.
+
+**Geplantes Frontend:** neue Seite `app/modules/ki_agenten/gruppe.html`, nutzt `registry.js` zur Agentenauswahl/-anzeige, zeigt alle 3 Avatare nebeneinander.
+
+**Geplante Speicherung:** Abschluss-Eintrag in `gemeinsames_gedaechtnis.json` bekommt `agent: "Gruppe (Nova+Fabu+Milo)"` o.ä. statt eines einzelnen Namens, damit die Herkunft nachvollziehbar bleibt.
+
+⬜ **Noch offen:** vollständige Implementierung (bisher nur Konzept, kein Code). Bei Umsetzung zusätzlich zu klären: Gemini-Freikontingent-Verbrauch bei häufigeren Gruppengesprächen (aktuell `gemini-flash-lite-latest`, ~1.500 Anfragen/Tag) im Praxisbetrieb beobachten, UI-Layout für 3 gleichzeitig sichtbare Avatare auf begrenzter Bildschirmfläche.
 
 ---
 
