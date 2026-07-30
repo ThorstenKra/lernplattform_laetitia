@@ -3,13 +3,18 @@
 // REGEL 1: Kein import(), kein type="module"
 // REGEL 4: Nur gerade Anführungszeichen
 //
-// Rein lokal, kein Gemini-Aufruf -- Fabus Bibliothek (geschichten_data.js)
-// treibt Vorlesen + Diskussionsfragen komplett offline. Siehe persona.json
-// für Charakter/Adaptionsregel.
+// Vorlesen der Geschichten selbst bleibt komplett offline (geschichten_data.js).
+// Seit 30.07.2026 reagiert Fabu zusaetzlich live per Gemini auf die Antwort, die
+// Laetitia bei einer Diskussionsfrage waehlt (siehe reagiereAufAntwort) -- faellt
+// bei Verbindungsproblemen ohne Fehleranzeige auf direktes Weitererzaehlen zurueck,
+// damit die Geschichte nie blockiert. Siehe persona.json fuer Charakter/Adaptionsregel.
 
 (function(){
 "use strict";
 
+var LISTENER_URL = "http://localhost:9999";
+var AGENT_ID     = "ki_agenten/fabu";
+var verlauf      = [];
 var zustand = "start";
 var _dwell  = null;
 
@@ -19,6 +24,20 @@ function $(id){ return document.getElementById(id); }
 function setzeStimmung(freude){
   var av = $("fabuAvatar");
   if(av) av.setAttribute("class", "fabu-avatar blink" + (freude ? " freude" : ""));
+}
+
+// ── HTTP ──────────────────────────────────────────────────────────────────────
+function apiFetch(pfad, daten, cb){
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", LISTENER_URL + pfad, true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.timeout = 25000;
+  xhr.onload = function(){
+    try{ cb(null, JSON.parse(xhr.responseText)); }
+    catch(e){ cb(new Error("Antwort ungueltig")); }
+  };
+  xhr.onerror = xhr.ontimeout = function(){ cb(new Error("Verbindungsfehler")); };
+  xhr.send(JSON.stringify(daten));
 }
 
 // ── TTS ──────────────────────────────────────────────────────────────────────
@@ -117,6 +136,7 @@ function zeigeGeschichtenAuswahl(){
 function starteGeschichte(geschichte){
   aktGeschichte = geschichte;
   aktAbschnitt = 0;
+  verlauf = [];
   zeigeAbschnitt();
 }
 
@@ -144,7 +164,7 @@ function zeigeAbschnitt(){
       btn.innerHTML = "<span style='pointer-events:none'>" + v + "</span>"
         + "<svg class='dwell-ring-svg' viewBox='0 0 70 70'>"
         + "<circle cx='35' cy='35' r='30' style='stroke:#d97706'/></svg>";
-      btn.addEventListener("click", function(){ weiterInGeschichte(); });
+      btn.addEventListener("click", function(){ reagiereAufAntwort(abschnitt, v); });
       if(grid) grid.appendChild(btn);
     });
   } else {
@@ -159,14 +179,58 @@ function zeigeAbschnitt(){
 function weiterInGeschichte(){
   stoppeGeschichteTimer();
   var abschnitt = aktGeschichte ? aktGeschichte.abschnitte[aktAbschnitt] : null;
-  if(!abschnitt || abschnitt.ende){ zeigeGeschichtenAuswahl(); return; }
+  if(!abschnitt || abschnitt.ende){ speichereGespraech(); zeigeGeschichtenAuswahl(); return; }
   aktAbschnitt++;
   zeigeAbschnitt();
+}
+
+// Gemeinsam genutzt von natuerlichem Geschichtenende (ende:true) und explizitem
+// "Geschichte beenden"-Button -- beide Wege sollen das Gespraech sichern.
+function speichereGespraech(){
+  if(verlauf.length > 0){
+    apiFetch("/chat/abschliessen", { agent: AGENT_ID, verlauf: verlauf }, function(){});
+    verlauf = [];
+  }
+}
+
+// Live-Reaktion auf die gewaehlte Diskussionsantwort -- faellt bei Fehlern
+// unauffaellig auf direktes Weitererzaehlen zurueck (Story blockiert nie).
+function reagiereAufAntwort(abschnitt, gewaehlterText){
+  stoppeGeschichteTimer();
+  var grid = $("vorschlaegeGrid");
+  if(grid) grid.innerHTML = "";
+  var fabuEl = $("fabuAntwort");
+  if(fabuEl) fabuEl.textContent = "🦊 …";
+
+  var kontext = "Ihr lest gerade gemeinsam die Geschichte \"" + (aktGeschichte ? aktGeschichte.titel : "") + "\". "
+    + "Fabu hat gerade erzaehlt: \"" + abschnitt.text + "\" und dann gefragt: \"" + abschnitt.frage + "\". "
+    + "Antworte NUR mit einer ganz kurzen persoenlichen Reaktion auf ihre Antwort (1 Satz, maximal 2). "
+    + "Erzaehle die Geschichte NICHT selbst weiter und stelle KEINE neue Frage -- die Fortsetzung der "
+    + "Geschichte kommt anschliessend automatisch von der App, nicht von dir.";
+
+  apiFetch("/chat", { agent: AGENT_ID, nachricht: gewaehlterText, verlauf: verlauf, kontext: kontext }, function(err, data){
+    if(err || !data || data.fehler){
+      weiterInGeschichte();
+      return;
+    }
+    verlauf.push({ rolle: "user",      text: gewaehlterText });
+    verlauf.push({ rolle: "assistant", text: data.antwort });
+
+    if(fabuEl) fabuEl.textContent = data.antwort;
+    setzeStimmung(data.stimmung === "aufgeregt" || data.stimmung === "schnippisch");
+
+    var bW = $("btnGeschichteWeiter"); if(bW) bW.style.display = "";
+    sprich(data.antwort, function(){
+      geschichteTimer = setTimeout(weiterInGeschichte, 3000);
+    });
+    rebindDwell(true);
+  });
 }
 
 function beendeGeschichte(){
   speechSynthesis.cancel();
   stoppeGeschichteTimer();
+  speichereGespraech();
   zeigeGeschichtenAuswahl();
 }
 

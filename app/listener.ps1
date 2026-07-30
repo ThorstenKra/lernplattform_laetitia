@@ -10,9 +10,13 @@
 #                             Modulordner unter modules\ (Standard "ki_gespraech" = Nova,
 #                             z.B. "ki_agenten/milo" fuer weitere Agenten). Jeder Agent
 #                             bringt seine eigene persona.json mit (Charakter, Eroeffnung,
-#                             Grenzen). body.kontext (optional) liefert zusaetzliche
-#                             strukturierte Fakten (z.B. Lernfortschritt), die in den
-#                             Prompt uebernommen werden.
+#                             Grenzen). Zusaetzlich lesen ALLE Agenten IMMER
+#                             modules\ki_agenten\lebenskontext_gemeinsam.json (sicherheits-
+#                             relevante Fakten ueber Laetitia, z.B. Mobilitaet/Soziales --
+#                             30.07.2026 aus Novas persona.json ausgelagert, damit jeder
+#                             Agent diese Grundlagen kennt). body.kontext (optional) liefert
+#                             zusaetzliche strukturierte Fakten fuer genau diese eine Antwort
+#                             (z.B. Milos Lernfortschritt, Fabus aktuelle Geschichten-Szene).
 #   /chat/abschliessen    -> POST: Gespraech speichern, GEMEINSAMES Gedaechtnis
 #                             (modules\ki_agenten\gemeinsames_gedaechtnis.json) aktualisieren.
 #                             Alle Agenten teilen sich dieses eine Gedaechtnis -- so "lernt"
@@ -304,10 +308,19 @@ while ($listener.IsListening) {
             $stimmungen    = ($persona.stimmungen.PSObject.Properties | ForEach-Object { "- $($_.Name): $($_.Value)" }) -join "`n"
             $rolle         = if ($persona.rolle) { $persona.rolle } else { "Gespraechspartnerin" }
 
+            # Gemeinsamer Lebenskontext (sicherheitsrelevante Fakten ueber Laetitia,
+            # gilt fuer ALLE Agenten) + optionaler agent-eigener Zusatzkontext (z.B.
+            # Novas Anekdoten-Material aus ihrem persoenlichen persona.json-Feld).
             $lebenskontextBlock = ""
+            $gemeinsamerLebenskontextPfad = "$PSScriptRoot\modules\ki_agenten\lebenskontext_gemeinsam.json"
+            if (Test-Path $gemeinsamerLebenskontextPfad) {
+                $gemeinsamerLebenskontext = Get-Content $gemeinsamerLebenskontextPfad -Raw -Encoding UTF8 | ConvertFrom-Json
+                $lebenskontextZeilen = ($gemeinsamerLebenskontext.PSObject.Properties | ForEach-Object { "- $($_.Name): $($_.Value)" }) -join "`n"
+                $lebenskontextBlock += "`nWichtiger Lebenskontext ueber Laetitia (gilt fuer ALLE Charaktere, unbedingt beachten):`n$lebenskontextZeilen`n"
+            }
             if ($persona.lebenskontext) {
-                $lebenskontext = ($persona.lebenskontext.PSObject.Properties | ForEach-Object { "- $($_.Name): $($_.Value)" }) -join "`n"
-                $lebenskontextBlock = "`nWichtiger Lebenskontext (unbedingt beachten):`n$lebenskontext`n"
+                $eigenerLebenskontext = ($persona.lebenskontext.PSObject.Properties | ForEach-Object { "- $($_.Name): $($_.Value)" }) -join "`n"
+                $lebenskontextBlock += "`nZusaetzlicher eigener Kontext:`n$eigenerLebenskontext`n"
             }
 
             $istErsteNachricht = (-not $body.verlauf -or $body.verlauf.Count -eq 0)
@@ -326,7 +339,7 @@ while ($listener.IsListening) {
 
             $kontextBlock = ""
             if ($body.kontext) {
-                $kontextBlock = "`n`nAktueller Lernfortschritt (strukturierte Fakten, von der App ermittelt):`n$($body.kontext)`nNutze diese Fakten aktiv, um konkret und persoenlich zu coachen -- nenne wenn passend echte Themen daraus.`n"
+                $kontextBlock = "`n`nZusaetzlicher Kontext von der App fuer genau diese Antwort:`n$($body.kontext)`nNutze das aktiv und konkret, nenne wenn passend echte Details daraus.`n"
             }
 
             $sysPrompt = @"
