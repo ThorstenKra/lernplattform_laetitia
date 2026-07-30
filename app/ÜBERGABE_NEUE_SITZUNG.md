@@ -306,6 +306,17 @@ Umsetzung der ursprünglichen Vision „Avatare sprechen untereinander UND mit L
 
 ⬜ **Noch offen:** vollständige Implementierung (bisher nur Konzept, kein Code). Bei Umsetzung zusätzlich zu klären: Gemini-Freikontingent-Verbrauch bei häufigeren Gruppengesprächen (aktuell `gemini-flash-lite-latest`, ~1.500 Anfragen/Tag) im Praxisbetrieb beobachten, UI-Layout für 3 gleichzeitig sichtbare Avatare auf begrenzter Bildschirmfläche.
 
+### ✅ Agenten weiter personalisiert (30.07.2026, commit `1e73134`)
+
+- **Gemeinsamer Lebenskontext:** neue `app/modules/ki_agenten/lebenskontext_gemeinsam.json` (Mobilität, Tagesablauf, Soziales, Persönlichkeit über Laetitia — Sicherheits-/Angemessenheitsregeln wie "keine Fragen die normale Mobilität voraussetzen") wird jetzt von `listener.ps1` für JEDEN Agenten automatisch geladen. Vorher kannte nur Nova diese Fakten über ihr eigenes `persona.json`-Feld — Milo und Fabu wussten z.B. nichts von Laetitias Rollstuhl/Spastik. Aus Novas `persona.json` ausgelagert (behält nur noch `zuhause`+`lernumgebung` als eigenes Anekdoten-Material).
+- **Milo auf Novas Personalisierungstiefe gebracht:** `eroeffnung.{a,b}` (Fortschritts-Bezug vs. neugierige Eulen-Beobachtung/Sprachrätsel als Einstieg), Selbstbild-Antwort ("bist du echt?"), eigene Interessen (Muster/Rätsel entdecken), freundlicher Widerspruch.
+- **Fabu reagiert jetzt live per Gemini** auf die bei einer Diskussionsfrage gewählte Antwort — vorher wurden alle 4 Antwort-Optionen identisch behandelt (`weiterInGeschichte()` ignorierte, welche geklickt wurde). `fabu_mod.js` bekam dafür dieselbe `apiFetch`/`verlauf`/`AGENT_ID`-Struktur wie Milo/Nova. Fällt bei Verbindungsproblemen ohne sichtbare Störung auf reines Weitererzählen zurück — die Geschichte selbst bleibt dadurch weiterhin robust, nur die persönliche Reaktion ist die zusätzliche (optionale) Komponente. Speichert das Gespräch über `speichereGespraech()` sowohl bei explizitem "Geschichte beenden" als auch bei natürlichem Geschichtenende.
+  - **🐛 Bug beim ersten Testlauf gefunden + behoben:** der natürliche Ende-Pfad (`ende:true`) rief den Speicher-Call ursprünglich nie auf, nur der explizite Beenden-Button.
+  - **Prompt-Lektion:** erste Formulierung "du erzählst danach selbst weiter" im Kontext-Text wurde von Gemini als Erlaubnis missverstanden, die Story selbst fortzusetzen statt nur kurz zu reagieren — Antworten vermischten Reaktion und Weitererzählung. Fix: explizit "Erzähle die Geschichte NICHT selbst weiter" ergänzt.
+- **✅ Live-Test aller drei Agenten:** Fabu (komplette Geschichte inkl. Live-Reaktionen auf allen 3 Diskussionsfragen + Speichern über beide Pfade), Milo (neue Eröffnungsvariante bestätigt, referenzierte im Test korrekt "Wer-Fall"), Nova (Lebenskontext kommt nachweislich aus der neuen gemeinsamen Datei — erwähnte "Spastik" trotz entfernten Feldes aus ihrer eigenen persona.json). `validate.ps1`: 0 Fehler.
+
+**⚠️ Zwischenfall (behoben) — wichtig für künftige Deploys von `listener.ps1`:** Beim Kopieren nach OneDrive wurde versehentlich der echte Gemini-API-Key durch den Repo-Platzhalter (`HIER_GEMINI_KEY_EINTRAGEN`) überschrieben — der echte Key existiert aus Sicherheitsgründen nur in der OneDrive-Kopie, nie im Repo. Wiederhergestellt über aistudio.google.com/apikey (Projekt "LaetitiaLernplattform", Key war noch gültig). **Merksatz für künftige Sitzungen: vor jedem Deploy von `listener.ps1` nach OneDrive prüfen, ob die Zieldatei einen echten Key enthält, der beim Überschreiben verloren ginge.**
+
 ---
 
 ## 🔴 Offene Aufgaben — Hochpriorität
