@@ -362,9 +362,11 @@ $eroeffnungHinweis$kontextBlock
 Heutiges Datum: $(Get-Date -Format "yyyy-MM-dd")
 
 Gemeinsames Gedaechtnis ueber Laetitia (JSON, wird von ALLEN KI-Charakteren auf dieser
-Plattform geteilt -- inkl. datierter vergangener Gespraeche unter "letzte_gespraeche"
-mit Angabe welcher Charakter dabei war, einer laufenden Routine unter "routine" und
-beobachteten Vorlieben unter "beobachtete_praeferenzen"):
+Plattform geteilt). Zwei Teile: "profil" sind dauerhafte, selten sich aendernde Fakten
+(ueber_laetitia, interessen, wiederkehrende_themen, eine laufende Routine unter
+"routine", beobachtete Vorlieben unter "beobachtete_praeferenzen"). "letzte_gespraeche"
+ist ein rollierendes Kurzzeit-Log der letzten Gespraeche (max. 20, aeltestes faellt raus)
+mit Angabe welcher Charakter jeweils dabei war:
 $gedaechtnis
 
 Nutze dieses Gedaechtnis aktiv:
@@ -440,44 +442,65 @@ Bei "stimmung" exakt einen der obigen Stimmungs-Namen eintragen.
             $agent   = if ($body.agent) { [string]$body.agent -replace '/', '\' } else { "ki_gespraech" }
             $modPfad = "$PSScriptRoot\modules\$agent"
             $persona = Get-Content "$modPfad\persona.json" -Raw -Encoding UTF8 | ConvertFrom-Json
-            $gedPfad = "$PSScriptRoot\modules\ki_agenten\gemeinsames_gedaechtnis.json"
-            $altesGed    = Get-Content $gedPfad -Raw -Encoding UTF8
+            $gedPfad     = "$PSScriptRoot\modules\ki_agenten\gemeinsames_gedaechtnis.json"
+            $gedaechtnis = Get-Content $gedPfad -Raw -Encoding UTF8 | ConvertFrom-Json
             $verlaufText = ($body.verlauf | ForEach-Object {
                 $rolle = if($_.rolle -eq "user") { "Laetitia" } else { $persona.name }
                 "${rolle}: $($_.text)"
             }) -join "`n"
 
             $heute = Get-Date -Format "yyyy-MM-dd"
+            # Nur das PROFIL (dauerhafte Fakten) geht an Gemini zur Aktualisierung --
+            # "letzte_gespraeche" wird unten rein mechanisch angehaengt/gekuerzt, nicht vom
+            # Modell neu geschrieben. Kleinerer JSON-Umfang = zuverlaessiger, und ein Fehler
+            # beim Parsen kann nie das rollierende Gespraechs-Log beschaedigen (30.07.2026,
+            # Langzeit/Kurzzeit-Trennung).
+            $profilJson = $gedaechtnis.profil | ConvertTo-Json -Depth 6 -Compress
             $gedPrompt = @"
-Altes GEMEINSAMES Gedaechtnis (JSON, wird von mehreren KI-Charakteren zusammen genutzt) --
-Schema: ueber_laetitia (Text), interessen (Liste), wiederkehrende_themen (Liste),
-letzte_gespraeche (Liste von {"datum":"YYYY-MM-DD","agent":"Name","zusammenfassung":"..."}),
-routine ({"ziel":"...","stand":"..."}), beobachtete_praeferenzen (Liste kurzer Notizen,
-worauf Laetitia im Ton/Thema gut reagiert):
-$altesGed
+Bisheriges PROFIL von Laetitia (dauerhafte Fakten, aendert sich selten -- JSON):
+$profilJson
 
 Neues Gespraech (heute, $heute, mit $($persona.name)):
 $verlaufText
 
-Aktualisiere das Gedaechtnis:
-1. Fuege einen NEUEN Eintrag zu "letzte_gespraeche" hinzu:
-   {"datum":"$heute","agent":"$($persona.name)","zusammenfassung":"1-2 Saetze Kernthema"}.
-   Bestehende Eintraege beibehalten, aber Liste auf maximal die letzten 20 Eintraege kuerzen
-   (aelteste zuerst entfernen).
-2. "interessen" und "wiederkehrende_themen" ergaenzen falls neue erkennbar sind (keine Duplikate).
-3. Falls im Gespraech eine taegliche Routine erwaehnt, vereinbart oder verfolgt wurde: "routine"
-   (ziel + stand) aktualisieren.
-4. Falls erkennbar ist, worauf Laetitia besonders gut reagiert hat (Humor-Art, Thema, Tonfall):
-   kurze Notiz zu "beobachtete_praeferenzen" hinzufuegen (max. 8 Eintraege insgesamt, bei Bedarf
-   aelteste entfernen).
-5. "ueber_laetitia" nur anpassen, wenn sich wirklich etwas Grundlegendes geaendert hat.
-Gib NUR das aktualisierte JSON zurueck (exakt dieses Schema), kein Markdown, keine Erklaerung.
+Aufgabe:
+1. Schreibe eine kurze Zusammenfassung (1-2 Saetze) des Kernthemas dieses Gespraechs.
+2. Aktualisiere das PROFIL NUR wenn im Gespraech wirklich etwas Neues/Wichtiges erkennbar
+   war -- nicht bei jedem Gespraech automatisch etwas ergaenzen, das Profil soll stabil
+   bleiben. Lieber ein Feld unveraendert lassen als unsicher raten:
+   - "interessen": neue erkennbare Interessen ergaenzen, keine Duplikate
+   - "wiederkehrende_themen": nur Themen die ueber mehrere Gespraeche immer wieder auftauchen
+   - "routine": nur aendern falls im Gespraech eine taegliche Routine erwaehnt, vereinbart
+     oder verfolgt wurde (ziel + stand)
+   - "beobachtete_praeferenzen": nur ergaenzen bei einer klar erkennbaren neuen Beobachtung
+     zu Ton/Thema/Humor, worauf Laetitia gut reagiert
+   - "ueber_laetitia": NUR aendern wenn sich wirklich etwas Grundlegendes geaendert hat
+Antworte NUR mit diesem JSON, kein Markdown, keine Erklaerung:
+{"zusammenfassung":"...","profil":{"ueber_laetitia":"...","interessen":[],"wiederkehrende_themen":[],"routine":{"ziel":"...","stand":"..."},"beobachtete_praeferenzen":[]}}
 "@
-            $gedResp = RufeGemini @(@{ role = "user"; content = $gedPrompt }) 2000 0.2 20000
-            $neuesGed = $gedResp.choices[0].message.content.Trim()
-            # Nur speichern wenn gueltiges JSON zurueckkam
-            $neuesGed | ConvertFrom-Json | Out-Null
-            $neuesGed | Set-Content $gedPfad -Encoding UTF8
+            $gedResp = RufeGemini @(@{ role = "user"; content = $gedPrompt }) 1500 0.2 20000
+            $antwort = $gedResp.choices[0].message.content.Trim() | ConvertFrom-Json
+
+            # Rollierendes Log mechanisch pflegen (kein LLM-Risiko fuer diesen Teil)
+            $neuerEintrag = [PSCustomObject]@{ datum = $heute; agent = $persona.name; zusammenfassung = $antwort.zusammenfassung }
+            $alleGespraeche = @($gedaechtnis.letzte_gespraeche) + @($neuerEintrag)
+            if ($alleGespraeche.Count -gt 20) { $alleGespraeche = $alleGespraeche[($alleGespraeche.Count - 20)..($alleGespraeche.Count - 1)] }
+
+            # Hartes Kappen als Sicherheitsnetz, unabhaengig davon ob Gemini sich an die im
+            # Prompt genannten Grenzen haelt
+            $neuesProfil = $antwort.profil
+            if ($neuesProfil.interessen -and $neuesProfil.interessen.Count -gt 15) {
+                $neuesProfil.interessen = $neuesProfil.interessen[($neuesProfil.interessen.Count - 15)..($neuesProfil.interessen.Count - 1)]
+            }
+            if ($neuesProfil.wiederkehrende_themen -and $neuesProfil.wiederkehrende_themen.Count -gt 10) {
+                $neuesProfil.wiederkehrende_themen = $neuesProfil.wiederkehrende_themen[($neuesProfil.wiederkehrende_themen.Count - 10)..($neuesProfil.wiederkehrende_themen.Count - 1)]
+            }
+            if ($neuesProfil.beobachtete_praeferenzen -and $neuesProfil.beobachtete_praeferenzen.Count -gt 8) {
+                $neuesProfil.beobachtete_praeferenzen = $neuesProfil.beobachtete_praeferenzen[($neuesProfil.beobachtete_praeferenzen.Count - 8)..($neuesProfil.beobachtete_praeferenzen.Count - 1)]
+            }
+
+            $neuesGedaechtnis = [PSCustomObject]@{ profil = $neuesProfil; letzte_gespraeche = $alleGespraeche }
+            ($neuesGedaechtnis | ConvertTo-Json -Depth 10) | Set-Content $gedPfad -Encoding UTF8
         } catch {
             $fehlerPfad = "$PSScriptRoot\modules\ki_agenten\listener_fehler.log"
             try {
