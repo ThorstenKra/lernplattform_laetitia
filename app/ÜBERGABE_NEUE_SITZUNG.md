@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 29. Juli 2026 (Sitzung 15 — abgeschlossen)*
+*Stand: 30. Juli 2026 (Sitzung 16 — abgeschlossen). Wichtigster offener Punkt für die nächste Sitzung: Fabu-Stimme (siehe Abschnitt „🔴 Fabu-Stimme" weiter unten) — Entscheidung des Nutzers steht noch aus, wie mit der von Windows blockierten Datei umgegangen wird.*
 
 ---
 
@@ -317,6 +317,52 @@ Umsetzung der ursprünglichen Vision „Avatare sprechen untereinander UND mit L
 
 **⚠️ Zwischenfall (behoben) — wichtig für künftige Deploys von `listener.ps1`:** Beim Kopieren nach OneDrive wurde versehentlich der echte Gemini-API-Key durch den Repo-Platzhalter (`HIER_GEMINI_KEY_EINTRAGEN`) überschrieben — der echte Key existiert aus Sicherheitsgründen nur in der OneDrive-Kopie, nie im Repo. Wiederhergestellt über aistudio.google.com/apikey (Projekt "LaetitiaLernplattform", Key war noch gültig). **Merksatz für künftige Sitzungen: vor jedem Deploy von `listener.ps1` nach OneDrive prüfen, ob die Zieldatei einen echten Key enthält, der beim Überschreiben verloren ginge.**
 
+### ✅ Gedächtnis weiterentwickelt: Langzeit/Kurzzeit-Trennung + Lernfortschritt (30.07.2026, commits `6317f20`, `63fcbbf`)
+
+Auf Nutzerwunsch in drei Schritten nacheinander umgesetzt und einzeln getestet:
+
+1. **Langzeit/Kurzzeit-Trennung:** `gemeinsames_gedaechtnis.json` hat jetzt zwei Teile: `profil` (dauerhaft: ueber_laetitia, interessen, wiederkehrende_themen, routine, beobachtete_praeferenzen, lernfortschritt) und `letzte_gespraeche` (rollierendes Log, max. 20). Das Log wird in `listener.ps1` jetzt **mechanisch** in PowerShell angehängt/gekürzt statt bei jedem `/chat/abschliessen` komplett vom LLM neu geschrieben — Gemini bearbeitet nur noch das kleinere `profil`-Objekt, mit Anweisung "lieber unverändert lassen als unsicher raten". Harte Kappungen im Code als Sicherheitsnetz (15/10/8 Einträge). Verhindert, dass langfristig wichtige Erkenntnisse beim automatischen Umschreiben leise verwässern.
+2. **Lernfortschritt dauerhaft verankert:** neuer gemeinsamer Helfer `app/modules/ki_agenten/lernfortschritt_gemeinsam.js` (`window.LaetitiaLernfortschritt.kurzZusammenfassung()`) berechnet aus `window.LaetitiaStats` eine kurze Zusammenfassung über Grammatik/Mathe/Lesen. Wird bei JEDEM Gesprächsende (alle drei Agenten) mitgeschickt und landet mechanisch (nicht LLM-umformuliert) in `profil.lernfortschritt` — bleibt bei späteren Gesprächen ohne neue Daten erhalten. Nova und Fabu hatten vorher kein `stats.js` eingebunden, jetzt beide ergänzt. **Live-Test-Highlight:** Fabu (nie direkt mit Stats verbunden) erwähnte im echten Gespräch von sich aus "heute fleißig gerechnet" und schrieb es korrekt Milo zu.
+3. **Geschichten-Fundus erweitert** (siehe eigener Abschnitt unten).
+
+Alle drei Schritte einzeln live getestet (echte Gespräche + Netzwerk-/Dateiinspektion), `validate.ps1` grün.
+
+### ✅ Fabus Geschichten-Fundus erweitert (30.07.2026, commit `d29c77e`)
+
+4 neue Geschichten zu `geschichten_data.js` ergänzt (bestehender Eintrag "Der Fluss und die Schlange" unverändert): **Der kluge Igel** (Cleverness statt Kraft), **Die Amsel und die vier Jahreszeiten** (ruhig, Vermissen/Wiederkommen), **Der Maulwurf mit der feinen Nase** (unterschiedliche Stärken, Hilfe als Normalität — bewusst vorsichtig formuliert, kein direkter Bezug zu Laetitias Situation), **Zwei Füchse und der geteilte Fund** (Freundschaft zwischen Unterschiedlichen). Komplett neu geschrieben auf Nutzerwunsch (nicht aus Vorlage adaptiert) — Nutzer bringt bei Bedarf noch eigene Vorlagen mit, die dann wie bei "Der Fluss und die Schlange" geprüft/adaptiert werden. Live getestet: alle 5 Geschichten laden korrekt, "Der kluge Igel" komplett durchgespielt inkl. Live-Reaktion und natürlichem Ende.
+
+### 🔴 Fabu-Stimme: männliche Stimme recherchiert, Installation blockiert (30.07.2026, offen)
+
+**Ausgangsfrage (Nutzer):** Haben die drei Agenten unterschiedliche Stimmen? Antwort: Nein — alle drei nutzen aktuell dieselbe Stimme (Katja Online (Natural)), unterschieden nur über Sprechtempo (Nova ~1.10, Milo 0.92, Fabu 0.88). Nutzerwunsch: Fabu soll eine männliche Stimme bekommen.
+
+**Stimmen-Inventur (per neuem Tool `tests/tools/cdp_list_voices.js` — fragt Stimmen direkt aus einer echten Edge-Instanz per CDP ab, wiederverwendbar für künftige Checks):**
+
+| Stimme | Typ | Geschlecht |
+|---|---|---|
+| Microsoft Hedda | lokal | weiblich (roboterhaft, bereits ausgeschlossen) |
+| Microsoft Katja | lokal | weiblich |
+| Microsoft Stefan | lokal | männlich (ältere, nicht-neuronale Qualitätsstufe) |
+| Microsoft Katja Online (Natural) | Cloud, beste Qualität | weiblich |
+
+Keine männliche "Online (Natural)"-Stimme für Deutsch verfügbar — das ist eine feste, von Microsoft kuratierte Liste in Edge, nicht über Windows-Sprachpakete erweiterbar.
+
+**Recherchierte Lösung: Thorsten-Voice über Piper TTS.** Kostenlose (CC0), offline laufende, hochwertige neuronale männliche deutsche TTS-Stimme (github.com/thorstenMueller/Thorsten-Voice). Über einen SAPI5-Treiber-Wrapper (github.com/Lej77/windows-text-to-speech) würde sie als normale Windows-Stimme erscheinen — Edge würde sie automatisch in `speechSynthesis` sehen, keine App-Architektur-Änderung nötig, nur die Stimmenauswahl-Priorität in `fabu_mod.js` müsste angepasst werden. Alternative geprüft: Cepstral (etablierter kommerzieller Anbieter seit 20+ Jahren, signierte Installer, aber kostenpflichtig und ältere Sprachqualität).
+
+**🔴 Blocker:** Windows verweigert den Download von `windows_tts_engine_piper.dll` (Teil des SAPI5-Wrappers). Recherche ergab: sehr wahrscheinlich SmartScreen-Reputationsblockade (Projekt ist unsigniert, nur 16 GitHub-Stars, kleines Hobby-Projekt eines Einzelentwicklers) — keine konkreten Malware-Berichte gefunden, aber auch keine Garantie ohne eigene Prüfung. **Claude darf aus Sicherheitsrichtlinien keine Dateien von Drittanbietern selbst herunterladen/ausführen**, auch nicht auf ausdrücklichen Wunsch — das muss der Nutzer selbst tun.
+
+**Nächste Schritte (Entscheidung steht noch aus):**
+1. Nutzer prüft die blockierte Datei selbst bei virustotal.com (URL oder Datei hochladen) — bei sauberem Ergebnis Installation fortsetzen.
+2. Alternativ: Cepstral probieren (kostenpflichtig, aber signiert/etablierter).
+3. Alternativ: darauf verzichten, alle drei Agenten bleiben bei Katja (nur Tempo unterscheidet).
+
+**Vollständige Installationsanleitung** (bereits erstellt, exakte Download-Links geprüft — bei Bedarf direkt weiterverwenden):
+- Engine-Installer: https://github.com/Lej77/windows-text-to-speech/releases/download/v0.2.7/windows_tts_engine_installer.exe
+- Engine-DLL (die blockierte Datei): https://github.com/Lej77/windows-text-to-speech/releases/download/v0.2.7/windows_tts_engine_piper.dll
+- Stimmmodell: https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/de/de_DE/thorsten/high/de_DE-thorsten-high.onnx?download=true
+- Stimmmodell-Config: https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/de/de_DE/thorsten/high/de_DE-thorsten-high.onnx.json?download=true
+- Aussprache-Hilfsdaten: https://github.com/thewh1teagle/piper-rs/releases/download/espeak-ng-files/espeak-ng-data.tar.gz
+- Ordnerstruktur: Installer + beide DLLs + entpackte espeak-ng-data in einem Ordner, zusätzlich Unterordner `piper_models/` mit den beiden Thorsten-Dateien. Dann `windows_tts_engine_installer.exe` ausführen. Prüfen über Windows-Sprachausgabe-Einstellungen, danach per `cdp_list_voices.js` bestätigen.
+
 ---
 
 ## 🔴 Offene Aufgaben — Hochpriorität
@@ -543,6 +589,28 @@ Dann Edge komplett neu starten.
 **Commits (alle gepusht):** 2694aa5, 86df18d, e51413e, f06b0d9
 
 **Grammatik-Werkstatt jetzt:** 44 Einheiten, 440 Aufgaben (E-03–E-46), Stufen 1–9 vollständig.
+
+---
+
+## Sitzungsprotokoll 30. Juli 2026 — Sitzung 16
+
+| Was | Ergebnis |
+|---|---|
+| Registry an Auswahl-UI angebunden | ✅ Neue Seite `ki_agenten.html` rendert alle Agenten dynamisch aus `registry.js` statt 3 fest verdrahteter Spielewelt-Kacheln. Live getestet (commit `552d753`) |
+| Milo: Fachwissen-Bibliothek vertieft | ✅ Grammatik-Merksätze im Lernkontext, `stats.js` in Mathe/Lesen nachgerüstet. Live getestet (commit `f9d9379`) |
+| Gruppengespräche-Konzept erarbeitet | 📐 Rederecht, Schlagabtausch-Deckel, Datenmodell, Backend-/Frontend-Plan dokumentiert — noch nicht implementiert (commit `393e2df`) |
+| Agenten weiter personalisiert | ✅ Gemeinsamer Lebenskontext für alle Agenten, Milo auf Novas Tiefe gebracht, Fabu reagiert jetzt live auf Diskussionsantworten. Live getestet (commit `1e73134`) |
+| 🐛 API-Key versehentlich überschrieben + behoben | ✅ Beim Deploy von `listener.ps1` echten Gemini-Key mit Repo-Platzhalter überschrieben — über aistudio.google.com wiederhergestellt (derselbe Key, noch gültig). Merksatz für künftige Deploys dokumentiert |
+| Gedächtnis: Langzeit/Kurzzeit-Trennung | ✅ `profil` (dauerhaft) von `letzte_gespraeche` (rollierend, mechanisch gepflegt) getrennt — reduziert LLM-Risiko beim automatischen Umschreiben. Live getestet (commit `6317f20`) |
+| Gedächtnis: Lernfortschritt dauerhaft verankert | ✅ Neuer Helfer `lernfortschritt_gemeinsam.js`, alle drei Agenten tragen jetzt zu `profil.lernfortschritt` bei. Live-Test-Highlight: Fabu erwähnte unaufgefordert korrekt Milos Mathe-Fortschritt (commit `63fcbbf`) |
+| Fabu: 4 neue Geschichten | ✅ Der kluge Igel, Die Amsel und die vier Jahreszeiten, Der Maulwurf mit der feinen Nase, Zwei Füchse und der geteilte Fund. Live getestet (commit `d29c77e`) |
+| Fabu-Stimme: männliche Stimme recherchiert | 🔴 Stimmen-Inventur durchgeführt (neues Tool `cdp_list_voices.js`), Thorsten-Voice/Piper als beste kostenlose Lösung identifiziert, Installationsanleitung mit exakten Links erstellt. **Blockiert:** Windows verweigert Download der Engine-DLL (SmartScreen-Reputationsblockade, vermutlich harmlos aber nicht verifiziert). Details + Nächste Schritte siehe Abschnitt oben bei „🔴 Fabu-Stimme" |
+
+**Commits (alle gepusht):** `552d753`, `f9d9379`, `393e2df`, `1e73134`, `76b008e`, `6317f20`, `63fcbbf`, `d29c77e`
+
+**Sitzungsabschluss:** Alle Code-Änderungen committed + gepusht, nach OneDrive deployed, `validate.ps1` grün. `tests/tools/cdp_list_voices.js` (neues wiederverwendbares Stimmen-Check-Tool) noch zu committen.
+
+**Nächste konkrete Schritte für die Folgesitzung:** (1) Fabu-Stimme — Nutzer entscheidet zwischen VirusTotal-Prüfung/Cepstral/Verzicht (siehe Abschnitt „🔴 Fabu-Stimme"), (2) danach ggf. Installation abschließen + `fabu_mod.js` Stimmenauswahl anpassen, (3) übrige offene Punkte unverändert: Tobii-Gerätetest, Telegram-Token, Pfad-Training-Modus-2-Bestätigung, Gruppengespräche-Implementierung.
 
 ---
 
