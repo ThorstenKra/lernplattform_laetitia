@@ -1,0 +1,109 @@
+<!doctype html>
+<!-- depth:2 -- Pfade: ../../core/ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia - KI-Freunde</title>
+<style>
+:root{
+  --bg:#f5f3ff; --panel:#ffffff;
+  --border:rgba(15,23,42,.14); --shadow:0 6px 18px rgba(15,23,42,.07);
+  --text:#0f172a; --muted:rgba(15,23,42,.65);
+  --akzent:#8b5cf6; --akzent-bg:rgba(139,92,246,.08);
+  --radius:18px;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg); color:var(--text);
+  height:100vh; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+.header{
+  background:var(--panel); border-bottom:2px solid var(--akzent);
+  box-shadow:0 2px 8px rgba(15,23,42,.06); flex-shrink:0;
+  padding:10px 16px; display:flex; align-items:center; gap:10px;
+}
+.header-emoji{ font-size:28px; }
+.header-titel{ font-size:20px; font-weight:1000; color:var(--akzent); }
+.header-sub{ font-size:13px; font-weight:800; color:var(--muted); margin-left:auto; }
+
+.agenten-bereich{
+  flex:1; min-height:0; padding:16px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  align-content:center;
+  gap:16px;
+}
+.agent-btn{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:10px; padding:20px 14px; min-height:170px;
+  background:var(--panel); border:3px solid var(--border);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  text-decoration:none; color:var(--text); font-weight:1000;
+  user-select:none; cursor:pointer; position:relative; transition:none;
+}
+.agent-btn:hover, .agent-btn:focus{ transform:scale(1.03); background:var(--akzent-bg); }
+.agent-btn.dwell-active{ transform:scale(1.04) !important; transition:none !important; }
+.agent-emoji{ font-size:clamp(40px,6vw,64px); }
+.agent-name{ font-size:clamp(20px,3vw,28px); }
+.agent-rolle{ font-size:clamp(12px,1.6vw,15px); color:var(--muted); font-weight:800; text-align:center; }
+
+/* Zurück */
+.zurueck-leiste{ padding:8px 12px; flex-shrink:0; }
+a.zurueckBtn{
+  display:flex; align-items:center; justify-content:center;
+  min-height:72px; font-size:20px; font-weight:1000;
+  border-radius:16px; border:2px solid #8b5cf6;
+  background:#ede9fe; color:#4c1d95;
+  text-decoration:none; cursor:pointer; user-select:none;
+  position:relative; transition:none; width:100%;
+}
+a.zurueckBtn:hover{ background:#ddd6fe; outline:3px solid #8b5cf6; }
+a.zurueckBtn.dwell-active{ transform:scale(1.02) !important; outline:3px solid #8b5cf6 !important; }
+a.zurueckBtn .dwell-ring-svg circle{ stroke:#8b5cf6; }
+
+/* Dwell-Ring */
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  pointer-events:none; z-index:10; width:60px; height:60px;
+}
+.dwell-ring-svg circle{
+  fill:none; stroke:var(--akzent); stroke-width:5;
+  stroke-dasharray:220; stroke-dashoffset:220;
+  transform:rotate(-90deg); transform-origin:35px 35px;
+}
+.dwell-ring-svg circle.animating{ animation:dwellRing var(--dwell-duration,.9s) linear forwards; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="header-emoji">🤝</span>
+  <span class="header-titel">KI-Freunde</span>
+  <span class="header-sub">Mit wem möchtest du sprechen?</span>
+</div>
+
+<div class="agenten-bereich" id="agentenBereich">
+  <!-- wird per JS aus registry.js befüllt -->
+</div>
+
+<div class="zurueck-leiste">
+  <a class="zurueckBtn" href="../../spielewelt.html" id="btnZurueck">
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+    ← Zurück zur Spielewelt
+  </a>
+</div>
+
+<script src="../../core/dwell.js"></script>
+<script src="../../core/error_handler.js"></script>
+<script src="./registry.js"></script>
+<script src="./ki_agenten_uebersicht.js"></script>
+<script>
+try{ localStorage.setItem("laetitia_return_url_v1", new URL("./ki_agenten.html", window.location.href).href); }catch(e){}
+window.KiAgentenUebersicht.baueUebersicht();
+</script>
+</body>
+</html>

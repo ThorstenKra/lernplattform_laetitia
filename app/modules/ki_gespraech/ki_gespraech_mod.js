@@ -341,7 +341,7 @@ function zurueck(){
     beendeGespraech(); return;
   }
   try{
-    window.location.href = new URL("../../spielewelt.html", window.location.href).href;
+    window.location.href = new URL("../ki_agenten/ki_agenten.html", window.location.href).href;
   }catch(e){ history.back(); }
 }
 

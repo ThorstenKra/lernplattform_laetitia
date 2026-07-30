@@ -3,8 +3,9 @@
 // REGEL 1: Kein import(), kein type="module"
 // REGEL 4: Nur gerade Anführungszeichen
 //
-// Noch NICHT in eine UI eingebunden -- dient als Vorbereitung für
-// spätere Gruppengespräche (mehrere Agenten gemeinsam im Gespräch).
+// Wird von ki_agenten.html (Auswahlbildschirm) dynamisch gerendert und
+// dient zusätzlich als Vorbereitung für spätere Gruppengespräche
+// (mehrere Agenten gemeinsam im Gespräch).
 // Jeder neue Agent wird hier mit seinen Eckdaten ergänzt, sobald er
 // existiert. Nova lebt technisch weiter in app/modules/ki_gespraech/
 // (nicht umgezogen, um ein funktionierendes Modul nicht zu riskieren),
