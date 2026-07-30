@@ -188,7 +188,12 @@ function weiterInGeschichte(){
 // "Geschichte beenden"-Button -- beide Wege sollen das Gespraech sichern.
 function speichereGespraech(){
   if(verlauf.length > 0){
-    apiFetch("/chat/abschliessen", { agent: AGENT_ID, verlauf: verlauf }, function(){});
+    var daten = { agent: AGENT_ID, verlauf: verlauf };
+    if(window.LaetitiaLernfortschritt){
+      var lf = window.LaetitiaLernfortschritt.kurzZusammenfassung();
+      if(lf) daten.lernfortschritt = lf;
+    }
+    apiFetch("/chat/abschliessen", daten, function(){});
     verlauf = [];
   }
 }

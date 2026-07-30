@@ -238,7 +238,12 @@ function sendeNachricht(text){
 function beendeGespraech(){
   zeigeAbschluss("Zusammenfassung wird gespeichert...");
   sprich("Bis bald!");
-  apiFetch("/chat/abschliessen", { agent: AGENT_ID, verlauf: verlauf }, function(){
+  var daten = { agent: AGENT_ID, verlauf: verlauf };
+  if(window.LaetitiaLernfortschritt){
+    var lf = window.LaetitiaLernfortschritt.kurzZusammenfassung();
+    if(lf) daten.lernfortschritt = lf;
+  }
+  apiFetch("/chat/abschliessen", daten, function(){
     zeigeAbschluss("Gespräch gespeichert. Bis bald!");
   });
 }

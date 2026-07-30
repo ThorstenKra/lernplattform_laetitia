@@ -266,7 +266,12 @@ function sendeNachricht(text){
 function beendeGespraech(){
   zeigeAbschluss("Zusammenfassung wird gespeichert...");
   sprich("Tschüss! Bis zum nächsten Mal.");
-  apiFetch("/chat/abschliessen", { agent: "ki_gespraech", verlauf: verlauf }, function(){
+  var daten = { agent: "ki_gespraech", verlauf: verlauf };
+  if(window.LaetitiaLernfortschritt){
+    var lf = window.LaetitiaLernfortschritt.kurzZusammenfassung();
+    if(lf) daten.lernfortschritt = lf;
+  }
+  apiFetch("/chat/abschliessen", daten, function(){
     zeigeAbschluss("Gespräch gespeichert. Bis zum nächsten Mal!");
   });
 }

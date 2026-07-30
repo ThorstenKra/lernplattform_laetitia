@@ -379,6 +379,9 @@ Nutze dieses Gedaechtnis aktiv:
   ohne Druck. Falls noch keine Routine existiert und sich ein Gespraech dafuer
   eignet, schlage behutsam vor, gemeinsam eine kleine taegliche Routine zu finden.
 - Lass "beobachtete_praeferenzen" deinen Ton und deine Themenwahl beeinflussen.
+- Falls unter "profil.lernfortschritt" echte Angaben stehen: beziehe dich gelegentlich
+  beilaeufig darauf (z.B. "wie laeuft's mit dem Kasus-Ueben?"), nie wie eine Pruefung oder
+  Ermahnung -- eher wie ehrliches, freundliches Interesse. Nicht in jeder Antwort.
 
 Wichtig: Haenge am Ende jeder Antwort EXAKT diesen einen Block an (eine Zeile, kein Markdown,
 kein weiterer Tag davor oder danach -- die Stimmung gehoert NUR in dieses "stimmung"-Feld,
@@ -497,6 +500,16 @@ Antworte NUR mit diesem JSON, kein Markdown, keine Erklaerung:
             }
             if ($neuesProfil.beobachtete_praeferenzen -and $neuesProfil.beobachtete_praeferenzen.Count -gt 8) {
                 $neuesProfil.beobachtete_praeferenzen = $neuesProfil.beobachtete_praeferenzen[($neuesProfil.beobachtete_praeferenzen.Count - 8)..($neuesProfil.beobachtete_praeferenzen.Count - 1)]
+            }
+
+            # Lernfortschritt (aus window.LaetitiaStats, vom Client mitgeschickt) wird NICHT
+            # von Gemini umformuliert -- echte Fortschrittsdaten sollen nicht driften. Mechanisch
+            # gesetzt: frischer Wert wenn mitgeschickt, sonst bisherigen Wert beibehalten
+            # (30.07.2026, Lernfortschritt dauerhaft im Profil statt nur situativ bei Milo).
+            if ($body.lernfortschritt) {
+                $neuesProfil | Add-Member -NotePropertyName lernfortschritt -NotePropertyValue ([string]$body.lernfortschritt) -Force
+            } elseif ($gedaechtnis.profil.lernfortschritt) {
+                $neuesProfil | Add-Member -NotePropertyName lernfortschritt -NotePropertyValue $gedaechtnis.profil.lernfortschritt -Force
             }
 
             $neuesGedaechtnis = [PSCustomObject]@{ profil = $neuesProfil; letzte_gespraeche = $alleGespraeche }
