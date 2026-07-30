@@ -89,6 +89,7 @@ function starteStufe(code, titel){
   var gefiltert = alleAufgaben.filter(function(t){ return t.stufe===code; });
   session = gefiltert.slice();
   index = 0; richtigCount = 0;
+  if(window.LaetitiaStats) window.LaetitiaStats.sessionStart("mathe", code);
   document.getElementById("screenStufen").style.display = "none";
   document.getElementById("screenAufgabe").style.display = "flex";
   document.getElementById("fortschrittText").textContent = titel;
@@ -99,6 +100,7 @@ function zeigeAufgabe(){
   if(index >= session.length){ zeigeAbschluss(); return; }
   var t = session[index];
   beantwortet = false;
+  if(window.LaetitiaStats) window.LaetitiaStats.taskStart();
 
   document.getElementById("progressFill").style.width = Math.round((index/session.length)*100)+"%";
   document.getElementById("aufgabeText").textContent = t.text;
@@ -128,6 +130,8 @@ function antworten(buchstabe){
   beantwortet = true;
   var t = session[index];
   var korrekt = buchstabe === t.richtig;
+  var taskId = aktStufe + "|" + index + "|" + (t.text || "");
+  if(window.LaetitiaStats) window.LaetitiaStats.taskAnswer(taskId, korrekt, buchstabe, false, null);
   ["btnA","btnB","btnC","btnD"].forEach(function(id){ var b=document.getElementById(id); if(b) b.classList.add("is-disabled"); });
 
   var gewaehlt = document.getElementById("btn"+buchstabe);
@@ -165,6 +169,7 @@ function zeigeAbschluss(){
   var zl=document.getElementById("navLeiste"); if(zl) zl.style.display="none";
   var sc=document.getElementById("abschlussScreen"); sc.classList.add("sichtbar");
   var pct=Math.round((richtigCount/session.length)*100);
+  if(window.LaetitiaStats) window.LaetitiaStats.sessionEnd(pct >= 80);
   document.getElementById("abschlussScore").textContent=richtigCount+" von "+session.length+" richtig";
   document.getElementById("abschlussEmoji").textContent=pct>=80?"🌟":pct>=60?"😊":"💪";
   document.getElementById("abschlussTitel").textContent=pct>=80?"Mathe-Meisterin!":pct>=60?"Gut gerechnet!":"Weiter so!";

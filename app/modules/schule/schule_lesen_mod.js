@@ -100,6 +100,7 @@ function zeigeAufgabe(){
   if(aktIndex >= aufgaben.length){ zeigeFertig(); return; }
   aktAufgabe = aufgaben[aktIndex];
   gesperrt   = false;
+  if(window.LaetitiaStats) window.LaetitiaStats.taskStart();
 
   // Fortschritt
   var pct = Math.round((aktIndex / gesamtCnt) * 100);
@@ -177,6 +178,9 @@ function pruefeAntwort(key, gewaehltZeile, gewaehltBtn){
   var weiter = document.getElementById("weiterBtn");
   var ub     = document.getElementById("btnUeberspringen");
 
+  var taskId = heft + "|" + aktIndex + "|" + (aktAufgabe.frage || "");
+  if(window.LaetitiaStats) window.LaetitiaStats.taskAnswer(taskId, key === richtigerKey, key, false, null);
+
   if(key === richtigerKey){
     richtigCnt++;
     gewaehltZeile.classList.add("richtig");
@@ -228,6 +232,7 @@ function zeigeFertig(){
   document.getElementById("infoZeile").style.display = "none";
   document.getElementById("weiterBtn").style.display = "none";
   document.getElementById("fertigScreen").className = "fertig-screen sichtbar";
+  if(window.LaetitiaStats) window.LaetitiaStats.sessionEnd(gesamtCnt > 0 && (richtigCnt / gesamtCnt) >= 0.8);
   document.getElementById("fertigPunkte").textContent =
     richtigCnt + " von " + gesamtCnt + " richtig";
   document.getElementById("fortschritt").style.width = "100%";
@@ -239,6 +244,7 @@ function nochmal(){
   aktIndex   = 0;
   richtigCnt = 0;
   aufgaben   = alleAufgaben.slice();
+  if(window.LaetitiaStats) window.LaetitiaStats.sessionStart("lesen", heft);
   document.getElementById("textCard").style.display = "";
   document.getElementById("frageCard").style.display = "";
   zeigeAufgabe();
@@ -262,6 +268,7 @@ function bindeDwell(){
 
 // ── Voices laden & starten ───────────────────────────────────────
 try{ localStorage.setItem("laetitia_return_url_v1", new URL("./schule_sachkunde.html", window.location.href).href); }catch(e){}
+if(window.LaetitiaStats) window.LaetitiaStats.sessionStart("lesen", heft);
 
 if(speechSynthesis.getVoices().length > 0){
   zeigeAufgabe();

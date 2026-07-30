@@ -59,27 +59,58 @@ function sprich(text){
   }catch(e){}
 }
 
-// ── Lernkontext (LaetitiaStats -> Grammatik-Werkstatt) ────────────────────────
+// ── Lernkontext (LaetitiaStats -> Grammatik-Werkstatt, Mathe, Lesen) ──────────
+
+// Grammatik-Merksatz zu einer Einheit nachschlagen (aus grammatik_data.js),
+// damit Milo bei einer schwachen Aufgabe weiss WORUM es inhaltlich geht,
+// nicht nur DASS sie oft falsch beantwortet wird.
+function findeGrammatikMerksatz(taskId){
+  if(!window.GRAMMATIK_EINHEITEN) return null;
+  var einheitId = String(taskId).split("|")[0];
+  var einheit = window.GRAMMATIK_EINHEITEN.filter(function(e){ return e.id === einheitId; })[0];
+  return einheit ? einheit.erklaerung_merksatz : null;
+}
+
+function sammleGrammatikKontext(){
+  var schwach = window.LaetitiaStats.schwacheAufgaben("grammatik").slice(0, 5);
+  var level   = window.LaetitiaStats.levelEmpfehlungen("grammatik");
+  var muster  = window.LaetitiaStats.musterWarnung("grammatik", 10);
+  var teile = [];
+  if(schwach.length){
+    teile.push("Grammatik-Werkstatt -- Aufgaben mit haeufigen Fehlern: " + schwach.map(function(s){
+      var merksatz = findeGrammatikMerksatz(s.id);
+      return s.id + " (" + s.fehlerRate + "% falsch bei " + s.gesamt + " Versuchen)"
+        + (merksatz ? " -- Merksatz dazu: \"" + merksatz + "\"" : "");
+    }).join("; "));
+  }
+  if(level.length){
+    teile.push("Grammatik-Werkstatt -- Einheiten, die schon mehrfach fehlerfrei geschafft wurden: " + level.map(function(l){
+      return l.stufe + " (" + l.allesRichtig + "x fehlerfrei)";
+    }).join(", "));
+  }
+  if(muster){
+    teile.push("Grammatik-Werkstatt -- Hinweis: " + muster.warnung + " (evtl. eher geraten als ueberlegt)");
+  }
+  return teile;
+}
+
+// Mathe/Lesen tracken noch keine eigenen Merksaetze -- solange nur die reine
+// Fehlerquote zeigen, sobald genug Sessions gesammelt wurden.
+function sammleFachKontext(modul, anzeigeName){
+  var schwach = window.LaetitiaStats.schwacheAufgaben(modul).slice(0, 3);
+  if(!schwach.length) return [];
+  return [anzeigeName + " -- Aufgaben mit haeufigen Fehlern: " + schwach.map(function(s){
+    return s.id + " (" + s.fehlerRate + "% falsch bei " + s.gesamt + " Versuchen)";
+  }).join("; ")];
+}
+
 function sammleLernkontext(){
   if(!window.LaetitiaStats) return null;
   try{
-    var schwach = window.LaetitiaStats.schwacheAufgaben("grammatik").slice(0, 5);
-    var level   = window.LaetitiaStats.levelEmpfehlungen("grammatik");
-    var muster  = window.LaetitiaStats.musterWarnung("grammatik", 10);
     var teile = [];
-    if(schwach.length){
-      teile.push("Aufgaben mit haeufigen Fehlern: " + schwach.map(function(s){
-        return s.id + " (" + s.fehlerRate + "% falsch bei " + s.gesamt + " Versuchen)";
-      }).join("; "));
-    }
-    if(level.length){
-      teile.push("Einheiten, die schon mehrfach fehlerfrei geschafft wurden: " + level.map(function(l){
-        return l.stufe + " (" + l.allesRichtig + "x fehlerfrei)";
-      }).join(", "));
-    }
-    if(muster){
-      teile.push("Hinweis: " + muster.warnung + " (evtl. eher geraten als ueberlegt)");
-    }
+    teile = teile.concat(sammleGrammatikKontext());
+    teile = teile.concat(sammleFachKontext("mathe", "Mathe"));
+    teile = teile.concat(sammleFachKontext("lesen", "Lesen"));
     if(!teile.length) return null;
     return teile.join("\n");
   }catch(e){ return null; }
