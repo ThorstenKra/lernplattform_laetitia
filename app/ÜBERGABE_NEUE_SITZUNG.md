@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 31. Juli 2026 (Sitzung 17 — abgeschlossen). Wichtigster offener Punkt für die nächste Sitzung: Fabu-Stimme (siehe Abschnitt „🔴 Fabu-Stimme" weiter unten) — Entscheidung des Nutzers steht noch aus. Neu diese Sitzung: Reime-Werkstatt komplett neu aufgesetzt (echte Goethe-Gedichte statt erfundener Zweizeiler) — automatisierter Live-Test war nicht möglich (Chrome-Erweiterung nicht verbunden), Nutzer bestätigt selbst in Edge (siehe Abschnitt „Reime-Werkstatt" weiter unten).*
+*Stand: 31. Juli 2026 (Sitzung 17 — abgeschlossen). Wichtigster offener Punkt für die nächste Sitzung: Fabu-Stimme (siehe Abschnitt „🔴 Fabu-Stimme" weiter unten) — Entscheidung des Nutzers steht noch aus. Umfangreiche Sitzung: Reime-Werkstatt komplett neu aufgesetzt (echte Goethe-Gedichte), danach Goldstandard-Audit bei Fabu+Milo (Auswahlfelder-Timing, Farbe, Zurück-Button lila) und neue Grammatik-Stufe 10 (Wessen-/Wem-Fall, 6 Lektionen) — siehe jeweilige Abschnitte weiter unten. Grammatik-Erweiterung wurde noch in dieser Sitzung live in Edge (Browser-Automatisierung) getestet und bestätigt; Reime/Fabu/Milo-Fixes wurden vom Nutzer selbst in Edge geprüft (Bugs dabei gefunden und behoben, siehe Protokoll).*
 
 ---
 
@@ -96,7 +96,7 @@ Erreichbar: `schule.html` → Grammatik-Button → `grammatik.html`
 - grundlagen = Stufe 1+2 (E-03–E-14, 12 Einheiten)
 - fortgeschrittene = Stufe 3+4 (E-15–E-26, 12 Einheiten)
 - profi = Stufe 5+6 (E-27–E-34, 8 Einheiten)
-- champion = Stufe 7+8+9 (E-35–E-46, 12 Einheiten) — Stufe 9 wurde Sitzung 12 ergänzt und der Champion-Kategorie zugeschlagen
+- champion = Stufe 7+8+9+10 (E-35–E-52, 18 Einheiten) — Stufe 9 wurde Sitzung 12, Stufe 10 wurde Sitzung 17 ergänzt und jeweils der Champion-Kategorie zugeschlagen
 
 **Lernpfad-Stand:**
 
@@ -110,8 +110,9 @@ Erreichbar: `schule.html` → Grammatik-Button → `grammatik.html`
 | 6 | E-31–E-34 | Groß-/Kleinschreibung | 40 | ✅ |
 | 7 | E-35–E-38 | Kasus (Wer-/Wen-Fall) | 40 | ✅ |
 | 8 | E-39–E-42 | Pronomen | 40 | ✅ |
-| 9 | E-43–E-46 | Satzzeichen (Punkt/Fragezeichen/Ausrufezeichen + gemischte Übung) | 40 | ✅ NEU |
-| **10+** | **E-47+** | — | — | ⬜ noch nicht geplant |
+| 9 | E-43–E-46 | Satzzeichen (Punkt/Fragezeichen/Ausrufezeichen + gemischte Übung) | 40 | ✅ |
+| 10 | E-47–E-52 | Kasus vertieft: Wessen-/Wem-Fall (Genitiv/Dativ) | 60 | ✅ NEU |
+| **11+** | — | — | — | ⬜ noch nicht geplant |
 
 **Grammatik-Werkstatt Features:**
 - Lesebereich (grau, `pointer-events:none`) oben — Frage + Satz + Vergleichsinhalte (Optionen/Wörter) sind PASSIV
@@ -148,7 +149,22 @@ Auf Nutzerwunsch komplett neu konzipiert: statt 31 selbst erfundener Zweizeiler 
 1. Reimen-Übersicht: 5 Kacheln (statt vorher 4) sprengten die feste 100vh-Höhe, Zurück-Button wurde aus dem Sichtbereich gedrückt. Fix: Übersicht scrollt jetzt intern (wie Fabus Geschichtenliste), Header + Zurück-Button bleiben fix — robust auch wenn später weitere Gedichte dazukommen.
 2. Überspringen-Button ohne Dwell-Bindung in allen 3 neuen Aufgabentypen — siehe Grammatik-Abschnitt oben, gleicher Fix auch dort angewendet.
 
-⬜ **Noch offen:** Automatisierter Live-Test in Edge war diese Sitzung nicht möglich (Chrome-Erweiterung nicht verbunden) — nur strukturelle Datenprüfung (Node-Skript: alle 49 Aufgaben, alle Verweise konsistent) + `validate.ps1` (0 Fehler). Nutzer testet Reime-Werkstatt und den Grammatik-Dwell-Fix selbst in Edge/Tobii.
+✅ **Vom Nutzer in Edge getestet** (automatisierter Live-Test war zunächst nicht möglich, Chrome-Erweiterung nicht verbunden — Nutzer hat stattdessen selbst geprüft): dabei wurde der oben beschriebene Zurück-Button-Bug gefunden und behoben. Danach keine weiteren Rückmeldungen zu Reimen selbst — Fokus verschob sich auf den Goldstandard-Audit bei Fabu/Milo (siehe nächster Abschnitt).
+
+## Fabu + Milo — Goldstandard-Audit (31.07.2026, Sitzung 17)
+
+Nutzeranfrage: Im Geschichten-Modul (Fabu) sollen Auswahlfelder erst nach vollständigem Vorlesen erscheinen, farblich dem Goldstandard entsprechen und eine angemessene Schriftgröße haben — plus eine umfassende Kontrolle der Goldstandard-Einhaltung. Nach Fabu auf ausdrücklichen Nutzerwunsch identisch auf Milo angewendet.
+
+**Behoben (beide Agenten, `fabu_mod.js`/`fabu.html` und `milo_mod.js`/`milo.html`):**
+1. **Timing:** Vorschläge (und bei Milo zusätzlich der „Eigene Antwort"-Button) erschienen bisher gleichzeitig mit Sprechbeginn statt erst nach TTS-Ende. Milos `sprich()` unterstützte bisher gar keinen Callback — dafür ergänzt (analog zu Fabus bereits vorhandenem Callback-Muster).
+2. **Farbe:** Auswahlfelder waren im Ruhezustand nur weiß/grau (Farbe kam erst bei Dwell-Hover) — abweichend vom Rest des Projekts (Grammatik/Reime-Antwortbuttons sind schon im Ruhezustand farbig). Jetzt durchgehend in der jeweiligen Agentenfarbe (Fabu amber, Milo türkis).
+3. **Schriftgröße:** 16px → 19px (war kleiner als alle anderen Haupt-Antwortbuttons im Projekt, 19–24px).
+4. **Regel 8 (Zurück-Button muss lila sein):** Fabu nutzte Amber, Milo Türkis — nur Nova hielt sich an die Vorgabe. Auf Nutzerwunsch bei beiden auf lila (`#8b5cf6`/`#ede9fe`) vereinheitlicht.
+5. **Kleinere Konsistenz-Fixes:** fehlende Stimmen-Fallback-Stufe ergänzt (jetzt exakt der 6-stufige Katja-Goldstandard wie in Grammatik), `user-select:none` auf allen interaktiven Buttons, `pointer-events:none` auf den passiven Lesebereichen (`#fabuAntwort`/`#miloAntwort`).
+
+**Geprüft, kein Bug:** `stats.js` ist bei Fabu/Nova eingebunden, aber es werden nie eigene `sessionStart`/`taskAnswer`-Aufrufe gemacht — das ist beabsichtigt, da beide Agenten keine bewertbaren Aufgaben haben. Das Skript wird nur als Abhängigkeit für `lernfortschritt_gemeinsam.js` gebraucht (liest fremde Stats, schreibt keine eigenen).
+
+Commits: `709b212` (Fabu-Fixes + Milo-Erweiterung inkl. Zurück-Button-Vereinheitlichung). `validate.ps1`: 0 Fehler, deployed. Vom Nutzer nicht explizit als „in Edge nachgetestet" bestätigt — nur strukturell/Konsolen-sauber verifiziert vor dem Commit.
 
 ## Quasselkiste / NuVoice-Emulation — Stand 31. Mai 2026
 
@@ -505,8 +521,8 @@ für die reine Sprachausgabe schaffen — Risiko für Stabilität, da die ganze 
 - Eine kuratierte Liste gewünschter Interjektionen pro Stimmung (kann ich vorschlagen, Feinschliff durch Nutzer)
 - Ggf. neuer API-Key für den gewählten Anbieter (gleiche Einmal-Hürde wie bei Groq/Gemini)
 
-**Grammatik-Werkstatt: Stufe 10+ (E-47+) — nächster Block**
-Thema noch offen — Stufe 9 (Satzzeichen, E-43–E-46) wurde Sitzung 12 abgeschlossen.
+**Grammatik-Werkstatt: Stufe 11+ — nächster Block**
+Thema noch offen — Stufe 10 (Wessen-/Wem-Fall, E-47–E-52) wurde Sitzung 17 abgeschlossen.
 
 **Bluetooth-Umschaltung:**
 Einziger offener Schritt — als Administrator ausführen:
@@ -528,7 +544,7 @@ Dann `lernwelt_starten.exe` neu starten → Audio-Dialog testen.
 - Mathe-Hefte digitalisieren (PDFs vorhanden) → `schule_mathe_data.js`
 - Sachkunde-Bilder für 7 fehlende Themen ergänzen
 - `stats.js` in weitere Spielseiten einbinden (Regel 15 vollständig umsetzen)
-- Grammatik Stufe 10+ (E-47+): Thema noch offen
+- Grammatik Stufe 11+: Thema noch offen (Stufe 10 seit Sitzung 17 abgeschlossen)
 
 ---
 
@@ -623,14 +639,16 @@ Dann Edge komplett neu starten.
 |---|---|
 | Reime-Werkstatt komplett neu aufgesetzt | ✅ 5 echte Goethe-Gedichte statt 31 erfundener Zweizeiler, gemeinsame Bibliothek `gedichte_data.js`, 49 kuratierte Aufgaben, Grammatik-Werkstatt-Pattern übernommen (commit `5eefdb5`) |
 | Fabu: Gedichte-Bibliothek ergänzt | ✅ Zweiter Bibliotheks-Button neben Geschichten, verallgemeinerte Player-Logik, Erlkönig als „gruselige alte Ballade" gerahmt (Präzedenzfall in persona.json dokumentiert) (commit `5eefdb5`) |
-| Bug: Zurück-Button auf Reimen-Übersicht unsichtbar | ✅ Layout-Fix — Übersicht scrollt jetzt intern statt fixer Box, wie Fabus Geschichtenliste (commit `5eefdb5`) |
+| Bug: Zurück-Button auf Reimen-Übersicht unsichtbar | ✅ Layout-Fix — Übersicht scrollt jetzt intern statt fixer Box, wie Fabus Geschichtenliste (commit `5eefdb5`). Vom Nutzer beim eigenen Edge-Test gefunden. |
 | Bug: Überspringen-Button ohne Dwell-Bindung | ✅ In Reime (3 Aufgabentypen) UND Grammatik-Werkstatt (5 Aufgabentypen) behoben — gleicher Gap in beiden Modulen gefunden (commits `5eefdb5`, `c0cdf11`) |
+| Fabu+Milo: Goldstandard-Audit | ✅ Auswahlfelder-Timing (erst nach TTS-Ende), Farbe im Ruhezustand, Schriftgröße, Zurück-Button lila vereinheitlicht, kleinere Konsistenz-Fixes — siehe Abschnitt „Fabu + Milo — Goldstandard-Audit" (commit `709b212`) |
+| Grammatik: neue Stufe 10 (Wessen-/Wem-Fall) | ✅ 6 neue Lektionen (E-47–E-52), 60 Aufgaben, Champion-Kategorie jetzt 18 Einheiten — live in Edge getestet (Browser-Automatisierung), keine Konsolenfehler, Fortschrittsspeicherung bestätigt (commit `87399ab`) |
 
-**Commits (alle gepusht):** `5eefdb5`, `c0cdf11`
+**Commits (alle gepusht):** `5eefdb5`, `c0cdf11`, `709b212`, `87399ab`
 
-**Sitzungsabschluss:** Code committed + gepusht, nach OneDrive deployed, `validate.ps1` 0 Fehler. Automatisierter Browser-Live-Test nicht möglich (Chrome-Erweiterung nicht verbunden) — nur strukturelle Datenprüfung (Node-Skript) durchgeführt.
+**Sitzungsabschluss:** Code committed + gepusht, nach OneDrive deployed, `validate.ps1` 0 Fehler. Grammatik-Erweiterung wurde noch in dieser Sitzung live in Edge (Browser-Automatisierung, Chrome-Erweiterung war zu diesem Zeitpunkt verbunden) getestet und bestätigt. Reime- und Fabu/Milo-Fixes wurden nur strukturell/über Konsolen-Checks verifiziert bzw. vom Nutzer selbst in Edge geprüft (Details je im jeweiligen Abschnitt).
 
-**Nächste konkrete Schritte für die Folgesitzung:** (1) Nutzer bestätigt Reime-Werkstatt + Grammatik-Dwell-Fix in echtem Edge/Tobii-Test, (2) übrige offene Punkte unverändert: Fabu-Stimme-Entscheidung, Tobii-Gerätetest (Nova-Avatar), Telegram-Token, Pfad-Training-Modus-2-Bestätigung, Gruppengespräche-Implementierung.
+**Nächste konkrete Schritte für die Folgesitzung:** (1) Fabu/Milo-Audit-Fixes vom Nutzer in echtem Edge/Tobii-Test bestätigen lassen, (2) übrige offene Punkte unverändert: Fabu-Stimme-Entscheidung, Tobii-Gerätetest (Nova-Avatar), Telegram-Token, Pfad-Training-Modus-2-Bestätigung, Gruppengespräche-Implementierung, Grammatik Stufe 11+ (Thema noch offen).
 
 ---
 
