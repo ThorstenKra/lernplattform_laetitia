@@ -240,7 +240,7 @@ function rendereJaNein(container, aufgabe){
   window._GrammAntwort = function(wahl){
     pruefeAntwort(wahl, aufgabe.richtig, aufgabe.erklaerung, aufgabe);
   };
-  bindeDwell("#btnJa, #btnNein, #btnZurueck");
+  bindeDwell("#btnJa, #btnNein, #btnZurueck, #btnUeberspringen");
 }
 
 // ── Typ: A / B Wahl ──────────────────────────────────────────────
@@ -262,7 +262,7 @@ function rendereAbWahl(container, aufgabe){
   window._GrammAntwort = function(wahl){
     pruefeAntwort(wahl, aufgabe.richtig, aufgabe.erklaerung, aufgabe);
   };
-  bindeDwell("#btnA, #btnB, #btnZurueck");
+  bindeDwell("#btnA, #btnB, #btnZurueck, #btnUeberspringen");
 }
 
 // ── Typ: A / B / C Wahl ──────────────────────────────────────────
@@ -286,7 +286,7 @@ function rendereAbcWahl(container, aufgabe){
   window._GrammAntwort = function(wahl){
     pruefeAntwort(wahl, aufgabe.richtig, aufgabe.erklaerung, aufgabe);
   };
-  bindeDwell("#btnA, #btnB, #btnC, #btnZurueck");
+  bindeDwell("#btnA, #btnB, #btnC, #btnZurueck, #btnUeberspringen");
 }
 
 // ── Typ: Wort-Button ─────────────────────────────────────────────
@@ -322,7 +322,7 @@ function rendereWortButton(container, aufgabe){
     setTimeout(function(){ pruefeAntwort(gewaehlt, richtig, aufgabe.erklaerung, aufgabe); }, 400);
   };
 
-  var dwellSel = aufgabe.woerter.map(function(w, i){ return "#wortBtn" + i; }).join(", ") + ", #btnZurueck";
+  var dwellSel = aufgabe.woerter.map(function(w, i){ return "#wortBtn" + i; }).join(", ") + ", #btnZurueck, #btnUeberspringen";
   bindeDwell(dwellSel);
 }
 
@@ -340,7 +340,7 @@ function rendereRichtigFalsch(container, aufgabe){
   window._GrammAntwort = function(wahl){
     pruefeAntwort(wahl, aufgabe.richtig, aufgabe.erklaerung, aufgabe);
   };
-  bindeDwell("#btnRichtig, #btnFalsch, #btnZurueck");
+  bindeDwell("#btnRichtig, #btnFalsch, #btnZurueck, #btnUeberspringen");
 }
 
 // ── Antwort auswerten ────────────────────────────────────────────
