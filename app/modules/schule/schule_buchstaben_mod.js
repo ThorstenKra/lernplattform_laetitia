@@ -159,9 +159,9 @@ function zeigeAbschluss(){
   var pct=Math.round((richtigCount/session.length)*100);
   document.getElementById("abschlussScore").textContent=richtigCount+" von "+session.length+" richtig";
   document.getElementById("abschlussEmoji").textContent=pct>=80?"🌟":pct>=60?"😊":"💪";
-  document.getElementById("abschlussTitel").textContent=pct>=80?"Raetsel-Meisterin!":pct>=60?"Gut gemacht!":"Weiter so!";
-  document.getElementById("abschlussSub").textContent="Loesungswort: "+g.wort;
-  sprich("Das Loesungswort ist: "+g.wort);
+  document.getElementById("abschlussTitel").textContent=pct>=80?"Rätsel-Meisterin!":pct>=60?"Gut gemacht!":"Weiter so!";
+  document.getElementById("abschlussSub").textContent="Lösungswort: "+g.wort;
+  sprich("Das Lösungswort ist: "+g.wort);
   delete document.getElementById("btnAbschluss").dataset.pdwell;
   bindDwellEinzel(document.getElementById("btnAbschluss"));
   document.getElementById("progressFill").style.width="100%";

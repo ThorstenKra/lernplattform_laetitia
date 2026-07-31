@@ -228,7 +228,7 @@ function zeigeGespraech(antwort, vorschlaege, stimmung, nachAnzeige){
     if(grid){
       var liste = (Array.isArray(vorschlaege) && vorschlaege.length > 0)
         ? vorschlaege.slice(0, 4)
-        : ["Ja", "Nein", "Erzaehl mehr", "Okay"];
+        : ["Ja", "Nein", "Erzähl mehr", "Okay"];
       liste.forEach(function(v){
         var btn = document.createElement("button");
         btn.className = "vorschlag-btn";

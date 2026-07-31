@@ -618,7 +618,7 @@
       var naechster = naechsterIdx();
       if(naechster !== null){
         setTimeout(function(){ ladeTitel(naechster, 0); }, 1500);
-        setStatus("Naechster Titel...");
+        setStatus("Nächster Titel...");
       } else {
         setStatus("Ende der Wiedergabeliste.");
       }

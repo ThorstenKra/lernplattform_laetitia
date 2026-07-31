@@ -38,13 +38,13 @@ window.GEDICHTE = [
       ["Und der wilde Knabe brach", "'s Röslein auf der Heiden;", "Röslein wehrte sich und stach,", "Half ihm doch kein Weh und Ach,", "Mußt es eben leiden.", "Röslein, Röslein, Röslein rot,", "Röslein auf der Heiden."]
     ],
     abschnitte: [
-      { text: "Sah ein Knab ein Roeslein stehn, Roeslein auf der Heiden, war so jung und morgenschoen, lief er schnell es nah zu sehn, sah's mit vielen Freuden. Roeslein, Roeslein, Roeslein rot, Roeslein auf der Heiden.",
-        frage: "Ein Junge hat ein huebsches Roeslein entdeckt. Was, glaubst du, macht er als Naechstes?",
-        vorschlaege: ["Er pflueckt es", "Er laesst es stehen", "Er riecht nur daran", "Weiß ich nicht"] },
-      { text: "Knabe sprach: ich breche dich, Roeslein auf der Heiden! Roeslein sprach: ich steche dich, dass du ewig denkst an mich, und ich will's nicht leiden. Roeslein, Roeslein, Roeslein rot, Roeslein auf der Heiden." },
-      { text: "Und der wilde Knabe brach 's Roeslein auf der Heiden; Roeslein wehrte sich und stach, half ihm doch kein Weh und Ach, musst es eben leiden. Roeslein, Roeslein, Roeslein rot, Roeslein auf der Heiden.",
-        frage: "Das Roeslein wollte nicht gepflueckt werden, aber der Knabe hat es trotzdem getan. Was haettest du an seiner Stelle gemacht?",
-        vorschlaege: ["Ich haette es stehen lassen", "Ich haette auch gepflueckt", "Ich haette gefragt", "Weiß ich nicht"],
+      { text: "Sah ein Knab ein Röslein stehn, Röslein auf der Heiden, war so jung und morgenschön, lief er schnell es nah zu sehn, sah's mit vielen Freuden. Röslein, Röslein, Röslein rot, Röslein auf der Heiden.",
+        frage: "Ein Junge hat ein hübsches Röslein entdeckt. Was, glaubst du, macht er als Nächstes?",
+        vorschlaege: ["Er pflückt es", "Er lässt es stehen", "Er riecht nur daran", "Weiß ich nicht"] },
+      { text: "Knabe sprach: ich breche dich, Röslein auf der Heiden! Röslein sprach: ich steche dich, dass du ewig denkst an mich, und ich will's nicht leiden. Röslein, Röslein, Röslein rot, Röslein auf der Heiden." },
+      { text: "Und der wilde Knabe brach 's Röslein auf der Heiden; Röslein wehrte sich und stach, half ihm doch kein Weh und Ach, musste es eben leiden. Röslein, Röslein, Röslein rot, Röslein auf der Heiden.",
+        frage: "Das Röslein wollte nicht gepflückt werden, aber der Knabe hat es trotzdem getan. Was hättest du an seiner Stelle gemacht?",
+        vorschlaege: ["Ich hätte es stehen lassen", "Ich hätte auch gepflückt", "Ich hätte gefragt", "Weiß ich nicht"],
         ende: true }
     ]
   },
@@ -58,12 +58,12 @@ window.GEDICHTE = [
       ["Ach! aber ach! das Mädchen kam", "Und nicht in Acht das Veilchen nahm,", "Ertrat das arme Veilchen.", "Es sank und starb und freut' sich noch:", "Und sterb' ich denn, so sterb' ich doch", "Durch sie, durch sie,", "Zu ihren Füßen doch."]
     ],
     abschnitte: [
-      { text: "Ein Veilchen auf der Wiese stand, gebueckt in sich und unbekannt; es war ein herzigs Veilchen. Da kam eine junge Schaeferin mit leichtem Schritt und munterm Sinn daher, daher, die Wiese her, und sang.",
-        frage: "Was, glaubst du, wuenscht sich das kleine Veilchen?",
+      { text: "Ein Veilchen auf der Wiese stand, gebückt in sich und unbekannt; es war ein herziges Veilchen. Da kam eine junge Schäferin mit leichtem Schritt und munterm Sinn daher, daher, die Wiese her, und sang.",
+        frage: "Was, glaubst du, wünscht sich das kleine Veilchen?",
         vorschlaege: ["Dass sie es bemerkt", "Dass sie vorbeigeht", "Dass es regnet", "Weiß ich nicht"] },
-      { text: "Ach, denkt das Veilchen, waer ich nur die schoenste Blume der Natur, ach nur ein kleines Weilchen, bis mich das Liebchen abgepflueckt und an dem Busen matt gedrueckt! Ach nur, ach nur, ein Viertelstuendchen lang!" },
-      { text: "Ach, aber ach! Das Maedchen kam und nicht in Acht das Veilchen nahm, ertrat das arme Veilchen. Es sank und starb und freute sich noch: Und sterb ich denn, so sterb ich doch durch sie, durch sie, zu ihren Fuessen doch.",
-        frage: "Das Veilchen wurde aus Versehen zertreten, aber es war am Ende trotzdem froh, weil es der Schaeferin so nah sein durfte. Das ist ein bisschen traurig und schoen zugleich. Kennst du so ein Gefuehl?",
+      { text: "Ach, denkt das Veilchen, wär ich nur die schönste Blume der Natur, ach nur ein kleines Weilchen, bis mich das Liebchen abgepflückt und an dem Busen matt gedrückt! Ach nur, ach nur, ein Viertelstündchen lang!" },
+      { text: "Ach, aber ach! Das Mädchen kam und nicht in Acht das Veilchen nahm, ertrat das arme Veilchen. Es sank und starb und freute sich noch: Und sterb ich denn, so sterb ich doch durch sie, durch sie, zu ihren Füßen doch.",
+        frage: "Das Veilchen wurde aus Versehen zertreten, aber es war am Ende trotzdem froh, weil es der Schäferin so nah sein durfte. Das ist ein bisschen traurig und schön zugleich. Kennst du so ein Gefühl?",
         vorschlaege: ["Ja, das kenne ich", "Nein, noch nicht", "Das fand ich traurig", "Erzähl mir mehr davon"],
         ende: true }
     ]
@@ -79,13 +79,13 @@ window.GEDICHTE = [
       ["Das Wasser rauscht', das Wasser schwoll,", "Netzt' ihm den nackten Fuß;", "Sein Herz wuchs ihm so sehnsuchtsvoll,", "Wie bei der Liebsten Gruß.", "Sie sprach zu ihm, sie sang zu ihm;", "Da war's um ihn geschehn:", "Halb zog sie ihn, halb sank er hin,", "Und ward nicht mehr gesehn."]
     ],
     abschnitte: [
-      { text: "Das Wasser rauschte, das Wasser schwoll, ein Fischer sass daran, sah nach dem Angel ruhevoll, kuehl bis ans Herz hinan. Und wie er sitzt und wie er lauscht, teilt sich die Flut empor; aus dem bewegten Wasser rauscht ein feuchtes Weib hervor.",
-        frage: "Aus dem Wasser taucht ploetzlich eine geheimnisvolle Frau auf. Was, glaubst du, will sie von dem Fischer?",
+      { text: "Das Wasser rauschte, das Wasser schwoll, ein Fischer saß daran, sah nach dem Angel ruhevoll, kühl bis ans Herz hinan. Und wie er sitzt und wie er lauscht, teilt sich die Flut empor; aus dem bewegten Wasser rauscht ein feuchtes Weib hervor.",
+        frage: "Aus dem Wasser taucht plötzlich eine geheimnisvolle Frau auf. Was, glaubst du, will sie von dem Fischer?",
         vorschlaege: ["Sie will ihn warnen", "Sie will ihn locken", "Sie will nur spielen", "Weiß ich nicht"] },
-      { text: "Sie sang zu ihm, sie sprach zu ihm: Was lockst du meine Brut mit Menschenwitz und Menschenlist hinauf in Todesglut? Ach, wuesstest du, wies Fischlein ist, so wohlig auf dem Grund, du stiegst herunter, wie du bist, und wuerdest erst gesund!" },
-      { text: "Labt sich die liebe Sonne nicht, der Mond sich nicht im Meer? Kehrt wellenatmend ihr Gesicht nicht doppelt schoener her? Lockt dich der tiefe Himmel nicht, das feuchtverklaerte Blau? Lockt dich dein eigen Angesicht nicht her in ewgen Tau?" },
-      { text: "Das Wasser rauschte, das Wasser schwoll, netzte ihm den nackten Fuss; sein Herz wuchs ihm so sehnsuchtsvoll, wie bei der Liebsten Gruss. Sie sprach zu ihm, sie sang zu ihm; da wars um ihn geschehn: Halb zog sie ihn, halb sank er hin, und ward nicht mehr gesehn.",
-        frage: "Das ist eine alte, geheimnisvolle Sage ueber eine Wasserfrau, die einen Menschen ins Wasser lockt -- so wie ein Fabelwesen aus einem Maerchen. Fandest du das eher spannend oder ein bisschen unheimlich?",
+      { text: "Sie sang zu ihm, sie sprach zu ihm: Was lockst du meine Brut mit Menschenwitz und Menschenlist hinauf in Todesglut? Ach, wüsstest du, wie's Fischlein ist, so wohlig auf dem Grund, du stiegst herunter, wie du bist, und würdest erst gesund!" },
+      { text: "Labt sich die liebe Sonne nicht, der Mond sich nicht im Meer? Kehrt wellenatmend ihr Gesicht nicht doppelt schöner her? Lockt dich der tiefe Himmel nicht, das feuchtverklärte Blau? Lockt dich dein eigen Angesicht nicht her in ew'gen Tau?" },
+      { text: "Das Wasser rauschte, das Wasser schwoll, netzte ihm den nackten Fuß; sein Herz wuchs ihm so sehnsuchtsvoll, wie bei der Liebsten Gruß. Sie sprach zu ihm, sie sang zu ihm; da war's um ihn geschehn: Halb zog sie ihn, halb sank er hin, und ward nicht mehr gesehn.",
+        frage: "Das ist eine alte, geheimnisvolle Sage über eine Wasserfrau, die einen Menschen ins Wasser lockt -- so wie ein Fabelwesen aus einem Märchen. Fandest du das eher spannend oder ein bisschen unheimlich?",
         vorschlaege: ["Spannend", "Ein bisschen unheimlich", "Beides", "Erzähl mir eine andere Geschichte"],
         ende: true }
     ]
@@ -103,12 +103,12 @@ window.GEDICHTE = [
       ["Er sah ihn stürzen, trinken", "Und sinken tief ins Meer.", "Die Augen täten ihm sinken;", "Trank nie einen Tropfen mehr."]
     ],
     abschnitte: [
-      { text: "Es war ein Koenig in Thule, gar treu bis an das Grab, dem sterbend seine Buhle einen goldnen Becher gab. Es ging ihm nichts darueber, er leert ihn jeden Schmaus; die Augen gingen ihm ueber, sooft er trank daraus.",
-        frage: "Der Koenig hat einen besonderen Becher von seiner Liebsten bekommen und passt ganz besonders gut darauf auf. Hast du auch ein Lieblingsding, das dir sehr viel bedeutet?",
+      { text: "Es war ein König in Thule, gar treu bis an das Grab, dem sterbend seine Buhle einen goldnen Becher gab. Es ging ihm nichts darüber, er leert ihn jeden Schmaus; die Augen gingen ihm über, sooft er trank daraus.",
+        frage: "Der König hat einen besonderen Becher von seiner Liebsten bekommen und passt ganz besonders gut darauf auf. Hast du auch ein Lieblingsding, das dir sehr viel bedeutet?",
         vorschlaege: ["Ja, das kenne ich", "Nein, nicht so", "Erzähl weiter", "Was passiert dann?"] },
-      { text: "Und als er kam zu sterben, zaehlte er seine Staedte im Reich, goennte alles seinen Erben, den Becher nicht zugleich. Er sass beim Koenigsmahle, die Ritter um ihn her, auf hohem Vaetersaale, dort auf dem Schloss am Meer." },
-      { text: "Dort stand der alte Zecher, trank letzte Lebensglut, und warf den heiligen Becher hinunter in die Flut. Er sah ihn stuerzen, trinken und sinken tief ins Meer. Die Augen taeten ihm sinken; trank nie einen Tropfen mehr.",
-        frage: "Der alte Koenig wollte nicht, dass jemand anders seinen besonderen Becher bekommt -- er hat ihn lieber ins Meer geworfen. Das ist eine alte, ein bisschen wehmuetige Geschichte ueber grosse Treue. Magst du darueber reden?",
+      { text: "Und als er kam zu sterben, zählte er seine Städte im Reich, gönnte alles seinen Erben, den Becher nicht zugleich. Er saß beim Königsmahle, die Ritter um ihn her, auf hohem Vätersaale, dort auf dem Schloss am Meer." },
+      { text: "Dort stand der alte Zecher, trank letzte Lebensglut, und warf den heiligen Becher hinunter in die Flut. Er sah ihn stürzen, trinken und sinken tief ins Meer. Die Augen täten ihm sinken; trank nie einen Tropfen mehr.",
+        frage: "Der alte König wollte nicht, dass jemand anders seinen besonderen Becher bekommt -- er hat ihn lieber ins Meer geworfen. Das ist eine alte, ein bisschen wehmütige Geschichte über große Treue. Magst du darüber reden?",
         vorschlaege: ["Ja, lass uns reden", "Das fand ich schön", "Das fand ich traurig", "Erzähl mir eine andere Geschichte"],
         ende: true }
     ]
@@ -130,15 +130,15 @@ window.GEDICHTE = [
       ["Dem Vater grauset's, er reitet geschwind,", "Er hält in Armen das ächzende Kind,", "Erreicht den Hof mit Mühe und Not;", "In seinen Armen das Kind war tot."]
     ],
     abschnitte: [
-      { text: "Jetzt kommt eine ganz alte, beruehmte Geschichte in Versen. Sie heisst Erlkoenig und ist ein kleines bisschen gruselig -- so wie eine alte Sage von einem unheimlichen Wesen in der Nacht. Ein beruehmter Dichter namens Goethe hat sie vor ueber zweihundert Jahren geschrieben." },
-      { text: "Wer reitet so spaet durch Nacht und Wind? Es ist der Vater mit seinem Kind; er hat den Knaben wohl in dem Arm, er fasst ihn sicher, er haelt ihn warm." },
-      { text: "Mein Sohn, was birgst du so bang dein Gesicht? Siehst, Vater, du den Erlkoenig nicht? Den Erlenkoenig mit Kron und Schweif? Mein Sohn, es ist ein Nebelstreif.",
+      { text: "Jetzt kommt eine ganz alte, berühmte Geschichte in Versen. Sie heißt Erlkönig und ist ein kleines bisschen gruselig -- so wie eine alte Sage von einem unheimlichen Wesen in der Nacht. Ein berühmter Dichter namens Goethe hat sie vor über zweihundert Jahren geschrieben." },
+      { text: "Wer reitet so spät durch Nacht und Wind? Es ist der Vater mit seinem Kind; er hat den Knaben wohl in dem Arm, er fasst ihn sicher, er hält ihn warm." },
+      { text: "Mein Sohn, was birgst du so bang dein Gesicht? Siehst, Vater, du den Erlkönig nicht? Den Erlenkönig mit Kron und Schweif? Mein Sohn, es ist ein Nebelstreif.",
         frage: "Der Junge hat Angst, aber sein Vater sagt, es ist nur Nebel. Was denkst du -- hat der Vater recht?",
         vorschlaege: ["Ja, nur Nebel", "Nein, da ist was", "Ich weiß nicht", "Erzähl weiter"] },
-      { text: "Du liebes Kind, komm, geh mit mir! Gar schoene Spiele spiel ich mit dir; manch bunte Blumen sind an dem Strand; meine Mutter hat manch guelden Gewand. Mein Vater, mein Vater, und hoerest du nicht, was Erlenkoenig mir leise verspricht? Sei ruhig, bleibe ruhig, mein Kind; in duerren Blaettern saeuselt der Wind." },
-      { text: "Willst, feiner Knabe, du mit mir gehn? Meine Toechter sollen dich warten schoen; meine Toechter fuehren den naechtlichen Reihn, und wiegen und tanzen und singen dich ein. Mein Vater, mein Vater, und siehst du nicht dort Erlkoenigs Toechter am duestern Ort? Mein Sohn, mein Sohn, ich seh es genau: Es scheinen die alten Weiden so grau." },
-      { text: "Ich liebe dich, mich reizt deine schoene Gestalt; und bist du nicht willig, so brauch ich Gewalt. Mein Vater, mein Vater, jetzt fasst er mich an! Erlkoenig hat mir ein Leids getan! Dem Vater grauset's, er reitet geschwind, er haelt in Armen das aechzende Kind, erreicht den Hof mit Muehe und Not; in seinen Armen das Kind war tot.",
-        frage: "Das ist ein trauriges und auch ein bisschen gruseliges Ende -- der Junge stirbt am Ende der alten Sage. Viele ganz alte Geschichten sind manchmal duester. Magst du darueber reden, wie du dich dabei fuehlst?",
+      { text: "Du liebes Kind, komm, geh mit mir! Gar schöne Spiele spiel ich mit dir; manch bunte Blumen sind an dem Strand; meine Mutter hat manch gülden Gewand. Mein Vater, mein Vater, und hörest du nicht, was Erlenkönig mir leise verspricht? Sei ruhig, bleibe ruhig, mein Kind; in dürren Blättern säuselt der Wind." },
+      { text: "Willst, feiner Knabe, du mit mir gehn? Meine Töchter sollen dich warten schön; meine Töchter führen den nächtlichen Reihn, und wiegen und tanzen und singen dich ein. Mein Vater, mein Vater, und siehst du nicht dort Erlkönigs Töchter am düstern Ort? Mein Sohn, mein Sohn, ich seh es genau: Es scheinen die alten Weiden so grau." },
+      { text: "Ich liebe dich, mich reizt deine schöne Gestalt; und bist du nicht willig, so brauch ich Gewalt. Mein Vater, mein Vater, jetzt fasst er mich an! Erlkönig hat mir ein Leids getan! Dem Vater grauset's, er reitet geschwind, er hält in Armen das ächzende Kind, erreicht den Hof mit Mühe und Not; in seinen Armen das Kind war tot.",
+        frage: "Das ist ein trauriges und auch ein bisschen gruseliges Ende -- der Junge stirbt am Ende der alten Sage. Viele ganz alte Geschichten sind manchmal düster. Magst du darüber reden, wie du dich dabei fühlst?",
         vorschlaege: ["Ja, lass uns reden", "Es hat mich gegruselt", "Es hat mich traurig gemacht", "Ich möchte eine andere Geschichte hören"],
         ende: true }
     ]

@@ -17,7 +17,7 @@ Claude beschränkt sich auf entscheidungsrelevante Ausgaben. Einzelschritte, Üb
 
 ---
 
-## 18 Goldstandard-Regeln
+## 19 Goldstandard-Regeln
 
 1. `dwell.js` immer `<script src="...">`, nie `import()`
 2. `localStorage["laetitia_input_mode"] = "tobii"` als Standard
@@ -37,6 +37,7 @@ Claude beschränkt sich auf entscheidungsrelevante Ausgaben. Einzelschritte, Üb
 16. Vor jedem `git push`: `validate.ps1` ausführen — alle 8 Prüfungen müssen grün sein
 17. **Lesebereich von Aktionsbereich trennen:** Text/Frage oben passiv (`pointer-events:none`), Trennstreifen mit Label, Antwort-Buttons unten dwell-aktiv. Buttons nach Antwort vollständig ausblenden (`display:none`). Vollständiges Muster in PROJEKT_WISSEN.md.
 18. **Auswahlfelder erst nach TTS-Ende:** Auswahl-/Antwort-Buttons werden erst NACH vollständigem Ende der Sprachausgabe des zugehörigen Texts sichtbar/dwell-aktiv — nie gleichzeitig mit oder vor Sprechbeginn. Zurück/Beenden bleiben sofort erreichbar. Referenz: `fabu_mod.js`/`milo_mod.js` (Sitzung 17, 31.07.2026).
+19. **Echte deutsche Umlaute, keine ASCII-Transliteration:** In vorgelesenen/angezeigten Texten (Aufgaben, `persona.json`, TTS-Strings, UI-Labels) immer `ä ö ü Ä Ö Ü ß` als echte Zeichen schreiben, nie `ae/oe/ue/ss` — sonst spricht Edge/Windows-TTS Wörter falsch aus. Gilt nicht für Code-Identifier, JSON-Schlüssel oder Kommentare. Codebase einmalig komplett bereinigt (Sitzung 17, 31.07.2026).
 
 ---
 

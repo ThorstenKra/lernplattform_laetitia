@@ -283,7 +283,7 @@
   function start(L){
     const levelTasks = tasks.filter(t=>upper(t.stufe)===upper(L));
     if(!levelTasks.length){
-      setTopStatus("Keine Aufgaben fuer Level "+L);
+      setTopStatus("Keine Aufgaben für Level "+L);
       return;
     }
 
@@ -309,7 +309,7 @@
 
   function startWrongOnly(){
     currentMode="wrong";
-    setTopStatus("Modus: Nur falsche Antworten. Waehle ein Level.");
+    setTopStatus("Modus: Nur falsche Antworten. Wähle ein Level.");
     showMenu();
   }
 
@@ -378,7 +378,7 @@
       setTopStatus("Falsch.");
       queue.play([
         {type:"wav", file:AUDIO.falsch,      fallback:"Das war falsch."},
-        {type:"wav", file:AUDIO.richtigWaere, fallback:"Richtig waere:"},
+        {type:"wav", file:AUDIO.richtigWaere, fallback:"Richtig wäre:"},
         {type:"tts", text: correctAnswerText(t), rate:0.98}
       ]);
     }

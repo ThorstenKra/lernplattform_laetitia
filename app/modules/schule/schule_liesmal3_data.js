@@ -62,13 +62,13 @@ var aufgaben = [
     kontext:"",
     text:"Hunde brauchen viel Bewegung.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"A",
-    erklaerung:"Richtig! Hunde muessen jeden Tag raus und laufen." },
+    erklaerung:"Richtig! Hunde müssen jeden Tag raus und laufen." },
 
   { heft:"liesmal3", seite:5, typ:"ja_nein", stufe:"SL_JAEIN",
     kontext:"",
-    text:"Autos ohne Raeder können fahren.",
+    text:"Autos ohne Räder können fahren.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"B",
-    erklaerung:"Nein, ohne Raeder kann kein Auto fahren." },
+    erklaerung:"Nein, ohne Räder kann kein Auto fahren." },
 
   { heft:"liesmal3", seite:5, typ:"ja_nein", stufe:"SL_JAEIN",
     kontext:"",
@@ -78,9 +78,9 @@ var aufgaben = [
 
   { heft:"liesmal3", seite:5, typ:"ja_nein", stufe:"SL_JAEIN",
     kontext:"",
-    text:"Zucker ist suess und Zitronen sind sauer.",
+    text:"Zucker ist süß und Zitronen sind sauer.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"A",
-    erklaerung:"Richtig! Zucker schmeckt suess, Zitronen schmecken sauer." },
+    erklaerung:"Richtig! Zucker schmeckt süß, Zitronen schmecken sauer." },
 
   { heft:"liesmal3", seite:5, typ:"ja_nein", stufe:"SL_JAEIN",
     kontext:"",
@@ -98,63 +98,63 @@ var aufgaben = [
     kontext:"",
     text:"In einem Badesee darf man schwimmen.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"A",
-    erklaerung:"Richtig, Badeseen sind extra dafuer da." },
+    erklaerung:"Richtig, Badeseen sind extra dafür da." },
 
-  // ── Seite 9: Der grosse Fisch ───────────────────────────────────────────────
+  // ── Seite 9: Der große Fisch ───────────────────────────────────────────────
   { heft:"liesmal3", seite:9, typ:"ja_nein", bild:"fisch_comic", stufe:"SL_JAEIN",
-    kontext:"Ein grosser Fisch jagt einen kleinen Fisch. Dann liegt der grosse Fisch auf dem Mittagstisch.",
-    text:"Der grosse Fisch jagt einen kleinen Frosch.",
+    kontext:"Ein großer Fisch jagt einen kleinen Fisch. Dann liegt der große Fisch auf dem Mittagstisch.",
+    text:"Der große Fisch jagt einen kleinen Frosch.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"B",
-    erklaerung:"Nein, der grosse Fisch jagt einen kleinen Fisch, keinen Frosch." },
+    erklaerung:"Nein, der große Fisch jagt einen kleinen Fisch, keinen Frosch." },
 
   { heft:"liesmal3", seite:9, typ:"ja_nein", bild:"fisch_comic", stufe:"SL_JAEIN",
-    kontext:"Ein grosser Fisch jagt einen kleinen Fisch.",
-    text:"Der grosse Fisch jagt einen kleinen Fisch.",
+    kontext:"Ein großer Fisch jagt einen kleinen Fisch.",
+    text:"Der große Fisch jagt einen kleinen Fisch.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"A",
     erklaerung:"Richtig, das sieht man im Comic." },
 
   { heft:"liesmal3", seite:9, typ:"ja_nein", bild:"fisch_comic", stufe:"SL_JAEIN",
-    kontext:"Ein grosser Fisch jagt einen kleinen Fisch.",
-    text:"Im Wasser schwimmt ein Angelhaken mit Wuermern.",
+    kontext:"Ein großer Fisch jagt einen kleinen Fisch.",
+    text:"Im Wasser schwimmt ein Angelhaken mit Würmern.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"A",
-    erklaerung:"Ja, im Comic sieht man einen Angelhaken mit Wuermern im Wasser." },
+    erklaerung:"Ja, im Comic sieht man einen Angelhaken mit Würmern im Wasser." },
 
   { heft:"liesmal3", seite:9, typ:"ja_nein", bild:"fisch_comic", stufe:"SL_JAEIN",
-    kontext:"Der grosse Fisch liegt auf dem Mittagstisch.",
+    kontext:"Der große Fisch liegt auf dem Mittagstisch.",
     text:"Der kleine Fisch liegt zum Essen auf einer großen Platte.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"A",
     erklaerung:"Richtig, im zweiten Bild sieht man den Fisch auf einer Platte." },
 
   { heft:"liesmal3", seite:9, typ:"ja_nein", bild:"fisch_comic", stufe:"SL_JAEIN",
-    kontext:"Der grosse Fisch liegt auf dem Mittagstisch.",
-    text:"Der grosse Fisch liegt zum Essen auf dem Mittagstisch.",
+    kontext:"Der große Fisch liegt auf dem Mittagstisch.",
+    text:"Der große Fisch liegt zum Essen auf dem Mittagstisch.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"A",
     erklaerung:"Richtig, so endet die Geschichte." },
 
   { heft:"liesmal3", seite:9, typ:"ja_nein", bild:"fisch_comic", stufe:"SL_JAEIN",
-    kontext:"Der grosse Fisch liegt auf dem Mittagstisch.",
-    text:"Der grosse Fisch hat eine Banane in seinem Maul.",
+    kontext:"Der große Fisch liegt auf dem Mittagstisch.",
+    text:"Der große Fisch hat eine Banane in seinem Maul.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"B",
     erklaerung:"Nein, eine Banane ist nicht dabei." },
 
   { heft:"liesmal3", seite:9, typ:"ja_nein", bild:"fisch_comic", stufe:"SL_JAEIN",
-    kontext:"Der grosse Fisch liegt auf dem Mittagstisch.",
-    text:"Der Tisch ist mit Tellern, Glaesernn und Besteck gedeckt.",
+    kontext:"Der große Fisch liegt auf dem Mittagstisch.",
+    text:"Der Tisch ist mit Tellern, Gläsern und Besteck gedeckt.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"A",
     erklaerung:"Richtig, das sieht man im Bild." },
 
   // ── Seite 11: Allgemeinwissen ───────────────────────────────────────────────
   { heft:"liesmal3", seite:11, typ:"ja_nein", stufe:"SL_JAEIN",
     kontext:"",
-    text:"Weisse Kreide wird aus Joghurt hergestellt.",
+    text:"Weiße Kreide wird aus Joghurt hergestellt.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"B",
     erklaerung:"Nein, Kreide wird aus Kalk gemacht, nicht aus Joghurt." },
 
   { heft:"liesmal3", seite:11, typ:"ja_nein", stufe:"SL_JAEIN",
     kontext:"",
-    text:"Autos und Fahrraeder sind aus Knetgummi.",
+    text:"Autos und Fahrräder sind aus Knetgummi.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"B",
-    erklaerung:"Nein, Autos und Fahrraeder sind aus Metall und anderen Materialien." },
+    erklaerung:"Nein, Autos und Fahrräder sind aus Metall und anderen Materialien." },
 
   { heft:"liesmal3", seite:11, typ:"ja_nein", stufe:"SL_JAEIN",
     kontext:"",
@@ -172,11 +172,11 @@ var aufgaben = [
     kontext:"",
     text:"Milch besteht aus geschmolzenem Schnee.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"B",
-    erklaerung:"Nein, Milch kommt von Kuehen und anderen Tieren." },
+    erklaerung:"Nein, Milch kommt von Kühen und anderen Tieren." },
 
   { heft:"liesmal3", seite:11, typ:"ja_nein", stufe:"SL_JAEIN",
     kontext:"",
-    text:"Ein Sonnenbrand ist gefaehrlich fuer die Haut.",
+    text:"Ein Sonnenbrand ist gefährlich für die Haut.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"A",
     erklaerung:"Richtig, deshalb trägt man Sonnencreme." },
 
@@ -201,7 +201,7 @@ var aufgaben = [
 
   { heft:"liesmal3", seite:15, typ:"ja_nein", bild:"weltraum_flummi", stufe:"SL_JAEIN",
     kontext:"Ein Flummiball springt vom Boden hoch bis ins All.",
-    text:"Auf der Wiese steht ein grosser Apfelbaum.",
+    text:"Auf der Wiese steht ein großer Apfelbaum.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"B",
     erklaerung:"Nein, kein Apfelbaum zu sehen." },
 
@@ -219,7 +219,7 @@ var aufgaben = [
 
   { heft:"liesmal3", seite:15, typ:"ja_nein", bild:"weltraum_flummi", stufe:"SL_JAEIN",
     kontext:"Ein Flummiball springt vom Boden hoch bis ins All.",
-    text:"Der Flummi schwebt zwischen dem Fußball und dem Kuerbis.",
+    text:"Der Flummi schwebt zwischen dem Fußball und dem Kürbis.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"A",
     erklaerung:"Richtig, das sieht man im zweiten Bild." },
 
@@ -238,13 +238,13 @@ var aufgaben = [
   // ── Seite 17: Allgemeinwissen (quer) ───────────────────────────────────────
   { heft:"liesmal3", seite:17, typ:"ja_nein", bild:"krake_lies", stufe:"SL_JAEIN",
     kontext:"",
-    text:"Es gibt Schafe mit Fluegeln und blaue Hunde.",
+    text:"Es gibt Schafe mit Flügeln und blaue Hunde.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"B",
     erklaerung:"Nein, das gibt es nicht in der Wirklichkeit." },
 
   { heft:"liesmal3", seite:17, typ:"ja_nein", bild:"krake_lies", stufe:"SL_JAEIN",
     kontext:"",
-    text:"Tomaten darf man nur zum Fruehstueck essen.",
+    text:"Tomaten darf man nur zum Frühstück essen.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"B",
     erklaerung:"Nein, Tomaten kann man zu jeder Mahlzeit essen." },
 
@@ -256,31 +256,31 @@ var aufgaben = [
 
   { heft:"liesmal3", seite:17, typ:"ja_nein", bild:"krake_lies", stufe:"SL_JAEIN",
     kontext:"",
-    text:"Schmuck ist haeufig aus Silber oder aus Gold.",
+    text:"Schmuck ist häufig aus Silber oder aus Gold.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"A",
     erklaerung:"Richtig, Ringe und Ketten sind oft aus Gold oder Silber." },
 
   { heft:"liesmal3", seite:17, typ:"ja_nein", bild:"krake_lies", stufe:"SL_JAEIN",
     kontext:"",
-    text:"Viele Maeuse spielen Fußball in einem Verein.",
+    text:"Viele Mäuse spielen Fußball in einem Verein.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"B",
-    erklaerung:"Nein, Maeuse spielen keinen Fußball." },
+    erklaerung:"Nein, Mäuse spielen keinen Fußball." },
 
   { heft:"liesmal3", seite:17, typ:"ja_nein", bild:"krake_lies", stufe:"SL_JAEIN",
     kontext:"",
-    text:"Gummibaerchen leben in Amerika und im Zoo.",
+    text:"Gummibärchen leben in Amerika und im Zoo.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"B",
-    erklaerung:"Nein, Gummibaerchen sind Suesssigkeiten, keine echten Tiere." },
+    erklaerung:"Nein, Gummibärchen sind Süßigkeiten, keine echten Tiere." },
 
   { heft:"liesmal3", seite:17, typ:"ja_nein", bild:"krake_lies", stufe:"SL_JAEIN",
     kontext:"",
-    text:"Braune Kueche geben Kaffee, Kakao oder Cola.",
+    text:"Braune Kühe geben Kaffee, Kakao oder Cola.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"B",
-    erklaerung:"Nein, Kueche geben Milch, keine anderen Getraenke." },
+    erklaerung:"Nein, Kühe geben Milch, keine anderen Getränke." },
 
   { heft:"liesmal3", seite:17, typ:"ja_nein", bild:"krake_lies", stufe:"SL_JAEIN",
     kontext:"",
-    text:"Elefanten haben Stosszaehne und einen Ruessel.",
+    text:"Elefanten haben Stoßzähne und einen Rüssel.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"A",
     erklaerung:"Richtig, das sind typische Merkmale von Elefanten." },
 
@@ -293,9 +293,9 @@ var aufgaben = [
 
   { heft:"liesmal3", seite:23, typ:"ja_nein", bild:"pizza_mia", stufe:"SL_JAEIN",
     kontext:"",
-    text:"In einer Schule gibt es viele Tische und Stuehle.",
+    text:"In einer Schule gibt es viele Tische und Stühle.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"A",
-    erklaerung:"Richtig, in jedem Klassenzimmer gibt es Tische und Stuehle." },
+    erklaerung:"Richtig, in jedem Klassenzimmer gibt es Tische und Stühle." },
 
   { heft:"liesmal3", seite:23, typ:"ja_nein", bild:"pizza_mia", stufe:"SL_JAEIN",
     kontext:"",
@@ -311,32 +311,32 @@ var aufgaben = [
 
   { heft:"liesmal3", seite:23, typ:"ja_nein", bild:"pizza_mia", stufe:"SL_JAEIN",
     kontext:"",
-    text:"Auf dem Mond gibt es viele schoene Spielplaetze.",
+    text:"Auf dem Mond gibt es viele schöne Spielplätze.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"B",
-    erklaerung:"Nein, auf dem Mond gibt es keine Spielplaetze." },
+    erklaerung:"Nein, auf dem Mond gibt es keine Spielplätze." },
 
   { heft:"liesmal3", seite:23, typ:"ja_nein", bild:"pizza_mia", stufe:"SL_JAEIN",
     kontext:"",
-    text:"In einem Wald stehen mehr Haeuser als Baeume.",
+    text:"In einem Wald stehen mehr Häuser als Bäume.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"B",
-    erklaerung:"Nein, in einem Wald stehen viele Baeume, kaum Haeuser." },
+    erklaerung:"Nein, in einem Wald stehen viele Bäume, kaum Häuser." },
 
   { heft:"liesmal3", seite:23, typ:"ja_nein", bild:"pizza_mia", stufe:"SL_JAEIN",
     kontext:"",
-    text:"Auch Zahnaerzte muessen sich die Zähne putzen.",
+    text:"Auch Zahnärzte müssen sich die Zähne putzen.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"A",
-    erklaerung:"Richtig, alle Menschen muessen sich die Zähne putzen!" },
+    erklaerung:"Richtig, alle Menschen müssen sich die Zähne putzen!" },
 
   { heft:"liesmal3", seite:23, typ:"ja_nein", bild:"pizza_mia", stufe:"SL_JAEIN",
     kontext:"",
     text:"Kinder trinken am liebsten Zitronentee mit Sand.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"B",
-    erklaerung:"Nein, Sand ist kein Getraenk!" },
+    erklaerung:"Nein, Sand ist kein Getränk!" },
 
   // ── Seite 29: Allgemeinwissen ───────────────────────────────────────────────
   { heft:"liesmal3", seite:29, typ:"ja_nein", bild:"taucher_lies", stufe:"SL_JAEIN",
     kontext:"",
-    text:"Kinder können sehr gut mit ihren Fuessen hören.",
+    text:"Kinder können sehr gut mit ihren Füßen hören.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"B",
     erklaerung:"Nein, wir hören mit unseren Ohren." },
 
@@ -356,7 +356,7 @@ var aufgaben = [
     kontext:"",
     text:"Diamanten sind besonders wertvolle Edelsteine.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"A",
-    erklaerung:"Richtig, Diamanten sind die haertesten und wertvollsten Steine." },
+    erklaerung:"Richtig, Diamanten sind die härtesten und wertvollsten Steine." },
 
   { heft:"liesmal3", seite:29, typ:"ja_nein", bild:"taucher_lies", stufe:"SL_JAEIN",
     kontext:"",
@@ -366,7 +366,7 @@ var aufgaben = [
 
   { heft:"liesmal3", seite:29, typ:"ja_nein", bild:"taucher_lies", stufe:"SL_JAEIN",
     kontext:"",
-    text:"Hunde haben auf dem Ruecken eine zweite Nase.",
+    text:"Hunde haben auf dem Rücken eine zweite Nase.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"B",
     erklaerung:"Nein, Hunde haben nur eine Nase, vorne am Kopf." },
 
@@ -378,9 +378,9 @@ var aufgaben = [
 
   { heft:"liesmal3", seite:29, typ:"ja_nein", bild:"taucher_lies", stufe:"SL_JAEIN",
     kontext:"",
-    text:"Bleistifte und Schulranzen können schoen singen.",
+    text:"Bleistifte und Schulranzen können schön singen.",
     frage:"Stimmt das?", antwort_a:"Ja", antwort_b:"Nein", richtig:"B",
-    erklaerung:"Nein, Bleistifte und Ranzen sind Gegenstaende. Die können nicht singen." }
+    erklaerung:"Nein, Bleistifte und Ranzen sind Gegenstände. Die können nicht singen." }
 
 ];
 

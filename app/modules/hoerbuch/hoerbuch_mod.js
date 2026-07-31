@@ -454,9 +454,9 @@
         state.autoNext = setTimeout(function(){
           ladeKapitel(idx + 1, 0);
         }, 2000);
-        setStatus("Naechstes Kapitel in 2 Sekunden...");
+        setStatus("Nächstes Kapitel in 2 Sekunden...");
       } else {
-        setStatus("Hoerspiel beendet!");
+        setStatus("Hörspiel beendet!");
         speicherzeichen(buch.id, 0, 0); // Lesezeichen zuruecksetzen
       }
     });

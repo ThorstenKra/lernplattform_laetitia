@@ -102,7 +102,7 @@ var aufgaben = [
 
   { heft:"liesmal3", seite:13, typ:"buchstaben", stufe:"SL_BUCHSTABEN",
     loesungswort:"LOKOMOTIVE",
-    text:"Er klingelt fruehs am Morgen.",
+    text:"Er klingelt früh am Morgen.",
     frage:"Was ist das?",
     antwort_a:"Telefon", antwort_b:"Wecker", antwort_c:"Vogel", antwort_d:"Radio",
     richtig:"B", erklaerung:"Der Wecker klingelt am Morgen und weckt uns." },
@@ -111,7 +111,7 @@ var aufgaben = [
     loesungswort:"LOKOMOTIVE",
     text:"An ihr befinden sich Finger.",
     frage:"Was ist das?",
-    antwort_a:"Fuss", antwort_b:"Hand", antwort_c:"Arm", antwort_d:"Schulter",
+    antwort_a:"Fuß", antwort_b:"Hand", antwort_c:"Arm", antwort_d:"Schulter",
     richtig:"B", erklaerung:"An der Hand befinden sich Finger." },
 
   { heft:"liesmal3", seite:13, typ:"buchstaben", stufe:"SL_BUCHSTABEN",
@@ -130,24 +130,24 @@ var aufgaben = [
 
   { heft:"liesmal3", seite:13, typ:"buchstaben", stufe:"SL_BUCHSTABEN",
     loesungswort:"LOKOMOTIVE",
-    text:"Dieses Tier hat zwei Hoecker.",
+    text:"Dieses Tier hat zwei Höcker.",
     frage:"Was ist das?",
     antwort_a:"Elefant", antwort_b:"Kamel", antwort_c:"Lama", antwort_d:"Kuh",
-    richtig:"B", erklaerung:"Das Kamel hat zwei Hoecker auf dem Ruecken." },
+    richtig:"B", erklaerung:"Das Kamel hat zwei Höcker auf dem Ruecken." },
 
   { heft:"liesmal3", seite:13, typ:"buchstaben", stufe:"SL_BUCHSTABEN",
     loesungswort:"LOKOMOTIVE",
-    text:"Es steht auf dem Fussballfeld.",
+    text:"Es steht auf dem Fußballfeld.",
     frage:"Was ist das?",
     antwort_a:"Zaun", antwort_b:"Tor", antwort_c:"Bank", antwort_d:"Fahne",
-    richtig:"B", erklaerung:"Das Tor steht auf dem Fussballfeld." },
+    richtig:"B", erklaerung:"Das Tor steht auf dem Fußballfeld." },
 
   { heft:"liesmal3", seite:13, typ:"buchstaben", stufe:"SL_BUCHSTABEN",
     loesungswort:"LOKOMOTIVE",
-    text:"Kaiser und Koenige tragen sie.",
+    text:"Kaiser und Könige tragen sie.",
     frage:"Was ist das?",
     antwort_a:"Krone", antwort_b:"Mütze", antwort_c:"Helm", antwort_d:"Kappe",
-    richtig:"A", erklaerung:"Kaiser und Koenige tragen eine Krone." },
+    richtig:"A", erklaerung:"Kaiser und Könige tragen eine Krone." },
 
   // ── Seite 19: Loesungswort SCHMETTERLING ────────────────────────────────────
   { heft:"liesmal3", seite:19, typ:"buchstaben", stufe:"SL_BUCHSTABEN",
@@ -194,17 +194,17 @@ var aufgaben = [
 
   { heft:"liesmal3", seite:19, typ:"buchstaben", stufe:"SL_BUCHSTABEN",
     loesungswort:"SCHMETTERLING",
-    text:"Er ist suess und schmeckt nicht lecker.",
+    text:"Er ist süß und schmeckt nicht lecker.",
     frage:"Was ist das? (Das klingt komisch — es stimmt nicht!)",
     antwort_a:"Zucker", antwort_b:"Senf", antwort_c:"Salz", antwort_d:"Pfeffer",
-    richtig:"B", erklaerung:"Senf schmeckt nicht suess und lecker wie Zucker." },
+    richtig:"B", erklaerung:"Senf schmeckt nicht süß und lecker wie Zucker." },
 
   { heft:"liesmal3", seite:19, typ:"buchstaben", stufe:"SL_BUCHSTABEN",
     loesungswort:"SCHMETTERLING",
     text:"Sie hat einen sehr langen Hals.",
     frage:"Was ist das?",
-    antwort_a:"Elefant", antwort_b:"Giraffe", antwort_c:"Kamel", antwort_d:"Straussenvogel",
-    richtig:"B", erklaerung:"Die Giraffe hat den laengsten Hals aller Tiere." },
+    antwort_a:"Elefant", antwort_b:"Giraffe", antwort_c:"Kamel", antwort_d:"Straußenvogel",
+    richtig:"B", erklaerung:"Die Giraffe hat den längsten Hals aller Tiere." },
 
   { heft:"liesmal3", seite:19, typ:"buchstaben", stufe:"SL_BUCHSTABEN",
     loesungswort:"SCHMETTERLING",

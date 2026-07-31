@@ -30,7 +30,7 @@ var alleAufgaben = [];
 
 var STUFEN = [
   { code:"SMA1", titel:"Rechnen mit der 10", sub:"Seiten 7 + 23", emoji:"🔟" },
-  { code:"SMA2", titel:"Grosse und kleine Aufgaben", sub:"Seiten 8 + 24", emoji:"📏" },
+  { code:"SMA2", titel:"Große und kleine Aufgaben", sub:"Seiten 8 + 24", emoji:"📏" },
   { code:"SMA3", titel:"Verdoppeln + Halbieren", sub:"Seiten 13 + 15", emoji:"✌️" },
   { code:"SMA4", titel:"Fast verdoppeln", sub:"Seite 14", emoji:"➕" },
   { code:"SMA5", titel:"Tauschaufgaben", sub:"Seiten 9 + 16", emoji:"🔄" },

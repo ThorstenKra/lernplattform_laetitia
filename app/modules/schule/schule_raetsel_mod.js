@@ -132,7 +132,7 @@ function zeigeAbschluss(){
   var pct = Math.round((richtigCount/session.length)*100);
   document.getElementById("abschlussScore").textContent = richtigCount+" von "+session.length+" richtig";
   var e,ti,su;
-  if(pct>=80){e="🌟";ti="Raetsel-Meisterin!";su="Du kennst alle Antworten!";}
+  if(pct>=80){e="🌟";ti="Rätsel-Meisterin!";su="Du kennst alle Antworten!";}
   else if(pct>=60){e="😊";ti="Gut geraetselt!";su="Immer besser!";}
   else{e="💪";ti="Weiter so!";su="Nächstes Mal klappt es noch besser!";}
   document.getElementById("abschlussEmoji").textContent=e;

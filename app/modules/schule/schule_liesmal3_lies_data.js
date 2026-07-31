@@ -106,7 +106,7 @@ var bloecke = [
   { heft:"liesmal3", seite:28, typ:"lies_leuchte", stufe:"SL_LIES",
     titel:"Taucher im Meer",
     bild_beschreibung:"Male den Taucher nach den Sätzen!",
-    frage_am_ende:{ text:"Gehoeren Sofas ins Meer?", richtig:"B", antwort_a:"Ja", antwort_b:"Nein",
+    frage_am_ende:{ text:"Gehören Sofas ins Meer?", richtig:"B", antwort_a:"Ja", antwort_b:"Nein",
       erklaerung:"Nein, das ist eine lustige Fantasiegeschichte!" },
     saetze:[
       { satz:"Hier taucht ein Taucher im Meer.", stimmt:true },

@@ -114,11 +114,11 @@
 
     setNavBtn("navBtn1", "← Zurück",    "nav-btn-zurueck", "#8b5cf6",
       function(){ window.location.href = "./sinnesorgane.html"; });
-    setNavBtn("navBtn2", "🔊 Hoeren",   "nav-btn-vorlesen", "#3b82f6",
+    setNavBtn("navBtn2", "🔊 Hören",    "nav-btn-vorlesen", "#3b82f6",
       function(){ sprich(d.tts_organ); });
     setNavBtn("navBtn3", "◀ Vorher",    "nav-btn-nav",     "#16a34a",
       function(){ zeigeOrgan(idx - 1); }, idx === 0);
-    setNavBtn("navBtn4", "Naechstes ▶", "nav-btn-nav",     "#16a34a",
+    setNavBtn("navBtn4", "Nächstes ▶",  "nav-btn-nav",     "#16a34a",
       function(){ zeigeOrgan(idx + 1); }, idx === daten.length - 1);
 
     rebindDwell();
@@ -145,7 +145,7 @@
 
     setNavBtn("navBtn1", "← Zurueck",                              "nav-btn-zurueck", "#8b5cf6",
       function(){ zeigeOrgan(idx); });
-    setNavBtn("navBtn2", "🔊 Hoeren",                              "nav-btn-vorlesen", "#3b82f6",
+    setNavBtn("navBtn2", "🔊 Hören",                               "nav-btn-vorlesen", "#3b82f6",
       function(){ sprich(detail.tts); });
     setNavBtn("navBtn3", andDetail.icon + " " + andDetail.titel,   andClass, andStroke,
       function(){ zeigeDetail(anderer); });

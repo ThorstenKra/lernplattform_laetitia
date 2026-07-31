@@ -404,7 +404,7 @@ Bei "stimmung" exakt einen der obigen Stimmungs-Namen eintragen.
 
             $roh = $geminiResp.choices[0].message.content
 
-            $vorschlaege = @("Ja", "Nein", "Erzaehl mehr", "Okay")
+            $vorschlaege = @("Ja", "Nein", "Erzähl mehr", "Okay")
             $stimmung    = "neutral"
             if ($roh -match "(?s)\[VORSCHLAEGE\](.*?)\[/VORSCHLAEGE\]") {
                 try {

@@ -11,7 +11,7 @@
 
 // ── Farbpalette (18 Farben) ──────────────────────────────────────────────────
 var FARBEN = [
-  { name:"Weiss",        hex:"#ffffff" },
+  { name:"Weiß",         hex:"#ffffff" },
   { name:"Hellgrau",     hex:"#e5e7eb" },
   { name:"Grau",         hex:"#6b7280" },
   { name:"Schwarz",      hex:"#1a1a2e" },
@@ -19,10 +19,10 @@ var FARBEN = [
   { name:"Dunkelrot",    hex:"#991b1b" },
   { name:"Orange",       hex:"#f97316" },
   { name:"Gelb",         hex:"#fbbf24" },
-  { name:"Hellgruen",    hex:"#86efac" },
-  { name:"Gruen",        hex:"#22c55e" },
-  { name:"Dunkelgruen",  hex:"#166534" },
-  { name:"Tuerkis",      hex:"#06b6d4" },
+  { name:"Hellgrün",     hex:"#86efac" },
+  { name:"Grün",         hex:"#22c55e" },
+  { name:"Dunkelgrün",   hex:"#166534" },
+  { name:"Türkis",       hex:"#06b6d4" },
   { name:"Hellblau",     hex:"#93c5fd" },
   { name:"Blau",         hex:"#3b82f6" },
   { name:"Dunkelblau",   hex:"#1e3a8a" },

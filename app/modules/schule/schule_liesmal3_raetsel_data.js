@@ -59,7 +59,7 @@ var aufgaben = [
     erklaerung:"Kaktus wächst in der Wüste und ist stachelig." },
 
   { heft:"liesmal3", seite:12, typ:"raetsel", stufe:"SL_RAETSEL",
-    text:"Man kann sie anziehen.\nMaedchen und Jungen tragen sie.\nMan trägt sie nicht auf dem Kopf.\nSie haben keine Ärmel.\nSie haben zwei Beine.",
+    text:"Man kann sie anziehen.\nMädchen und Jungen tragen sie.\nMan trägt sie nicht auf dem Kopf.\nSie haben keine Ärmel.\nSie haben zwei Beine.",
     frage:"Was bin ich?",
     antwort_a:"Hosen", antwort_b:"Hemden", antwort_c:"Mützen", antwort_d:"",
     richtig:"A",
@@ -81,9 +81,9 @@ var aufgaben = [
     erklaerung:"Bienen machen Honig und haben einen Stachel." },
 
   { heft:"liesmal3", seite:18, typ:"raetsel", stufe:"SL_RAETSEL",
-    text:"Sie sind nicht immer zu sehen.\nSie bewegen sich am Himmel.\nSie bewegen sich.\nSie können nicht immer weiß oder grau sein.\nAus ihnen faellt der Regen.",
+    text:"Sie sind nicht immer zu sehen.\nSie bewegen sich am Himmel.\nSie bewegen sich.\nSie können nicht immer weiß oder grau sein.\nAus ihnen fällt der Regen.",
     frage:"Was bin ich?",
-    antwort_a:"Maeuse", antwort_b:"Wolken", antwort_c:"Tauben", antwort_d:"",
+    antwort_a:"Mäuse", antwort_b:"Wolken", antwort_c:"Tauben", antwort_d:"",
     richtig:"B",
     erklaerung:"Aus Wolken kommt der Regen." },
 

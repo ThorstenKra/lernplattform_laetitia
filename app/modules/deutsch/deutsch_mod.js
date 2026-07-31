@@ -447,7 +447,7 @@
       var erkl = (t.erklaerung || "").trim();
       queue.play([
         {type:"wav", file:AUDIO.falsch,       fallback:"Das war falsch."},
-        {type:"wav", file:AUDIO.richtigWaere,  fallback:"Richtig waere:"},
+        {type:"wav", file:AUDIO.richtigWaere,  fallback:"Richtig wäre:"},
         {type:"tts", text: correctAnswerText(t) + (erkl ? ". " + erkl : ""), rate:0.98}
       ]);
       zeigAntwortFlash(t, false); // gleichzeitig mit Audio einblenden

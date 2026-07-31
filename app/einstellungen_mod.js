@@ -240,7 +240,7 @@ document.getElementById("btnResetUnlock").addEventListener("click", ()=>{
 var schulAktuellerMonat = new Date();
 schulAktuellerMonat.setDate(1);
 
-var MONATSNAMEN = ["Januar","Februar","Maerz","April","Mai","Juni",
+var MONATSNAMEN = ["Januar","Februar","März","April","Mai","Juni",
                    "Juli","August","September","Oktober","November","Dezember"];
 
 function schulTagKey(y, m, d){
