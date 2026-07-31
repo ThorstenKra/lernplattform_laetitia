@@ -36,7 +36,8 @@ function setzeStimmung(stimmung){
 }
 
 // ── TTS ──────────────────────────────────────────────────────────────────────
-function sprich(text){
+// danach (optional): wird nach TTS-Ende aufgerufen (z.B. Vorschlaege erst dann einblenden)
+function sprich(text, danach){
   try{
     speechSynthesis.cancel();
     setTimeout(function(){
@@ -48,15 +49,19 @@ function sprich(text){
              || vv.find(function(x){ return x.name === "Microsoft Katja - German (Germany)"; })
              || vv.find(function(x){ return x.name.indexOf("Katja") >= 0; })
              || vv.find(function(x){ return x.name.indexOf("Microsoft") >= 0 && x.lang.startsWith("de") && x.name.indexOf("Hedda") < 0; })
+             || vv.find(function(x){ return x.name.indexOf("Microsoft") >= 0 && x.lang.startsWith("de"); })
              || vv.find(function(x){ return x.lang.startsWith("de"); });
         if(v) u.voice = v;
         u.onstart = function(){ var av = $("miloAvatar"); if(av) av.classList.add("spricht"); };
-        var stopp = function(){ var av = $("miloAvatar"); if(av) av.classList.remove("spricht"); };
+        var stopp = function(){
+          var av = $("miloAvatar"); if(av) av.classList.remove("spricht");
+          if(danach) danach();
+        };
         u.onend = stopp; u.onerror = stopp;
         speechSynthesis.speak(u);
-      }catch(e){}
+      }catch(e){ if(danach) danach(); }
     }, 120);
-  }catch(e){}
+  }catch(e){ if(danach) danach(); }
 }
 
 // ── Lernkontext (LaetitiaStats -> Grammatik-Werkstatt, Mathe, Lesen) ──────────
@@ -176,7 +181,7 @@ function zeigeAbschluss(info){
   rebindDwell();
 }
 
-function zeigeGespraech(antwort, vorschlaege, stimmung){
+function zeigeGespraech(antwort, vorschlaege, stimmung, nachAnzeige){
   zustand = "gespraech"; alleVerstecken();
 
   var gc = $("gespraechContainer"); if(gc) gc.style.display = "";
@@ -186,27 +191,35 @@ function zeigeGespraech(antwort, vorschlaege, stimmung){
 
   var miloEl = $("miloAntwort");
   if(miloEl) miloEl.textContent = antwort;
-  sprich(antwort);
 
   var grid = $("vorschlaegeGrid");
-  if(grid){
-    grid.innerHTML = "";
-    var liste = (Array.isArray(vorschlaege) && vorschlaege.length > 0)
-      ? vorschlaege.slice(0, 4)
-      : ["Ja", "Nein", "Erzähl mehr", "Okay"];
-    liste.forEach(function(v){
-      var btn = document.createElement("button");
-      btn.className = "vorschlag-btn";
-      btn.innerHTML = "<span style='pointer-events:none'>" + v + "</span>"
-        + "<svg class='dwell-ring-svg' viewBox='0 0 70 70'>"
-        + "<circle cx='35' cy='35' r='30' style='stroke:#0d9488'/></svg>";
-      btn.addEventListener("click", function(){ sendeNachricht(v); });
-      grid.appendChild(btn);
-    });
-  }
-  var bE = $("btnEigeneAntwort");
-  if(bE) bE.style.display = "";
+  if(grid) grid.innerHTML = "";
+
+  // Zurueck/Beenden sofort per Dwell erreichbar, waehrend Milo noch spricht --
+  // Vorschlaege + "Eigene Antwort" werden erst NACH TTS-Ende sichtbar (siehe unten),
+  // damit kein Blick auf den entstehenden Text versehentlich einen Klick ausloest.
   rebindDwell(true);
+
+  sprich(antwort, function(){
+    if(grid){
+      var liste = (Array.isArray(vorschlaege) && vorschlaege.length > 0)
+        ? vorschlaege.slice(0, 4)
+        : ["Ja", "Nein", "Erzähl mehr", "Okay"];
+      liste.forEach(function(v){
+        var btn = document.createElement("button");
+        btn.className = "vorschlag-btn";
+        btn.innerHTML = "<span style='pointer-events:none'>" + v + "</span>"
+          + "<svg class='dwell-ring-svg' viewBox='0 0 70 70'>"
+          + "<circle cx='35' cy='35' r='30' style='stroke:#0d9488'/></svg>";
+        btn.addEventListener("click", function(){ sendeNachricht(v); });
+        grid.appendChild(btn);
+      });
+    }
+    var bE = $("btnEigeneAntwort");
+    if(bE) bE.style.display = "";
+    rebindDwell(true);
+    if(typeof nachAnzeige === "function") nachAnzeige();
+  });
 }
 
 // ── Konversation ──────────────────────────────────────────────────────────────
@@ -221,12 +234,15 @@ function sendeNachricht(text){
     if(err || data.fehler){
       zeigeGespraech(
         "Entschuldigung, ich bin gerade nicht erreichbar. Bitte versuche es gleich nochmal.",
-        ["Nochmal versuchen", "Okay"]
+        ["Nochmal versuchen", "Okay"],
+        null,
+        function(){
+          var grid = $("vorschlaegeGrid");
+          if(grid && grid.firstChild){
+            grid.firstChild.addEventListener("click", function(){ sendeNachricht(text); }, { once: true });
+          }
+        }
       );
-      var grid = $("vorschlaegeGrid");
-      if(grid && grid.firstChild){
-        grid.firstChild.addEventListener("click", function(){ sendeNachricht(text); }, { once: true });
-      }
       return;
     }
     verlauf.push({ rolle: "user",      text: text });

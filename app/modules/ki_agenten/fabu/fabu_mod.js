@@ -59,6 +59,7 @@ function sprich(text, danach){
              || vv.find(function(x){ return x.name === "Microsoft Katja - German (Germany)"; })
              || vv.find(function(x){ return x.name.indexOf("Katja") >= 0; })
              || vv.find(function(x){ return x.name.indexOf("Microsoft") >= 0 && x.lang.startsWith("de") && x.name.indexOf("Hedda") < 0; })
+             || vv.find(function(x){ return x.name.indexOf("Microsoft") >= 0 && x.lang.startsWith("de"); })
              || vv.find(function(x){ return x.lang.startsWith("de"); });
         if(v) u.voice = v;
         u.onstart = function(){ var av = $("fabuAvatar"); if(av) av.classList.add("spricht"); };
@@ -177,24 +178,31 @@ function zeigeAbschnitt(){
   var grid = $("vorschlaegeGrid");
   if(grid) grid.innerHTML = "";
 
+  // Zurueck/Beenden sofort per Dwell erreichbar, waehrend Fabu noch spricht --
+  // Vorschlaege bzw. Weiter-Button werden erst NACH TTS-Ende sichtbar (siehe unten),
+  // damit kein Blick auf den entstehenden Text versehentlich einen Klick ausloest.
+  rebindDwell(true);
+
   if(abschnitt.frage && Array.isArray(abschnitt.vorschlaege)){
-    sprich(text);
-    abschnitt.vorschlaege.slice(0, 4).forEach(function(v){
-      var btn = document.createElement("button");
-      btn.className = "vorschlag-btn";
-      btn.innerHTML = "<span style='pointer-events:none'>" + v + "</span>"
-        + "<svg class='dwell-ring-svg' viewBox='0 0 70 70'>"
-        + "<circle cx='35' cy='35' r='30' style='stroke:#d97706'/></svg>";
-      btn.addEventListener("click", function(){ reagiereAufAntwort(abschnitt, v); });
-      if(grid) grid.appendChild(btn);
+    sprich(text, function(){
+      abschnitt.vorschlaege.slice(0, 4).forEach(function(v){
+        var btn = document.createElement("button");
+        btn.className = "vorschlag-btn";
+        btn.innerHTML = "<span style='pointer-events:none'>" + v + "</span>"
+          + "<svg class='dwell-ring-svg' viewBox='0 0 70 70'>"
+          + "<circle cx='35' cy='35' r='30' style='stroke:#d97706'/></svg>";
+        btn.addEventListener("click", function(){ reagiereAufAntwort(abschnitt, v); });
+        if(grid) grid.appendChild(btn);
+      });
+      rebindDwell(true);
     });
   } else {
-    var bW = $("btnGeschichteWeiter"); if(bW) bW.style.display = "";
     sprich(text, function(){
+      var bW = $("btnGeschichteWeiter"); if(bW) bW.style.display = "";
+      rebindDwell(true);
       geschichteTimer = setTimeout(weiterInGeschichte, 3000);
     });
   }
-  rebindDwell(true);
 }
 
 function zeigeAuswahlFuerQuelle(){
@@ -253,11 +261,11 @@ function reagiereAufAntwort(abschnitt, gewaehlterText){
     if(fabuEl) fabuEl.textContent = data.antwort;
     setzeStimmung(data.stimmung === "aufgeregt" || data.stimmung === "schnippisch");
 
-    var bW = $("btnGeschichteWeiter"); if(bW) bW.style.display = "";
     sprich(data.antwort, function(){
+      var bW = $("btnGeschichteWeiter"); if(bW) bW.style.display = "";
+      rebindDwell(true);
       geschichteTimer = setTimeout(weiterInGeschichte, 3000);
     });
-    rebindDwell(true);
   });
 }
 
