@@ -89,7 +89,7 @@ function starteStufe(code, titel){
   var gefiltert = alleAufgaben.filter(function(t){ return t.stufe===code; });
   session = gefiltert.slice();
   index = 0; richtigCount = 0;
-  if(window.LaetitiaStats) window.LaetitiaStats.sessionStart("mathe", code);
+  if(window.LaetitiaStats) window.LaetitiaStats.sessionStart("schule_mathe", code);
   document.getElementById("screenStufen").style.display = "none";
   document.getElementById("screenAufgabe").style.display = "flex";
   document.getElementById("fortschrittText").textContent = titel;

@@ -349,6 +349,7 @@
       enableTimer=setTimeout(()=>{
         setPickDisabled(false);
         enableTimer=null;
+        try{ if(window.LaetitiaStats) window.LaetitiaStats.taskStart(); }catch(e){}
         // Dwell nach Delay-Ende neu binden, da Antwort-Buttons jetzt aktiv sind
         rebindDwell();
       }, DELAY_MS);
@@ -473,7 +474,11 @@
       if(onSpeakTaskCb){
         setPickDisabled(true);
         setTimeout(()=>{
-          onSpeakTaskCb(t, function(){ setPickDisabled(false); rebindDwell(); });
+          onSpeakTaskCb(t, function(){
+            setPickDisabled(false);
+            try{ if(window.LaetitiaStats) window.LaetitiaStats.taskStart(); }catch(e){}
+            rebindDwell();
+          });
         }, 300);
       } else if(readAloud){
         const AQ = window.LaetitiaAudioQueue;
@@ -484,7 +489,11 @@
               displayTextFlow(t.text),
               displayTextFlow(t.frage)
             ].filter(Boolean).join(" … ");
-            AQ.speak(sprechText, 0.92, function(){ setPickDisabled(false); rebindDwell(); });
+            AQ.speak(sprechText, 0.92, function(){
+              setPickDisabled(false);
+              try{ if(window.LaetitiaStats) window.LaetitiaStats.taskStart(); }catch(e){}
+              rebindDwell();
+            });
           }, 300);
         } else {
           scheduleEnableAnswers();
@@ -515,6 +524,8 @@
       index=0;
       sessionCorrect=0;
       sessionTotal=0;
+
+      try{ if(window.LaetitiaStats) window.LaetitiaStats.sessionStart(moduleId, L); }catch(e){}
 
       setTopStatus(levelLabel(level)+" gestartet ("+current.length+" Aufgaben). Delay: "+Math.round(DELAY_MS/1000)+"s");
       showTask();
@@ -561,6 +572,10 @@
       const correct = upper(t.richtig) === originalLetter;
       answered=true;
       sessionTotal++;
+
+      try{
+        if(window.LaetitiaStats) window.LaetitiaStats.taskAnswer(taskId(t), correct, originalLetter, false, null);
+      }catch(e){}
 
       if(correct){
         sessionCorrect++;
@@ -635,6 +650,8 @@
     }
 
     function finishSession(){
+      try{ if(window.LaetitiaStats) window.LaetitiaStats.sessionEnd(true); }catch(e){}
+
       const pct = sessionTotal>0 ? Math.round((sessionCorrect/sessionTotal)*100) : 0;
       $("overlayScore").textContent = "Richtig: "+sessionCorrect+" / "+sessionTotal+" ("+pct+"%)";
 
@@ -670,6 +687,7 @@
     }
 
     function home(){
+      try{ if(window.LaetitiaStats) window.LaetitiaStats.sessionEnd(false); }catch(e){}
       queue.clear();
       showMenu();
     }
@@ -750,6 +768,7 @@
         btnHelp.addEventListener("click",(ev)=>{
           ev.preventDefault();
           const t = current[index];
+          try{ if(t && window.LaetitiaStats) window.LaetitiaStats.markHilfe(taskId(t)); }catch(e){}
           if(onHelpCb){
             // Modul-spezifischer Hilfe-Handler (z.B. Lesen → lesen_hilfe.html)
             onHelpCb(t);
