@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 30. Juli 2026 (Sitzung 16 — abgeschlossen). Wichtigster offener Punkt für die nächste Sitzung: Fabu-Stimme (siehe Abschnitt „🔴 Fabu-Stimme" weiter unten) — Entscheidung des Nutzers steht noch aus, wie mit der von Windows blockierten Datei umgegangen wird.*
+*Stand: 31. Juli 2026 (Sitzung 17 — abgeschlossen). Wichtigster offener Punkt für die nächste Sitzung: Fabu-Stimme (siehe Abschnitt „🔴 Fabu-Stimme" weiter unten) — Entscheidung des Nutzers steht noch aus. Neu diese Sitzung: Reime-Werkstatt komplett neu aufgesetzt (echte Goethe-Gedichte statt erfundener Zweizeiler) — automatisierter Live-Test war nicht möglich (Chrome-Erweiterung nicht verbunden), Nutzer bestätigt selbst in Edge (siehe Abschnitt „Reime-Werkstatt" weiter unten).*
 
 ---
 
@@ -124,6 +124,31 @@ Erreichbar: `schule.html` → Grammatik-Button → `grammatik.html`
 - **Admin-Panel:** 3 Sekunden auf den Header halten → „Alle Fortschritte löschen"
 
 **Lese-/Aktions-Trennungs-Fix (Sitzung 12):** ab_wahl/abc_wahl/wort_button zeigten Vergleichsinhalte (Optionstexte bzw. Satz-Wörter) vorher NUR auf den Dwell-Buttons — bei Augensteuerung ein Risiko (Hingucken zum Lesen löst Klick aus). Fix: `leseHtml()` um optionalen `extraHtml`-Parameter erweitert; Optionen erscheinen zusätzlich als „A: … / B: …" im passiven Lesebereich (`.lese-optionen`), Wort-Sätze als zusammengesetzter `.lese-satz`. Reiner Code-Fix in `grammatik_mod.js` + CSS — keine Änderung an `grammatik_data.js` nötig.
+
+**🐛 Dwell-Lücke gefunden + behoben (Sitzung 17, 31.07.2026):** `#btnUeberspringen` fehlte in der `bindeDwell()`-Selektorliste aller 5 Aufgabentypen — der Button war nur per Maus/Touch klickbar, nicht per Blick-Dwell. Beim Testen des neuen Reime-Moduls (gleicher Bug dort) aufgefallen und in beiden Modulen behoben.
+
+## Reime-Werkstatt — Stand 31. Juli 2026 (komplett neu aufgesetzt, Sitzung 17)
+
+Erreichbar: `lernen.html` → 🎵 Reimen-Kachel → `reim.html`
+
+Auf Nutzerwunsch komplett neu konzipiert: statt 31 selbst erfundener Zweizeiler jetzt **5 echte Gedichte von Johann Wolfgang von Goethe** (Heidenröslein, Das Veilchen, Der Fischer, Der König in Thule, Erlkönig), die gleichzeitig als Content-Bibliothek für Fabu (KI-Agent) dienen.
+
+| Datei | Inhalt |
+|---|---|
+| `app/modules/gedichte/gedichte_data.js` | NEU, gemeinsam genutzt — `window.GEDICHTE`, 5 Gedichte mit Volltext (`strophen`) + Fabu-Vorlese-Abschnitten (`abschnitte`, gleiche Form wie `geschichten_data.js`) |
+| `app/modules/reim/reim_data.js` | `window.REIM_EINHEITEN` (G-01…G-05), 49 aus echten Zeilen kuratierte Aufgaben (3 Typen: `reim_wahl`, `luecke_wahl`, `reim_janein`) |
+| `app/modules/reim/reim.html` + `reim_uebersicht.js` | Einheiten-Übersicht, dynamisch aus `REIM_EINHEITEN` gebaut (wie `grammatik_uebersicht.js`) |
+| `app/modules/reim/reim_spielen.html` + `reim_spielen_mod.js` | Spielseite, 1:1 an Grammatik-Werkstatt-Pattern angelehnt (Lese-/Aktionsbereich-Trennung, Auto-Weiter, `stats.js`, Katja-TTS) — plus neuer Button „📖 Ganzes Gedicht hören" am Einheitenende |
+
+**Fabu bekommt dieselben Gedichte als zweite Bibliothek** neben seinen Geschichten (`fabu.html`/`fabu_mod.js`: neuer Button „📜 Gedichte anschauen", Player-Logik verallgemeinert auf `aktInhalt`/`aktQuelle` statt nur `aktGeschichte`).
+
+**Erlkönig-Entscheidung (mit dem Nutzer abgestimmt):** Das Gedicht endet mit dem Tod des Kindes im Arm des Vaters — inhaltlich intensiver als die anderen vier. Anders als bei Fabus eigenen, frei nacherzählbaren Geschichten wird echte, kanonische Literatur NICHT umgeschrieben. Stattdessen führt Fabu es zu Beginn als „gruselige alte Ballade" ein (wie eine Sage) und bietet nach dem Ende ein ruhiges Gespräch an, statt kommentarlos weiterzugehen. Dokumentiert in `persona.json` (neuer Abschnitt `gedichte`) als Präzedenzfall für künftige Gedichte mit ähnlich schweren Themen.
+
+**Zwei Bugs beim ersten Test gefunden + behoben:**
+1. Reimen-Übersicht: 5 Kacheln (statt vorher 4) sprengten die feste 100vh-Höhe, Zurück-Button wurde aus dem Sichtbereich gedrückt. Fix: Übersicht scrollt jetzt intern (wie Fabus Geschichtenliste), Header + Zurück-Button bleiben fix — robust auch wenn später weitere Gedichte dazukommen.
+2. Überspringen-Button ohne Dwell-Bindung in allen 3 neuen Aufgabentypen — siehe Grammatik-Abschnitt oben, gleicher Fix auch dort angewendet.
+
+⬜ **Noch offen:** Automatisierter Live-Test in Edge war diese Sitzung nicht möglich (Chrome-Erweiterung nicht verbunden) — nur strukturelle Datenprüfung (Node-Skript: alle 49 Aufgaben, alle Verweise konsistent) + `validate.ps1` (0 Fehler). Nutzer testet Reime-Werkstatt und den Grammatik-Dwell-Fix selbst in Edge/Tobii.
 
 ## Quasselkiste / NuVoice-Emulation — Stand 31. Mai 2026
 
@@ -589,6 +614,23 @@ Dann Edge komplett neu starten.
 **Commits (alle gepusht):** 2694aa5, 86df18d, e51413e, f06b0d9
 
 **Grammatik-Werkstatt jetzt:** 44 Einheiten, 440 Aufgaben (E-03–E-46), Stufen 1–9 vollständig.
+
+---
+
+## Sitzungsprotokoll 31. Juli 2026 — Sitzung 17
+
+| Was | Ergebnis |
+|---|---|
+| Reime-Werkstatt komplett neu aufgesetzt | ✅ 5 echte Goethe-Gedichte statt 31 erfundener Zweizeiler, gemeinsame Bibliothek `gedichte_data.js`, 49 kuratierte Aufgaben, Grammatik-Werkstatt-Pattern übernommen (commit `5eefdb5`) |
+| Fabu: Gedichte-Bibliothek ergänzt | ✅ Zweiter Bibliotheks-Button neben Geschichten, verallgemeinerte Player-Logik, Erlkönig als „gruselige alte Ballade" gerahmt (Präzedenzfall in persona.json dokumentiert) (commit `5eefdb5`) |
+| Bug: Zurück-Button auf Reimen-Übersicht unsichtbar | ✅ Layout-Fix — Übersicht scrollt jetzt intern statt fixer Box, wie Fabus Geschichtenliste (commit `5eefdb5`) |
+| Bug: Überspringen-Button ohne Dwell-Bindung | ✅ In Reime (3 Aufgabentypen) UND Grammatik-Werkstatt (5 Aufgabentypen) behoben — gleicher Gap in beiden Modulen gefunden (commits `5eefdb5`, `c0cdf11`) |
+
+**Commits (alle gepusht):** `5eefdb5`, `c0cdf11`
+
+**Sitzungsabschluss:** Code committed + gepusht, nach OneDrive deployed, `validate.ps1` 0 Fehler. Automatisierter Browser-Live-Test nicht möglich (Chrome-Erweiterung nicht verbunden) — nur strukturelle Datenprüfung (Node-Skript) durchgeführt.
+
+**Nächste konkrete Schritte für die Folgesitzung:** (1) Nutzer bestätigt Reime-Werkstatt + Grammatik-Dwell-Fix in echtem Edge/Tobii-Test, (2) übrige offene Punkte unverändert: Fabu-Stimme-Entscheidung, Tobii-Gerätetest (Nova-Avatar), Telegram-Token, Pfad-Training-Modus-2-Bestätigung, Gruppengespräche-Implementierung.
 
 ---
 
