@@ -9,7 +9,7 @@ var KATEGORIEN = {
   grundlagen:       { titel:"Grundlagen",       emoji:"🌱", stufen:[1,2] },
   fortgeschrittene: { titel:"Fortgeschrittene", emoji:"🌿", stufen:[3,4] },
   profi:            { titel:"Profi",            emoji:"🌳", stufen:[5,6] },
-  champion:         { titel:"Champion",         emoji:"🏆", stufen:[7,8,9] }
+  champion:         { titel:"Champion",         emoji:"🏆", stufen:[7,8,9,10] }
 };
 
 function ladeStand(){

@@ -4551,6 +4551,600 @@ var GRAMMATIK_EINHEITEN = [
         erklaerung: "Nein! Der Satz fragt etwas — er braucht ein Fragezeichen, keinen Punkt."
       }
     ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-47 — Der Wem-Fall
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-47", titel: "Der Wem-Fall", emoji: "🎁", stufe: 10,
+    erklaerung_tts: "Manchmal bekommt jemand etwas. Das ist der Wem-Fall. Wir fragen: WEM? Zum Beispiel: Ich schenke dem Hund einen Ball. WEM schenke ich den Ball? Dem Hund! Das ist der Wem-Fall.",
+    erklaerung_merksatz: "WEM?\n\n🎁 Ich schenke dem Hund einen Ball.\nWEM schenke ich ihn? → Dem Hund!\n\nDas ist der Wem-Fall.",
+    aufgaben: [
+      {
+        typ: "ja_nein",
+        frage: "Fragen wir nach dem Wem-Fall mit dem Wort 'Wem?'",
+        tts: "Fragen wir nach dem Wem-Fall mit dem Wort: Wem?",
+        richtig: "ja",
+        erklaerung: "Ja! Der Wem-Fall antwortet auf die Frage: WEM?"
+      },
+      {
+        typ: "ja_nein",
+        frage: "Ist 'dem Hund' die Antwort auf WEM gebe ich den Ball?",
+        satz: "Ich gebe dem Hund den Ball.",
+        tts: "Ist dem Hund die Antwort auf WEM gebe ich den Ball? — Ich gebe dem Hund den Ball.",
+        richtig: "ja",
+        erklaerung: "Ja! Dem Hund ist der Wem-Fall. WEM gebe ich den Ball? Dem Hund!"
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Wem hilft er?",
+        satz: "Er hilft der Oma.",
+        tts: "Wem hilft er? — Er hilft der Oma.",
+        option_a: "der Oma",
+        option_b: "hilft",
+        richtig: "a",
+        erklaerung: "Der Oma ist die Antwort auf WEM hilft er — das ist der Wem-Fall."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Wem schenkt Papa Blumen?",
+        satz: "Papa schenkt der Mama Blumen.",
+        tts: "Wem schenkt Papa Blumen? — Papa schenkt der Mama Blumen.",
+        option_a: "Blumen",
+        option_b: "der Mama",
+        richtig: "b",
+        erklaerung: "Der Mama ist die Antwort auf WEM Papa Blumen schenkt — das ist der Wem-Fall."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Wort im Wem-Fall!",
+        tts: "Klick auf das Wort im Wem-Fall! — Wir schenken dem Kind ein Buch.",
+        woerter: ["Wir", "schenken", "dem", "Kind", "ein", "Buch."],
+        richtig: 3,
+        erklaerung: "Kind ist das Nomen im Wem-Fall! WEM schenken wir das Buch? Dem Kind."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Wort im Wem-Fall!",
+        tts: "Klick auf das Wort im Wem-Fall! — Sie dankt dem Lehrer.",
+        woerter: ["Sie", "dankt", "dem", "Lehrer."],
+        richtig: 3,
+        erklaerung: "Lehrer ist das Nomen im Wem-Fall! WEM dankt sie? Dem Lehrer."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'der Freundin' hier der Wem-Fall?",
+        satz: "Ich zeige der Freundin das Bild.",
+        tts: "Ist der Freundin hier der Wem-Fall? — Ich zeige der Freundin das Bild.",
+        richtig: "richtig",
+        erklaerung: "Ja! WEM zeige ich das Bild? Der Freundin. Das ist der Wem-Fall."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'das Bild' hier der Wem-Fall?",
+        satz: "Ich zeige der Freundin das Bild.",
+        tts: "Ist das Bild hier der Wem-Fall? — Ich zeige der Freundin das Bild.",
+        richtig: "falsch",
+        erklaerung: "Nein! Das Bild ist der Wen-Fall. WEM zeige ich es? Der Freundin — das ist der Wem-Fall."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Wem gehört das Buch?",
+        satz: "Das Buch gehört der Schwester.",
+        tts: "Wem gehört das Buch? — Das Buch gehört der Schwester.",
+        option_a: "das Buch",
+        option_b: "gehört",
+        option_c: "der Schwester",
+        richtig: "c",
+        erklaerung: "Der Schwester ist die Antwort auf WEM das Buch gehört — das ist der Wem-Fall."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Wort im Wem-Fall!",
+        tts: "Klick auf das Wort im Wem-Fall! — Der Hund gehorcht dem Jungen.",
+        woerter: ["Der", "Hund", "gehorcht", "dem", "Jungen."],
+        richtig: 4,
+        erklaerung: "Jungen ist das Nomen im Wem-Fall! WEM gehorcht der Hund? Dem Jungen."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-48 — Der Wessen-Fall
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-48", titel: "Der Wessen-Fall", emoji: "🗝️", stufe: 10,
+    erklaerung_tts: "Manchmal gehört etwas zu jemandem. Das ist der Wessen-Fall. Wir fragen: WESSEN? Zum Beispiel: Das ist der Ball des Jungen. WESSEN Ball ist das? Des Jungen! Das ist der Wessen-Fall.",
+    erklaerung_merksatz: "WESSEN?\n\n🗝️ Das ist der Ball des Jungen.\nWESSEN Ball ist das? → Des Jungen!\n\nDas ist der Wessen-Fall.",
+    aufgaben: [
+      {
+        typ: "ja_nein",
+        frage: "Fragen wir nach dem Wessen-Fall mit dem Wort 'Wessen?'",
+        tts: "Fragen wir nach dem Wessen-Fall mit dem Wort: Wessen?",
+        richtig: "ja",
+        erklaerung: "Ja! Der Wessen-Fall antwortet auf die Frage: WESSEN?"
+      },
+      {
+        typ: "ja_nein",
+        frage: "Ist 'des Mädchens' die Antwort auf WESSEN Fahrrad rot ist?",
+        satz: "Das Fahrrad des Mädchens ist rot.",
+        tts: "Ist des Mädchens die Antwort auf WESSEN Fahrrad rot ist? — Das Fahrrad des Mädchens ist rot.",
+        richtig: "ja",
+        erklaerung: "Ja! Des Mädchens ist der Wessen-Fall. WESSEN Fahrrad ist rot? Des Mädchens!"
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Wessen Schwanz wedelt?",
+        satz: "Der Schwanz des Hundes wedelt.",
+        tts: "Wessen Schwanz wedelt? — Der Schwanz des Hundes wedelt.",
+        option_a: "des Hundes",
+        option_b: "wedelt",
+        richtig: "a",
+        erklaerung: "Des Hundes ist die Antwort auf WESSEN Schwanz wedelt — das ist der Wessen-Fall."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Wessen Haus ist groß?",
+        satz: "Das Haus der Familie ist groß.",
+        tts: "Wessen Haus ist groß? — Das Haus der Familie ist groß.",
+        option_a: "groß",
+        option_b: "der Familie",
+        richtig: "b",
+        erklaerung: "Der Familie ist die Antwort auf WESSEN Haus groß ist — das ist der Wessen-Fall."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Wort im Wessen-Fall!",
+        tts: "Klick auf das Wort im Wessen-Fall! — Die Tasche der Lehrerin ist blau.",
+        woerter: ["Die", "Tasche", "der", "Lehrerin", "ist", "blau."],
+        richtig: 3,
+        erklaerung: "Lehrerin ist das Nomen im Wessen-Fall! WESSEN Tasche ist blau? Der Lehrerin."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Wort im Wessen-Fall!",
+        tts: "Klick auf das Wort im Wessen-Fall! — Das Spielzeug des Kindes liegt da.",
+        woerter: ["Das", "Spielzeug", "des", "Kindes", "liegt", "da."],
+        richtig: 3,
+        erklaerung: "Kindes ist das Nomen im Wessen-Fall! WESSEN Spielzeug liegt da? Des Kindes."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'des Opas' hier der Wessen-Fall?",
+        satz: "Die Mütze des Opas ist warm.",
+        tts: "Ist des Opas hier der Wessen-Fall? — Die Mütze des Opas ist warm.",
+        richtig: "richtig",
+        erklaerung: "Ja! WESSEN Mütze ist warm? Des Opas. Das ist der Wessen-Fall."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'Die Mütze' hier der Wessen-Fall?",
+        satz: "Die Mütze des Opas ist warm.",
+        tts: "Ist Die Mütze hier der Wessen-Fall? — Die Mütze des Opas ist warm.",
+        richtig: "falsch",
+        erklaerung: "Nein! Die Mütze ist der Wer-Fall. WESSEN Mütze? Des Opas — das ist der Wessen-Fall."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Wessen Auto steht vorne?",
+        satz: "Das Auto der Mama steht vorne.",
+        tts: "Wessen Auto steht vorne? — Das Auto der Mama steht vorne.",
+        option_a: "Das Auto",
+        option_b: "steht",
+        option_c: "der Mama",
+        richtig: "c",
+        erklaerung: "Der Mama ist die Antwort auf WESSEN Auto vorne steht — das ist der Wessen-Fall."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Wort im Wessen-Fall!",
+        tts: "Klick auf das Wort im Wessen-Fall! — Das ist der Ball des Jungen.",
+        woerter: ["Das", "ist", "der", "Ball", "des", "Jungen."],
+        richtig: 5,
+        erklaerung: "Jungen ist das Nomen im Wessen-Fall! WESSEN Ball ist das? Des Jungen."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-49 — Wem oder Wessen?
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-49", titel: "Wem oder Wessen?", emoji: "🔍", stufe: 10,
+    erklaerung_tts: "Jetzt üben wir beide Fälle zusammen! Der Wem-Fall fragt WEM. Der Wessen-Fall fragt WESSEN. Schau genau hin, welcher Fall es ist!",
+    erklaerung_merksatz: "🎁 WEM? → Wem-Fall\n🗝️ WESSEN? → Wessen-Fall\n\nIch gebe dem Kind das Buch der Mama.\nWEM? dem Kind — WESSEN? der Mama",
+    aufgaben: [
+      {
+        typ: "ab_wahl",
+        frage: "Was ist 'dem Kind' in diesem Satz?",
+        satz: "Ich gebe dem Kind das Buch der Mama.",
+        tts: "Was ist dem Kind in diesem Satz? — Ich gebe dem Kind das Buch der Mama.",
+        option_a: "Wem-Fall",
+        option_b: "Wessen-Fall",
+        richtig: "a",
+        erklaerung: "WEM gebe ich das Buch? Dem Kind. Das ist der Wem-Fall."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist 'der Mama' in diesem Satz?",
+        satz: "Ich gebe dem Kind das Buch der Mama.",
+        tts: "Was ist der Mama in diesem Satz? — Ich gebe dem Kind das Buch der Mama.",
+        option_a: "Wem-Fall",
+        option_b: "Wessen-Fall",
+        richtig: "b",
+        erklaerung: "WESSEN Buch ist das? Der Mama. Das ist der Wessen-Fall."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist 'dem Opa' in diesem Satz?",
+        satz: "Ich zeige dem Opa das Foto des Kindes.",
+        tts: "Was ist dem Opa in diesem Satz? — Ich zeige dem Opa das Foto des Kindes.",
+        option_a: "Wem-Fall",
+        option_b: "Wessen-Fall",
+        richtig: "a",
+        erklaerung: "WEM zeige ich das Foto? Dem Opa. Das ist der Wem-Fall."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist 'des Kindes' in diesem Satz?",
+        satz: "Ich zeige dem Opa das Foto des Kindes.",
+        tts: "Was ist des Kindes in diesem Satz? — Ich zeige dem Opa das Foto des Kindes.",
+        option_a: "Wem-Fall",
+        option_b: "Wessen-Fall",
+        richtig: "b",
+        erklaerung: "WESSEN Foto ist das? Des Kindes. Das ist der Wessen-Fall."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'der Lehrerin' hier der Wem-Fall?",
+        satz: "Ich gebe der Lehrerin die Mappe des Schülers.",
+        tts: "Ist der Lehrerin hier der Wem-Fall? — Ich gebe der Lehrerin die Mappe des Schülers.",
+        richtig: "richtig",
+        erklaerung: "Ja! WEM gebe ich die Mappe? Der Lehrerin. Das ist der Wem-Fall."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'des Schülers' hier der Wem-Fall?",
+        satz: "Ich gebe der Lehrerin die Mappe des Schülers.",
+        tts: "Ist des Schülers hier der Wem-Fall? — Ich gebe der Lehrerin die Mappe des Schülers.",
+        richtig: "falsch",
+        erklaerung: "Nein! Des Schülers ist der Wessen-Fall. WESSEN Mappe? Des Schülers."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was ist 'dem Hund' in diesem Satz?",
+        satz: "Ich werfe dem Hund den Ball des Jungen.",
+        tts: "Was ist dem Hund in diesem Satz? — Ich werfe dem Hund den Ball des Jungen.",
+        option_a: "Wem-Fall",
+        option_b: "Wessen-Fall",
+        option_c: "weder noch",
+        richtig: "a",
+        erklaerung: "WEM werfe ich den Ball? Dem Hund. Das ist der Wem-Fall."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Was ist 'des Jungen' in diesem Satz?",
+        satz: "Ich werfe dem Hund den Ball des Jungen.",
+        tts: "Was ist des Jungen in diesem Satz? — Ich werfe dem Hund den Ball des Jungen.",
+        option_a: "Wem-Fall",
+        option_b: "Wessen-Fall",
+        option_c: "weder noch",
+        richtig: "b",
+        erklaerung: "WESSEN Ball ist das? Des Jungen. Das ist der Wessen-Fall."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Wort im Wem-Fall!",
+        tts: "Klick auf das Wort im Wem-Fall! — Ich schenke der Schwester das Fahrrad des Bruders.",
+        woerter: ["Ich", "schenke", "der", "Schwester", "das", "Fahrrad", "des", "Bruders."],
+        richtig: 3,
+        erklaerung: "Schwester ist der Wem-Fall. WEM schenke ich es? Der Schwester!"
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Wort im Wessen-Fall!",
+        tts: "Klick auf das Wort im Wessen-Fall! — Ich schenke der Schwester das Fahrrad des Bruders.",
+        woerter: ["Ich", "schenke", "der", "Schwester", "das", "Fahrrad", "des", "Bruders."],
+        richtig: 7,
+        erklaerung: "Bruders ist der Wessen-Fall. WESSEN Fahrrad ist das? Des Bruders!"
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-50 — Wem-Fall im Satz
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-50", titel: "Wem-Fall im Satz", emoji: "🎁", stufe: 10,
+    erklaerung_tts: "Jetzt üben wir den Wem-Fall noch mehr in ganzen Sätzen. Achte genau auf das Wort, das mit 'dem' oder 'der' beginnt!",
+    erklaerung_merksatz: "WEM?\n\n🎁 Mama schenkt dem Bruder ein Auto.\nWEM schenkt sie das Auto? → Dem Bruder!",
+    aufgaben: [
+      {
+        typ: "ja_nein",
+        frage: "Ist 'dem Bruder' die Antwort auf WEM Mama ein Auto schenkt?",
+        satz: "Mama schenkt dem Bruder ein Auto.",
+        tts: "Ist dem Bruder die Antwort auf WEM Mama ein Auto schenkt? — Mama schenkt dem Bruder ein Auto.",
+        richtig: "ja",
+        erklaerung: "Ja! Dem Bruder ist der Wem-Fall. WEM schenkt Mama das Auto? Dem Bruder!"
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Wem hilft die Ärztin?",
+        satz: "Die Ärztin hilft dem Patienten.",
+        tts: "Wem hilft die Ärztin? — Die Ärztin hilft dem Patienten.",
+        option_a: "Die Ärztin",
+        option_b: "dem Patienten",
+        richtig: "b",
+        erklaerung: "Dem Patienten ist die Antwort auf WEM die Ärztin hilft — das ist der Wem-Fall."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Wort im Wem-Fall!",
+        tts: "Klick auf das Wort im Wem-Fall! — Der Kellner bringt dem Gast die Suppe.",
+        woerter: ["Der", "Kellner", "bringt", "dem", "Gast", "die", "Suppe."],
+        richtig: 4,
+        erklaerung: "Gast ist das Nomen im Wem-Fall! WEM bringt der Kellner die Suppe? Dem Gast."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Wort im Wem-Fall!",
+        tts: "Klick auf das Wort im Wem-Fall! — Ich erzähle der Freundin eine Geschichte.",
+        woerter: ["Ich", "erzähle", "der", "Freundin", "eine", "Geschichte."],
+        richtig: 3,
+        erklaerung: "Freundin ist das Nomen im Wem-Fall! WEM erzähle ich die Geschichte? Der Freundin."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'dem Vogel' hier der Wem-Fall?",
+        satz: "Wir geben dem Vogel Körner.",
+        tts: "Ist dem Vogel hier der Wem-Fall? — Wir geben dem Vogel Körner.",
+        richtig: "richtig",
+        erklaerung: "Ja! WEM geben wir Körner? Dem Vogel. Das ist der Wem-Fall."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'Körner' hier der Wem-Fall?",
+        satz: "Wir geben dem Vogel Körner.",
+        tts: "Ist Körner hier der Wem-Fall? — Wir geben dem Vogel Körner.",
+        richtig: "falsch",
+        erklaerung: "Nein! Körner ist der Wen-Fall. WEM geben wir sie? Dem Vogel — das ist der Wem-Fall."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Wem gratuliert Oma?",
+        satz: "Oma gratuliert der Enkelin.",
+        tts: "Wem gratuliert Oma? — Oma gratuliert der Enkelin.",
+        option_a: "Oma",
+        option_b: "gratuliert",
+        option_c: "der Enkelin",
+        richtig: "c",
+        erklaerung: "Der Enkelin ist die Antwort auf WEM Oma gratuliert — das ist der Wem-Fall."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Wort im Wem-Fall!",
+        tts: "Klick auf das Wort im Wem-Fall! — Der Lehrer erklärt dem Schüler die Aufgabe.",
+        woerter: ["Der", "Lehrer", "erklärt", "dem", "Schüler", "die", "Aufgabe."],
+        richtig: 4,
+        erklaerung: "Schüler ist das Nomen im Wem-Fall! WEM erklärt der Lehrer die Aufgabe? Dem Schüler."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Wem gehört der Regenschirm?",
+        satz: "Der Regenschirm gehört der Nachbarin.",
+        tts: "Wem gehört der Regenschirm? — Der Regenschirm gehört der Nachbarin.",
+        option_a: "Der Regenschirm",
+        option_b: "der Nachbarin",
+        richtig: "b",
+        erklaerung: "Der Nachbarin ist die Antwort auf WEM der Regenschirm gehört — das ist der Wem-Fall."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Wort im Wem-Fall!",
+        tts: "Klick auf das Wort im Wem-Fall! — Anna schreibt dem Onkel einen Brief.",
+        woerter: ["Anna", "schreibt", "dem", "Onkel", "einen", "Brief."],
+        richtig: 3,
+        erklaerung: "Onkel ist das Nomen im Wem-Fall! WEM schreibt Anna den Brief? Dem Onkel."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-51 — Wessen-Fall im Satz
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-51", titel: "Wessen-Fall im Satz", emoji: "🗝️", stufe: 10,
+    erklaerung_tts: "Jetzt üben wir den Wessen-Fall noch mehr in ganzen Sätzen. Achte genau auf das Wort, das mit 'des' oder 'der' beginnt und zu wem etwas gehört!",
+    erklaerung_merksatz: "WESSEN?\n\n🗝️ Die Schuhe des Bruders sind groß.\nWESSEN Schuhe sind groß? → Des Bruders!",
+    aufgaben: [
+      {
+        typ: "ja_nein",
+        frage: "Ist 'des Bruders' die Antwort auf WESSEN Schuhe groß sind?",
+        satz: "Die Schuhe des Bruders sind groß.",
+        tts: "Ist des Bruders die Antwort auf WESSEN Schuhe groß sind? — Die Schuhe des Bruders sind groß.",
+        richtig: "ja",
+        erklaerung: "Ja! Des Bruders ist der Wessen-Fall. WESSEN Schuhe sind groß? Des Bruders!"
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Wessen Garten ist bunt?",
+        satz: "Der Garten der Nachbarin ist bunt.",
+        tts: "Wessen Garten ist bunt? — Der Garten der Nachbarin ist bunt.",
+        option_a: "bunt",
+        option_b: "der Nachbarin",
+        richtig: "b",
+        erklaerung: "Der Nachbarin ist die Antwort auf WESSEN Garten bunt ist — das ist der Wessen-Fall."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Wort im Wessen-Fall!",
+        tts: "Klick auf das Wort im Wessen-Fall! — Die Mütze des Kindes ist gelb.",
+        woerter: ["Die", "Mütze", "des", "Kindes", "ist", "gelb."],
+        richtig: 3,
+        erklaerung: "Kindes ist das Nomen im Wessen-Fall! WESSEN Mütze ist gelb? Des Kindes."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Wort im Wessen-Fall!",
+        tts: "Klick auf das Wort im Wessen-Fall! — Das Zimmer der Schwester ist aufgeräumt.",
+        woerter: ["Das", "Zimmer", "der", "Schwester", "ist", "aufgeräumt."],
+        richtig: 3,
+        erklaerung: "Schwester ist das Nomen im Wessen-Fall! WESSEN Zimmer ist aufgeräumt? Der Schwester."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'des Lehrers' hier der Wessen-Fall?",
+        satz: "Der Stift des Lehrers ist rot.",
+        tts: "Ist des Lehrers hier der Wessen-Fall? — Der Stift des Lehrers ist rot.",
+        richtig: "richtig",
+        erklaerung: "Ja! WESSEN Stift ist rot? Des Lehrers. Das ist der Wessen-Fall."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'Der Stift' hier der Wessen-Fall?",
+        satz: "Der Stift des Lehrers ist rot.",
+        tts: "Ist Der Stift hier der Wessen-Fall? — Der Stift des Lehrers ist rot.",
+        richtig: "falsch",
+        erklaerung: "Nein! Der Stift ist der Wer-Fall. WESSEN Stift? Des Lehrers — das ist der Wessen-Fall."
+      },
+      {
+        typ: "abc_wahl",
+        frage: "Wessen Ball liegt im Gras?",
+        satz: "Der Ball des Nachbarn liegt im Gras.",
+        tts: "Wessen Ball liegt im Gras? — Der Ball des Nachbarn liegt im Gras.",
+        option_a: "Der Ball",
+        option_b: "liegt",
+        option_c: "des Nachbarn",
+        richtig: "c",
+        erklaerung: "Des Nachbarn ist die Antwort auf WESSEN Ball im Gras liegt — das ist der Wessen-Fall."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Wort im Wessen-Fall!",
+        tts: "Klick auf das Wort im Wessen-Fall! — Der Rucksack des Schülers ist schwer.",
+        woerter: ["Der", "Rucksack", "des", "Schülers", "ist", "schwer."],
+        richtig: 3,
+        erklaerung: "Schülers ist das Nomen im Wessen-Fall! WESSEN Rucksack ist schwer? Des Schülers."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Wessen Katze schläft dort?",
+        satz: "Die Katze des Mädchens schläft dort.",
+        tts: "Wessen Katze schläft dort? — Die Katze des Mädchens schläft dort.",
+        option_a: "Die Katze",
+        option_b: "des Mädchens",
+        richtig: "b",
+        erklaerung: "Des Mädchens ist die Antwort auf WESSEN Katze dort schläft — das ist der Wessen-Fall."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Wort im Wessen-Fall!",
+        tts: "Klick auf das Wort im Wessen-Fall! — Das Auto des Opas ist alt.",
+        woerter: ["Das", "Auto", "des", "Opas", "ist", "alt."],
+        richtig: 3,
+        erklaerung: "Opas ist das Nomen im Wessen-Fall! WESSEN Auto ist alt? Des Opas."
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // E-52 — Alle vier Fälle
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: "E-52", titel: "Alle vier Fälle", emoji: "🏆", stufe: 10,
+    erklaerung_tts: "Jetzt üben wir alle vier Fälle zusammen! WER tut etwas — Wer-Fall. WEN oder WAS — Wen-Fall. WEM bekommt etwas — Wem-Fall. WESSEN gehört etwas — Wessen-Fall. Du schaffst das!",
+    erklaerung_merksatz: "❓ WER → Wer-Fall\n🎯 WEN/WAS → Wen-Fall\n🎁 WEM → Wem-Fall\n🗝️ WESSEN → Wessen-Fall\n\nDer Junge gibt dem Hund den Ball der Schwester.\nWER? Der Junge — WEM? dem Hund — WEN? den Ball — WESSEN? der Schwester",
+    aufgaben: [
+      {
+        typ: "ab_wahl",
+        frage: "Was ist 'Der Junge' in diesem Satz?",
+        satz: "Der Junge gibt dem Hund den Ball der Schwester.",
+        tts: "Was ist Der Junge in diesem Satz? — Der Junge gibt dem Hund den Ball der Schwester.",
+        option_a: "Wer-Fall",
+        option_b: "Wen-Fall",
+        richtig: "a",
+        erklaerung: "WER gibt? Der Junge. Das ist der Wer-Fall."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist 'den Ball' in diesem Satz?",
+        satz: "Der Junge gibt dem Hund den Ball der Schwester.",
+        tts: "Was ist den Ball in diesem Satz? — Der Junge gibt dem Hund den Ball der Schwester.",
+        option_a: "Wer-Fall",
+        option_b: "Wen-Fall",
+        richtig: "b",
+        erklaerung: "WAS gibt er? Den Ball. Das ist der Wen-Fall."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist 'dem Hund' in diesem Satz?",
+        satz: "Der Junge gibt dem Hund den Ball der Schwester.",
+        tts: "Was ist dem Hund in diesem Satz? — Der Junge gibt dem Hund den Ball der Schwester.",
+        option_a: "Wem-Fall",
+        option_b: "Wessen-Fall",
+        richtig: "a",
+        erklaerung: "WEM gibt er den Ball? Dem Hund. Das ist der Wem-Fall."
+      },
+      {
+        typ: "ab_wahl",
+        frage: "Was ist 'der Schwester' in diesem Satz?",
+        satz: "Der Junge gibt dem Hund den Ball der Schwester.",
+        tts: "Was ist der Schwester in diesem Satz? — Der Junge gibt dem Hund den Ball der Schwester.",
+        option_a: "Wem-Fall",
+        option_b: "Wessen-Fall",
+        richtig: "b",
+        erklaerung: "WESSEN Ball ist das? Der Schwester. Das ist der Wessen-Fall."
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Wort im Wer-Fall!",
+        tts: "Klick auf das Wort im Wer-Fall! — Die Mutter schenkt dem Kind das Buch des Vaters.",
+        woerter: ["Die", "Mutter", "schenkt", "dem", "Kind", "das", "Buch", "des", "Vaters."],
+        richtig: 1,
+        erklaerung: "Mutter ist der Wer-Fall. WER schenkt? Die Mutter!"
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Wort im Wem-Fall!",
+        tts: "Klick auf das Wort im Wem-Fall! — Die Mutter schenkt dem Kind das Buch des Vaters.",
+        woerter: ["Die", "Mutter", "schenkt", "dem", "Kind", "das", "Buch", "des", "Vaters."],
+        richtig: 4,
+        erklaerung: "Kind ist der Wem-Fall. WEM schenkt sie das Buch? Dem Kind!"
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Wort im Wen-Fall!",
+        tts: "Klick auf das Wort im Wen-Fall! — Die Mutter schenkt dem Kind das Buch des Vaters.",
+        woerter: ["Die", "Mutter", "schenkt", "dem", "Kind", "das", "Buch", "des", "Vaters."],
+        richtig: 6,
+        erklaerung: "Buch ist der Wen-Fall. WAS schenkt sie? Das Buch!"
+      },
+      {
+        typ: "wort_button",
+        frage: "Klick auf das Wort im Wessen-Fall!",
+        tts: "Klick auf das Wort im Wessen-Fall! — Die Mutter schenkt dem Kind das Buch des Vaters.",
+        woerter: ["Die", "Mutter", "schenkt", "dem", "Kind", "das", "Buch", "des", "Vaters."],
+        richtig: 8,
+        erklaerung: "Vaters ist der Wessen-Fall. WESSEN Buch ist das? Des Vaters!"
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'der Oma' hier der Wem-Fall?",
+        satz: "Ich bringe der Oma die Tasche des Opas.",
+        tts: "Ist der Oma hier der Wem-Fall? — Ich bringe der Oma die Tasche des Opas.",
+        richtig: "richtig",
+        erklaerung: "Ja! WEM bringe ich die Tasche? Der Oma. Das ist der Wem-Fall."
+      },
+      {
+        typ: "richtig_falsch",
+        frage: "Ist 'des Opas' hier der Wem-Fall?",
+        satz: "Ich bringe der Oma die Tasche des Opas.",
+        tts: "Ist des Opas hier der Wem-Fall? — Ich bringe der Oma die Tasche des Opas.",
+        richtig: "falsch",
+        erklaerung: "Nein! Des Opas ist der Wessen-Fall. WESSEN Tasche? Des Opas."
+      }
+    ]
   }
 
 ];
