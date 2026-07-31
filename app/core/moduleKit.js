@@ -461,26 +461,36 @@
 
       answered=false;
       setNextEnabled(false);
-      scheduleEnableAnswers();
       setProgressUI(index, current.length);
       setCorrectUI(sessionCorrect, sessionTotal);
 
       // ── TTS: Text + Frage vorlesen ────────────────────────────────────
       // onSpeakTask: modul-spezifischer Callback (z.B. Mathe M0 mit Symbol-Namen)
       // readAloud:   allgemeiner Fallback für andere Module
+      // Regel 18: Antwort-Buttons erst NACH TTS-Ende freigeben (statt nach festem
+      // Timer). Module ohne automatische Vorlese-TTS (kein onSpeakTask/readAloud,
+      // z.B. Logik, Sinnesorgane-Quiz) behalten den bisherigen Timer bei.
       if(onSpeakTaskCb){
-        setTimeout(()=>{ onSpeakTaskCb(t); }, 300);
+        setPickDisabled(true);
+        setTimeout(()=>{
+          onSpeakTaskCb(t, function(){ setPickDisabled(false); rebindDwell(); });
+        }, 300);
       } else if(readAloud){
         const AQ = window.LaetitiaAudioQueue;
         if(AQ && typeof AQ.speak === "function"){
+          setPickDisabled(true);
           setTimeout(()=>{
             const sprechText = [
               displayTextFlow(t.text),
               displayTextFlow(t.frage)
             ].filter(Boolean).join(" … ");
-            AQ.speak(sprechText, 0.92);
+            AQ.speak(sprechText, 0.92, function(){ setPickDisabled(false); rebindDwell(); });
           }, 300);
+        } else {
+          scheduleEnableAnswers();
         }
+      } else {
+        scheduleEnableAnswers();
       }
     }
 

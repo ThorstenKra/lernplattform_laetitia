@@ -18,7 +18,7 @@ Ausgegeben werden: Ergebnisse, Fehler die eine Entscheidung erfordern, Rückfrag
 
 ---
 
-## 17 Goldstandard-Regeln (NIEMALS brechen)
+## 18 Goldstandard-Regeln (NIEMALS brechen)
 
 1. `dwell.js` immer `<script src="...">`, nie `import()`
 2. `localStorage["laetitia_input_mode"] = "tobii"` als Standard
@@ -37,6 +37,7 @@ Ausgegeben werden: Ergebnisse, Fehler die eine Entscheidung erfordern, Rückfrag
 15. `stats.js` in jede Spielseite einbinden (`sessionStart`/`taskStart`/`taskAnswer`/`sessionEnd`)
 16. Vor jedem `git push`: `validate.ps1` ausführen — alle 8 Prüfungen müssen grün sein
 17. **Lesebereich/Aktionsbereich-Trennung:** Text/Frage oben passiv (`pointer-events:none`), Trennstreifen mit Label, Antwort-Buttons unten dwell-aktiv. Buttons nach Antwort vollständig ausblenden (`display:none`). Vollständiges Muster siehe unten.
+18. **Auswahlfelder erst nach TTS-Ende:** Wenn das System einen Text vorliest (Frage, Aufgabenstellung, Nachricht), werden die zugehörigen Auswahl-/Antwort-Buttons erst NACH vollständigem Ende der Sprachausgabe sichtbar bzw. per Dwell aktivierbar — nie gleichzeitig mit oder vor Sprechbeginn. Verhindert, dass Laetitia absichtlich oder unabsichtlich klickt, bevor der Text zu Ende gesprochen wurde. Navigations-Buttons (Zurück, Beenden) bleiben davon unberührt und sind weiterhin sofort erreichbar. Referenzimplementierung: `app/modules/ki_agenten/fabu/fabu_mod.js` / `milo_mod.js` (Sitzung 17, 31.07.2026).
 
 ---
 

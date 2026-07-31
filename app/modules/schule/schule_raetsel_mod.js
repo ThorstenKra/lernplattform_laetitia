@@ -73,17 +73,25 @@ function zeigeAufgabe(){
   var fb = document.getElementById("feedbackBanner");
   fb.className = "feedback-banner"; fb.textContent = "";
 
+  // Regel 18: Antwort-Buttons erst nach TTS-Ende freigeben -- Zurueck bleibt sofort erreichbar
   ["btnA","btnB","btnC"].forEach(function(id){
     var b = document.getElementById(id);
-    b.classList.remove("is-disabled","richtig-flash","falsch-flash");
+    b.classList.remove("richtig-flash","falsch-flash");
+    b.classList.add("is-disabled");
     delete b.dataset.pdwell;
-    bindDwellEinzel(b);
   });
   delete document.getElementById("btnZurueck").dataset.pdwell;
   bindDwellEinzel(document.getElementById("btnZurueck"));
 
   // TTS: alle Hinweise vorlesen
-  setTimeout(function(){ sprich(hinweise.join(". ") + ". Was bin ich?"); }, 300);
+  setTimeout(function(){
+    sprich(hinweise.join(". ") + ". Was bin ich?", function(){
+      ["btnA","btnB","btnC"].forEach(function(id){
+        document.getElementById(id).classList.remove("is-disabled");
+      });
+      rebindDwell();
+    });
+  }, 300);
 }
 
 function antworten(buchstabe){

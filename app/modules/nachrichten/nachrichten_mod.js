@@ -21,7 +21,8 @@ var _dwell        = null;
 function $(id){ return document.getElementById(id); }
 
 // ── TTS ──────────────────────────────────────────────────────────────────────
-function sprich(text){
+// danach (optional, Regel 18): wird nach TTS-Ende aufgerufen
+function sprich(text, danach){
   try{
     speechSynthesis.cancel();
     setTimeout(function(){
@@ -35,10 +36,11 @@ function sprich(text){
              || vv.find(function(x){ return x.name.indexOf("Microsoft") >= 0 && x.lang.startsWith("de") && x.name.indexOf("Hedda") < 0; })
              || vv.find(function(x){ return x.lang.startsWith("de"); });
         if(v) u.voice = v;
+        if(danach){ u.onend = danach; u.onerror = danach; }
         speechSynthesis.speak(u);
-      }catch(e){}
+      }catch(e){ if(danach) danach(); }
     }, 120);
-  }catch(e){}
+  }catch(e){ if(danach) danach(); }
 }
 
 // ── Dwell ─────────────────────────────────────────────────────────────────────
@@ -188,7 +190,6 @@ function zeigeNachricht(n){
   alleVerstecken();
 
   var nc = $("nachrichtContainer"); if(nc) nc.style.display = "";
-  var bA = $("btnAntwort");        if(bA) bA.style.display = "";
 
   var vonEl = $("nachrichtVon");
   if(vonEl) vonEl.textContent = n.von;
@@ -223,15 +224,18 @@ function zeigeNachricht(n){
     textEl.style.display = "";
   }
 
-  sprich(n.von + " schreibt: " + (n.text || typEmoji(n.typ)));
+  // Regel 18: "Antworten"-Button erst nach TTS-Ende sichtbar/dwell-aktiv
+  rebindDwell();
+  sprich(n.von + " schreibt: " + (n.text || typEmoji(n.typ)), function(){
+    var bA = $("btnAntwort"); if(bA) bA.style.display = "";
+    rebindDwell();
+  });
 
   if(!n.gelesen){
     apiFetch("POST", "/gelesen/" + n.id, null, function(){});
     n.gelesen = true;
     aktualisiereKopf();
   }
-
-  rebindDwell();
 }
 
 function zeigeAntwort(){

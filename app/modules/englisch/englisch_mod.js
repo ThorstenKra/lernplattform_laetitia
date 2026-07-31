@@ -153,9 +153,10 @@ function zeigeEmojiAufgabe(t){
     document.getElementById("label"+i).textContent   = slots[i].label;
     document.getElementById("btnEmoji"+i).dataset.korrekt = slots[i].korrekt ? "1" : "0";
     var b = document.getElementById("btnEmoji"+i);
-    b.classList.remove("is-disabled","correct-flash","falsch-gewaehlt");
+    // Regel 18: erst nach TTS-Ende freigeben
+    b.classList.remove("correct-flash","falsch-gewaehlt");
+    b.classList.add("is-disabled");
     delete b.dataset.pdwell;
-    bindDwellEinzel(b);
   }
 
   setInfoLine("infoLineEmoji","","");
@@ -166,7 +167,13 @@ function zeigeEmojiAufgabe(t){
   bindDwellEinzel(document.getElementById("btnZurueck"));
 
   zeigeScreen("screenEmoji");
-  setTimeout(function(){ sprichEN(t.tts_en); }, 400);
+  setTimeout(function(){
+    sprichEN(t.tts_en, function(){
+      document.getElementById("btnEmoji0").classList.remove("is-disabled");
+      document.getElementById("btnEmoji1").classList.remove("is-disabled");
+      rebindDwell();
+    });
+  }, 400);
 }
 
 function antwortenEmoji(idx){
@@ -202,9 +209,10 @@ function zeigeWortAufgabe(t){
 
   ["btnW0","btnW1","btnW2"].forEach(function(id){
     var b=document.getElementById(id);
-    b.classList.remove("is-disabled","correct-flash","falsch-gewaehlt");
+    // Regel 18: erst nach TTS-Ende freigeben
+    b.classList.remove("correct-flash","falsch-gewaehlt");
+    b.classList.add("is-disabled");
     delete b.dataset.pdwell;
-    bindDwellEinzel(b);
   });
 
   setInfoLine("infoLineWort","","");
@@ -215,7 +223,12 @@ function zeigeWortAufgabe(t){
   bindDwellEinzel(document.getElementById("btnZurueck"));
 
   zeigeScreen("screenWort");
-  setTimeout(function(){ sprichEN(t.tts_en); }, 400);
+  setTimeout(function(){
+    sprichEN(t.tts_en, function(){
+      ["btnW0","btnW1","btnW2"].forEach(function(id){ document.getElementById(id).classList.remove("is-disabled"); });
+      rebindDwell();
+    });
+  }, 400);
 }
 
 function antwortenWort(buchstabe){

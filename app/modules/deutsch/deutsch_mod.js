@@ -276,15 +276,23 @@
 
     answered=false;
     setNextEnabled(false);
-    scheduleEnableAnswers();
 
     setProgressUI(index, current.length);
     setCorrectUI(sessionCorrect, sessionTotal);
 
+    // Regel 18: im Vorlese-Modus Antwort-Buttons erst NACH TTS-Ende freigeben
+    // (statt nach festem Timer); ohne Vorlese-Modus liest nichts automatisch vor,
+    // dort bleibt der bisherige Timer als reine Lesezeit-Pause bestehen.
     if(VORLESE_MODUS){
-      queue.play([{type:"tts", text: (displayTextFlow(t.text)+" … "+displayTextFlow(t.frage)).trim(), rate:0.98}]);
+      setPickDisabled(true);
+      queue.play([{type:"tts", text: (displayTextFlow(t.text)+" … "+displayTextFlow(t.frage)).trim(), rate:0.98}], function(){
+        setPickDisabled(false);
+        rebindDwell();
+        try{ if(window.LaetitiaStats) window.LaetitiaStats.taskStart(); }catch{}
+      });
     } else {
       queue.clear();
+      scheduleEnableAnswers();
     }
   }
 

@@ -205,7 +205,7 @@ function zeigeAbschluss(info){
   rebindDwell();
 }
 
-function zeigeGespraech(antwort, vorschlaege, stimmung){
+function zeigeGespraech(antwort, vorschlaege, stimmung, nachAnzeige){
   zustand = "gespraech"; alleVerstecken();
 
   var gc = $("gespraechContainer"); if(gc) gc.style.display = "";
@@ -216,29 +216,36 @@ function zeigeGespraech(antwort, vorschlaege, stimmung){
 
   var novaEl = $("novaAntwort");
   if(novaEl) novaEl.textContent = antwort;
-  sprich(antwort);
 
   var grid = $("vorschlaegeGrid");
-  if(grid){
-    grid.innerHTML = "";
-    var liste = (Array.isArray(vorschlaege) && vorschlaege.length > 0)
-      ? vorschlaege.slice(0, 4)
-      : ["Ja", "Nein", "Erzaehl mehr", "Okay"];
-    liste.forEach(function(v){
-      var btn = document.createElement("button");
-      btn.className = "vorschlag-btn";
-      btn.innerHTML = "<span style='pointer-events:none'>" + v + "</span>"
-        + "<svg class='dwell-ring-svg' viewBox='0 0 70 70'>"
-        + "<circle cx='35' cy='35' r='30' style='stroke:#8b5cf6'/></svg>";
-      btn.addEventListener("click", function(){ sendeNachricht(v); });
-      grid.appendChild(btn);
-    });
-  }
-  var bE = $("btnEigeneAntwort");
-  if(bE) bE.style.display = "";
-  // skipRecheck=true: Vorschlag-Buttons erscheinen an derselben Position wie
-  // die vorherige Antwortrunde -- kein Auto-Dwell auf ruhendem Blick (siehe oben).
+  if(grid) grid.innerHTML = "";
+
+  // Regel 18: Vorschlaege + Eigene-Antwort-Button erst NACH TTS-Ende sichtbar --
+  // Zurueck/Beenden bleiben sofort per Dwell erreichbar, waehrend Nova spricht.
   rebindDwell(true);
+
+  sprich(antwort, function(){
+    if(grid){
+      var liste = (Array.isArray(vorschlaege) && vorschlaege.length > 0)
+        ? vorschlaege.slice(0, 4)
+        : ["Ja", "Nein", "Erzaehl mehr", "Okay"];
+      liste.forEach(function(v){
+        var btn = document.createElement("button");
+        btn.className = "vorschlag-btn";
+        btn.innerHTML = "<span style='pointer-events:none'>" + v + "</span>"
+          + "<svg class='dwell-ring-svg' viewBox='0 0 70 70'>"
+          + "<circle cx='35' cy='35' r='30' style='stroke:#8b5cf6'/></svg>";
+        btn.addEventListener("click", function(){ sendeNachricht(v); });
+        grid.appendChild(btn);
+      });
+    }
+    var bE = $("btnEigeneAntwort");
+    if(bE) bE.style.display = "";
+    // skipRecheck=true: Vorschlag-Buttons erscheinen an derselben Position wie
+    // die vorherige Antwortrunde -- kein Auto-Dwell auf ruhendem Blick (siehe oben).
+    rebindDwell(true);
+    if(typeof nachAnzeige === "function") nachAnzeige();
+  });
 }
 
 // ── Konversation ──────────────────────────────────────────────────────────────
@@ -248,13 +255,16 @@ function sendeNachricht(text){
     if(err || data.fehler){
       zeigeGespraech(
         "Entschuldigung, ich bin gerade nicht erreichbar. Bitte versuche es gleich nochmal.",
-        ["Nochmal versuchen", "Okay"]
+        ["Nochmal versuchen", "Okay"],
+        null,
+        function(){
+          // "Nochmal versuchen" soll denselben Text nochmals senden
+          var grid = $("vorschlaegeGrid");
+          if(grid && grid.firstChild){
+            grid.firstChild.addEventListener("click", function(){ sendeNachricht(text); }, { once: true });
+          }
+        }
       );
-      // "Nochmal versuchen" soll denselben Text nochmals senden
-      var grid = $("vorschlaegeGrid");
-      if(grid && grid.firstChild){
-        grid.firstChild.addEventListener("click", function(){ sendeNachricht(text); }, { once: true });
-      }
       return;
     }
     verlauf.push({ rolle: "user",      text: text });

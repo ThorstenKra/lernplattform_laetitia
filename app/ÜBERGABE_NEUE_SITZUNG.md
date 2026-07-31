@@ -17,7 +17,7 @@ Claude beschränkt sich auf entscheidungsrelevante Ausgaben. Einzelschritte, Üb
 
 ---
 
-## 17 Goldstandard-Regeln
+## 18 Goldstandard-Regeln
 
 1. `dwell.js` immer `<script src="...">`, nie `import()`
 2. `localStorage["laetitia_input_mode"] = "tobii"` als Standard
@@ -36,6 +36,7 @@ Claude beschränkt sich auf entscheidungsrelevante Ausgaben. Einzelschritte, Üb
 15. `stats.js` in jede Spielseite einbinden (sessionStart/taskStart/taskAnswer/sessionEnd)
 16. Vor jedem `git push`: `validate.ps1` ausführen — alle 8 Prüfungen müssen grün sein
 17. **Lesebereich von Aktionsbereich trennen:** Text/Frage oben passiv (`pointer-events:none`), Trennstreifen mit Label, Antwort-Buttons unten dwell-aktiv. Buttons nach Antwort vollständig ausblenden (`display:none`). Vollständiges Muster in PROJEKT_WISSEN.md.
+18. **Auswahlfelder erst nach TTS-Ende:** Auswahl-/Antwort-Buttons werden erst NACH vollständigem Ende der Sprachausgabe des zugehörigen Texts sichtbar/dwell-aktiv — nie gleichzeitig mit oder vor Sprechbeginn. Zurück/Beenden bleiben sofort erreichbar. Referenz: `fabu_mod.js`/`milo_mod.js` (Sitzung 17, 31.07.2026).
 
 ---
 

@@ -192,10 +192,10 @@
   }
 
   // Aufgabentext für TTS zusammenbauen: "Wie viele Sterne siehst du?"
-  function sprechAufgabe(t){
-    if(!t) return;
+  function sprechAufgabe(t, fertig){
+    if(!t){ if(fertig) fertig(); return; }
     var AQ = window.LaetitiaAudioQueue;
-    if(!AQ || typeof AQ.speak !== "function") return;
+    if(!AQ || typeof AQ.speak !== "function"){ if(fertig) fertig(); return; }
 
     var text = (t.text || "").trim();
 
@@ -219,7 +219,7 @@
       }
     }
 
-    AQ.speak(text, 0.90);
+    AQ.speak(text, 0.90, fertig);
   }
 
 
@@ -261,8 +261,8 @@
     },
 
     // Aufgabentext vorlesen mit Symbol-Namen (M0) oder normalem Text
-    onSpeakTask: function(t){
-      sprechAufgabe(t);
+    onSpeakTask: function(t, fertig){
+      sprechAufgabe(t, fertig);
     },
 
     // Zähl-Animation bei falscher Antwort in M0-Stufen

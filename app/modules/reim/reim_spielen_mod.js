@@ -186,6 +186,7 @@ function zeigeErklaerung(){
   var ub = document.getElementById("btnUeberspringen");
   if(ub) ub.style.display = "none";
 
+  bindeDwell("#btnZurueck");
   sprich(aktEinheit.erklaerung_tts, function(){
     bindeDwell("#weiterBtn, #btnZurueck");
   });
@@ -226,6 +227,15 @@ function zeigeAufgabe(){
   else if(aufgabe.typ === "reim_janein") rendereReimJaNein(spielfeld, aufgabe);
 }
 
+// ── Regel 18: Antwort-Buttons erst nach TTS-Ende dwell-aktiv ─────────────
+// Zurueck/Ueberspringen bleiben sofort erreichbar, waehrend die Frage noch vorgelesen wird.
+function aktiviereNachTts(tts, vollSelektor){
+  bindeDwell("#btnZurueck, #btnUeberspringen");
+  setTimeout(function(){
+    sprich(tts, function(){ bindeDwell(vollSelektor); });
+  }, 400);
+}
+
 // ── Typ: Reim-Wahl (A/B/C/D — welches Wort reimt sich?) ──────────
 function rendereReimWahl(container, aufgabe){
   container.innerHTML =
@@ -242,8 +252,7 @@ function rendereReimWahl(container, aufgabe){
   window._ReimAntwort = function(wahl){
     pruefeAntwort(wahl, aufgabe.richtig, aufgabe.erklaerung, aufgabe);
   };
-  bindeDwell("#btnA, #btnB, #btnC, #btnD, #btnZurueck, #btnUeberspringen");
-  setTimeout(function(){ sprich(aufgabe.tts); }, 400);
+  aktiviereNachTts(aufgabe.tts, "#btnA, #btnB, #btnC, #btnD, #btnZurueck, #btnUeberspringen");
 }
 
 // ── Typ: Lücke-Wahl (echte Gedichtzeile, fehlendes Reimwort) ─────
@@ -268,8 +277,7 @@ function rendereLueckeWahl(container, aufgabe){
   window._ReimAntwort = function(wahl){
     pruefeAntwort(wahl, aufgabe.richtig, aufgabe.erklaerung, aufgabe);
   };
-  bindeDwell("#btnA, #btnB, #btnC, #btnD, #btnZurueck, #btnUeberspringen");
-  setTimeout(function(){ sprich(aufgabe.tts_bekannt + " " + aufgabe.tts_luecke); }, 400);
+  aktiviereNachTts(aufgabe.tts_bekannt + " " + aufgabe.tts_luecke, "#btnA, #btnB, #btnC, #btnD, #btnZurueck, #btnUeberspringen");
 }
 
 // ── Typ: Reim Ja/Nein ─────────────────────────────────────────────
@@ -294,8 +302,7 @@ function rendereReimJaNein(container, aufgabe){
     var korrekt    = gewaehltJa === !!aufgabe.reimt;
     pruefeAntwort(korrekt ? "richtig" : "falsch", "richtig", aufgabe.erklaerung, aufgabe, wahl);
   };
-  bindeDwell("#btnJa, #btnNein, #btnZurueck, #btnUeberspringen");
-  setTimeout(function(){ sprich(aufgabe.tts); }, 400);
+  aktiviereNachTts(aufgabe.tts, "#btnJa, #btnNein, #btnZurueck, #btnUeberspringen");
 }
 
 // ── Antwort auswerten ────────────────────────────────────────────

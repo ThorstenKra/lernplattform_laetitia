@@ -182,6 +182,7 @@ function zeigeErklaerung(){
   var ub = document.getElementById("btnUeberspringen");
   if(ub) ub.style.display = "none";
 
+  bindeDwell("#btnZurueck");
   sprich(aktEinheit.erklaerung_tts, function(){
     bindeDwell("#weiterBtn, #btnZurueck");
   });
@@ -222,8 +223,15 @@ function zeigeAufgabe(){
   else if(aufgabe.typ === "abc_wahl")       rendereAbcWahl(spielfeld, aufgabe);
   else if(aufgabe.typ === "wort_button")    rendereWortButton(spielfeld, aufgabe);
   else if(aufgabe.typ === "richtig_falsch") rendereRichtigFalsch(spielfeld, aufgabe);
+}
 
-  setTimeout(function(){ sprich(aufgabe.tts); }, 400);
+// ── Regel 18: Antwort-Buttons erst nach TTS-Ende dwell-aktiv ─────────────
+// Zurueck bleibt sofort erreichbar, waehrend die Frage noch vorgelesen wird.
+function aktiviereNachTts(tts, vollSelektor){
+  bindeDwell("#btnZurueck, #btnUeberspringen");
+  setTimeout(function(){
+    sprich(tts, function(){ bindeDwell(vollSelektor); });
+  }, 400);
 }
 
 // ── Typ: Ja / Nein ───────────────────────────────────────────────
@@ -240,7 +248,7 @@ function rendereJaNein(container, aufgabe){
   window._GrammAntwort = function(wahl){
     pruefeAntwort(wahl, aufgabe.richtig, aufgabe.erklaerung, aufgabe);
   };
-  bindeDwell("#btnJa, #btnNein, #btnZurueck, #btnUeberspringen");
+  aktiviereNachTts(aufgabe.tts, "#btnJa, #btnNein, #btnZurueck, #btnUeberspringen");
 }
 
 // ── Typ: A / B Wahl ──────────────────────────────────────────────
@@ -262,7 +270,7 @@ function rendereAbWahl(container, aufgabe){
   window._GrammAntwort = function(wahl){
     pruefeAntwort(wahl, aufgabe.richtig, aufgabe.erklaerung, aufgabe);
   };
-  bindeDwell("#btnA, #btnB, #btnZurueck, #btnUeberspringen");
+  aktiviereNachTts(aufgabe.tts, "#btnA, #btnB, #btnZurueck, #btnUeberspringen");
 }
 
 // ── Typ: A / B / C Wahl ──────────────────────────────────────────
@@ -286,7 +294,7 @@ function rendereAbcWahl(container, aufgabe){
   window._GrammAntwort = function(wahl){
     pruefeAntwort(wahl, aufgabe.richtig, aufgabe.erklaerung, aufgabe);
   };
-  bindeDwell("#btnA, #btnB, #btnC, #btnZurueck, #btnUeberspringen");
+  aktiviereNachTts(aufgabe.tts, "#btnA, #btnB, #btnC, #btnZurueck, #btnUeberspringen");
 }
 
 // ── Typ: Wort-Button ─────────────────────────────────────────────
@@ -323,7 +331,7 @@ function rendereWortButton(container, aufgabe){
   };
 
   var dwellSel = aufgabe.woerter.map(function(w, i){ return "#wortBtn" + i; }).join(", ") + ", #btnZurueck, #btnUeberspringen";
-  bindeDwell(dwellSel);
+  aktiviereNachTts(aufgabe.tts, dwellSel);
 }
 
 // ── Typ: Richtig / Falsch ────────────────────────────────────────
@@ -340,7 +348,7 @@ function rendereRichtigFalsch(container, aufgabe){
   window._GrammAntwort = function(wahl){
     pruefeAntwort(wahl, aufgabe.richtig, aufgabe.erklaerung, aufgabe);
   };
-  bindeDwell("#btnRichtig, #btnFalsch, #btnZurueck, #btnUeberspringen");
+  aktiviereNachTts(aufgabe.tts, "#btnRichtig, #btnFalsch, #btnZurueck, #btnUeberspringen");
 }
 
 // ── Antwort auswerten ────────────────────────────────────────────

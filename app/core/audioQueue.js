@@ -15,7 +15,9 @@
 
   function stopSpeak(){ try{ speechSynthesis.cancel(); }catch{} }
 
-  function speak(text, rate){
+  // callback (optional, Regel 18): wird nach TTS-Ende aufgerufen -- damit
+  // koennen Aufrufer Auswahlfelder erst nach vollstaendigem Vorlesen freigeben.
+  function speak(text, rate, callback){
     try{
       stopSpeak();
       setTimeout(function(){
@@ -27,10 +29,14 @@
           u.rate = rate || 1.0;
           u.pitch = 1.0;
           u.volume = 1.0;
+          if(typeof callback === "function"){
+            u.onend = callback;
+            u.onerror = callback;
+          }
           speechSynthesis.speak(u);
-        }catch{}
+        }catch{ if(typeof callback === "function") callback(); }
       }, 120);
-    }catch{}
+    }catch{ if(typeof callback === "function") callback(); }
   }
 
   function createQueue(){

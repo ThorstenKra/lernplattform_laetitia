@@ -88,11 +88,22 @@ function zeigeAufgabe(){
   btnD.style.display = t.antwort_d ? "" : "none";
 
   setInfoLine("","");
-  ["btnA","btnB","btnC","btnD","btnZurueck"].forEach(function(id){
-    var b=document.getElementById(id); if(b){ b.classList.remove("is-disabled","correct-flash","falsch-gewaehlt"); delete b.dataset.pdwell; bindDwellEinzel(b); }
+  // Regel 18: Antwort-Buttons erst nach TTS-Ende freigeben -- Zurueck bleibt sofort erreichbar
+  ["btnA","btnB","btnC","btnD"].forEach(function(id){
+    var b=document.getElementById(id); if(b){ b.classList.remove("correct-flash","falsch-gewaehlt"); b.classList.add("is-disabled"); delete b.dataset.pdwell; }
   });
+  var btnZurueck = document.getElementById("btnZurueck");
+  if(btnZurueck){ btnZurueck.classList.remove("is-disabled","correct-flash","falsch-gewaehlt"); delete btnZurueck.dataset.pdwell; }
+  bindDwellEinzel(btnZurueck);
 
-  setTimeout(function(){ sprich(t.text + ". " + (t.frage||"Was ist das?")); }, 300);
+  setTimeout(function(){
+    sprich(t.text + ". " + (t.frage||"Was ist das?"), function(){
+      ["btnA","btnB","btnC","btnD"].forEach(function(id){
+        var b=document.getElementById(id); if(b) b.classList.remove("is-disabled");
+      });
+      rebindDwell();
+    });
+  }, 300);
 }
 
 function antworten(buchstabe){

@@ -136,7 +136,7 @@ function zeigeAufgabe(){
     txt.className = "antwort-text";
     txt.textContent = opt.text;
     var btn = document.createElement("button");
-    btn.className = "antwortBtn";
+    btn.className = "antwortBtn disabled"; // Regel 18: erst nach TTS-Ende freigeben
     btn.setAttribute("data-key", opt.key);
     delete btn.dataset.pdwell;
     btn.innerHTML = '<svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>✓';
@@ -157,9 +157,13 @@ function zeigeAufgabe(){
 
   bindeDwell();
 
-  // Frage vorlesen nach kurzem Delay
+  // Frage vorlesen nach kurzem Delay -- Regel 18: Antwort-Buttons (.disabled
+  // beim Rendern gesetzt) erst im TTS-Callback freigeben
   setTimeout(function(){
-    sprich(aktAufgabe.frage);
+    sprich(aktAufgabe.frage, function(){
+      document.querySelectorAll(".antwortBtn").forEach(function(b){ b.classList.remove("disabled"); });
+      bindeDwell();
+    });
   }, 600);
 }
 

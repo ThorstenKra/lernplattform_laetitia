@@ -261,13 +261,23 @@
 
     setProgressUI(index, current.length);
     setCorrectUI(sessionCorrect, sessionTotal);
-    scheduleEnableAnswers();
 
-    // Text automatisch vorlesen
-    try{
-      const fullText = norm(t.text).replaceAll("\\n"," ") + " … " + norm(t.frage);
-      speak(fullText, 0.92);
-    }catch(e){}
+    // Text automatisch vorlesen -- Regel 18: Antwort-Buttons erst NACH TTS-Ende
+    // freigeben (statt nach festem Timer). Faellt auf den alten Timer zurueck,
+    // falls AQ/speak fehlt (sonst wuerden die Buttons nie wieder freigegeben).
+    if(AQ && typeof AQ.speak === "function"){
+      setPickDisabled(true);
+      try{
+        const fullText = norm(t.text).replaceAll("\\n"," ") + " … " + norm(t.frage);
+        speak(fullText, 0.92, function(){
+          setPickDisabled(false);
+          rebindDwell();
+          try{ if(window.LaetitiaStats) window.LaetitiaStats.taskStart(); }catch{}
+        });
+      }catch(e){ scheduleEnableAnswers(); }
+    } else {
+      scheduleEnableAnswers();
+    }
   }
 
   function start(L){
