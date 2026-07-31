@@ -18,43 +18,50 @@ body{
   font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
   background:var(--bg); color:var(--text);
   height:100vh; overflow:hidden;
-  display:flex; align-items:center; justify-content:center;
+  display:flex; flex-direction:column;
 }
-.app{ width:min(860px,96vw); display:flex; flex-direction:column; gap:14px; padding:16px; }
+.app{
+  width:min(860px,96vw); margin:0 auto; padding:16px;
+  flex:1; min-height:0; display:flex; flex-direction:column; gap:14px;
+}
 
 /* ── Header ── */
 .header{
   background:var(--panel); border:2px solid var(--akzent);
   border-radius:var(--radius); box-shadow:var(--shadow);
-  padding:20px 24px; text-align:center;
+  padding:16px 24px; text-align:center; flex-shrink:0;
 }
-.header-emoji{ font-size:52px; margin-bottom:6px; }
-.header-titel{ font-size:clamp(26px,5vw,40px); font-weight:1000; color:var(--akzent); margin:0 0 6px; }
-.header-sub{ font-size:clamp(15px,2.5vw,20px); font-weight:800; color:var(--muted); }
+.header-emoji{ font-size:40px; margin-bottom:4px; }
+.header-titel{ font-size:clamp(24px,5vw,34px); font-weight:1000; color:var(--akzent); margin:0 0 4px; }
+.header-sub{ font-size:clamp(14px,2.5vw,18px); font-weight:800; color:var(--muted); }
 
-/* ── Modus-Grid ── */
-.modus-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+/* ── Einheiten-Grid: eigener Scrollbereich, damit Header + Zurueck-Button
+   immer sichtbar bleiben, egal wie viele Gedichte spaeter dazukommen
+   (gleiches Muster wie Fabus .geschichten-liste) ── */
+.einheiten-scroll{ flex:1; min-height:0; overflow-y:auto; padding:2px; }
+.einheiten-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
 
-a.modBtn{
+a.einheit-btn{
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:10px; min-height:130px; padding:18px 14px;
+  gap:8px; min-height:150px; padding:18px 14px;
   background:var(--panel); border:2px solid var(--border);
   border-radius:var(--radius); box-shadow:var(--shadow);
   text-decoration:none; color:var(--text); font-weight:1000;
   user-select:none; cursor:pointer; position:relative; transition:none;
 }
-a.modBtn:hover, a.modBtn:focus{
+a.einheit-btn:hover, a.einheit-btn:focus{
   transform:scale(1.03); outline:4px solid var(--akzent);
   background:var(--akzent-bg);
 }
-.mod-emoji{ font-size:40px; }
-.mod-label{ font-size:17px; font-weight:1000; color:var(--akzent); text-align:center; }
-.mod-sub{ font-size:13px; font-weight:800; color:var(--muted); text-align:center; }
-.mod-count{ font-size:12px; font-weight:1000; padding:3px 10px; border-radius:999px;
+a.einheit-btn.gemeistert{ border-color:#f59e0b; background:rgba(245,158,11,0.06); }
+.einheit-emoji{ font-size:38px; }
+.einheit-titel{ font-size:17px; font-weight:1000; color:var(--akzent); text-align:center; }
+.einheit-autor{ font-size:12px; font-weight:800; color:var(--muted); text-align:center; }
+.einheit-count{ font-size:12px; font-weight:1000; padding:3px 10px; border-radius:999px;
   background:var(--akzent-bg); border:1px solid rgba(232,93,4,.25); color:var(--akzent); }
 
 /* ── Zurueck ── */
-.zurueck-wrap{ display:flex; }
+.zurueck-wrap{ display:flex; flex-shrink:0; }
 a.zurueckBtn{
   display:flex; align-items:center; justify-content:center;
   min-height:72px; font-size:20px; font-weight:1000;
@@ -90,43 +97,13 @@ a.zurueckBtn.dwell-active{ outline-color:#8b5cf6 !important; }
   <div class="header">
     <div class="header-emoji">🎵</div>
     <div class="header-titel">Reimen</div>
-    <div class="header-sub">Woerter klingen — Reime springen!</div>
+    <div class="header-sub">Gedichte hören — Reime erkennen!</div>
   </div>
 
-  <div class="modus-grid">
-
-    <a class="modBtn" href="./reim_spielen.html?modus=R1" id="btnR1">
-      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
-      <span class="mod-emoji">🔍</span>
-      <span class="mod-label">Reimpaar finden</span>
-      <span class="mod-sub">Welches Wort reimt sich?</span>
-      <span class="mod-count">15 Aufgaben</span>
-    </a>
-
-    <a class="modBtn" href="./reim_spielen.html?modus=R2" id="btnR2">
-      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
-      <span class="mod-emoji">📜</span>
-      <span class="mod-label">Gedicht vollenden</span>
-      <span class="mod-sub">Welches Wort fehlt am Ende?</span>
-      <span class="mod-count">9 Aufgaben</span>
-    </a>
-
-    <a class="modBtn" href="./reim_spielen.html?modus=R3" id="btnR3">
-      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
-      <span class="mod-emoji">🤔</span>
-      <span class="mod-label">Reim oder kein Reim?</span>
-      <span class="mod-sub">Ja oder Nein — reimt sich das?</span>
-      <span class="mod-count">16 Aufgaben</span>
-    </a>
-
-    <a class="modBtn" href="./reim_spielen.html?modus=R4" id="btnR4">
-      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
-      <span class="mod-emoji">✏️</span>
-      <span class="mod-label">Meinen Reim bauen</span>
-      <span class="mod-sub">Ich waehle das Reimwort!</span>
-      <span class="mod-count">7 Aufgaben</span>
-    </a>
-
+  <div class="einheiten-scroll">
+    <div class="einheiten-grid" id="einheitenBereich">
+      <!-- wird von reim_uebersicht.js befuellt -->
+    </div>
   </div>
 
   <div class="zurueck-wrap">
@@ -140,24 +117,13 @@ a.zurueckBtn.dwell-active{ outline-color:#8b5cf6 !important; }
 
 </div>
 <script src="../../core/dwell.js"></script>
+<script src="./reim_data.js"></script>
+<script src="./reim_uebersicht.js"></script>
 <script>
-// Return-URL setzen
 try{
   localStorage.setItem("laetitia_return_url_v1", new URL("./modules/reim/reim.html", window.location.href).href);
 }catch(e){}
-
-var attachDwell = window.LaetitiaAttachDwell || function(){ return {cancelDwell:function(){}}; };
-var dwellMs    = parseInt(localStorage.getItem("laetitia_dwell_ms"))    || 900;
-var leaveGrace = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
-
-attachDwell("a.modBtn, #btnZurueck", {
-  dwellMs: dwellMs, leaveGrace: leaveGrace,
-  onActivate: function(el){
-    if(el.getAttribute("aria-disabled") === "true") return;
-    if(el.classList.contains("is-disabled")) return;
-    try{ el.click(); }catch(e){}
-  }
-});
+window.ReimUebersicht && window.ReimUebersicht.baueUebersicht();
 </script>
 </body>
 </html>

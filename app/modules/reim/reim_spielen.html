@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- depth:2 — Pfade: ../../core/, ../../lernen.html -->
+<!-- depth:2 — Pfade: ../../core/ -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -8,311 +8,263 @@
 <style>
 :root{
   --bg:#fff8f0; --panel:#ffffff;
-  --border:rgba(15,23,42,.14); --shadow:0 10px 26px rgba(15,23,42,.08);
-  --text:#0f172a; --muted:rgba(15,23,42,.60);
-  --akzent:#e85d04; --akzent2:#dc2f02;
-  --akzent-bg:rgba(232,93,4,0.09); --radius:20px;
-  --ja:#16a34a; --nein:#dc2626;
+  --border:rgba(15,23,42,.14); --shadow:0 6px 18px rgba(15,23,42,.07);
+  --text:#0f172a; --muted:rgba(15,23,42,.65);
+  --akzent:#e85d04; --akzent2:#c2410c;
+  --akzent-bg:rgba(232,93,4,0.08); --radius:16px;
+  --lila:#8b5cf6; --lila-bg:#ede9fe;
+  --gruen:#16a34a; --gruen-bg:#dcfce7;
+  --rot:#dc2626; --rot-bg:rgba(220,38,38,0.08);
+  --orange:#f97316; --orange-bg:#fff7ed;
+  --lese-bg:#fffaf5; --lese-border:#fed7aa;
+  --trenn-bg:#fff1e6; --trenn-border:#fdba74;
 }
 *{ box-sizing:border-box; margin:0; padding:0; }
 body{
   font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
   background:var(--bg); color:var(--text);
-  height:100vh; overflow:hidden; display:flex; flex-direction:column;
+  height:100vh; overflow:hidden;
+  display:flex; flex-direction:column;
 }
 
-/* ── Progress-Bar ── */
-.progress-bar-wrap{ height:6px; background:rgba(232,93,4,.15); flex-shrink:0; }
-.progress-bar-fill{ height:6px; background:var(--akzent); transition:width .4s ease; }
+/* ── Header ─────────────────────────────────────────────────────── */
+.header{
+  background:var(--panel); border-bottom:2px solid var(--akzent);
+  box-shadow:0 2px 8px rgba(15,23,42,.06); flex-shrink:0;
+  padding:10px 16px; display:flex; align-items:center; gap:10px;
+}
+.header-emoji{ font-size:30px; }
+.header-titel{ font-size:20px; font-weight:1000; color:var(--akzent); }
+.header-sub{ font-size:13px; font-weight:800; color:var(--muted); margin-left:auto; }
 
-/* ── Topbar ── */
-.topbar{
-  display:flex; align-items:center; justify-content:space-between;
-  padding:10px 16px; background:var(--panel);
-  border-bottom:1px solid var(--border); box-shadow:0 2px 8px rgba(15,23,42,.06);
+/* ── Fortschritt ─────────────────────────────────────────────────── */
+.fortschritt-bar{ height:7px; background:rgba(232,93,4,0.12); flex-shrink:0; }
+.fortschritt-fill{ height:100%; background:var(--akzent); transition:width .4s ease; }
+
+/* ── Spielfeld ───────────────────────────────────────────────────── */
+.spielfeld{
+  flex:1; overflow-y:hidden; padding:10px 14px;
+  display:flex; flex-direction:column; gap:0;
+  min-height:0;
+}
+
+/* ── LESEBEREICH (passiv — kein Dwell) ──────────────────────────── */
+.lese-bereich{
+  background:var(--lese-bg);
+  border:2px solid var(--lese-border);
+  border-radius:var(--radius) var(--radius) 0 0;
+  padding:16px 18px;
   flex-shrink:0;
+  pointer-events:none;
+  user-select:none;
 }
-.topbar-titel{ font-size:18px; font-weight:1000; color:var(--akzent); }
-.topbar-fortschritt{ font-size:13px; font-weight:900; color:var(--muted); }
-
-/* Zurueck-Button unten (Standard) */
-.zurueck-leiste{ padding:10px 16px; flex-shrink:0; }
-a.zurueckBtn{
-  display:flex; align-items:center; justify-content:center;
-  min-height:70px; font-size:18px; font-weight:1000;
-  border-radius:16px; border:2px solid #8b5cf6;
-  background:#ede9fe; color:#4c1d95;
-  text-decoration:none; cursor:pointer; user-select:none;
-  position:relative; transition:none; width:100%;
-}
-a.zurueckBtn:hover, a.zurueckBtn:focus{ background:#ddd6fe; outline:4px solid #8b5cf6; }
-a.zurueckBtn.dwell-active{ transform:scale(1.02) !important; outline:4px solid #8b5cf6 !important; transition:none !important; }
-
-/* ── Main ── */
-.main{
-  flex:1; display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-  padding:16px; gap:14px; overflow:hidden;
-}
-
-/* ── Reim-Karte (Wort / Gedichtzeilen) ── */
-.reim-karte{
-  background:var(--panel); border:2px solid rgba(232,93,4,.30);
-  border-radius:var(--radius); box-shadow:var(--shadow);
-  padding:22px 28px; max-width:700px; width:100%; text-align:center;
-}
-.reim-wort{
-  font-size:clamp(28px,5vw,52px); font-weight:1000;
-  color:var(--akzent); letter-spacing:0.03em; margin-bottom:8px;
-}
-.reim-zeile1{
-  font-size:clamp(17px,3vw,26px); font-weight:1000; color:var(--text);
-  margin-bottom:6px; line-height:1.4;
-}
-.reim-zeile2{
-  font-size:clamp(17px,3vw,26px); font-weight:1000; color:var(--akzent);
-  line-height:1.4;
-}
-.reim-luecke{
-  display:inline-block; min-width:120px; border-bottom:3px solid var(--akzent);
-  color:rgba(232,93,4,.35); font-style:italic;
-}
-
-/* Vorlesen-Button */
-.play-btn{
-  display:inline-flex; align-items:center; gap:8px;
-  padding:8px 18px; border-radius:999px;
-  border:2px solid rgba(232,93,4,.30); background:var(--akzent-bg);
-  color:var(--akzent); font-size:14px; font-weight:1000;
-  cursor:pointer; user-select:none; position:relative; margin-top:12px;
-}
-.play-btn:hover{ background:rgba(232,93,4,.18); }
-
-/* Aufgaben-Hinweis */
-.reim-hinweis{
-  font-size:15px; font-weight:900; color:var(--muted); text-align:center;
-  max-width:700px; width:100%;
-}
-
-/* ── R3: Ja/Nein ── */
-.janein-woerter{
-  display:flex; align-items:center; justify-content:center;
-  gap:20px; font-size:clamp(28px,5vw,52px); font-weight:1000;
-  color:var(--text); max-width:700px; width:100%;
-}
-.janein-trenner{ font-size:clamp(20px,3vw,32px); color:var(--muted); font-weight:400; }
-
-/* ── Antwort-Buttons (R1/R2/R4) ── */
-.antwort-grid{
-  display:grid; grid-template-columns:repeat(2,1fr);
-  gap:12px; max-width:700px; width:100%;
-}
-.antwort-btn{
-  display:flex; align-items:center; justify-content:center;
-  min-height:80px; border-radius:18px;
-  border:2px solid rgba(232,93,4,.25); background:var(--akzent-bg);
-  color:var(--akzent); font-size:clamp(16px,2.5vw,22px); font-weight:1000;
-  cursor:pointer; user-select:none; position:relative;
-  text-align:center; padding:12px; transition:none;
+.lese-frage{
+  font-size:22px; font-weight:1000; color:var(--text);
   line-height:1.3;
 }
-.antwort-btn:hover{ background:rgba(232,93,4,.18); }
-.antwort-btn.dwell-active{ transform:scale(1.05) !important; outline:3px solid var(--akzent); transition:none !important; }
-.antwort-btn.is-disabled{ pointer-events:none; opacity:0.35; }
+.lese-satz{
+  margin-top:10px;
+  font-size:24px; font-weight:800;
+  color:var(--akzent2);
+  background:var(--akzent-bg);
+  border:2px solid var(--akzent);
+  border-radius:10px; padding:12px 16px;
+  line-height:1.4;
+}
+.lese-luecke{
+  display:inline-block; min-width:100px; border-bottom:3px solid var(--akzent);
+  color:rgba(232,93,4,.4); font-style:italic;
+}
+.lese-woerter{
+  margin-top:10px; display:flex; align-items:center; justify-content:center;
+  gap:16px; font-size:clamp(26px,4.5vw,44px); font-weight:1000; color:var(--text);
+}
+.lese-trenner{ font-size:clamp(18px,3vw,28px); color:var(--muted); font-weight:400; }
 
-/* ── Ja/Nein-Buttons (R3) ── */
-.janein-grid{
-  display:grid; grid-template-columns:1fr 1fr;
-  gap:14px; max-width:700px; width:100%;
+/* ── TRENNSTREIFEN ───────────────────────────────────────────────── */
+.trenn-streifen{
+  background:var(--trenn-bg);
+  border-left:2px solid var(--trenn-border);
+  border-right:2px solid var(--trenn-border);
+  padding:6px 18px;
+  display:flex; align-items:center; gap:6px;
+  flex-shrink:0;
+  pointer-events:none;
 }
-.janein-btn{
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:6px; min-height:100px; border-radius:18px;
-  border:2px solid var(--border); background:var(--panel);
-  font-size:clamp(18px,3vw,28px); font-weight:1000;
-  cursor:pointer; user-select:none; position:relative; transition:none;
+.trenn-label{
+  font-size:13px; font-weight:1000;
+  color:#9a3412; text-transform:uppercase; letter-spacing:.05em;
 }
-.janein-btn.ja{ border-color:rgba(22,163,74,.35); color:var(--ja); background:rgba(22,163,74,.07); }
-.janein-btn.nein{ border-color:rgba(220,38,38,.35); color:var(--nein); background:rgba(220,38,38,.07); }
-.janein-btn:hover.ja{ background:rgba(22,163,74,.15); }
-.janein-btn:hover.nein{ background:rgba(220,38,38,.15); }
-.janein-btn.dwell-active{ transform:scale(1.05) !important; outline:3px solid currentColor; transition:none !important; }
-.janein-btn.is-disabled{ pointer-events:none; opacity:0.35; }
-.janein-emoji{ font-size:34px; }
 
-/* ── Feedback ── */
-@keyframes correctFlash{
-  0%  { background:rgba(22,163,74,.60); border-color:#16a34a; }
-  50% { background:rgba(22,163,74,.15); }
-  100%{ background:rgba(22,163,74,.60); border-color:#16a34a; }
+/* ── AKTIONSBEREICH (dwell-aktiv) ───────────────────────────────── */
+.aktions-bereich{
+  background:var(--panel);
+  border:2px solid var(--trenn-border);
+  border-top:none;
+  border-radius:0 0 var(--radius) var(--radius);
+  padding:12px 14px;
+  display:flex; flex-direction:column; gap:10px;
+  flex-shrink:0;
 }
-.correct-flash{ animation:correctFlash .45s ease forwards !important; }
-.falsch-gewaehlt{ background:rgba(220,38,38,.25) !important; border-color:#dc2626 !important; }
 
-.infoLine{
-  display:none; max-width:700px; width:100%;
-  padding:12px 18px; border-radius:14px;
-  font-size:15px; font-weight:900; text-align:center;
+/* ── Feedback ────────────────────────────────────────────────────── */
+.feedback-zeile{
+  padding:12px 16px; border-radius:12px;
+  font-size:19px; font-weight:800; display:none;
+  border:2px solid transparent; flex-shrink:0; line-height:1.4;
+  margin-top:8px;
+  pointer-events:none;
 }
-.infoLine.richtig{ display:block; background:rgba(22,163,74,.15); border:1px solid rgba(22,163,74,.40); color:#166534; }
-.infoLine.falsch { display:block; background:rgba(220,38,38,.12); border:1px solid rgba(220,38,38,.35); color:#991b1b; }
+.feedback-richtig{ display:block; background:#dcfce7; border-color:var(--gruen); color:#166534; }
+.feedback-falsch{ display:block; background:#fee2e2; border-color:var(--rot); color:#991b1b; }
 
-/* ── R4: Reim-Vorschau nach Auswahl ── */
-.reim-vorschau{
-  display:none; max-width:700px; width:100%;
-  padding:14px 20px; border-radius:14px;
-  background:rgba(232,93,4,.08); border:2px solid rgba(232,93,4,.25);
-  text-align:center; font-size:clamp(16px,2.5vw,22px); font-weight:1000;
-  color:var(--text); line-height:1.5;
+/* ── Antwort-Buttons Zweier (Ja/Nein) ───────────────────────────── */
+.antwort-zweier{ display:flex; gap:10px; }
+.antwort-btn{
+  flex:1; min-height:96px;
+  border-radius:var(--radius); border:2px solid var(--akzent);
+  background:var(--akzent-bg); color:var(--akzent2);
+  font-size:22px; font-weight:1000;
+  cursor:pointer; user-select:none;
+  position:relative; display:flex;
+  align-items:center; justify-content:center;
+  transition:none; text-align:center; padding:10px; line-height:1.3;
 }
-.reim-vorschau.sichtbar{ display:block; }
+.antwort-btn:hover:not(:disabled){ background:rgba(232,93,4,.18); outline:3px solid var(--akzent); }
+.antwort-btn.dwell-active{ transform:scale(1.03) !important; outline:3px solid var(--akzent) !important; transition:none !important; }
+.antwort-btn:disabled{ opacity:.5; cursor:default; }
+.antwort-ja{ background:#dcfce7; border-color:var(--gruen); color:#166534; }
+.antwort-ja:hover:not(:disabled){ background:#bbf7d0; outline:3px solid var(--gruen); }
+.antwort-nein{ background:#fee2e2; border-color:var(--rot); color:#991b1b; }
+.antwort-nein:hover:not(:disabled){ background:#fecaca; outline:3px solid var(--rot); }
 
-/* ── Abschluss ── */
-.abschluss-screen{
-  display:none; flex-direction:column; align-items:center; justify-content:center;
-  gap:16px; padding:24px; text-align:center; width:100%;
-}
-.abschluss-screen.sichtbar{ display:flex; }
-.abschluss-emoji{ font-size:64px; }
-.abschluss-titel{ font-size:clamp(22px,4vw,34px); font-weight:1000; color:var(--akzent); }
-.abschluss-score{
-  font-size:40px; font-weight:1000; color:var(--akzent);
-  background:var(--akzent-bg); border:2px solid rgba(232,93,4,.25);
-  border-radius:16px; padding:10px 28px;
-}
-.abschluss-sub{ font-size:15px; font-weight:900; color:var(--muted); }
-.abschluss-btn{
-  display:flex; align-items:center; justify-content:center;
-  min-height:60px; min-width:220px; border-radius:16px;
-  border:2px solid var(--akzent); background:var(--akzent); color:#fff;
-  font-size:17px; font-weight:1000; cursor:pointer; user-select:none;
-  position:relative; text-decoration:none;
-}
-.abschluss-btn:hover{ background:var(--akzent2); }
+/* ── Antwort-Buttons Vierer (A/B/C/D) ───────────────────────────── */
+.antwort-vierer{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.antwort-vierer .antwort-btn{ min-height:80px; font-size:20px; }
 
-/* ── Dwell-Ring ── */
+/* ── Erklär-Screen ───────────────────────────────────────────────── */
+.erklaer-card{
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  background:var(--panel); border:2px solid var(--akzent);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:24px 20px; gap:16px; text-align:center;
+}
+.erklaer-emoji{ font-size:64px; }
+.erklaer-titel{ font-size:26px; font-weight:1000; color:var(--akzent); }
+.erklaer-autor{ font-size:15px; font-weight:800; color:var(--muted); }
+.erklaer-merksatz{
+  font-size:22px; font-weight:1000;
+  background:var(--akzent-bg); border:2px solid var(--akzent);
+  border-radius:12px; padding:14px 22px;
+  color:var(--akzent2); line-height:1.4;
+}
+
+/* ── Fertig-Screen ───────────────────────────────────────────────── */
+.fertig-screen{
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:14px; padding:24px; text-align:center;
+}
+.fertig-stern{ font-size:72px; }
+.fertig-stern.gold{ filter:drop-shadow(0 0 14px #fbbf24); }
+.fertig-titel{ font-size:28px; font-weight:1000; color:var(--akzent); }
+.fertig-punkte{ font-size:34px; font-weight:1000; color:var(--akzent2); }
+.fertig-btn{
+  min-height:76px; min-width:240px;
+  border-radius:var(--radius); border:2px solid var(--akzent);
+  background:var(--akzent-bg); color:var(--akzent2);
+  font-size:20px; font-weight:1000;
+  cursor:pointer; user-select:none;
+  position:relative; display:flex;
+  align-items:center; justify-content:center;
+  gap:8px; transition:none;
+}
+.fertig-btn:hover{ background:rgba(232,93,4,.18); outline:3px solid var(--akzent); }
+.fertig-btn.dwell-active{ transform:scale(1.02) !important; outline:3px solid var(--akzent) !important; transition:none !important; }
+.fertig-btn.vorlesen{ border-color:var(--lila); background:var(--lila-bg); color:#4c1d95; }
+.fertig-btn.vorlesen:hover{ background:#ddd6fe; outline:3px solid var(--lila); }
+.fertig-btn.vorlesen.dwell-active{ outline:3px solid var(--lila) !important; }
+
+/* ── Nav-Leiste Goldstandard ─────────────────────────────────────── */
+.nav-leiste-unten{ display:flex; gap:8px; padding:8px 12px; flex-shrink:0; }
+.nav-btn{
+  flex:1; min-height:70px; border-radius:var(--radius);
+  font-size:17px; font-weight:1000;
+  cursor:pointer; user-select:none;
+  position:relative; display:flex;
+  align-items:center; justify-content:center;
+  gap:6px; transition:none; border:2px solid;
+  text-decoration:none;
+}
+a.nav-btn{ color:inherit; }
+.nav-btn-zurueck{ background:var(--lila-bg); border-color:var(--lila); color:#4c1d95; }
+.nav-btn-zurueck:hover{ background:#ddd6fe; outline:3px solid var(--lila); }
+.nav-btn-zurueck .dwell-ring-svg circle{ stroke:var(--lila); }
+.nav-btn-weiter{ background:var(--gruen-bg); border-color:var(--gruen); color:#166534; display:none; }
+.nav-btn-weiter.sichtbar{ display:flex; }
+.nav-btn-weiter:hover{ background:#bbf7d0; outline:3px solid var(--gruen); }
+.nav-btn-weiter .dwell-ring-svg circle{ stroke:var(--gruen); }
+.nav-btn-ueberspringen{ background:var(--orange-bg); border-color:var(--orange); color:#9a3412; }
+.nav-btn-ueberspringen:hover{ background:#ffedd5; outline:3px solid var(--orange); }
+.nav-btn-ueberspringen .dwell-ring-svg circle{ stroke:var(--orange); }
+.nav-btn.dwell-active{ transform:scale(1.02) !important; outline:3px solid currentColor !important; transition:none !important; }
+
+/* ── Dwell-Ring ─────────────────────────────────────────────────── */
 @keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
 .dwell-ring-svg{
   position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-  pointer-events:none; z-index:10; width:70px; height:70px;
+  pointer-events:none; z-index:10; width:60px; height:60px;
 }
 .dwell-ring-svg circle{
   fill:none; stroke:var(--akzent); stroke-width:5;
   stroke-dasharray:220; stroke-dashoffset:220;
   transform:rotate(-90deg); transform-origin:35px 35px;
 }
-.janein-btn .dwell-ring-svg circle.ja-circle{ stroke:var(--ja); }
-.janein-btn .dwell-ring-svg circle.nein-circle{ stroke:var(--nein); }
 .dwell-ring-svg circle.animating{ animation:dwellRing var(--dwell-duration,.9s) linear forwards; }
 </style>
 </head>
 <body>
 
-<div class="progress-bar-wrap">
-  <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+<div class="header">
+  <span class="header-emoji">🎵</span>
+  <span class="header-titel" id="headerTitel">Reimen</span>
+  <span class="header-sub" id="headerSub">Lade…</span>
 </div>
 
-<div class="topbar">
-  <div class="topbar-titel" id="topbarTitel">🎵 Reimen</div>
-  <div class="topbar-fortschritt" id="fortschrittText"></div>
+<div class="fortschritt-bar"><div class="fortschritt-fill" id="fortschritt" style="width:0%"></div></div>
+
+<div class="spielfeld" id="spielfeld">
+  <!-- wird von reim_spielen_mod.js befüllt -->
 </div>
 
-<div class="main" id="mainBereich">
-
-  <!-- ── R1/R2/R4: Reim-Karte + 4 Antwort-Buttons ── -->
-  <div id="screenAntwort" style="display:none;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:700px;">
-    <div class="reim-karte">
-      <div class="reim-wort"    id="reimWort"    style="display:none;"></div>
-      <div class="reim-zeile1"  id="reimZeile1"  style="display:none;"></div>
-      <div class="reim-zeile2"  id="reimZeile2"  style="display:none;"></div>
-      <button class="play-btn" id="btnPlay">
-        <svg class="dwell-ring-svg" viewBox="0 0 70 70" style="width:36px;height:36px;position:relative;top:0;left:0;transform:none;">
-          <circle cx="35" cy="35" r="30"/>
-        </svg>
-        &#128266; Nochmal hören
-      </button>
-    </div>
-    <div class="reim-hinweis" id="reimHinweis"></div>
-    <div class="reim-vorschau" id="reimVorschau"></div>
-    <div class="infoLine" id="infoLineAntwort"></div>
-    <div class="antwort-grid" id="antwortGrid">
-      <button class="antwort-btn" id="btnA" onclick="antworten('A')">
-        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
-        <span id="textA"></span>
-      </button>
-      <button class="antwort-btn" id="btnB" onclick="antworten('B')">
-        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
-        <span id="textB"></span>
-      </button>
-      <button class="antwort-btn" id="btnC" onclick="antworten('C')">
-        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
-        <span id="textC"></span>
-      </button>
-      <button class="antwort-btn" id="btnD" onclick="antworten('D')">
-        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
-        <span id="textD"></span>
-      </button>
-    </div>
-  </div>
-
-  <!-- ── R3: Ja/Nein-Screen ── -->
-  <div id="screenJaNein" style="display:none;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:700px;">
-    <div class="reim-karte">
-      <div class="janein-woerter">
-        <span id="jnWort1"></span>
-        <span class="janein-trenner">—</span>
-        <span id="jnWort2"></span>
-      </div>
-      <button class="play-btn" id="btnPlayJN">
-        <svg class="dwell-ring-svg" viewBox="0 0 70 70" style="width:36px;height:36px;position:relative;top:0;left:0;transform:none;">
-          <circle cx="35" cy="35" r="30"/>
-        </svg>
-        &#128266; Nochmal hören
-      </button>
-    </div>
-    <div class="reim-hinweis">Reimen sich diese zwei Worter?</div>
-    <div class="infoLine" id="infoLineJN"></div>
-    <div class="janein-grid">
-      <button class="janein-btn ja" id="btnJa" onclick="antwortenJN(true)">
-        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle class="ja-circle" cx="35" cy="35" r="30"/></svg>
-        <span class="janein-emoji">✅</span>
-        <span>Ja! Reim!</span>
-      </button>
-      <button class="janein-btn nein" id="btnNein" onclick="antwortenJN(false)">
-        <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle class="nein-circle" cx="35" cy="35" r="30"/></svg>
-        <span class="janein-emoji">❌</span>
-        <span>Nein!</span>
-      </button>
-    </div>
-  </div>
-
-</div>
-
-<!-- Zurueck-Button unten (immer sichtbar ausser im Abschluss) -->
-<div class="zurueck-leiste" id="zurueckLeiste">
-  <a class="zurueckBtn" href="./reim.html" id="btnZurueck">
-    <svg class="dwell-ring-svg" viewBox="0 0 70 70" style="width:50px;height:50px;">
-      <circle cx="35" cy="35" r="30" style="stroke:#8b5cf6;"/>
-    </svg>
-    ← Zurueck zu den Modi
-  </a>
-</div>
-
-<!-- ── Abschluss ── -->
-<div class="abschluss-screen" id="abschlussScreen">
-  <div class="abschluss-emoji" id="abschlussEmoji"></div>
-  <div class="abschluss-titel" id="abschlussTitel"></div>
-  <div class="abschluss-score" id="abschlussScore"></div>
-  <div class="abschluss-sub"   id="abschlussSub"></div>
-  <a class="abschluss-btn" href="./reim.html" id="btnAbschluss">
+<div class="nav-leiste-unten" id="navLeiste">
+  <a class="nav-btn nav-btn-zurueck" id="btnZurueck" href="./reim.html">
     <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
-    Zurueck zu den Modi
+    ← Zurück
   </a>
+  <button class="nav-btn nav-btn-weiter" id="weiterBtn">
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+    Weiter ✅
+  </button>
+  <button class="nav-btn nav-btn-ueberspringen" id="btnUeberspringen">
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+    → Überspringen
+  </button>
 </div>
 
 <script src="../../core/dwell.js"></script>
 <script src="../../core/error_handler.js"></script>
+<script src="../../core/stats.js"></script>
 <script src="./reim_data.js"></script>
+<script src="../gedichte/gedichte_data.js"></script>
 <script src="./reim_spielen_mod.js"></script>
+<script>
+var _params = new URLSearchParams(window.location.search);
+var _eid = _params.get("einheit") || "G-01";
+try{ localStorage.setItem("laetitia_return_url_v1", new URL("./reim.html", window.location.href).href); }catch(e){}
+if(speechSynthesis.getVoices().length > 0){ window.ReimMod.starteEinheit(_eid); }
+else { speechSynthesis.addEventListener("voiceschanged", function(){ window.ReimMod.starteEinheit(_eid); },{once:true}); setTimeout(function(){ window.ReimMod.starteEinheit(_eid); },800); }
+</script>
 </body>
 </html>

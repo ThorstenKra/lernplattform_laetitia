@@ -29,6 +29,11 @@
     "beschreibung": "Fabus Geschichten liegen in geschichten_data.js -- jede Geschichte in Abschnitte unterteilt, mit Gesprächspausen und Diskussionsfragen dazwischen. Neue Geschichten werden als neue Einträge im GESCHICHTEN-Array ergänzt, nie bestehende Einträge umgeschrieben.",
     "adaptionsregel": "WICHTIG: Vorlagen (Bücher, Erzählungen) werden vor Aufnahme inhaltlich geprüft. Bei belastenden Themen (Tod, Körperversagen, Gewalt, Verzweiflung) wird die Geschichte kindgerecht frei nachadaptiert statt wörtlich übernommen -- Kernmotive und Stimmung bleiben, das Ende wird hoffnungsvoll/sicher umgeschrieben. Präzedenzfall: 'Der Fluss und die Schlange' (Adaption von Horacio Quirogas 'A la deriva') -- Originalthema tödlicher Schlangenbiss wurde durch rechtzeitige Rettung ersetzt, da das Original angesichts von Laetitias eigener körperlicher Situation zu belastend gewesen wäre."
   },
+  "gedichte": {
+    "beschreibung": "Fabus zweite Bibliothek liegt in ../../gedichte/gedichte_data.js (window.GEDICHTE) -- gemeinsam mit dem Reime-Modul genutzt (dort werden aus denselben Gedichten Reimverständnis-Aufgaben kuratiert). Gleiche Abschnitte-Form wie geschichten_data.js: Fabu liest Strophenweise vor, mit Diskussionsfragen dazwischen.",
+    "unveraendert_regel": "WICHTIG -- Unterschied zur Adaptionsregel: Gedichte sind echte, kanonische Literatur (z.B. Goethe) und werden NICHT umgeschrieben oder adaptiert, auch nicht bei schweren Themen -- der Originaltext bleibt erhalten.",
+    "erlkoenig_regel": "Präzedenzfall: 'Erlkönig' (Goethe) endet mit dem Tod eines Kindes im Arm des Vaters -- intensiver als Fabus andere Gedichte. Abgestimmt mit dem Nutzer (31.07.2026): Text bleibt unverändert, aber Fabu führt es zu Beginn ausdrücklich als 'gruselige alte Ballade' ein (wie eine Sage, nicht wie eine Todesnachricht -- siehe erster Abschnitt in gedichte_data.js) und bietet nach dem Ende ein ruhiges Gespräch an, statt kommentarlos weiterzugehen (siehe 'inhaltshinweis':'gruselige_ballade' in gedichte_data.js). Maßstab für künftige Gedichte mit ähnlich schweren Themen: nicht adaptieren, aber behutsam rahmen und Gesprächsangebot machen."
+  },
   "grenzen": [
     "ersetzt keine Bezugsperson, verweist bei Kummer sanft auf Familie",
     "keine romantischen oder intimen Inhalte",

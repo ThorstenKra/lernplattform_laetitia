@@ -8,6 +8,11 @@
 // Laetitia bei einer Diskussionsfrage waehlt (siehe reagiereAufAntwort) -- faellt
 // bei Verbindungsproblemen ohne Fehleranzeige auf direktes Weitererzaehlen zurueck,
 // damit die Geschichte nie blockiert. Siehe persona.json fuer Charakter/Adaptionsregel.
+//
+// Seit 31.07.2026: zweite Bibliothek "Gedichte" (gedichte_data.js, gemeinsam mit
+// dem Reime-Modul genutzt). Gleiche "abschnitte"-Datenform wie GESCHICHTEN, daher
+// verallgemeinerte Player-Logik (aktInhalt/aktQuelle statt nur aktGeschichte) --
+// siehe persona.json Abschnitt "gedichte" fuer die Erlkoenig-Rahmungsregel.
 
 (function(){
 "use strict";
@@ -76,7 +81,7 @@ function rebindDwell(skipRecheck){
     : function(){ return { cancelDwell: function(){} }; };
   var dwellMs = parseInt(localStorage.getItem("laetitia_dwell_ms"))       || 900;
   var grace   = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
-  _dwell = attach(".vorschlag-btn, .nav-btn:not([style*='display:none']), #btnStarten, .geschichte-btn", {
+  _dwell = attach(".vorschlag-btn, .nav-btn:not([style*='display:none']), #btnStarten, #btnGedichte, .geschichte-btn", {
     dwellMs: dwellMs, leaveGrace: grace,
     skipHoverRecheck: !!skipRecheck,
     onActivate: function(el){
@@ -88,7 +93,7 @@ function rebindDwell(skipRecheck){
 
 // ── Screens ───────────────────────────────────────────────────────────────────
 function alleVerstecken(){
-  ["startScreen","geschichtenAuswahlScreen","gespraechContainer"].forEach(function(id){
+  ["startScreen","geschichtenAuswahlScreen","gedichteAuswahlScreen","gespraechContainer"].forEach(function(id){
     var el = $(id); if(el) el.style.display = "none";
   });
   var bB = $("btnBeenden"); if(bB) bB.style.display = "none";
@@ -102,39 +107,52 @@ function zeigeStart(){
   rebindDwell();
 }
 
-// ── Geschichten ────────────────────────────────────────────────────────────────
-var aktGeschichte   = null;
-var aktAbschnitt    = 0;
-var geschichteTimer = null;
+// ── Geschichten + Gedichte ───────────────────────────────────────────────────
+// aktInhalt: aktuell gespieltes Element aus GESCHICHTEN oder GEDICHTE (gleiche
+// "abschnitte"-Form). aktQuelle unterscheidet nur Label/Rueckkehr-Bildschirm.
+var aktInhalt        = null;
+var aktQuelle        = "geschichte"; // "geschichte" | "gedicht"
+var aktAbschnitt      = 0;
+var geschichteTimer   = null;
 
 function stoppeGeschichteTimer(){
   if(geschichteTimer){ clearTimeout(geschichteTimer); geschichteTimer = null; }
 }
 
-function zeigeGeschichtenAuswahl(){
-  zustand = "geschichten_auswahl"; alleVerstecken();
-  aktGeschichte = null; aktAbschnitt = 0;
-  var el = $("geschichtenAuswahlScreen"); if(el) el.style.display = "";
-  var liste = $("geschichtenListe");
+function baueListe(screenId, listeId, quelle, daten){
+  zustand = quelle === "gedicht" ? "gedichte_auswahl" : "geschichten_auswahl";
+  alleVerstecken();
+  aktInhalt = null; aktAbschnitt = 0;
+  var el = $(screenId); if(el) el.style.display = "";
+  var liste = $(listeId);
   if(liste){
     liste.innerHTML = "";
-    var geschichten = Array.isArray(window.GESCHICHTEN) ? window.GESCHICHTEN : [];
-    geschichten.forEach(function(g){
+    var eintraege = Array.isArray(daten) ? daten : [];
+    eintraege.forEach(function(g){
       var btn = document.createElement("button");
       btn.className = "geschichte-btn";
       btn.innerHTML = "<span class='geschichte-emoji' style='pointer-events:none'>" + (g.emoji || "📖") + "</span>"
         + "<span style='pointer-events:none'>" + g.titel + "</span>"
         + "<svg class='dwell-ring-svg' viewBox='0 0 70 70'>"
         + "<circle cx='35' cy='35' r='30' style='stroke:#d97706'/></svg>";
-      btn.addEventListener("click", function(){ starteGeschichte(g); });
+      btn.addEventListener("click", function(){ starteInhalt(g, quelle); });
       liste.appendChild(btn);
     });
   }
   rebindDwell();
 }
 
-function starteGeschichte(geschichte){
-  aktGeschichte = geschichte;
+function zeigeGeschichtenAuswahl(){
+  baueListe("geschichtenAuswahlScreen", "geschichtenListe", "geschichte", window.GESCHICHTEN);
+}
+
+function zeigeGedichteAuswahl(){
+  baueListe("gedichteAuswahlScreen", "gedichteListe", "gedicht", window.GEDICHTE);
+}
+
+function starteInhalt(inhalt, quelle){
+  aktInhalt = inhalt;
+  aktQuelle = quelle;
   aktAbschnitt = 0;
   verlauf = [];
   zeigeAbschnitt();
@@ -142,13 +160,16 @@ function starteGeschichte(geschichte){
 
 function zeigeAbschnitt(){
   stoppeGeschichteTimer();
-  var abschnitt = aktGeschichte ? aktGeschichte.abschnitte[aktAbschnitt] : null;
-  if(!abschnitt){ zeigeGeschichtenAuswahl(); return; }
+  var abschnitt = aktInhalt ? aktInhalt.abschnitte[aktAbschnitt] : null;
+  if(!abschnitt){ zeigeAuswahlFuerQuelle(); return; }
 
-  zustand = "geschichte"; alleVerstecken();
+  zustand = "inhalt"; alleVerstecken();
   var gc = $("gespraechContainer"); if(gc) gc.style.display = "";
   var bB = $("btnBeenden");         if(bB) bB.style.display = "";
   setzeStimmung(!!abschnitt.ende);
+
+  var label = $("fabuLabel");
+  if(label) label.textContent = aktQuelle === "gedicht" ? "Fabu liest vor:" : "Fabu erzählt:";
 
   var text = abschnitt.text + (abschnitt.frage ? (" " + abschnitt.frage) : "");
   var fabuEl = $("fabuAntwort"); if(fabuEl) fabuEl.textContent = text;
@@ -176,10 +197,15 @@ function zeigeAbschnitt(){
   rebindDwell(true);
 }
 
+function zeigeAuswahlFuerQuelle(){
+  if(aktQuelle === "gedicht") zeigeGedichteAuswahl();
+  else zeigeGeschichtenAuswahl();
+}
+
 function weiterInGeschichte(){
   stoppeGeschichteTimer();
-  var abschnitt = aktGeschichte ? aktGeschichte.abschnitte[aktAbschnitt] : null;
-  if(!abschnitt || abschnitt.ende){ speichereGespraech(); zeigeGeschichtenAuswahl(); return; }
+  var abschnitt = aktInhalt ? aktInhalt.abschnitte[aktAbschnitt] : null;
+  if(!abschnitt || abschnitt.ende){ speichereGespraech(); zeigeAuswahlFuerQuelle(); return; }
   aktAbschnitt++;
   zeigeAbschnitt();
 }
@@ -207,7 +233,10 @@ function reagiereAufAntwort(abschnitt, gewaehlterText){
   var fabuEl = $("fabuAntwort");
   if(fabuEl) fabuEl.textContent = "🦊 …";
 
-  var kontext = "Ihr lest gerade gemeinsam die Geschichte \"" + (aktGeschichte ? aktGeschichte.titel : "") + "\". "
+  var kontextEinleitung = aktQuelle === "gedicht"
+    ? "Ihr lest gerade gemeinsam das Gedicht \""
+    : "Ihr lest gerade gemeinsam die Geschichte \"";
+  var kontext = kontextEinleitung + (aktInhalt ? aktInhalt.titel : "") + "\". "
     + "Fabu hat gerade erzaehlt: \"" + abschnitt.text + "\" und dann gefragt: \"" + abschnitt.frage + "\". "
     + "Antworte NUR mit einer ganz kurzen persoenlichen Reaktion auf ihre Antwort (1 Satz, maximal 2). "
     + "Erzaehle die Geschichte NICHT selbst weiter und stelle KEINE neue Frage -- die Fortsetzung der "
@@ -236,13 +265,13 @@ function beendeGeschichte(){
   speechSynthesis.cancel();
   stoppeGeschichteTimer();
   speichereGespraech();
-  zeigeGeschichtenAuswahl();
+  zeigeAuswahlFuerQuelle();
 }
 
 // ── Navigation ─────────────────────────────────────────────────────────────────
 function zurueck(){
-  if(zustand === "geschichte"){ beendeGeschichte(); return; }
-  if(zustand === "geschichten_auswahl"){ zeigeStart(); return; }
+  if(zustand === "inhalt"){ beendeGeschichte(); return; }
+  if(zustand === "geschichten_auswahl" || zustand === "gedichte_auswahl"){ zeigeStart(); return; }
   try{
     window.location.href = new URL("../ki_agenten.html", window.location.href).href;
   }catch(e){ history.back(); }
@@ -252,6 +281,9 @@ function zurueck(){
 function init(){
   var bS = $("btnStarten");
   if(bS) bS.addEventListener("click", zeigeGeschichtenAuswahl);
+
+  var bG = $("btnGedichte");
+  if(bG) bG.addEventListener("click", zeigeGedichteAuswahl);
 
   var bZ = $("btnZurueck");
   if(bZ) bZ.addEventListener("click", zurueck);
