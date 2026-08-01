@@ -232,18 +232,8 @@
     profi:           ["M1","M2"],
     champion:        ["M3","M4"]
   };
-  var KAT_TITEL = {
-    grundlagen:      "🌱 Grundlagen",
-    fortgeschritten: "🌿 Fortgeschritten",
-    profi:           "🌳 Profi",
-    champion:        "🏆 Champion"
-  };
   var matheKat = new URLSearchParams(window.location.search).get("kat");
   var gefilterteReihenfolge = MATHE_KATEGORIEN[matheKat] || VOLLE_LEVEL_REIHENFOLGE;
-  if(matheKat && KAT_TITEL[matheKat]){
-    var subEl = document.getElementById("moduleSub");
-    if(subEl) subEl.textContent = KAT_TITEL[matheKat] + " — Wähle eine Lektion";
-  }
 
   var mod = kit.createFourChoiceModule({
     moduleId:   "mathe",
