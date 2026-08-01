@@ -99,7 +99,57 @@ function sammleGrammatikKontext(){
   return teile;
 }
 
-// Mathe/Lesen tracken noch keine eigenen Merksaetze -- solange nur die reine
+// Mathe-Erklaerung zu einer Aufgaben-ID nachschlagen (aus mathe_data.js/mathe_m0_data.js),
+// damit Milo bei einer schwachen Aufgabe weiss WORUM es inhaltlich geht,
+// nicht nur DASS sie oft falsch beantwortet wird. Aufgaben-ID-Format identisch
+// zu moduleKit.js taskId(): stufe|seite|text|frage.
+var _matheErklaerungMap = null;
+function matheErklaerungMap(){
+  if(_matheErklaerungMap) return _matheErklaerungMap;
+  _matheErklaerungMap = {};
+  var api = window.LaetitiaDataRegistryApi;
+  var tasks = api ? api.get("mathe") : null;
+  if(Array.isArray(tasks)){
+    tasks.forEach(function(t){
+      if(!t.erklaerung) return;
+      var id = String(t.stufe || "").trim().toUpperCase()
+        + "|" + String(t.seite != null ? t.seite : "").trim()
+        + "|" + String(t.text || "").trim()
+        + "|" + String(t.frage || "").trim();
+      _matheErklaerungMap[id] = t.erklaerung;
+    });
+  }
+  return _matheErklaerungMap;
+}
+
+function findeMatheErklaerung(taskId){
+  return matheErklaerungMap()[String(taskId)] || null;
+}
+
+function sammleMatheKontext(){
+  var schwach = window.LaetitiaStats.schwacheAufgaben("mathe").slice(0, 5);
+  var level   = window.LaetitiaStats.levelEmpfehlungen("mathe");
+  var muster  = window.LaetitiaStats.musterWarnung("mathe", 10);
+  var teile = [];
+  if(schwach.length){
+    teile.push("Mathe -- Aufgaben mit haeufigen Fehlern: " + schwach.map(function(s){
+      var erkl = findeMatheErklaerung(s.id);
+      return s.id + " (" + s.fehlerRate + "% falsch bei " + s.gesamt + " Versuchen)"
+        + (erkl ? " -- Erklaerung dazu: \"" + erkl + "\"" : "");
+    }).join("; "));
+  }
+  if(level.length){
+    teile.push("Mathe -- Stufen, die schon mehrfach fehlerfrei geschafft wurden: " + level.map(function(l){
+      return l.stufe + " (" + l.allesRichtig + "x fehlerfrei)";
+    }).join(", "));
+  }
+  if(muster){
+    teile.push("Mathe -- Hinweis: " + muster.warnung + " (evtl. eher geraten als ueberlegt)");
+  }
+  return teile;
+}
+
+// Lesen trackt noch keine eigenen Erklaerungen -- solange nur die reine
 // Fehlerquote zeigen, sobald genug Sessions gesammelt wurden.
 function sammleFachKontext(modul, anzeigeName){
   var schwach = window.LaetitiaStats.schwacheAufgaben(modul).slice(0, 3);
@@ -114,7 +164,7 @@ function sammleLernkontext(){
   try{
     var teile = [];
     teile = teile.concat(sammleGrammatikKontext());
-    teile = teile.concat(sammleFachKontext("mathe", "Mathe"));
+    teile = teile.concat(sammleMatheKontext());
     teile = teile.concat(sammleFachKontext("lesen", "Lesen"));
     if(!teile.length) return null;
     return teile.join("\n");
