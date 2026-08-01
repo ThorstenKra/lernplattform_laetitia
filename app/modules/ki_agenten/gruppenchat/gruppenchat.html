@@ -1,0 +1,231 @@
+<!doctype html>
+<!-- depth:3 — Pfade: ../../../core/ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia – Gruppenchat</title>
+<style>
+:root{
+  --lila:#8b5cf6; --lila-bg:#ede9fe; --lila-dark:#4c1d95;
+  --rot:#ef4444;  --rot-bg:#fee2e2;
+  --grau-rand:#cbd5e1; --text:#0f172a;
+  --sprecher-farbe:#8b5cf6; --sprecher-bg:#ede9fe;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:#faf9ff; height:100vh; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+#kopfLeiste{
+  flex-shrink:0; padding:10px 14px;
+  background:#fff; border-bottom:2px solid var(--grau-rand);
+  display:flex; align-items:center;
+}
+#kopfTitel{ font-size:20px; font-weight:1000; color:var(--lila-dark); }
+#hauptBereich{
+  flex:1; min-height:0; overflow:hidden;
+  display:flex; flex-direction:column;
+  padding:10px 12px; gap:8px;
+}
+.status-screen{
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:14px; text-align:center;
+}
+.status-emoji{ font-size:52px; }
+.status-text{ font-size:24px; font-weight:1000; color:var(--text); }
+.status-sub{ font-size:16px; color:#64748b; }
+#btnStarten{
+  min-height:84px; width:min(320px,90%);
+  border-radius:18px; border:3px solid var(--lila);
+  background:var(--lila-bg); color:var(--lila-dark);
+  font-size:22px; font-weight:1000; cursor:pointer; user-select:none;
+  position:relative; transition:none; font-family:inherit;
+}
+#btnStarten:hover,#btnStarten:focus{ background:#ddd6fe; outline:4px solid var(--lila); }
+#btnStarten.dwell-active{ transform:scale(1.02) !important; outline:3px solid var(--lila) !important; transition:none !important; }
+#gespraechContainer{
+  flex:1; min-height:0; display:flex; flex-direction:column; gap:8px;
+}
+#sprecherBadge{
+  flex-shrink:0; display:flex; align-items:center; justify-content:center; gap:10px;
+  padding:10px 14px; border-radius:14px; border:3px solid var(--sprecher-farbe);
+  background:var(--sprecher-bg); transition:none;
+}
+#sprecherEmoji{ font-size:34px; }
+#sprecherName{ font-size:20px; font-weight:1000; color:var(--sprecher-farbe); }
+#sprecherStimmung{ font-size:22px; }
+#chatAntwort{
+  flex:1; min-height:0; background:#fff; border:2px solid var(--grau-rand);
+  border-radius:14px; padding:14px 16px;
+  font-size:22px; font-weight:700; color:var(--text);
+  line-height:1.5; overflow-y:auto;
+  pointer-events:none; user-select:none;
+}
+#vorschlaegeGrid{
+  display:grid; grid-template-columns:1fr 1fr;
+  grid-template-rows:1fr 1fr; gap:8px;
+  flex-shrink:0; height:148px;
+}
+.vorschlag-btn{
+  border-radius:14px; border:2px solid var(--sprecher-farbe); background:var(--sprecher-bg);
+  display:flex; align-items:center; justify-content:center;
+  font-size:19px; font-weight:1000; color:var(--sprecher-farbe);
+  line-height:1.25; cursor:pointer; position:relative; transition:none;
+  font-family:inherit; text-align:center; padding:4px 10px; user-select:none;
+}
+.vorschlag-btn:hover,.vorschlag-btn:focus{ filter:brightness(0.95); outline:none; }
+.vorschlag-btn.dwell-active{ transform:scale(1.03) !important; outline:3px solid currentColor !important; transition:none !important; }
+#btnEigeneAntwort{
+  flex-shrink:0; min-height:56px; border-radius:14px;
+  border:2px solid var(--lila); background:var(--lila-bg); color:var(--lila-dark);
+  font-size:15px; font-weight:1000; cursor:pointer; position:relative; user-select:none;
+  transition:none; font-family:inherit;
+}
+#btnEigeneAntwort:hover,#btnEigeneAntwort:focus{ background:#ddd6fe; outline:none; }
+#btnEigeneAntwort.dwell-active{ transform:scale(1.02) !important; outline:3px solid var(--lila) !important; transition:none !important; }
+
+#tastaturOverlay{
+  position:fixed; inset:0; background:rgba(15,23,42,.92); z-index:100;
+  display:flex; flex-direction:column; padding:14px; gap:10px;
+}
+#tastaturAnzeige{
+  flex-shrink:0; min-height:60px; background:#fff; border-radius:14px;
+  padding:12px 16px; font-size:22px; font-weight:700; color:var(--text);
+  display:flex; align-items:center; overflow-wrap:anywhere;
+}
+#tastaturTasten{
+  flex:1; min-height:0; display:grid; gap:6px;
+  grid-template-columns:repeat(10,1fr); grid-auto-rows:1fr;
+}
+.tasten-btn{
+  border-radius:10px; border:2px solid var(--grau-rand); background:#fff;
+  color:var(--text); font-size:18px; font-weight:1000; cursor:pointer;
+  position:relative; transition:none; font-family:inherit;
+  display:flex; align-items:center; justify-content:center;
+}
+.tasten-btn:hover,.tasten-btn:focus{ background:var(--lila-bg); border-color:var(--lila); outline:none; }
+.tasten-btn.dwell-active{ transform:scale(1.05) !important; outline:3px solid var(--lila) !important; transition:none !important; }
+#tastaturAktionen{ flex-shrink:0; display:flex; gap:8px; height:64px; }
+#tastaturAktionen .tasten-btn{ flex:1; font-size:15px; }
+#btnTastaturFertig{ background:#dcfce7; border-color:#16a34a; color:#166534; }
+#btnTastaturLoeschen{ background:#fee2e2; border-color:#ef4444; color:#7f1d1d; }
+.nav-leiste{
+  flex-shrink:0; display:flex; gap:8px; padding:8px 12px;
+  background:#fff; border-top:2px solid var(--grau-rand);
+}
+.nav-btn{
+  flex:1; min-height:70px; border-radius:14px;
+  font-size:16px; font-weight:1000; cursor:pointer; position:relative;
+  display:flex; align-items:center; justify-content:center;
+  gap:6px; transition:none; border:2px solid;
+  text-decoration:none; font-family:inherit; background:none;
+}
+.nav-btn-zurueck{ background:var(--lila-bg); border-color:var(--lila); color:var(--lila-dark); }
+.nav-btn-zurueck:hover{ background:#ddd6fe; }
+.nav-btn-beenden{ background:var(--rot-bg); border-color:var(--rot); color:#7f1d1d; }
+.nav-btn-beenden:hover{ background:#fecaca; }
+.nav-btn.dwell-active{ transform:scale(1.02) !important; outline:3px solid currentColor !important; transition:none !important; }
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  pointer-events:none; z-index:10; width:48px; height:48px;
+}
+.dwell-ring-svg circle{
+  fill:none; stroke-width:4; stroke-dasharray:220; stroke-dashoffset:220;
+  transform:rotate(-90deg); transform-origin:35px 35px; opacity:0;
+}
+.dwell-ring-svg circle.animating{ opacity:1; animation:dwellRing var(--dwell-duration,.9s) linear forwards; }
+</style>
+</head>
+<body>
+
+<div id="kopfLeiste">
+  <div id="kopfTitel">🤝 Gruppenchat — Nova, Fabu &amp; Milo</div>
+</div>
+
+<div id="hauptBereich">
+
+  <div id="startScreen" class="status-screen">
+    <div class="status-emoji">✨🦊🦉</div>
+    <div class="status-text">Alle sind da</div>
+    <div class="status-sub">Ein Gespräch, drei Freunde — je nach Thema meldet sich Nova, Fabu oder Milo</div>
+    <button id="btnStarten">
+      Gespräch starten
+      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#8b5cf6"/></svg>
+    </button>
+  </div>
+
+  <div id="ladenScreen" class="status-screen" style="display:none">
+    <div class="status-emoji">⏳</div>
+    <div class="status-text" id="ladenText">Es wird nachgedacht…</div>
+  </div>
+
+  <div id="gespraechContainer" style="display:none">
+    <div id="sprecherBadge">
+      <span id="sprecherEmoji">✨</span>
+      <span id="sprecherName">Nova</span>
+      <span id="sprecherStimmung"></span>
+    </div>
+    <div id="chatAntwort"></div>
+    <div id="vorschlaegeGrid"></div>
+    <button id="btnEigeneAntwort" style="display:none">
+      ✏️ Ich möchte selbst antworten
+      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#8b5cf6"/></svg>
+    </button>
+  </div>
+
+  <div id="abschlussScreen" class="status-screen" style="display:none">
+    <div class="status-emoji">✅</div>
+    <div class="status-text">Gespräch beendet</div>
+    <div class="status-sub" id="abschlussInfo">Zusammenfassung wird gespeichert…</div>
+  </div>
+
+</div>
+
+<div class="nav-leiste">
+  <button class="nav-btn nav-btn-zurueck" id="btnZurueck">
+    ← Zurück
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#8b5cf6"/></svg>
+  </button>
+  <button class="nav-btn nav-btn-beenden" id="btnBeenden" style="display:none">
+    ✕ Gespräch beenden
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#ef4444"/></svg>
+  </button>
+</div>
+
+<div id="tastaturOverlay" style="display:none">
+  <div id="tastaturAnzeige"></div>
+  <div id="tastaturTasten"></div>
+  <div id="tastaturAktionen">
+    <button class="tasten-btn" id="btnTastaturLoeschen">⌫ Löschen</button>
+    <button class="tasten-btn" id="btnTastaturFertig">✓ Fertig</button>
+  </div>
+</div>
+
+<script src="../../../core/dwell.js"></script>
+<script src="../../../core/error_handler.js"></script>
+<script src="../../../core/stats.js"></script>
+<script src="../../../core/dataRegistry.js"></script>
+<script src="../../schule/grammatik_data.js"></script>
+<script src="../../mathe/data/mathe_data.js"></script>
+<script src="../../mathe/data/mathe_m0_data.js"></script>
+<script src="../../logik/data/logik_data.js"></script>
+<script src="../../logik/data/logik_data_L5.js"></script>
+<script src="../../logik/data/logik_data_L6_L9.js"></script>
+<script src="../../logik/data/logik_data_L10.js"></script>
+<script src="../../schule/schule_mathe_data.js"></script>
+<script src="../../deutsch/data/deutsch_data.js"></script>
+<script src="../../deutsch/data/deutsch_data_A3_alltag.js"></script>
+<script src="../../deutsch/data/deutsch_data_A2_alltag.js"></script>
+<script src="../../deutsch/data/deutsch_data_A1_alltag.js"></script>
+<script src="../../sachkunde/sinnesorgane/data/sinnesorgane_quiz_data.js"></script>
+<script src="../../reim/reim_data.js"></script>
+<script src="../lernfortschritt_gemeinsam.js"></script>
+<script src="./gruppenchat_mod.js"></script>
+<script>
+  window.GruppenchatMod && window.GruppenchatMod.init();
+</script>
+</body>
+</html>
