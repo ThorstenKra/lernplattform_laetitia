@@ -23,7 +23,8 @@
     L6: "Überlege, was zuerst da sein oder passieren muss, damit das andere danach überhaupt möglich wird.",
     L7: "Überlege: Was müsste vorher passiert sein, damit genau das entsteht, was in der Frage beschrieben wird?",
     L8: "Lies dir alle vier Sätze der Reihe nach durch — bei welchem passt etwas gar nicht zusammen?",
-    L9: "Schau dir beide Mengen genau an und zähle nach, bevor du dich entscheidest."
+    L9: "Schau dir beide Mengen genau an und zähle nach, bevor du dich entscheidest.",
+    L10: "Schau dir jede Zeile UND jede Spalte an — welche zwei Zeichen sind dort schon zu sehen? Das dritte fehlt noch."
   };
 
   function offlineTipp(t){
@@ -95,7 +96,7 @@
     icon:       "🧩",
     dataKey:    "logik",
 
-    levelOrder: ["L1","L2","L3","L4","L5","L6","L7","L8","L9"],
+    levelOrder: ["L1","L2","L3","L4","L5","L6","L7","L8","L9","L10"],
 
     levelLabel: function(lv){
       var namen = {
@@ -107,7 +108,8 @@
         L6: "L6 - Was zuerst, was zuletzt?",
         L7: "L7 - Ursache und Wirkung",
         L8: "L8 - Was stimmt nicht?",
-        L9: "L9 - Was ist mehr?"
+        L9: "L9 - Was ist mehr?",
+        L10: "L10 - Muster-Raster"
       };
       return namen[lv] || lv;
     },
