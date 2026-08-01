@@ -149,6 +149,59 @@ function sammleMatheKontext(){
   return teile;
 }
 
+// Schulheft-Erklaerung zu einer Aufgaben-ID nachschlagen (aus schule_mathe_data.js).
+// ACHTUNG: schule_mathe_mod.js ist NICHT moduleKit-basiert und nutzt ein eigenes
+// ID-Format: stufe|index|text (index = Position innerhalb der auf diese Stufe
+// gefilterten Aufgabenliste, in Original-Datenreihenfolge -- stabil, da die
+// Filterung nie neu gemischt wird). schule_mathe_data.js registriert je nach
+// Kontext ueber die Registry (falls dataRegistry.js geladen ist, wie hier in
+// milo.html) ODER als globale Variable window.LaetitiaSchuleMatheAufgaben
+// (Fallback, z.B. in schule_mathe.html selbst) -- beide Quellen abfragen.
+var _schuleMatheErklaerungMap = null;
+function schuleMatheErklaerungMap(){
+  if(_schuleMatheErklaerungMap) return _schuleMatheErklaerungMap;
+  _schuleMatheErklaerungMap = {};
+  var api = window.LaetitiaDataRegistryApi;
+  var alle = (api ? api.get("schule_mathe") : null) || window.LaetitiaSchuleMatheAufgaben || [];
+  var indexProStufe = {};
+  alle.forEach(function(t){
+    var stufe = String(t.stufe || "");
+    var idx = indexProStufe[stufe] || 0;
+    indexProStufe[stufe] = idx + 1;
+    if(!t.erklaerung) return;
+    var id = stufe + "|" + idx + "|" + (t.text || "");
+    _schuleMatheErklaerungMap[id] = t.erklaerung;
+  });
+  return _schuleMatheErklaerungMap;
+}
+
+function findeSchuleMatheErklaerung(taskId){
+  return schuleMatheErklaerungMap()[String(taskId)] || null;
+}
+
+function sammleSchuleMatheKontext(){
+  var schwach = window.LaetitiaStats.schwacheAufgaben("schule_mathe").slice(0, 5);
+  var level   = window.LaetitiaStats.levelEmpfehlungen("schule_mathe");
+  var muster  = window.LaetitiaStats.musterWarnung("schule_mathe", 10);
+  var teile = [];
+  if(schwach.length){
+    teile.push("Schulheft (Nase vorn! Rechnen bis 20) -- Aufgaben mit haeufigen Fehlern: " + schwach.map(function(s){
+      var erkl = findeSchuleMatheErklaerung(s.id);
+      return s.id + " (" + s.fehlerRate + "% falsch bei " + s.gesamt + " Versuchen)"
+        + (erkl ? " -- Erklaerung dazu: \"" + erkl + "\"" : "");
+    }).join("; "));
+  }
+  if(level.length){
+    teile.push("Schulheft -- Stufen, die schon mehrfach fehlerfrei geschafft wurden: " + level.map(function(l){
+      return l.stufe + " (" + l.allesRichtig + "x fehlerfrei)";
+    }).join(", "));
+  }
+  if(muster){
+    teile.push("Schulheft -- Hinweis: " + muster.warnung + " (evtl. eher geraten als ueberlegt)");
+  }
+  return teile;
+}
+
 // Logik-Erklaerung zu einer Aufgaben-ID nachschlagen (aus logik_data.js/logik_data_L5.js),
 // analog zu findeMatheErklaerung(). Aufgaben-ID-Format identisch zu moduleKit.js taskId().
 var _logikErklaerungMap = null;
@@ -214,6 +267,7 @@ function sammleLernkontext(){
     teile = teile.concat(sammleGrammatikKontext());
     teile = teile.concat(sammleMatheKontext());
     teile = teile.concat(sammleLogikKontext());
+    teile = teile.concat(sammleSchuleMatheKontext());
     teile = teile.concat(sammleFachKontext("lesen", "Lesen"));
     if(!teile.length) return null;
     return teile.join("\n");

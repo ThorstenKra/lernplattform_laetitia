@@ -37,7 +37,7 @@ function modulAusId(id){
 }
 
 function modulLabel(m){
-  return {deutsch:"📖 Deutsch", lesen:"🔊 Lesen", mathe:"🔢 Mathe", logik:"🧩 Logik"}[m] || m;
+  return {deutsch:"📖 Deutsch", lesen:"🔊 Lesen", mathe:"🔢 Mathe", logik:"🧩 Logik", schule_mathe:"📘 Schulheft"}[m] || m;
 }
 
 function msFormatieren(ms){
@@ -69,7 +69,7 @@ function berechneKPIs(sessions){
 }
 
 function berechneFortschrittProModul(sessions){
-  const module = ["deutsch","lesen","mathe","logik"];
+  const module = ["deutsch","lesen","mathe","logik","schule_mathe"];
   const result = [];
   for(const m of module){
     const ms = sessions.filter(s => s.modul === m);
@@ -215,7 +215,7 @@ function renderMuster(modul){
   if(!window.LaetitiaStats){ el.innerHTML = `<div class="empty">Stats nicht verfügbar.</div>`; return; }
 
   const module = modul === "alle"
-    ? ["deutsch","lesen","mathe","logik"]
+    ? ["deutsch","lesen","mathe","logik","schule_mathe"]
     : [modul];
 
   const warnungen = [];
