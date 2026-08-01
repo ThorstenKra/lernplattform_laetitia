@@ -64,7 +64,7 @@ function sprich(text, danach){
   }catch(e){ if(danach) danach(); }
 }
 
-// ── Lernkontext (LaetitiaStats -> Grammatik-Werkstatt, Mathe, Lesen) ──────────
+// ── Lernkontext (LaetitiaStats -> Grammatik-Werkstatt, Mathe, Logik, Lesen) ──
 
 // Grammatik-Merksatz zu einer Einheit nachschlagen (aus grammatik_data.js),
 // damit Milo bei einer schwachen Aufgabe weiss WORUM es inhaltlich geht,
@@ -149,6 +149,54 @@ function sammleMatheKontext(){
   return teile;
 }
 
+// Logik-Erklaerung zu einer Aufgaben-ID nachschlagen (aus logik_data.js/logik_data_L5.js),
+// analog zu findeMatheErklaerung(). Aufgaben-ID-Format identisch zu moduleKit.js taskId().
+var _logikErklaerungMap = null;
+function logikErklaerungMap(){
+  if(_logikErklaerungMap) return _logikErklaerungMap;
+  _logikErklaerungMap = {};
+  var api = window.LaetitiaDataRegistryApi;
+  var tasks = api ? api.get("logik") : null;
+  if(Array.isArray(tasks)){
+    tasks.forEach(function(t){
+      if(!t.erklaerung) return;
+      var id = String(t.stufe || "").trim().toUpperCase()
+        + "|" + String(t.seite != null ? t.seite : "").trim()
+        + "|" + String(t.text || "").trim()
+        + "|" + String(t.frage || "").trim();
+      _logikErklaerungMap[id] = t.erklaerung;
+    });
+  }
+  return _logikErklaerungMap;
+}
+
+function findeLogikErklaerung(taskId){
+  return logikErklaerungMap()[String(taskId)] || null;
+}
+
+function sammleLogikKontext(){
+  var schwach = window.LaetitiaStats.schwacheAufgaben("logik").slice(0, 5);
+  var level   = window.LaetitiaStats.levelEmpfehlungen("logik");
+  var muster  = window.LaetitiaStats.musterWarnung("logik", 10);
+  var teile = [];
+  if(schwach.length){
+    teile.push("Logik -- Aufgaben mit haeufigen Fehlern: " + schwach.map(function(s){
+      var erkl = findeLogikErklaerung(s.id);
+      return s.id + " (" + s.fehlerRate + "% falsch bei " + s.gesamt + " Versuchen)"
+        + (erkl ? " -- Erklaerung dazu: \"" + erkl + "\"" : "");
+    }).join("; "));
+  }
+  if(level.length){
+    teile.push("Logik -- Stufen, die schon mehrfach fehlerfrei geschafft wurden: " + level.map(function(l){
+      return l.stufe + " (" + l.allesRichtig + "x fehlerfrei)";
+    }).join(", "));
+  }
+  if(muster){
+    teile.push("Logik -- Hinweis: " + muster.warnung + " (evtl. eher geraten als ueberlegt)");
+  }
+  return teile;
+}
+
 // Lesen trackt noch keine eigenen Erklaerungen -- solange nur die reine
 // Fehlerquote zeigen, sobald genug Sessions gesammelt wurden.
 function sammleFachKontext(modul, anzeigeName){
@@ -165,6 +213,7 @@ function sammleLernkontext(){
     var teile = [];
     teile = teile.concat(sammleGrammatikKontext());
     teile = teile.concat(sammleMatheKontext());
+    teile = teile.concat(sammleLogikKontext());
     teile = teile.concat(sammleFachKontext("lesen", "Lesen"));
     if(!teile.length) return null;
     return teile.join("\n");
