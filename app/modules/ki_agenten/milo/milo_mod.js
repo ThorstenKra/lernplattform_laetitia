@@ -250,6 +250,154 @@ function sammleLogikKontext(){
   return teile;
 }
 
+// Deutsch-Erklaerung zu einer Aufgaben-ID nachschlagen (aus deutsch_data*.js),
+// analog zu findeMatheErklaerung(). Aufgaben-ID-Format identisch zu moduleKit.js
+// taskId() -- deutsch_mod.js ist nicht moduleKit-basiert, baut die ID aber
+// nach demselben Muster (stufe|seite|text|frage).
+var _deutschErklaerungMap = null;
+function deutschErklaerungMap(){
+  if(_deutschErklaerungMap) return _deutschErklaerungMap;
+  _deutschErklaerungMap = {};
+  var api = window.LaetitiaDataRegistryApi;
+  var tasks = api ? api.get("deutsch") : null;
+  if(Array.isArray(tasks)){
+    tasks.forEach(function(t){
+      if(!t.erklaerung) return;
+      var id = String(t.stufe || "").trim().toUpperCase()
+        + "|" + String(t.seite != null ? t.seite : "").trim()
+        + "|" + String(t.text || "").trim()
+        + "|" + String(t.frage || "").trim();
+      _deutschErklaerungMap[id] = t.erklaerung;
+    });
+  }
+  return _deutschErklaerungMap;
+}
+
+function findeDeutschErklaerung(taskId){
+  return deutschErklaerungMap()[String(taskId)] || null;
+}
+
+function sammleDeutschKontext(){
+  var schwach = window.LaetitiaStats.schwacheAufgaben("deutsch").slice(0, 5);
+  var level   = window.LaetitiaStats.levelEmpfehlungen("deutsch");
+  var muster  = window.LaetitiaStats.musterWarnung("deutsch", 10);
+  var teile = [];
+  if(schwach.length){
+    teile.push("Deutsch -- Aufgaben mit haeufigen Fehlern: " + schwach.map(function(s){
+      var erkl = findeDeutschErklaerung(s.id);
+      return s.id + " (" + s.fehlerRate + "% falsch bei " + s.gesamt + " Versuchen)"
+        + (erkl ? " -- Erklaerung dazu: \"" + erkl + "\"" : "");
+    }).join("; "));
+  }
+  if(level.length){
+    teile.push("Deutsch -- Stufen, die schon mehrfach fehlerfrei geschafft wurden: " + level.map(function(l){
+      return l.stufe + " (" + l.allesRichtig + "x fehlerfrei)";
+    }).join(", "));
+  }
+  if(muster){
+    teile.push("Deutsch -- Hinweis: " + muster.warnung + " (evtl. eher geraten als ueberlegt)");
+  }
+  return teile;
+}
+
+// Sinnesorgane-Erklaerung zu einer Aufgaben-ID nachschlagen (aus sinnesorgane_quiz_data.js),
+// analog zu findeLogikErklaerung(). Aufgaben-ID-Format identisch zu moduleKit.js taskId(),
+// da sinnesorgane_quiz_mod.js wie Mathe/Logik moduleKit.js nutzt.
+var _sinnesorganeErklaerungMap = null;
+function sinnesorganeErklaerungMap(){
+  if(_sinnesorganeErklaerungMap) return _sinnesorganeErklaerungMap;
+  _sinnesorganeErklaerungMap = {};
+  var api = window.LaetitiaDataRegistryApi;
+  var tasks = api ? api.get("sinnesorgane") : null;
+  if(Array.isArray(tasks)){
+    tasks.forEach(function(t){
+      if(!t.erklaerung) return;
+      var id = String(t.stufe || "").trim().toUpperCase()
+        + "|" + String(t.seite != null ? t.seite : "").trim()
+        + "|" + String(t.text || "").trim()
+        + "|" + String(t.frage || "").trim();
+      _sinnesorganeErklaerungMap[id] = t.erklaerung;
+    });
+  }
+  return _sinnesorganeErklaerungMap;
+}
+
+function findeSinnesorganeErklaerung(taskId){
+  return sinnesorganeErklaerungMap()[String(taskId)] || null;
+}
+
+function sammleSinnesorganeKontext(){
+  var schwach = window.LaetitiaStats.schwacheAufgaben("sinnesorgane").slice(0, 5);
+  var level   = window.LaetitiaStats.levelEmpfehlungen("sinnesorgane");
+  var muster  = window.LaetitiaStats.musterWarnung("sinnesorgane", 10);
+  var teile = [];
+  if(schwach.length){
+    teile.push("Sinnesorgane -- Aufgaben mit haeufigen Fehlern: " + schwach.map(function(s){
+      var erkl = findeSinnesorganeErklaerung(s.id);
+      return s.id + " (" + s.fehlerRate + "% falsch bei " + s.gesamt + " Versuchen)"
+        + (erkl ? " -- Erklaerung dazu: \"" + erkl + "\"" : "");
+    }).join("; "));
+  }
+  if(level.length){
+    teile.push("Sinnesorgane -- Stufen, die schon mehrfach fehlerfrei geschafft wurden: " + level.map(function(l){
+      return l.stufe + " (" + l.allesRichtig + "x fehlerfrei)";
+    }).join(", "));
+  }
+  if(muster){
+    teile.push("Sinnesorgane -- Hinweis: " + muster.warnung + " (evtl. eher geraten als ueberlegt)");
+  }
+  return teile;
+}
+
+// Reim-Erklaerung zu einer Aufgaben-ID nachschlagen (aus reim_data.js).
+// ACHTUNG: reim_spielen_mod.js ist NICHT moduleKit-basiert und nutzt ein
+// eigenes ID-Format: einheitId|index|(wort|zeile_bekannt|wort1-wort2) --
+// index = Position innerhalb aktEinheit.aufgaben (stabil, da reim_spielen_mod.js
+// die Liste nie mischt, nur sequenziell durchgeht). Daten liegen NICHT in der
+// Registry, sondern als globale Variable window.REIM_EINHEITEN.
+var _reimErklaerungMap = null;
+function reimErklaerungMap(){
+  if(_reimErklaerungMap) return _reimErklaerungMap;
+  _reimErklaerungMap = {};
+  var einheiten = window.REIM_EINHEITEN || [];
+  einheiten.forEach(function(einheit){
+    (einheit.aufgaben || []).forEach(function(a, idx){
+      if(!a.erklaerung) return;
+      var schluessel = a.wort || a.zeile_bekannt || (a.wort1 + "-" + a.wort2);
+      var id = einheit.id + "|" + idx + "|" + schluessel;
+      _reimErklaerungMap[id] = a.erklaerung;
+    });
+  });
+  return _reimErklaerungMap;
+}
+
+function findeReimErklaerung(taskId){
+  return reimErklaerungMap()[String(taskId)] || null;
+}
+
+function sammleReimKontext(){
+  var schwach = window.LaetitiaStats.schwacheAufgaben("reim").slice(0, 5);
+  var level   = window.LaetitiaStats.levelEmpfehlungen("reim");
+  var muster  = window.LaetitiaStats.musterWarnung("reim", 10);
+  var teile = [];
+  if(schwach.length){
+    teile.push("Reime-Werkstatt -- Aufgaben mit haeufigen Fehlern: " + schwach.map(function(s){
+      var erkl = findeReimErklaerung(s.id);
+      return s.id + " (" + s.fehlerRate + "% falsch bei " + s.gesamt + " Versuchen)"
+        + (erkl ? " -- Erklaerung dazu: \"" + erkl + "\"" : "");
+    }).join("; "));
+  }
+  if(level.length){
+    teile.push("Reime-Werkstatt -- Gedichte, die schon mehrfach fehlerfrei geschafft wurden: " + level.map(function(l){
+      return l.stufe + " (" + l.allesRichtig + "x fehlerfrei)";
+    }).join(", "));
+  }
+  if(muster){
+    teile.push("Reime-Werkstatt -- Hinweis: " + muster.warnung + " (evtl. eher geraten als ueberlegt)");
+  }
+  return teile;
+}
+
 // Lesen trackt noch keine eigenen Erklaerungen -- solange nur die reine
 // Fehlerquote zeigen, sobald genug Sessions gesammelt wurden.
 function sammleFachKontext(modul, anzeigeName){
@@ -268,6 +416,9 @@ function sammleLernkontext(){
     teile = teile.concat(sammleMatheKontext());
     teile = teile.concat(sammleLogikKontext());
     teile = teile.concat(sammleSchuleMatheKontext());
+    teile = teile.concat(sammleDeutschKontext());
+    teile = teile.concat(sammleSinnesorganeKontext());
+    teile = teile.concat(sammleReimKontext());
     teile = teile.concat(sammleFachKontext("lesen", "Lesen"));
     if(!teile.length) return null;
     return teile.join("\n");
