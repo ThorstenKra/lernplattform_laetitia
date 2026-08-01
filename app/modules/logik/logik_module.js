@@ -19,7 +19,11 @@
     L2: "Schau genau hin, wie sich die Zeichen von einem zum nächsten verändern. Wiederholt sich etwas?",
     L3: "Überlege zuerst, wie die beiden Dinge im ersten Beispiel zusammenhängen. Genau diese Beziehung brauchst du auch für das zweite Beispiel.",
     L4: "Lies den Satz noch einmal ganz genau durch. Stimmt wirklich jedes einzelne Wort?",
-    L5: "Überlege: Was passiert normalerweise, wenn genau das eintritt, was im Text beschrieben wird?"
+    L5: "Überlege: Was passiert normalerweise, wenn genau das eintritt, was im Text beschrieben wird?",
+    L6: "Überlege, was zuerst da sein oder passieren muss, damit das andere danach überhaupt möglich wird.",
+    L7: "Überlege: Was müsste vorher passiert sein, damit genau das entsteht, was in der Frage beschrieben wird?",
+    L8: "Lies dir alle vier Sätze der Reihe nach durch — bei welchem passt etwas gar nicht zusammen?",
+    L9: "Schau dir beide Mengen genau an und zähle nach, bevor du dich entscheidest."
   };
 
   function offlineTipp(t){
@@ -91,7 +95,7 @@
     icon:       "🧩",
     dataKey:    "logik",
 
-    levelOrder: ["L1","L2","L3","L4","L5"],
+    levelOrder: ["L1","L2","L3","L4","L5","L6","L7","L8","L9"],
 
     levelLabel: function(lv){
       var namen = {
@@ -99,7 +103,11 @@
         L2: "L2 - Was kommt als Nächstes?",
         L3: "L3 - Was ist ähnlich?",
         L4: "L4 - Richtig oder Falsch?",
-        L5: "L5 - Wenn ... dann ...?"
+        L5: "L5 - Wenn ... dann ...?",
+        L6: "L6 - Was zuerst, was zuletzt?",
+        L7: "L7 - Ursache und Wirkung",
+        L8: "L8 - Was stimmt nicht?",
+        L9: "L9 - Was ist mehr?"
       };
       return namen[lv] || lv;
     },
