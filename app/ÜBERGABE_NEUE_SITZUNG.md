@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 1. August 2026 (Sitzung 18 — abgeschlossen). Wichtigster offener Punkt für die nächste Sitzung: Fabu-Stimme (siehe Abschnitt „🔴 Fabu-Stimme" weiter unten) — Entscheidung des Nutzers steht noch aus. Diese Sitzung: ausstehenden Commit aus Sitzung 17 nachgeholt (Mathe `erklaerung`-Feld + Milo-Anbindung), danach Mathe-Modul-Ausbau Schritt 4 (4-Stufen-Navigation Grundlagen/Fortgeschritten/Profi/Champion) umgesetzt — damit ist das gesamte Mathe-Ausbau-Vorhaben (Schritte 1–4) abgeschlossen. Siehe Abschnitt „Mathe-Modul-Ausbau" und „Sitzungsprotokoll Sitzung 18" weiter unten. Live in Chrome getestet (Browser-Erweiterung war diese Sitzung verbunden), dabei zwei kleine Bugs gefunden und sofort behoben.*
+*Stand: 1. August 2026 (Sitzung 18 — abgeschlossen). Wichtigster offener Punkt für die nächste Sitzung: Fabu-Stimme (siehe Abschnitt „🔴 Fabu-Stimme" weiter unten) — Entscheidung des Nutzers steht noch aus. Umfangreiche Sitzung in zwei Teilen: (1) ausstehenden Commit aus Sitzung 17 nachgeholt, danach Mathe-Modul-Ausbau Schritt 4 (4-Stufen-Navigation) umgesetzt — Mathe-Ausbau-Vorhaben (Schritte 1–4) damit abgeschlossen; (2) auf Nutzerwunsch Logik-Modul analysiert, zwei Bugs behoben (Header, fehlende Statistik-Sichtbarkeit) und Milo-Anschluss Stufe A umgesetzt (offline Sokratischer Hinweis-Button + Milo-Chat-Kontext). Siehe Abschnitte „Mathe-Modul-Ausbau", „Logik-Modul: Analyse + Ausbau" und „Sitzungsprotokoll Sitzung 18" weiter unten. Live überwiegend in Chrome getestet (Browser-Erweiterung war diese Sitzung verbunden), dabei mehrere kleine Bugs gefunden und sofort behoben.*
 
 ---
 
@@ -202,6 +202,29 @@ Live in Chrome getestet (Browser-Erweiterung war diese Sitzung verbunden): alle 
 1. Rechenweg-Visuals für M1–M4 (aktuell nur bei M0/Zählen eine visuelle Neuerklärung bei Falsch-Antwort — größte didaktische Lücke, da Laetitia nicht selbst mit echten Rechenmaterialien hantieren kann).
 2. Fabu-Rechengeschichten (optional, größerer Aufwand — Matheaufgaben als Erzählungen, analog zur Gedichte-Integration).
 3. Sichtbarkeits-Entscheidung `schule_mathe` (eigener Tab in `statistik.html` + eigener Milo-Kontext) — bewusst zurückgestellt in Schritt 1.
+
+## Logik-Modul: Analyse + Ausbau — Stand 01.08.2026 (Sitzung 18)
+
+Nutzeranfrage: Logik-Modul analysieren, didaktische/optische Verbesserungsvorschläge machen, Mathe-Erkenntnisse wo übertragbar wiederverwenden, KI-Agent (Milo) einbeziehen.
+
+**Ist-Zustand:** 5 Stufen (L1 Was passt nicht?/L2 Muster/L3 Analogien/L4 Richtig-Falsch/L5 Wenn-Dann), 66 Aufgaben, alle bereits mit `erklaerung`-Feld (Mathe brauchte dafür noch einen eigenen Schritt), Lese-/Aktionsbereich-Trennung (Regel 17) schon korrekt. Die 4-Stufen-Navigation von Mathe wurde als **nicht übertragbar** bewertet — bei nur 5 Stufen wäre eine zusätzliche Kachel-Ebene unnötiger Klick-Overhead.
+
+**Zwei Bugs gefunden + behoben (commit `67979c5`):**
+1. `logik.html`/`logik_module.js` waren sichtbar 1:1 von `mathe.html` kopiert — statischer Platzhalter zeigte „🔢 Mathematik", `icon:"Logik"` (Text statt Emoji) baute den Laufzeit-Header als „Logik Logik". Auf `icon:"🧩"` korrigiert — gleiche Bugklasse wie zuvor bei Mathe.
+2. Logik wurde seit dem Mathe-Schritt-1-Stats-Fix bereits generisch getrackt, war aber in `statistik.html` komplett unsichtbar: zwei hartcodierte Modul-Listen in `statistik_mod.js` sowie Tab-Leiste und Label-Map fehlte der Eintrag. Logik erscheint jetzt als eigener Tab, live mit echter Test-Session verifiziert.
+
+**Milo-Anschluss Stufe A, offline (commits `9b6c054`, `cb75292`):** Zwei Teile umgesetzt, beide ohne Netzwerk-/Gemini-Abhängigkeit:
+1. **In-Modul-Hinweis:** Der „Hilfe"-Button zeigte bisher moduleKit.js' generisches Wort-Glossar-Overlay — für Logik ohne `opts.glossary` faktisch nutzlos (jedes Wort nur „Noch keine Erklärung hinterlegt", zudem strukturell unstyled, da `.overlayCard`/`.overlaySub`-Klassen in `logik.html` gar nicht definiert sind — vermutlich ein weiterer, bislang nicht behobener Alt-Bug, siehe „Bekannte Einschränkung" unten). Über `onHelp` ersetzt durch ein neues 🦉 „Milo denkt mit"-Overlay: fünf sokratische Hinweise (einer je Aufgabentyp L1–L5, formuliert als Denkanstoß statt Lösung), per Katja-TTS vorgelesen, zählt weiterhin als `markHilfe()`. Nutzt die bereits funktionierenden `overlayBox`/`overlayEmoji`/`overlayTitle`-Klassen aus dem bestehenden Abschluss-Overlay statt der unstyled Glossar-Klassen.
+2. **Milo-Chat-Kontext:** `milo_mod.js` kannte Logik in `sammleLernkontext()` bisher überhaupt nicht (nicht mal generisch, anders als Lesen). Neue `logikErklaerungMap()`/`findeLogikErklaerung()`/`sammleLogikKontext()` — 1:1-Struktur-Kopie von `sammleMatheKontext()`, aber ohne Generierungsschritt nötig, da Logik das `erklaerung`-Feld schon vollständig hatte. `milo.html` lädt dafür zusätzlich `logik_data.js` + `logik_data_L5.js`.
+
+Beide Teile live in Chrome getestet: Hinweis-Overlay erscheint korrekt je Stufe mit TTS, schließt sauber, beeinträchtigt das normale Aufgaben-Feedback nicht; Milo-Kontext per XHR-Interception verifiziert (simulierte schwache Logik-Aufgabe im Stats-LocalStorage → gesendeter `kontext`-String enthält korrekt Fehlerrate + Erklärungstext). Keine Konsolenfehler, `validate.ps1`: 0 Fehler nach jedem Commit, OneDrive durchgehend synchron.
+
+**Bekannte Einschränkung (nicht behoben, am Rande entdeckt):** Der generische Wort-Glossar-Hilfe-Overlay aus `moduleKit.js` (`ensureHelpOverlays()`) nutzt CSS-Klassen (`.overlayCard`, `.overlaySub`, `a.uibtn.secondary`), die weder in `mathe.html` noch in `logik.html` definiert sind — dort rendert er vermutlich unstyled. Betrifft nur Module ohne eigenen `onHelp`-Callback und ohne `opts.glossary` (aktuell nur noch Mathe, da Logik jetzt eigenen `onHelp` hat). Nicht untersucht, ob das in der Praxis auffällt (Mathe hat aktuell auch kaum sinnvolle Glossar-Wörter).
+
+**Weitere Vorschläge aus der Analyse (vom Nutzer noch nicht beauftragt):**
+- Content-Ausbau: mehr Stufen (L6 Reihenfolgen/Sortieren, L7 Ursache-Wirkung, L8 Widersprüche, L9 Mengenvergleiche) oder visuelle Matrizen-Aufgaben — reine Dateneingabe, kein Engine-Code nötig, da alle Typen den gleichen Frage+4-Antworten-Mechanismus nutzen.
+- L2-Muster-Aufgaben (Emoji-Sequenzen) könnten von mehr visuellem Abstand zwischen den Symbolen profitieren.
+- Milo-Integration Stufe B (online/dynamisch über Gemini, gleiches Fallback-Muster wie bei Fabus Live-Reaktionen) — deutlich mehr Aufwand als Stufe A, bewusst zurückgestellt.
 
 ## Quasselkiste / NuVoice-Emulation — Stand 31. Mai 2026
 
@@ -678,12 +701,15 @@ Dann Edge komplett neu starten.
 | Mathe-Modul-Ausbau Schritt 4: 4-Stufen-Navigation | ✅ Neue Kachel-Übersicht (Grundlagen/Fortgeschritten/Profi/Champion), `mathe_module.js` filtert `levelOrder` selbst über `?kat=` — `moduleKit.js` bleibt unangetastet, Rückweg nutzt vorhandenes `LaetitiaReturn`-System. Live in Chrome getestet, keine Konsolenfehler. Siehe eigener Abschnitt „Mathe-Modul-Ausbau" oben (commit `32ee5bf`) |
 | Bug: toter Kategorie-Untertitel | ✅ Von `showMenu()` immer überschrieben, nie sichtbar — als totes Code-Stück entfernt statt `moduleKit.js` anzufassen (commit `723edc2`) |
 | Bug: Menü-Header zeigte „Mathe Mathematik" | ✅ Vorbestehender, unabhängiger Bug (`icon:"Mathe"` statt Emoji) gefunden und behoben, live verifiziert (commit `f365eb6`) |
+| Logik-Modul analysiert + Verbesserungsvorschläge erarbeitet | ✅ Ist-Zustand, didaktische/optische Vorschläge, Übertragbarkeit der Mathe-Erkenntnisse geprüft (4-Stufen-Nav bewusst verworfen, zu wenige Stufen) — siehe eigener Abschnitt „Logik-Modul: Analyse + Ausbau" oben, keine Codeänderung in diesem Schritt |
+| Logik: Header-Bug + Statistik-Sichtbarkeit behoben | ✅ Gleiche Bugklasse wie bei Mathe („Logik Logik" statt „🧩 Logik"); Logik war trotz laufendem Stats-Tracking in `statistik.html` komplett unsichtbar (2 hartcodierte Modul-Listen + Tab fehlten). Live in Chrome verifiziert (commit `67979c5`) |
+| Logik: Milo-Anschluss Stufe A (offline) | ✅ Neuer 🦉 „Milo denkt mit"-Hinweis-Overlay am Hilfe-Button (5 sokratische Tipps je Aufgabentyp, ersetzt das vorher faktisch nutzlose Standard-Wort-Glossar) UND `sammleLogikKontext()` in `milo_mod.js` (Milo kannte Logik in Gesprächen bisher gar nicht). Beide Teile live getestet (Overlay in Chrome, Kontext per XHR-Interception) (commits `9b6c054`, `cb75292`) |
 
-**Commits (alle gepusht):** `1188c7f`, `32ee5bf`, `723edc2`, `f365eb6`
+**Commits (alle gepusht):** `1188c7f`, `32ee5bf`, `723edc2`, `f365eb6`, `67979c5`, `9b6c054`, `cb75292`
 
-**Sitzungsabschluss:** Alle vier Commits gepusht, nach jedem Schritt nach OneDrive deployed, `validate.ps1` durchgehend 0 Fehler. Git-Arbeitsverzeichnis sauber (bis auf diese Doku-Aktualisierung selbst).
+**Sitzungsabschluss:** Alle sieben Commits gepusht, nach jedem Schritt nach OneDrive deployed, `validate.ps1` durchgehend 0 Fehler. Git-Arbeitsverzeichnis sauber (bis auf diese Doku-Aktualisierung selbst). Browser-Tests liefen diese Sitzung größtenteils in Chrome (Erweiterung war verbunden, mit einigen bekannten Screenshot-/document_idle-Timeouts der Erweiterung selbst — kein App-Bug, siehe Muster aus früheren Sitzungen: neuer Tab statt Retry löst es zuverlässig).
 
-**Nächste konkrete Schritte für die Folgesitzung:** Mathe-Modul-Ausbau hat aktuell keine offene, vom Nutzer beauftragte Aufgabe mehr (weitere Ideen — Rechenweg-Visuals, Fabu-Rechengeschichten, schule_mathe-Sichtbarkeit — stehen unbeauftragt im Mathe-Abschnitt oben). Übrige offene Punkte unverändert: Fabu-Stimme-Entscheidung, Tobii-Gerätetest (Nova-Avatar), Telegram-Token, Pfad-Training-Modus-2-Bestätigung, Gruppengespräche-Implementierung, Grammatik Stufe 11+ (Thema noch offen).
+**Nächste konkrete Schritte für die Folgesitzung:** Weder Mathe- noch Logik-Modul-Ausbau haben aktuell eine offene, vom Nutzer beauftragte Aufgabe (weitere Ideen zu beiden stehen unbeauftragt in den jeweiligen Abschnitten oben, u.a. Milo-Logik-Stufe-B, Rechenweg-Visuals, Content-Ausbau Logik, unstyled-Glossar-Overlay-Fund). Übrige offene Punkte unverändert: Fabu-Stimme-Entscheidung, Tobii-Gerätetest (Nova-Avatar), Telegram-Token, Pfad-Training-Modus-2-Bestätigung, Gruppengespräche-Implementierung, Grammatik Stufe 11+ (Thema noch offen).
 
 ---
 
