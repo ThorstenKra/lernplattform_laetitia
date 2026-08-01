@@ -1,0 +1,113 @@
+<!doctype html>
+<!-- depth:2 — Pfade: ../../core/, ../../lernen.html -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laetitia - Mathematik</title>
+<style>
+:root{
+  --bg:#f6f7fb; --panel:#ffffff;
+  --border:rgba(15,23,42,.14); --shadow:0 6px 18px rgba(15,23,42,.07);
+  --text:#0f172a; --muted:rgba(15,23,42,.65);
+  --akzent:#2563eb; --akzent2:#1d4ed8;
+  --akzent-bg:rgba(37,99,235,0.08); --radius:16px;
+  --lila:#8b5cf6; --lila-bg:#ede9fe;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg); color:var(--text);
+  height:100vh; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+.header{
+  background:var(--panel); border-bottom:2px solid var(--akzent);
+  box-shadow:0 2px 8px rgba(15,23,42,.06); flex-shrink:0;
+  padding:10px 16px; display:flex; align-items:center; gap:10px;
+}
+.header-emoji{ font-size:28px; }
+.header-titel{ font-size:20px; font-weight:1000; color:var(--akzent); }
+.header-sub{ font-size:13px; font-weight:800; color:var(--muted); margin-left:auto; }
+
+.kategorien-bereich{
+  flex:1; min-height:0; padding:14px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:1fr 1fr;
+  gap:14px;
+}
+.kategorie-btn{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:10px; padding:14px;
+  background:var(--panel); border:3px solid var(--border);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  text-decoration:none; color:var(--text); font-weight:1000;
+  user-select:none; cursor:pointer; position:relative; transition:none;
+}
+.kategorie-btn.verfuegbar{ border-color:var(--akzent); background:var(--akzent-bg); }
+.kategorie-btn:hover{
+  transform:scale(1.02); outline:3px solid var(--akzent); background:var(--akzent-bg);
+}
+.kategorie-btn.dwell-active{
+  transform:scale(1.03) !important; outline:3px solid var(--akzent) !important;
+  background:var(--akzent-bg) !important; transition:none !important;
+}
+.kategorie-emoji{ font-size:clamp(36px,6vw,64px); }
+.kategorie-titel{ font-size:clamp(20px,3vw,30px); }
+.kategorie-sub{ font-size:clamp(12px,1.6vw,16px); color:var(--muted); font-weight:800; }
+
+.zurueck-leiste{ padding:8px 12px; flex-shrink:0; }
+a.zurueckBtn{
+  display:flex; align-items:center; justify-content:center;
+  min-height:72px; font-size:20px; font-weight:1000;
+  border-radius:16px; border:2px solid #8b5cf6;
+  background:#ede9fe; color:#4c1d95;
+  text-decoration:none; cursor:pointer; user-select:none;
+  position:relative; transition:none; width:100%;
+}
+a.zurueckBtn:hover{ background:#ddd6fe; outline:3px solid #8b5cf6; }
+a.zurueckBtn.dwell-active{ transform:scale(1.02) !important; outline:3px solid #8b5cf6 !important; }
+a.zurueckBtn .dwell-ring-svg circle{ stroke:#8b5cf6; }
+
+@keyframes dwellRing{ from{stroke-dashoffset:220} to{stroke-dashoffset:0} }
+.dwell-ring-svg{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  pointer-events:none; z-index:10; width:60px; height:60px;
+}
+.dwell-ring-svg circle{
+  fill:none; stroke:var(--akzent); stroke-width:5;
+  stroke-dasharray:220; stroke-dashoffset:220;
+  transform:rotate(-90deg); transform-origin:35px 35px;
+}
+a.zurueckBtn .dwell-ring-svg circle{ stroke:#8b5cf6; }
+.dwell-ring-svg circle.animating{ animation:dwellRing var(--dwell-duration,.9s) linear forwards; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="header-emoji">🔢</span>
+  <span class="header-titel">Mathematik</span>
+  <span class="header-sub">Schwierigkeitsstufe wählen</span>
+</div>
+
+<div class="kategorien-bereich" id="kategorienBereich">
+  <!-- wird per JS befüllt -->
+</div>
+
+<div class="zurueck-leiste">
+  <a class="zurueckBtn" href="../../lernen.html" id="btnZurueck">
+    <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>
+    ← Zurück
+  </a>
+</div>
+
+<script src="../../core/dwell.js"></script>
+<script src="../../core/error_handler.js"></script>
+<script src="./mathe_uebersicht_mod.js"></script>
+<script>
+window.MatheUebersicht.baueUebersicht();
+</script>
+</body>
+</html>

@@ -224,13 +224,34 @@
 
 
 
+  // ── 4-Stufen-Navigation: ?kat=<id> filtert die Level-Liste ──────────────────
+  var VOLLE_LEVEL_REIHENFOLGE = ["M0a","M0b","M0c","M0f","M0d","M0e","M1_NACHBAR","M1_REIHE","M1","M2","M3","M4"];
+  var MATHE_KATEGORIEN = {
+    grundlagen:      ["M0a","M0b","M0c","M0f"],
+    fortgeschritten: ["M0d","M0e","M1_NACHBAR","M1_REIHE"],
+    profi:           ["M1","M2"],
+    champion:        ["M3","M4"]
+  };
+  var KAT_TITEL = {
+    grundlagen:      "🌱 Grundlagen",
+    fortgeschritten: "🌿 Fortgeschritten",
+    profi:           "🌳 Profi",
+    champion:        "🏆 Champion"
+  };
+  var matheKat = new URLSearchParams(window.location.search).get("kat");
+  var gefilterteReihenfolge = MATHE_KATEGORIEN[matheKat] || VOLLE_LEVEL_REIHENFOLGE;
+  if(matheKat && KAT_TITEL[matheKat]){
+    var subEl = document.getElementById("moduleSub");
+    if(subEl) subEl.textContent = KAT_TITEL[matheKat] + " — Wähle eine Lektion";
+  }
+
   var mod = kit.createFourChoiceModule({
     moduleId:   "mathe",
     moduleName: "Mathematik",
     icon:       "Mathe",
     dataKey:    "mathe",
 
-    levelOrder: ["M0a","M0b","M0c","M0f","M0d","M0e","M1_NACHBAR","M1_REIHE","M1","M2","M3","M4"],
+    levelOrder: gefilterteReihenfolge,
 
     levelLabel: function(lv){
       var namen = {
