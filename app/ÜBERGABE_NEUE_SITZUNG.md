@@ -1,5 +1,5 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
-*Stand: 31. Juli 2026 (Sitzung 17 — abgeschlossen). Wichtigster offener Punkt für die nächste Sitzung: Fabu-Stimme (siehe Abschnitt „🔴 Fabu-Stimme" weiter unten) — Entscheidung des Nutzers steht noch aus. Umfangreiche Sitzung: Reime-Werkstatt komplett neu aufgesetzt (echte Goethe-Gedichte), danach Goldstandard-Audit bei Fabu+Milo (Auswahlfelder-Timing, Farbe, Zurück-Button lila) und neue Grammatik-Stufe 10 (Wessen-/Wem-Fall, 6 Lektionen) — siehe jeweilige Abschnitte weiter unten. Grammatik-Erweiterung wurde noch in dieser Sitzung live in Edge (Browser-Automatisierung) getestet und bestätigt; Reime/Fabu/Milo-Fixes wurden vom Nutzer selbst in Edge geprüft (Bugs dabei gefunden und behoben, siehe Protokoll).*
+*Stand: 1. August 2026 (Sitzung 18 — abgeschlossen). Wichtigster offener Punkt für die nächste Sitzung: Fabu-Stimme (siehe Abschnitt „🔴 Fabu-Stimme" weiter unten) — Entscheidung des Nutzers steht noch aus. Diese Sitzung: ausstehenden Commit aus Sitzung 17 nachgeholt (Mathe `erklaerung`-Feld + Milo-Anbindung), danach Mathe-Modul-Ausbau Schritt 4 (4-Stufen-Navigation Grundlagen/Fortgeschritten/Profi/Champion) umgesetzt — damit ist das gesamte Mathe-Ausbau-Vorhaben (Schritte 1–4) abgeschlossen. Siehe Abschnitt „Mathe-Modul-Ausbau" und „Sitzungsprotokoll Sitzung 18" weiter unten. Live in Chrome getestet (Browser-Erweiterung war diese Sitzung verbunden), dabei zwei kleine Bugs gefunden und sofort behoben.*
 
 ---
 
@@ -167,6 +167,41 @@ Nutzeranfrage: Im Geschichten-Modul (Fabu) sollen Auswahlfelder erst nach vollst
 **Geprüft, kein Bug:** `stats.js` ist bei Fabu/Nova eingebunden, aber es werden nie eigene `sessionStart`/`taskAnswer`-Aufrufe gemacht — das ist beabsichtigt, da beide Agenten keine bewertbaren Aufgaben haben. Das Skript wird nur als Abhängigkeit für `lernfortschritt_gemeinsam.js` gebraucht (liest fremde Stats, schreibt keine eigenen).
 
 Commits: `709b212` (Fabu-Fixes + Milo-Erweiterung inkl. Zurück-Button-Vereinheitlichung). `validate.ps1`: 0 Fehler, deployed. Vom Nutzer nicht explizit als „in Edge nachgetestet" bestätigt — nur strukturell/Konsolen-sauber verifiziert vor dem Commit.
+
+## Umlaut-Aussprache-Fix + neue Regel 19 (31.07.2026, Sitzung 17 Fortsetzung)
+
+Nutzeranfrage: Deutsche Umlaute (ä ö ü ß) sollen in Gedichten/Geschichten und systemweit korrekt ausgesprochen werden — sowohl für bestehende als auch künftige Texte.
+
+Systemweiter Audit (Explore-Agent) fand ASCII-Transliterationen (ae/oe/ue/ss statt echter Umlaute) in ~15 Dateien: `gedichte_data.js` (alle 5 Gedichte inkl. Erlkönig), `sinnesorgane_info_data.js` (`tts_organ`-Feld), `schule_liesmal3_data.js` (~45 Stellen, inkl. Bedeutungsfehler „Kueche" statt „Kühe"), `schule_liesmal3_buchstaben_data.js`, `mathe_data.js` (M1_REIHE, 20×), Nova- und Milo-`persona.json`, `lebenskontext_gemeinsam.json`, plus ~15 kleinere Fundstellen in diversen `*_mod.js`/HTML und `listener.ps1`.
+
+Alle Fundstellen auf Werte-Ebene behoben (Code-Kommentare/Variablennamen/JSON-Schlüssel bewusst ausgenommen). Neue **Regel 19** dokumentiert: „Echte deutsche Umlaute, keine ASCII-Transliteration" — gilt für alle vorgelesenen/angezeigten Texte, damit künftiger Content von Anfang an korrekt geschrieben wird.
+
+Commit: `2512029`. `validate.ps1`: 0 Fehler, deployed.
+
+## Mathe-Modul-Ausbau — Stand 01.08.2026 (Sitzung 18, Schritte 1–4 abgeschlossen)
+
+Nutzeranfrage: Mathe-Modul didaktisch und optisch verbessern, unter Einbeziehung der KI-Agenten. Wird schrittweise umgesetzt, Details/Architektur-Recherche auch in Claude-Memory `project_mathe.md`.
+
+**Schritt 1 — Stats-Tracking-Lücke gefunden + gefixt (commit `a3a1585`):** Das Haupt-Mathe-Modul (M0a–M4, über `moduleKit.js`) schrieb bisher gar nicht in die Lernstatistik (Regel 15 im gemeinsamen Motor nie umgesetzt) — nur das kleine Arbeitsheft-Begleitmodul `schule_mathe` tat das, fälschlich ebenfalls unter dem Label `"mathe"`. Alles was bisher unter „Mathe" in `statistik.html`/bei Milo erschien, stammte dadurch ausschließlich vom Arbeitsheft-Modul. `moduleKit.js` bekam generisches `sessionStart`/`taskStart`/`taskAnswer`/`sessionEnd`/`markHilfe` (kommt automatisch auch Logik und Sinnesorgane-Quiz zugute, da alle drei denselben Motor nutzen). `schule_mathe_mod.js` bekam eigene Modul-ID (`"schule_mathe"` statt `"mathe"`) — bleibt auf Nutzerentscheidung vorerst unsichtbar in `statistik.html`/Milo.
+
+**Schritt 2 — `erklaerung`-Feld für alle 265 Aufgaben ergänzt (commit `1188c7f`):** `mathe_data.js` (200 Aufgaben) + `mathe_m0_data.js` (65 Aufgaben) bekamen ein `erklaerung`-Feld, das `moduleKit.js` bereits unterstützte (zeigt es automatisch in der Richtig/Falsch-Rückmeldung an). Programmatisch generiert (regelbasiert je Stufentyp: Verdopplung/Plus-Minus-0/Mit-der-10 bei Addition/Subtraktion, komplette Zahlenfolge mit erkannter Schrittweite bei Nachbarzahlen/Zahlenreihen, Zahlwörter beim Zählen) statt 265 Texte einzeln zu tippen. Ein eigenes Verifikationsskript prüfte alle generierten Texte gegen die tatsächliche Arithmetik nach — dabei einen **echten, vorbestehenden Datenfehler gefunden und behoben**: `M2 "8 - 4 = ?"` war mit der falschen Antwort (5 statt 4) als „richtig" markiert.
+
+**Schritt 3 — Milo an `erklaerung`-Feld angeschlossen (commit `1188c7f`):** `milo_mod.js` bekam `sammleMatheKontext()` (Struktur-Kopie von `sammleGrammatikKontext()`) — löst schwache Mathe-Aufgaben jetzt zur passenden Erklärung auf, genau wie bei Grammatik. `milo.html` lädt dafür zusätzlich `dataRegistry.js` + `mathe_data.js` + `mathe_m0_data.js`. Live in Edge verifiziert (XHR-Interception, Backend nicht nötig): gesendeter Kontext enthält jetzt echte Erklärungen statt nur Fehlerraten.
+
+Schritte 2+3 wurden zu Sitzungsbeginn 18 nachträglich committet + gepusht (waren seit Sitzung 17 fertig getestet, aber uncommittet liegen geblieben) und nach OneDrive deployed.
+
+**Schritt 4 — 4-Stufen-Navigation umgesetzt (commits `32ee5bf`, `723edc2`, `f365eb6`):** Neue `mathe_uebersicht.html` + `mathe_uebersicht_mod.js` zeigen 4 Kacheln (🌱 Grundlagen/🌿 Fortgeschritten/🌳 Profi/🏆 Champion) analog zur Grammatik-Werkstatt, statt der bisherigen flachen 12-Stufen-Liste. Architektur-Entscheidung (mit Nutzer abgestimmt): `mathe_module.js` filtert sein `levelOrder`-Array selbst anhand des `?kat=`-URL-Parameters, bevor es an `moduleKit.js` übergeben wird — **`moduleKit.js` bleibt dadurch komplett unangetastet**, Logik/Sinnesorgane-Quiz sind nicht betroffen. Der Rückweg von der gefilterten Lektionsliste zur Kachel-Übersicht nutzt das bereits vorhandene generische `LaetitiaReturn`-System (`?return=`-Parameter, in `moduleKit.js` schon eingebaut) — dafür war keine einzige Zeile Zusatzcode nötig. `lernen.html`: Mathe-Kachel zeigt jetzt auf `mathe_uebersicht.html`.
+
+Stufen→Tier-Zuordnung (alle 265 Aufgaben exakt einmal zugeordnet, per Skript gegen die echten Daten verifiziert): 🌱 Grundlagen = M0a/M0b/M0c/M0f (45 Aufgaben), 🌿 Fortgeschritten = M0d/M0e/M1_NACHBAR/M1_REIHE (60), 🌳 Profi = M1/M2 (80), 🏆 Champion = M3/M4 (80).
+
+Live in Chrome getestet (Browser-Erweiterung war diese Sitzung verbunden): alle 4 Kacheln, Filterung je Kategorie, Rückweg beidseitig, ein kompletter Aufgaben-Durchlauf inkl. Stats-Update — keine Konsolenfehler. Dabei zwei kleine Bugs gefunden + sofort behoben: (1) ein selbst ergänzter Kategorie-Untertitel wurde von `moduleKit.js`s `showMenu()` bei jedem Aufruf überschrieben und kam nie sichtbar an — als totes Code-Stück wieder entfernt statt `moduleKit.js` für eine Kosmetik-Ergänzung anzufassen; (2) ein **vorbestehender** Bug (unabhängig von Schritt 4) zeigte „Mathe Mathematik" statt „🔢 Mathematik" im Menü-Header, weil `icon:"Mathe"` (Text statt Emoji) an `moduleKit.js` übergeben wurde — auf `icon:"🔢"` korrigiert.
+
+**Damit sind alle 4 geplanten Ausbauschritte abgeschlossen.** `validate.ps1`: 0 Fehler nach jedem Commit, OneDrive durchgehend synchron.
+
+**Weitere offene Schritte (vom Nutzer noch nicht beauftragt):**
+1. Rechenweg-Visuals für M1–M4 (aktuell nur bei M0/Zählen eine visuelle Neuerklärung bei Falsch-Antwort — größte didaktische Lücke, da Laetitia nicht selbst mit echten Rechenmaterialien hantieren kann).
+2. Fabu-Rechengeschichten (optional, größerer Aufwand — Matheaufgaben als Erzählungen, analog zur Gedichte-Integration).
+3. Sichtbarkeits-Entscheidung `schule_mathe` (eigener Tab in `statistik.html` + eigener Milo-Kontext) — bewusst zurückgestellt in Schritt 1.
 
 ## Quasselkiste / NuVoice-Emulation — Stand 31. Mai 2026
 
@@ -635,6 +670,23 @@ Dann Edge komplett neu starten.
 
 ---
 
+## Sitzungsprotokoll 1. August 2026 — Sitzung 18
+
+| Was | Ergebnis |
+|---|---|
+| Ausstehender Commit von Sitzung 17 nachgeholt | ✅ Mathe-Ausbau Schritte 2+3 (`erklaerung`-Feld für 265 Aufgaben + Milo-Anbindung), waren seit Sitzungsende 17 uncommittet — committet, gepusht, nach OneDrive deployed (commit `1188c7f`) |
+| Mathe-Modul-Ausbau Schritt 4: 4-Stufen-Navigation | ✅ Neue Kachel-Übersicht (Grundlagen/Fortgeschritten/Profi/Champion), `mathe_module.js` filtert `levelOrder` selbst über `?kat=` — `moduleKit.js` bleibt unangetastet, Rückweg nutzt vorhandenes `LaetitiaReturn`-System. Live in Chrome getestet, keine Konsolenfehler. Siehe eigener Abschnitt „Mathe-Modul-Ausbau" oben (commit `32ee5bf`) |
+| Bug: toter Kategorie-Untertitel | ✅ Von `showMenu()` immer überschrieben, nie sichtbar — als totes Code-Stück entfernt statt `moduleKit.js` anzufassen (commit `723edc2`) |
+| Bug: Menü-Header zeigte „Mathe Mathematik" | ✅ Vorbestehender, unabhängiger Bug (`icon:"Mathe"` statt Emoji) gefunden und behoben, live verifiziert (commit `f365eb6`) |
+
+**Commits (alle gepusht):** `1188c7f`, `32ee5bf`, `723edc2`, `f365eb6`
+
+**Sitzungsabschluss:** Alle vier Commits gepusht, nach jedem Schritt nach OneDrive deployed, `validate.ps1` durchgehend 0 Fehler. Git-Arbeitsverzeichnis sauber (bis auf diese Doku-Aktualisierung selbst).
+
+**Nächste konkrete Schritte für die Folgesitzung:** Mathe-Modul-Ausbau hat aktuell keine offene, vom Nutzer beauftragte Aufgabe mehr (weitere Ideen — Rechenweg-Visuals, Fabu-Rechengeschichten, schule_mathe-Sichtbarkeit — stehen unbeauftragt im Mathe-Abschnitt oben). Übrige offene Punkte unverändert: Fabu-Stimme-Entscheidung, Tobii-Gerätetest (Nova-Avatar), Telegram-Token, Pfad-Training-Modus-2-Bestätigung, Gruppengespräche-Implementierung, Grammatik Stufe 11+ (Thema noch offen).
+
+---
+
 ## Sitzungsprotokoll 31. Juli 2026 — Sitzung 17
 
 | Was | Ergebnis |
@@ -645,12 +697,17 @@ Dann Edge komplett neu starten.
 | Bug: Überspringen-Button ohne Dwell-Bindung | ✅ In Reime (3 Aufgabentypen) UND Grammatik-Werkstatt (5 Aufgabentypen) behoben — gleicher Gap in beiden Modulen gefunden (commits `5eefdb5`, `c0cdf11`) |
 | Fabu+Milo: Goldstandard-Audit | ✅ Auswahlfelder-Timing (erst nach TTS-Ende), Farbe im Ruhezustand, Schriftgröße, Zurück-Button lila vereinheitlicht, kleinere Konsistenz-Fixes — siehe Abschnitt „Fabu + Milo — Goldstandard-Audit" (commit `709b212`) |
 | Grammatik: neue Stufe 10 (Wessen-/Wem-Fall) | ✅ 6 neue Lektionen (E-47–E-52), 60 Aufgaben, Champion-Kategorie jetzt 18 Einheiten — live in Edge getestet (Browser-Automatisierung), keine Konsolenfehler, Fortschrittsspeicherung bestätigt (commit `87399ab`) |
+| Neue Regel 18 (Auswahlfelder erst nach TTS-Ende) systemweit ausgerollt | ✅ Alle Module geprüft/gefixt, die automatisch vorlesen (commit `0adcb0c`) |
+| Umlaut-Aussprache-Fix + neue Regel 19 | ✅ Systemweiter Audit + Fix in ~15 Dateien, siehe eigener Abschnitt oben (commit `2512029`) |
+| Mathe-Modul-Ausbau (laufendes Vorhaben) | 🟡 Schritt 1 (Stats-Tracking-Fix) committet (`a3a1585`), Schritte 2+3 (erklaerung-Feld für 265 Aufgaben, Milo-Anbindung) fertig getestet aber **noch nicht committet** — siehe eigener Abschnitt oben |
 
-**Commits (alle gepusht):** `5eefdb5`, `c0cdf11`, `709b212`, `87399ab`
+**Commits (alle gepusht):** `5eefdb5`, `c0cdf11`, `709b212`, `87399ab`, `0adcb0c`, `2512029`, `a3a1585`
 
-**Sitzungsabschluss:** Code committed + gepusht, nach OneDrive deployed, `validate.ps1` 0 Fehler. Grammatik-Erweiterung wurde noch in dieser Sitzung live in Edge (Browser-Automatisierung, Chrome-Erweiterung war zu diesem Zeitpunkt verbunden) getestet und bestätigt. Reime- und Fabu/Milo-Fixes wurden nur strukturell/über Konsolen-Checks verifiziert bzw. vom Nutzer selbst in Edge geprüft (Details je im jeweiligen Abschnitt).
+**Noch NICHT committet (Stand Sitzungsende):** `app/modules/ki_agenten/milo/milo.html`, `app/modules/ki_agenten/milo/milo_mod.js`, `app/modules/mathe/data/mathe_data.js`, `app/modules/mathe/data/mathe_m0_data.js` — Mathe-Ausbau Schritte 2+3, fertig getestet (Edge, keine Konsolenfehler, `validate.ps1` 0 Fehler, OneDrive deployed), wartet nur auf Nutzeranweisung „committen und pushen".
 
-**Nächste konkrete Schritte für die Folgesitzung:** (1) Fabu/Milo-Audit-Fixes vom Nutzer in echtem Edge/Tobii-Test bestätigen lassen, (2) übrige offene Punkte unverändert: Fabu-Stimme-Entscheidung, Tobii-Gerätetest (Nova-Avatar), Telegram-Token, Pfad-Training-Modus-2-Bestätigung, Gruppengespräche-Implementierung, Grammatik Stufe 11+ (Thema noch offen).
+**Sitzungsabschluss:** Umfangreiche Sitzung in mehreren Teilen (Reime-Neuaufbau, Fabu/Milo-Audit, Grammatik Stufe 10, Regel 18 Rollout, Umlaut-Systemfix + Regel 19, Mathe-Modul-Ausbau Schritte 1–3). Grammatik-Erweiterung und alle Mathe-Schritte live in Edge getestet und bestätigt. Reime-, Fabu/Milo- und Umlaut-Fixes wurden strukturell/über Konsolen-Checks verifiziert bzw. vom Nutzer selbst in Edge geprüft (Details je im jeweiligen Abschnitt). Git-Arbeitsverzeichnis ist bei Sitzungsende NICHT sauber — 4 Dateien warten auf Commit (siehe oben).
+
+**Nächste konkrete Schritte für die Folgesitzung:** (1) Ausstehenden Commit für Mathe Schritte 2+3 nachholen, sobald vom Nutzer angewiesen, (2) Mathe-Modul-Ausbau fortsetzen — Schritt 4 (4-Stufen-Navigation) ist bereits architektonisch recherchiert, siehe Mathe-Abschnitt oben bzw. Claude-Memory `project_mathe.md`, (3) Fabu/Milo-Audit-Fixes vom Nutzer in echtem Edge/Tobii-Test bestätigen lassen, (4) übrige offene Punkte unverändert: Fabu-Stimme-Entscheidung, Tobii-Gerätetest (Nova-Avatar), Telegram-Token, Pfad-Training-Modus-2-Bestätigung, Gruppengespräche-Implementierung, Grammatik Stufe 11+ (Thema noch offen).
 
 ---
 
