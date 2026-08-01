@@ -58,6 +58,22 @@ a.modBtn.is-disabled{ pointer-events:none; opacity:0.45; }
 .mod-badge.ok  { background:rgba(29,185,84,.16); border-color:rgba(29,185,84,.35); color:#0b5c22; }
 .mod-badge.wip { background:rgba(255,193,7,.18);  border-color:rgba(255,193,7,.45);  color:#7a5a00; }
 .mod-badge.bald{ background:rgba(156,163,175,.18); border-color:rgba(156,163,175,.45); color:#374151; }
+.impulsKarte{
+  display:none;
+  background:var(--panel); border:2px solid #8b5cf6;
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:14px 18px; align-items:center; gap:12px;
+}
+.impuls-emoji{ font-size:32px; flex-shrink:0; }
+.impuls-text{ flex:1; font-size:15px; font-weight:800; color:var(--text); line-height:1.35; }
+a.impuls-btn{
+  flex-shrink:0; display:flex; align-items:center; justify-content:center;
+  min-height:56px; padding:10px 16px; border-radius:14px;
+  background:#ede9fe; border:2px solid #8b5cf6; color:#4c1d95;
+  font-weight:1000; font-size:14px; text-decoration:none; white-space:nowrap;
+  user-select:none; cursor:pointer; position:relative; transition:none;
+}
+a.impuls-btn:hover, a.impuls-btn:focus{ background:#ddd6fe; outline:4px solid #8b5cf6; }
 .statusbar{
   background:var(--panel); border:1px solid var(--border); border-radius:12px;
   box-shadow:var(--shadow); padding:8px 14px; font-size:13px; font-weight:900;
@@ -101,6 +117,11 @@ a.modBtn.is-disabled{ pointer-events:none; opacity:0.45; }
     <div class="greeting-emoji">🎓</div>
     <div class="greeting-title">Lernen</div>
     <div class="greeting-sub">Was wollen wir heute lernen?</div>
+  </div>
+  <div class="impulsKarte" id="impulsKarte">
+    <span class="impuls-emoji" id="impulsEmoji">✨</span>
+    <span class="impuls-text" id="impulsText"></span>
+    <a class="impuls-btn" id="impulsBtn" href="#">Hallo sagen →</a>
   </div>
   <div class="moduleGrid" id="moduleGrid">
 
@@ -153,11 +174,14 @@ a.modBtn.is-disabled{ pointer-events:none; opacity:0.45; }
 </div>
 <script src="./core/dwell.js"></script>
 <script src="./core/error_handler.js"></script>
+<script src="./core/stats.js"></script>
+<script src="./lernen_impuls.js"></script>
 <script>
+window.LaetitiaLernenImpuls && window.LaetitiaLernenImpuls.zeigeImpuls();
 var attachDwell = window.LaetitiaAttachDwell || function(){ return {cancelDwell:function(){}}; };
 var dwellMs    = parseInt(localStorage.getItem("laetitia_dwell_ms"))       || 900;
 var leaveGrace = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 100;
-attachDwell("a.modBtn:not(.is-disabled), #btnZurueck", {
+attachDwell("a.modBtn:not(.is-disabled), #btnZurueck, #impulsBtn", {
   dwellMs: dwellMs, leaveGrace: leaveGrace,
   onActivate: function(el){
     if(el.getAttribute("aria-disabled") === "true") return;
