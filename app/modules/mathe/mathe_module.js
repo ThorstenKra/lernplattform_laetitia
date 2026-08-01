@@ -11,6 +11,88 @@
     return;
   }
 
+  // ── Milo-Tipp: Stufe A (offline, sokratischer Hinweis je Aufgabentyp) ───────
+  // Analog zu logik_module.js -- ersetzt das generische (nur teilweise
+  // gestylte) Wort-Glossar-Overlay von moduleKit.js durch einen echten
+  // Denkanstoss von Milo, der die Loesung nicht verraet.
+  var MILO_TIPPS = {
+    M0a: "Zähl die Sachen ganz langsam einzeln durch — mit dem Finger mitzeigen hilft.",
+    M0b: "Zähl jedes Ding einzeln, von Anfang bis Ende — nichts überspringen.",
+    M0c: "Zähl in kleinen Gruppen, zum Beispiel immer 5 auf einmal, dann geht's schneller.",
+    M0f: "Zähl in Zehnerschritten, wenn es viele sind — erst bis 10, dann weiter.",
+    M0d: "Wie viele waren es vorher? Jetzt kommt noch eins dazu — welche Zahl kommt danach?",
+    M0e: "Wie viele waren es vorher? Jetzt kommen noch zwei dazu — zähl zwei Schritte weiter.",
+    M1_NACHBAR: "Überlege: welche Zahl kommt direkt davor, welche direkt danach beim Zählen?",
+    M1_REIHE: "Schau dir an, wie sich die Zahlen von einer zur nächsten verändern — wird immer dieselbe Zahl dazugezählt?",
+    M1: "Zähl von der ersten Zahl aus weiter — so viele Schritte, wie die zweite Zahl sagt.",
+    M2: "Zähl von der ersten Zahl aus rückwärts — so viele Schritte, wie die zweite Zahl sagt.",
+    M3: "Zähl erst bis 10, dann von dort weiter — das macht große Additionen leichter.",
+    M4: "Zähl von der größeren Zahl aus rückwärts, Schritt für Schritt."
+  };
+
+  function offlineTipp(t){
+    return (t && MILO_TIPPS[t.stufe]) || "Schau dir die Aufgabe noch einmal ganz genau an.";
+  }
+
+  function zeigeMiloOverlay(text, sprechen){
+    var textEl = document.getElementById("miloTippText");
+    var ov     = document.getElementById("overlayMilo");
+    if(textEl) textEl.textContent = text;
+    if(ov) ov.classList.add("show");
+    if(sprechen !== false){
+      var AQ = window.LaetitiaAudioQueue;
+      if(AQ && typeof AQ.speak === "function") AQ.speak(text, 0.92);
+    }
+  }
+
+  // ── Milo-Tipp: Stufe B (online, live per Gemini ueber listener.ps1) ─────────
+  // Faellt bei Verbindungsproblemen unauffaellig auf den Stufe-A-Text zurueck
+  // (gleiches Fallback-Muster wie logik_module.js/fabu_mod.js).
+  var LISTENER_URL = "http://localhost:9999";
+  var MILO_AGENT_ID = "ki_agenten/milo";
+  var _miloAnfrageId = 0;
+
+  function apiFetchMilo(daten, cb){
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", LISTENER_URL + "/chat", true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.timeout = 25000;
+    xhr.onload = function(){
+      try{ cb(null, JSON.parse(xhr.responseText)); }
+      catch(e){ cb(new Error("Antwort ungueltig")); }
+    };
+    xhr.onerror = xhr.ontimeout = function(){ cb(new Error("Verbindungsfehler")); };
+    xhr.send(JSON.stringify(daten));
+  }
+
+  function zeigeMiloTipp(t){
+    var meineId = ++_miloAnfrageId;
+    zeigeMiloOverlay("🦉 Milo denkt nach …", false);
+
+    var kontext = "Ihr uebt gerade zusammen eine Matheaufgabe. Die Aufgabe: \"" + (t && t.frage || "") + "\""
+      + (t && t.text ? " (" + t.text + ")" : "") + ". "
+      + "Die richtige Loesung waere: \"" + (t && t.erklaerung || "") + "\" -- das darfst du NICHT direkt verraten. "
+      + "Gib NUR einen kurzen, ermutigenden Denkanstoss (1 Satz, maximal 2), der sie selbst auf die Loesung "
+      + "kommen laesst, ohne die Antwort zu nennen.";
+
+    apiFetchMilo({ agent: MILO_AGENT_ID, nachricht: "Kannst du mir einen Tipp geben?", verlauf: [], kontext: kontext }, function(err, data){
+      if(meineId !== _miloAnfrageId) return; // ueberholt durch neuere Anfrage
+      if(err || !data || data.fehler || !data.antwort){
+        zeigeMiloOverlay(offlineTipp(t));
+        return;
+      }
+      zeigeMiloOverlay(data.antwort);
+    });
+  }
+
+  document.getElementById("btnMiloClose")?.addEventListener("click", function(ev){
+    ev.preventDefault();
+    _miloAnfrageId++; // laufende Online-Anfrage invalidieren -- Overlay soll nicht nachtraeglich wieder aufspringen
+    try{ window.speechSynthesis.cancel(); }catch(e){}
+    var ov = document.getElementById("overlayMilo");
+    if(ov) ov.classList.remove("show");
+  });
+
   // ── Zähl-Animation bei falscher Antwort (nur M0-Stufen) ──────────────────────
 
   function istZaehlAufgabe(t){
@@ -387,6 +469,8 @@
       };
       return namen[lv] || lv;
     },
+
+    onHelp: zeigeMiloTipp,
 
     allowUnlock: false,
 

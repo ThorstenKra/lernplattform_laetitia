@@ -285,6 +285,7 @@
     border:1px solid var(--border); box-shadow:0 24px 70px rgba(0,0,0,.25); padding:20px;
   }
   .overlaySub{ font-size:15px; font-weight:900; color:var(--muted); margin:4px 0 0 0; }
+  .overlayText{ font-size:19px; font-weight:800; line-height:1.4; color:var(--text); margin:0 0 18px 0; }
 
   @media (max-width:760px){
     .taskHeader{ grid-template-columns:1fr; }
@@ -403,6 +404,17 @@
     <div class="overlayBtns">
       <a class="uibtn overlayBtn" href="#" data-action="OVL_REPEAT">Nochmal</a>
       <a class="overlayBtnHome" id="btnReturnFromOverlay" href="../../index.html">Zur Gesamtübersicht</a>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlayMilo">
+  <div class="overlayBox">
+    <div class="overlayEmoji">🦉</div>
+    <div class="overlayTitle">Milo denkt mit</div>
+    <div class="overlayText" id="miloTippText">–</div>
+    <div class="overlayBtns">
+      <a class="uibtn overlayBtn" href="#" id="btnMiloClose">Zurück</a>
     </div>
   </div>
 </div>
