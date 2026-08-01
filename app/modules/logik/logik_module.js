@@ -13,6 +13,32 @@
     return;
   }
 
+  // ── Milo-Tipp: sokratischer Hinweis je Aufgabentyp (Hilfe-Button, offline) ──
+  var MILO_TIPPS = {
+    L1: "Schau dir immer drei der vier Dinge an — was haben die gemeinsam? Das vierte gehört nicht dazu.",
+    L2: "Schau genau hin, wie sich die Zeichen von einem zum nächsten verändern. Wiederholt sich etwas?",
+    L3: "Überlege zuerst, wie die beiden Dinge im ersten Beispiel zusammenhängen. Genau diese Beziehung brauchst du auch für das zweite Beispiel.",
+    L4: "Lies den Satz noch einmal ganz genau durch. Stimmt wirklich jedes einzelne Wort?",
+    L5: "Überlege: Was passiert normalerweise, wenn genau das eintritt, was im Text beschrieben wird?"
+  };
+
+  function zeigeMiloTipp(t){
+    var text = (t && MILO_TIPPS[t.stufe]) || "Schau dir die Aufgabe noch einmal ganz genau an.";
+    var textEl = document.getElementById("miloTippText");
+    var ov     = document.getElementById("overlayMilo");
+    if(textEl) textEl.textContent = text;
+    if(ov) ov.classList.add("show");
+    var AQ = window.LaetitiaAudioQueue;
+    if(AQ && typeof AQ.speak === "function") AQ.speak(text, 0.92);
+  }
+
+  document.getElementById("btnMiloClose")?.addEventListener("click", function(ev){
+    ev.preventDefault();
+    try{ window.speechSynthesis.cancel(); }catch(e){}
+    var ov = document.getElementById("overlayMilo");
+    if(ov) ov.classList.remove("show");
+  });
+
   var mod = kit.createFourChoiceModule({
     moduleId:   "logik",
     moduleName: "Logik",
@@ -31,6 +57,8 @@
       };
       return namen[lv] || lv;
     },
+
+    onHelp: zeigeMiloTipp,
 
     allowUnlock: false,
 
