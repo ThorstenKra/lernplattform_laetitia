@@ -13,7 +13,7 @@
     return;
   }
 
-  // ── Milo-Tipp: sokratischer Hinweis je Aufgabentyp (Hilfe-Button, offline) ──
+  // ── Milo-Tipp: Stufe A (offline, sokratischer Hinweis je Aufgabentyp) ───────
   var MILO_TIPPS = {
     L1: "Schau dir immer drei der vier Dinge an — was haben die gemeinsam? Das vierte gehört nicht dazu.",
     L2: "Schau genau hin, wie sich die Zeichen von einem zum nächsten verändern. Wiederholt sich etwas?",
@@ -22,18 +22,64 @@
     L5: "Überlege: Was passiert normalerweise, wenn genau das eintritt, was im Text beschrieben wird?"
   };
 
-  function zeigeMiloTipp(t){
-    var text = (t && MILO_TIPPS[t.stufe]) || "Schau dir die Aufgabe noch einmal ganz genau an.";
+  function offlineTipp(t){
+    return (t && MILO_TIPPS[t.stufe]) || "Schau dir die Aufgabe noch einmal ganz genau an.";
+  }
+
+  function zeigeMiloOverlay(text, sprechen){
     var textEl = document.getElementById("miloTippText");
     var ov     = document.getElementById("overlayMilo");
     if(textEl) textEl.textContent = text;
     if(ov) ov.classList.add("show");
-    var AQ = window.LaetitiaAudioQueue;
-    if(AQ && typeof AQ.speak === "function") AQ.speak(text, 0.92);
+    if(sprechen !== false){
+      var AQ = window.LaetitiaAudioQueue;
+      if(AQ && typeof AQ.speak === "function") AQ.speak(text, 0.92);
+    }
+  }
+
+  // ── Milo-Tipp: Stufe B (online, live per Gemini ueber listener.ps1) ─────────
+  // Faellt bei Verbindungsproblemen unauffaellig auf den Stufe-A-Text zurueck
+  // (gleiches Fallback-Muster wie Fabus Live-Reaktionen in fabu_mod.js).
+  var LISTENER_URL = "http://localhost:9999";
+  var MILO_AGENT_ID = "ki_agenten/milo";
+  var _miloAnfrageId = 0;
+
+  function apiFetchMilo(daten, cb){
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", LISTENER_URL + "/chat", true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.timeout = 25000;
+    xhr.onload = function(){
+      try{ cb(null, JSON.parse(xhr.responseText)); }
+      catch(e){ cb(new Error("Antwort ungueltig")); }
+    };
+    xhr.onerror = xhr.ontimeout = function(){ cb(new Error("Verbindungsfehler")); };
+    xhr.send(JSON.stringify(daten));
+  }
+
+  function zeigeMiloTipp(t){
+    var meineId = ++_miloAnfrageId;
+    zeigeMiloOverlay("🦉 Milo denkt nach …", false);
+
+    var kontext = "Ihr uebt gerade zusammen eine Logik-Aufgabe. Die Aufgabe: \"" + (t && t.frage || "") + "\""
+      + (t && t.text ? " (" + t.text + ")" : "") + ". "
+      + "Die richtige Loesung waere: \"" + (t && t.erklaerung || "") + "\" -- das darfst du NICHT direkt verraten. "
+      + "Gib NUR einen kurzen, ermutigenden Denkanstoss (1 Satz, maximal 2), der sie selbst auf die Loesung "
+      + "kommen laesst, ohne die Antwort zu nennen.";
+
+    apiFetchMilo({ agent: MILO_AGENT_ID, nachricht: "Kannst du mir einen Tipp geben?", verlauf: [], kontext: kontext }, function(err, data){
+      if(meineId !== _miloAnfrageId) return; // ueberholt durch neuere Anfrage
+      if(err || !data || data.fehler || !data.antwort){
+        zeigeMiloOverlay(offlineTipp(t));
+        return;
+      }
+      zeigeMiloOverlay(data.antwort);
+    });
   }
 
   document.getElementById("btnMiloClose")?.addEventListener("click", function(ev){
     ev.preventDefault();
+    _miloAnfrageId++; // laufende Online-Anfrage invalidieren -- Overlay soll nicht nachtraeglich wieder aufspringen
     try{ window.speechSynthesis.cancel(); }catch(e){}
     var ov = document.getElementById("overlayMilo");
     if(ov) ov.classList.remove("show");
