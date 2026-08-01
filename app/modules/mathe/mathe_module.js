@@ -238,7 +238,7 @@
   var mod = kit.createFourChoiceModule({
     moduleId:   "mathe",
     moduleName: "Mathematik",
-    icon:       "Mathe",
+    icon:       "🔢",
     dataKey:    "mathe",
 
     levelOrder: gefilterteReihenfolge,
