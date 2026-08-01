@@ -117,11 +117,13 @@
     // Overlay aufräumen und anzeigen
     var symbolBox = document.getElementById("zaehlSymbole");
     var zahlBox   = document.getElementById("zaehlZahl");
+    var labelBox  = document.getElementById("zaehlLabel");
     if(!symbolBox || !zahlBox) return;
 
     symbolBox.innerHTML = "";
     zahlBox.textContent = "";
     zahlBox.className   = "zaehlZahl";
+    if(labelBox) labelBox.textContent = "Lass uns zusammen zählen!";
     overlay.classList.add("show");
 
     var schrittMs = 1500;
@@ -167,6 +169,131 @@
       }, i * schrittMs);
       _zaehlTimers.push(tid);
     });
+  }
+
+  // ── Rechenweg-Animation bei falscher Antwort (nur M1-M4) ──────────────────────
+  // Nutzt dasselbe Zaehl-Overlay wie M0, aber mit Punkten statt Frage-Emojis:
+  // Addition zeigt erst die Ausgangszahl (blau), dann die dazukommende Zahl
+  // (gruen), weiterzaehlend. Subtraktion zeigt erst alle Punkte, nimmt danach
+  // welche weg (rotes Kreuz), rueckwaerts zaehlend.
+
+  function istRechenAufgabe(t){
+    return t && (t.stufe === "M1" || t.stufe === "M2" || t.stufe === "M3" || t.stufe === "M4");
+  }
+
+  function parseRechenaufgabe(text){
+    var m = /^\s*(\d+)\s*([+\-])\s*(\d+)\s*=/.exec(text || "");
+    if(!m) return null;
+    return { a: parseInt(m[1], 10), op: m[2], b: parseInt(m[3], 10) };
+  }
+
+  function zeigeRechenwegAnimation(t){
+    var overlay = document.getElementById("zaehlOverlay");
+    if(!overlay) return;
+
+    var aufgabe = parseRechenaufgabe(t.text || "");
+    if(!aufgabe) return;
+
+    // Vorherige Animation sicher abbrechen
+    abbrechenZaehlAnimation();
+
+    var symbolBox = document.getElementById("zaehlSymbole");
+    var zahlBox   = document.getElementById("zaehlZahl");
+    var labelBox  = document.getElementById("zaehlLabel");
+    if(!symbolBox || !zahlBox) return;
+
+    symbolBox.innerHTML = "";
+    zahlBox.textContent = "";
+    zahlBox.className   = "zaehlZahl";
+    if(labelBox) labelBox.textContent = aufgabe.op === "+" ? "Lass uns zusammen rechnen!" : "Lass uns zusammen wegnehmen!";
+    overlay.classList.add("show");
+
+    var schrittMs   = 1500;
+    var anzahlPunkte = aufgabe.op === "+" ? (aufgabe.a + aufgabe.b) : aufgabe.a;
+    var anzahlZeilen = Math.ceil(Math.max(anzahlPunkte, 1) / 5);
+    var zeilenEls = [];
+    for(var z = 0; z < anzahlZeilen; z++){
+      var zeile = document.createElement("div");
+      zeile.className = "zaehlZeile";
+      symbolBox.appendChild(zeile);
+      zeilenEls.push(zeile);
+    }
+
+    function zeigeSchluss(){
+      var tidEnd = setTimeout(function(){
+        overlay.classList.remove("show");
+        symbolBox.innerHTML = "";
+        zahlBox.textContent = "";
+      }, 1800);
+      _zaehlTimers.push(tidEnd);
+    }
+
+    function aktualisiereZahl(wert){
+      zahlBox.textContent = String(wert);
+      zahlBox.classList.remove("zahlBlink");
+      void zahlBox.offsetWidth;
+      zahlBox.classList.add("zahlBlink");
+    }
+
+    if(aufgabe.op === "+"){
+      for(var i = 0; i < anzahlPunkte; i++){
+        (function(i){
+          var farbe = i < aufgabe.a ? "🔵" : "🟢";
+          var tid = setTimeout(function(){
+            var zeilennr = Math.floor(i / 5);
+            var el = document.createElement("span");
+            el.className   = "zaehlSym";
+            el.textContent = farbe;
+            zeilenEls[zeilennr].appendChild(el);
+
+            aktualisiereZahl(i + 1);
+            spielTon(ZAEHLTOENE[Math.min(i, ZAEHLTOENE.length - 1)]);
+            sprich(String(i + 1));
+
+            if(i === anzahlPunkte - 1) zeigeSchluss();
+          }, i * schrittMs);
+          _zaehlTimers.push(tid);
+        })(i);
+      }
+    } else {
+      // Subtraktion: erst alle a Punkte zeigen ...
+      for(var k = 0; k < aufgabe.a; k++){
+        (function(k){
+          var tid = setTimeout(function(){
+            var zeilennr = Math.floor(k / 5);
+            var el = document.createElement("span");
+            el.className   = "zaehlSym";
+            el.textContent = "🔵";
+            zeilenEls[zeilennr].appendChild(el);
+
+            aktualisiereZahl(k + 1);
+            spielTon(ZAEHLTOENE[Math.min(k, ZAEHLTOENE.length - 1)]);
+          }, k * schrittMs);
+          _zaehlTimers.push(tid);
+        })(k);
+      }
+      // ... danach b Punkte der Reihe nach wegnehmen (rueckwaerts zaehlen)
+      var wegnahmeStart = aufgabe.a * schrittMs + 400;
+      for(var j = 0; j < aufgabe.b; j++){
+        (function(j){
+          var tid = setTimeout(function(){
+            var uebrig = symbolBox.querySelectorAll(".zaehlSym:not(.zaehlWeg)");
+            var letztes = uebrig[uebrig.length - 1];
+            if(letztes){
+              letztes.classList.add("zaehlWeg");
+              letztes.textContent = "❌";
+            }
+            var verbleibend = aufgabe.a - j - 1;
+            aktualisiereZahl(verbleibend);
+            spielTon(ZAEHLTOENE[Math.min(Math.max(verbleibend, 0), ZAEHLTOENE.length - 1)]);
+            sprich(String(verbleibend));
+
+            if(j === aufgabe.b - 1) zeigeSchluss();
+          }, wegnahmeStart + j * schrittMs);
+          _zaehlTimers.push(tid);
+        })(j);
+      }
+    }
   }
 
   // ── Emoji → deutscher Name ────────────────────────────────────────────────────
@@ -276,11 +403,13 @@
       sprechAufgabe(t, fertig);
     },
 
-    // Zähl-Animation bei falscher Antwort in M0-Stufen
+    // Zähl-Animation (M0) bzw. Rechenweg-Animation (M1-M4) bei falscher Antwort
     onWrongAnswer: function(t){
+      // Wird erst aufgerufen wenn die Falsch-Audio-Sequenz komplett abgespielt ist
       if(istZaehlAufgabe(t)){
-        // Wird erst aufgerufen wenn die Falsch-Audio-Sequenz komplett abgespielt ist
         zeigeZaehlAnimation(t);
+      } else if(istRechenAufgabe(t)){
+        zeigeRechenwegAnimation(t);
       }
     },
 
