@@ -13,6 +13,12 @@
 // dem Reime-Modul genutzt). Gleiche "abschnitte"-Datenform wie GESCHICHTEN, daher
 // verallgemeinerte Player-Logik (aktInhalt/aktQuelle statt nur aktGeschichte) --
 // siehe persona.json Abschnitt "gedichte" fuer die Erlkoenig-Rahmungsregel.
+//
+// Seit 01.08.2026: dritte Bibliothek "Rechengeschichten" (rechengeschichten_data.js)
+// -- Matheaufgaben narrativ eingebettet. Abschnitte mit "richtig"-Feld sind
+// Rechenfragen: werden lokal/offline ausgewertet (siehe beantworteRechenfrage),
+// NICHT per Gemini-Live-Reaktion wie normale Diskussionsfragen, da Mathe
+// eindeutig richtig/falsch ist und das nicht Gemini ueberlassen werden darf.
 
 (function(){
 "use strict";
@@ -82,7 +88,7 @@ function rebindDwell(skipRecheck){
     : function(){ return { cancelDwell: function(){} }; };
   var dwellMs = parseInt(localStorage.getItem("laetitia_dwell_ms"))       || 900;
   var grace   = parseInt(localStorage.getItem("laetitia_leave_grace_ms")) || 150;
-  _dwell = attach(".vorschlag-btn, .nav-btn:not([style*='display:none']), #btnStarten, #btnGedichte, .geschichte-btn", {
+  _dwell = attach(".vorschlag-btn, .nav-btn:not([style*='display:none']), #btnStarten, #btnGedichte, #btnRechengeschichten, .geschichte-btn", {
     dwellMs: dwellMs, leaveGrace: grace,
     skipHoverRecheck: !!skipRecheck,
     onActivate: function(el){
@@ -94,7 +100,7 @@ function rebindDwell(skipRecheck){
 
 // ── Screens ───────────────────────────────────────────────────────────────────
 function alleVerstecken(){
-  ["startScreen","geschichtenAuswahlScreen","gedichteAuswahlScreen","gespraechContainer"].forEach(function(id){
+  ["startScreen","geschichtenAuswahlScreen","gedichteAuswahlScreen","rechengeschichtenAuswahlScreen","gespraechContainer"].forEach(function(id){
     var el = $(id); if(el) el.style.display = "none";
   });
   var bB = $("btnBeenden"); if(bB) bB.style.display = "none";
@@ -121,7 +127,9 @@ function stoppeGeschichteTimer(){
 }
 
 function baueListe(screenId, listeId, quelle, daten){
-  zustand = quelle === "gedicht" ? "gedichte_auswahl" : "geschichten_auswahl";
+  zustand = quelle === "gedicht" ? "gedichte_auswahl"
+    : quelle === "rechengeschichte" ? "rechengeschichten_auswahl"
+    : "geschichten_auswahl";
   alleVerstecken();
   aktInhalt = null; aktAbschnitt = 0;
   var el = $(screenId); if(el) el.style.display = "";
@@ -149,6 +157,10 @@ function zeigeGeschichtenAuswahl(){
 
 function zeigeGedichteAuswahl(){
   baueListe("gedichteAuswahlScreen", "gedichteListe", "gedicht", window.GEDICHTE);
+}
+
+function zeigeRechengeschichtenAuswahl(){
+  baueListe("rechengeschichtenAuswahlScreen", "rechengeschichtenListe", "rechengeschichte", window.RECHENGESCHICHTEN);
 }
 
 function starteInhalt(inhalt, quelle){
@@ -191,7 +203,10 @@ function zeigeAbschnitt(){
         btn.innerHTML = "<span style='pointer-events:none'>" + v + "</span>"
           + "<svg class='dwell-ring-svg' viewBox='0 0 70 70'>"
           + "<circle cx='35' cy='35' r='30' style='stroke:#d97706'/></svg>";
-        btn.addEventListener("click", function(){ reagiereAufAntwort(abschnitt, v); });
+        btn.addEventListener("click", function(){
+          if(abschnitt.richtig != null) beantworteRechenfrage(abschnitt, v);
+          else reagiereAufAntwort(abschnitt, v);
+        });
         if(grid) grid.appendChild(btn);
       });
       rebindDwell(true);
@@ -207,6 +222,7 @@ function zeigeAbschnitt(){
 
 function zeigeAuswahlFuerQuelle(){
   if(aktQuelle === "gedicht") zeigeGedichteAuswahl();
+  else if(aktQuelle === "rechengeschichte") zeigeRechengeschichtenAuswahl();
   else zeigeGeschichtenAuswahl();
 }
 
@@ -230,6 +246,28 @@ function speichereGespraech(){
     apiFetch("/chat/abschliessen", daten, function(){});
     verlauf = [];
   }
+}
+
+// Rechenfrage lokal/offline auswerten (kein Gemini-Aufruf) -- richtig/falsch
+// ist bei Mathe eindeutig, das darf nicht der Live-Reaktion ueberlassen werden.
+// Gleiches Auto-Weiter-Verhalten wie reagiereAufAntwort (Weiter-Button + 3s-Timer).
+function beantworteRechenfrage(abschnitt, gewaehlt){
+  stoppeGeschichteTimer();
+  var grid = $("vorschlaegeGrid");
+  if(grid) grid.innerHTML = "";
+
+  var korrekt = String(gewaehlt).trim() === String(abschnitt.richtig).trim();
+  var text = (korrekt ? "✓ Richtig! " : "✗ Fast! Richtig wäre " + abschnitt.richtig + ". ")
+    + (abschnitt.erklaerung || "");
+
+  var fabuEl = $("fabuAntwort"); if(fabuEl) fabuEl.textContent = text;
+  setzeStimmung(korrekt);
+
+  sprich(text, function(){
+    var bW = $("btnGeschichteWeiter"); if(bW) bW.style.display = "";
+    rebindDwell(true);
+    geschichteTimer = setTimeout(weiterInGeschichte, 3000);
+  });
 }
 
 // Live-Reaktion auf die gewaehlte Diskussionsantwort -- faellt bei Fehlern
@@ -279,7 +317,7 @@ function beendeGeschichte(){
 // ── Navigation ─────────────────────────────────────────────────────────────────
 function zurueck(){
   if(zustand === "inhalt"){ beendeGeschichte(); return; }
-  if(zustand === "geschichten_auswahl" || zustand === "gedichte_auswahl"){ zeigeStart(); return; }
+  if(zustand === "geschichten_auswahl" || zustand === "gedichte_auswahl" || zustand === "rechengeschichten_auswahl"){ zeigeStart(); return; }
   try{
     window.location.href = new URL("../ki_agenten.html", window.location.href).href;
   }catch(e){ history.back(); }
@@ -292,6 +330,9 @@ function init(){
 
   var bG = $("btnGedichte");
   if(bG) bG.addEventListener("click", zeigeGedichteAuswahl);
+
+  var bR = $("btnRechengeschichten");
+  if(bR) bR.addEventListener("click", zeigeRechengeschichtenAuswahl);
 
   var bZ = $("btnZurueck");
   if(bZ) bZ.addEventListener("click", zurueck);

@@ -36,15 +36,15 @@ body{
 .status-emoji{ font-size:52px; }
 .status-text{ font-size:24px; font-weight:1000; color:var(--text); }
 .status-sub{ font-size:16px; color:#64748b; }
-#btnStarten,#btnGedichte{
-  min-height:84px; width:min(320px,90%);
+#btnStarten,#btnGedichte,#btnRechengeschichten{
+  min-height:76px; width:min(320px,90%);
   border-radius:18px; border:3px solid var(--amber);
   background:var(--amber-bg); color:var(--amber-dark);
-  font-size:22px; font-weight:1000; cursor:pointer; user-select:none;
+  font-size:20px; font-weight:1000; cursor:pointer; user-select:none;
   position:relative; transition:none; font-family:inherit;
 }
-#btnStarten:hover,#btnStarten:focus,#btnGedichte:hover,#btnGedichte:focus{ background:#fde68a; outline:4px solid var(--amber); }
-#btnStarten.dwell-active,#btnGedichte.dwell-active{ transform:scale(1.02) !important; outline:3px solid var(--amber) !important; transition:none !important; }
+#btnStarten:hover,#btnStarten:focus,#btnGedichte:hover,#btnGedichte:focus,#btnRechengeschichten:hover,#btnRechengeschichten:focus{ background:#fde68a; outline:4px solid var(--amber); }
+#btnStarten.dwell-active,#btnGedichte.dwell-active,#btnRechengeschichten.dwell-active{ transform:scale(1.02) !important; outline:3px solid var(--amber) !important; transition:none !important; }
 
 .geschichten-liste{
   flex:1; min-height:0; overflow-y:auto;
@@ -133,13 +133,17 @@ body{
   <div id="startScreen" class="status-screen">
     <div class="status-emoji">🦊</div>
     <div class="status-text">Fabu ist da</div>
-    <div class="status-sub">Möchtest du eine Geschichte hören, oder ein Gedicht?</div>
+    <div class="status-sub">Möchtest du eine Geschichte hören, ein Gedicht, oder eine Rechengeschichte?</div>
     <button id="btnStarten">
       📖 Geschichten anschauen
       <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#d97706"/></svg>
     </button>
     <button id="btnGedichte">
       📜 Gedichte anschauen
+      <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#d97706"/></svg>
+    </button>
+    <button id="btnRechengeschichten">
+      🌰 Rechengeschichten
       <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" style="stroke:#d97706"/></svg>
     </button>
   </div>
@@ -152,6 +156,11 @@ body{
   <div id="gedichteAuswahlScreen" class="status-screen" style="display:none">
     <div class="status-text" style="margin-bottom:6px;">📜 Welches Gedicht?</div>
     <div class="geschichten-liste" id="gedichteListe"></div>
+  </div>
+
+  <div id="rechengeschichtenAuswahlScreen" class="status-screen" style="display:none">
+    <div class="status-text" style="margin-bottom:6px;">🌰 Welche Rechengeschichte?</div>
+    <div class="geschichten-liste" id="rechengeschichtenListe"></div>
   </div>
 
   <div id="gespraechContainer" style="display:none">
@@ -203,6 +212,7 @@ body{
 <script src="../../../core/stats.js"></script>
 <script src="./geschichten_data.js"></script>
 <script src="../../gedichte/gedichte_data.js"></script>
+<script src="./rechengeschichten_data.js"></script>
 <script src="../lernfortschritt_gemeinsam.js"></script>
 <script src="./fabu_mod.js"></script>
 <script>
