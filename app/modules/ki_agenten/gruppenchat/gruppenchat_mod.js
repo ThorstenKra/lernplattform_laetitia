@@ -48,7 +48,7 @@ function sprich(text, danach){
     setTimeout(function(){
       try{
         var u = new SpeechSynthesisUtterance(String(text || ""));
-        u.lang = "de-DE"; u.rate = 0.92;
+        u.lang = "de-DE"; u.rate = 1.104; // angeglichen an Novas Standardtempo (RATE_BASIS)
         var vv = speechSynthesis.getVoices();
         var v = vv.find(function(x){ return x.name === "Microsoft Katja Online (Natural) - German (Germany)"; })
              || vv.find(function(x){ return x.name === "Microsoft Katja - German (Germany)"; })
