@@ -327,12 +327,17 @@ while ($listener.IsListening) {
             $eroeffnungHinweis = ""
             if ($istErsteNachricht -and $persona.eroeffnung) {
                 # persona.eroeffnung ist entweder ein einzelner Text, oder ein Objekt
-                # {a:"...", b:"..."} fuer tagesabhaengige Abwechslung. Deterministischer
-                # Tageswechsel statt Modell-Zufall: das Modell waehlt bei freier Wahl in
-                # Tests fast immer Variante A, auch bei hoher Temperature.
+                # {a:"...", b:"...", c:"...", ...} fuer tagesabhaengige Abwechslung
+                # zwischen beliebig vielen Varianten. Deterministischer Tageswechsel
+                # statt Modell-Zufall: das Modell waehlt bei freier Wahl in Tests fast
+                # immer Variante A, auch bei hoher Temperature.
                 $eroeffnungText = $persona.eroeffnung
-                if ($persona.eroeffnung.a -and $persona.eroeffnung.b) {
-                    $eroeffnungText = if ((Get-Date).DayOfYear % 2 -eq 0) { $persona.eroeffnung.b } else { $persona.eroeffnung.a }
+                if ($persona.eroeffnung -is [System.Management.Automation.PSCustomObject]) {
+                    $eroeffnungVarianten = @($persona.eroeffnung.PSObject.Properties | Sort-Object Name)
+                    if ($eroeffnungVarianten.Count -gt 0) {
+                        $eroeffnungIndex = (Get-Date).DayOfYear % $eroeffnungVarianten.Count
+                        $eroeffnungText = $eroeffnungVarianten[$eroeffnungIndex].Value
+                    }
                 }
                 $eroeffnungHinweis = "`n`nDies ist die ALLERERSTE Nachricht des heutigen Gespraechs.`n$eroeffnungText`n"
             }
