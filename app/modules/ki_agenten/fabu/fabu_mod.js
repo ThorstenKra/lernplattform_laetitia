@@ -184,8 +184,23 @@ function zeigeAbschnitt(){
   var label = $("fabuLabel");
   if(label) label.textContent = aktQuelle === "gedicht" ? "Fabu liest vor:" : "Fabu erzählt:";
 
+  var hatVorschlaege = !!(abschnitt.frage && Array.isArray(abschnitt.vorschlaege));
   var text = abschnitt.text + (abschnitt.frage ? (" " + abschnitt.frage) : "");
-  var fabuEl = $("fabuAntwort"); if(fabuEl) fabuEl.textContent = text;
+  var fabuEl = $("fabuAntwort");
+  if(fabuEl){
+    var html = text;
+    // Regel 20: Antwortvorschlaege zuerst im passiven Lesebereich zeigen (hier
+    // bereits pointer-events:none), getrennt von den Dwell-Buttons unten --
+    // sonst loest schon das Lesen/Vergleichen der Vorschlaege eine Auswahl aus.
+    if(hatVorschlaege){
+      html += "<div class=\"vorschlaege-lese\">" +
+        abschnitt.vorschlaege.slice(0, 4).map(function(v){
+          return "<div class=\"vorschlag-lese-eintrag\">" + v + "</div>";
+        }).join("") +
+      "</div>";
+    }
+    fabuEl.innerHTML = html;
+  }
 
   var grid = $("vorschlaegeGrid");
   if(grid) grid.innerHTML = "";
@@ -195,7 +210,7 @@ function zeigeAbschnitt(){
   // damit kein Blick auf den entstehenden Text versehentlich einen Klick ausloest.
   rebindDwell(true);
 
-  if(abschnitt.frage && Array.isArray(abschnitt.vorschlaege)){
+  if(hatVorschlaege){
     sprich(text, function(){
       abschnitt.vorschlaege.slice(0, 4).forEach(function(v){
         var btn = document.createElement("button");

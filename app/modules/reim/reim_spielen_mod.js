@@ -237,9 +237,18 @@ function aktiviereNachTts(tts, vollSelektor){
 }
 
 // ── Typ: Reim-Wahl (A/B/C/D — welches Wort reimt sich?) ──────────
+// Regel 20: Optionen zuerst passiv im Lesebereich, getrennt von den
+// Dwell-Buttons darunter (die dieselben Woerter tragen duerfen).
 function rendereReimWahl(container, aufgabe){
+  var optionenHtml =
+    "<div class=\"lese-optionen\">" +
+      "<span class=\"lese-options-eintrag\"><b>A</b> " + esc(aufgabe.antwort_a) + "</span>" +
+      "<span class=\"lese-options-eintrag\"><b>B</b> " + esc(aufgabe.antwort_b) + "</span>" +
+      "<span class=\"lese-options-eintrag\"><b>C</b> " + esc(aufgabe.antwort_c) + "</span>" +
+      "<span class=\"lese-options-eintrag\"><b>D</b> " + esc(aufgabe.antwort_d) + "</span>" +
+    "</div>";
   container.innerHTML =
-    leseHtml("Welches Wort reimt sich auf:", aufgabe.wort) +
+    leseHtml("Welches Wort reimt sich auf:", aufgabe.wort, optionenHtml) +
       "<div class=\"antwort-vierer\">" +
         "<button class=\"antwort-btn\" id=\"btnA\" onclick=\"window._ReimAntwort('A')\">" + esc(aufgabe.antwort_a) + RING + "</button>" +
         "<button class=\"antwort-btn\" id=\"btnB\" onclick=\"window._ReimAntwort('B')\">" + esc(aufgabe.antwort_b) + RING + "</button>" +
@@ -256,12 +265,22 @@ function rendereReimWahl(container, aufgabe){
 }
 
 // ── Typ: Lücke-Wahl (echte Gedichtzeile, fehlendes Reimwort) ─────
+// Regel 20: Optionen zuerst passiv im Lesebereich, getrennt von den
+// Dwell-Buttons darunter (die dieselben Woerter tragen duerfen).
 function rendereLueckeWahl(container, aufgabe){
   var satzHtml = esc(aufgabe.zeile_bekannt) + "<br>" + esc(aufgabe.zeile_luecke) + " <span class=\"lese-luecke\">___?</span>";
+  var optionenHtml =
+    "<div class=\"lese-optionen\">" +
+      "<span class=\"lese-options-eintrag\"><b>A</b> " + esc(aufgabe.antwort_a) + "</span>" +
+      "<span class=\"lese-options-eintrag\"><b>B</b> " + esc(aufgabe.antwort_b) + "</span>" +
+      "<span class=\"lese-options-eintrag\"><b>C</b> " + esc(aufgabe.antwort_c) + "</span>" +
+      "<span class=\"lese-options-eintrag\"><b>D</b> " + esc(aufgabe.antwort_d) + "</span>" +
+    "</div>";
   container.innerHTML =
     "<div class=\"lese-bereich\">" +
       "<div class=\"lese-frage\">Welches Wort fehlt am Ende?</div>" +
       "<div class=\"lese-satz\">" + satzHtml + "</div>" +
+      optionenHtml +
     "</div>" +
     "<div class=\"trenn-streifen\"><span class=\"trenn-label\">👆 Deine Antwort</span></div>" +
     "<div class=\"aktions-bereich\" id=\"aktionsBereich\">" +

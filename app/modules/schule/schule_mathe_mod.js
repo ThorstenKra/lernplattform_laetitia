@@ -112,6 +112,20 @@ function zeigeAufgabe(){
   document.getElementById("labelD").textContent = t.antwort_d || "";
   document.getElementById("btnD").style.display = t.antwort_d ? "" : "none";
 
+  // Regel 20: Antwortoptionen zuerst passiv anzeigen (optionen-lese hat
+  // pointer-events:none), getrennt von den Dwell-Buttons btnA-D unten.
+  var optLese = document.getElementById("optionenLese");
+  if(optLese){
+    optLese.innerHTML = "";
+    [t.antwort_a, t.antwort_b, t.antwort_c, t.antwort_d].forEach(function(w){
+      if(!w) return;
+      var span = document.createElement("span");
+      span.className = "optionen-lese-eintrag";
+      span.textContent = w;
+      optLese.appendChild(span);
+    });
+  }
+
   setInfoLine("","");
   // Regel 18: Antwort-Buttons erst nach TTS-Ende freigeben -- Zurueck bleibt sofort erreichbar
   ["btnA","btnB","btnC","btnD"].forEach(function(id){

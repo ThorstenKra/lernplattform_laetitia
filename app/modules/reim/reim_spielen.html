@@ -81,6 +81,18 @@ body{
 }
 .lese-trenner{ font-size:clamp(18px,3vw,28px); color:var(--muted); font-weight:400; }
 
+/* ── Regel 20: Antwortoptionen zuerst passiv lesbar, getrennt vom  ── */
+/* ── Auslösefeld (Dwell-Button) — siehe PROJEKT_WISSEN.md          ── */
+.lese-optionen{
+  margin-top:10px; display:grid; grid-template-columns:repeat(2,1fr);
+  gap:8px;
+}
+.lese-options-eintrag{
+  font-size:19px; font-weight:800; color:var(--akzent2);
+  background:var(--akzent-bg); border:2px solid var(--akzent);
+  border-radius:10px; padding:8px 12px; text-align:center;
+}
+
 /* ── TRENNSTREIFEN ───────────────────────────────────────────────── */
 .trenn-streifen{
   background:var(--trenn-bg);

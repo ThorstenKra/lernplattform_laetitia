@@ -207,6 +207,20 @@ function zeigeWortAufgabe(t){
   document.getElementById("wortB").textContent = t.antwort_b;
   document.getElementById("wortC").textContent = t.antwort_c;
 
+  // Regel 20: Antwortoptionen zuerst passiv anzeigen (optionen-lese hat
+  // pointer-events:none), getrennt von den Dwell-Buttons btnW0-2 unten.
+  var optLese = document.getElementById("optionenLeseWort");
+  if(optLese){
+    optLese.innerHTML = "";
+    [t.antwort_a, t.antwort_b, t.antwort_c].forEach(function(w){
+      if(!w) return;
+      var span = document.createElement("span");
+      span.className = "optionen-lese-eintrag";
+      span.textContent = w;
+      optLese.appendChild(span);
+    });
+  }
+
   ["btnW0","btnW1","btnW2"].forEach(function(id){
     var b=document.getElementById(id);
     // Regel 18: erst nach TTS-Ende freigeben

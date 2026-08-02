@@ -18,7 +18,7 @@ Ausgegeben werden: Ergebnisse, Fehler die eine Entscheidung erfordern, Rückfrag
 
 ---
 
-## 19 Goldstandard-Regeln (NIEMALS brechen)
+## 20 Goldstandard-Regeln (NIEMALS brechen)
 
 1. `dwell.js` immer `<script src="...">`, nie `import()`
 2. `localStorage["laetitia_input_mode"] = "tobii"` als Standard
@@ -39,6 +39,7 @@ Ausgegeben werden: Ergebnisse, Fehler die eine Entscheidung erfordern, Rückfrag
 17. **Lesebereich/Aktionsbereich-Trennung:** Text/Frage oben passiv (`pointer-events:none`), Trennstreifen mit Label, Antwort-Buttons unten dwell-aktiv. Buttons nach Antwort vollständig ausblenden (`display:none`). Vollständiges Muster siehe unten.
 18. **Auswahlfelder erst nach TTS-Ende:** Wenn das System einen Text vorliest (Frage, Aufgabenstellung, Nachricht), werden die zugehörigen Auswahl-/Antwort-Buttons erst NACH vollständigem Ende der Sprachausgabe sichtbar bzw. per Dwell aktivierbar — nie gleichzeitig mit oder vor Sprechbeginn. Verhindert, dass Laetitia absichtlich oder unabsichtlich klickt, bevor der Text zu Ende gesprochen wurde. Navigations-Buttons (Zurück, Beenden) bleiben davon unberührt und sind weiterhin sofort erreichbar. Referenzimplementierung: `app/modules/ki_agenten/fabu/fabu_mod.js` / `milo_mod.js` (Sitzung 17, 31.07.2026).
 19. **Echte deutsche Umlaute, keine ASCII-Transliteration:** In allen Texten, die vorgelesen oder angezeigt werden (Aufgaben, Erklärungen, `persona.json`-Charakterprofile, TTS-Strings in `*_mod.js`, sichtbare UI-Labels), immer `ä ö ü Ä Ö Ü ß` als echte Unicode-Zeichen schreiben — nie `ae/oe/ue/ss` als Ersatz. ASCII-Transliteration lässt Edge/Windows-TTS Wörter falsch aussprechen (z.B. "gehoert" statt "gehört"). Gilt nicht für Code-Identifier, Variablennamen, JSON-Schlüsselnamen oder Code-Kommentare — dort ist ASCII unkritisch und wird nicht angefasst. Alle Dateien sind einmalig durchsucht und bereinigt (Sitzung 17, 31.07.2026); bei neuem Content immer direkt mit echten Umlauten schreiben.
+20. **Antwortvorschlag ≠ Auslösefeld:** Bei jeder Mehrfachauswahl (auch bei nur einzelnen Wörtern als Optionen) muss der Text jeder Antwortoption zuerst in einem passiven Feld erscheinen (`pointer-events:none`, kein Dwell möglich) — getrennt vom zugehörigen Auslösefeld (dem Dwell-/Klick-Button, der die Auswahl tatsächlich auslöst). Erst wenn Laetitia alle Optionen gefahrlos gelesen und verglichen hat, darf ihr Blick auf den Auslöse-Button überhaupt eine Auswahl bewirken — sonst löst bereits das Lesen/Vergleichen der Optionen eine versehentliche Dwell-Auswahl aus. Vollständiges Muster + Referenzimplementierungen siehe unten.
 
 ---
 
@@ -285,6 +286,57 @@ function verbergeAntwortButtons(){
   });
 }
 ```
+
+---
+
+## Antwortvorschlag ≠ Auslösefeld (Goldstandard 20)
+
+**Herkunft:** Ursprünglich als Einzelfix in der Grammatik-Werkstatt entstanden ("Lese-/Aktions-Trennungs-Fix", Sitzung 12) — dort zeigten `ab_wahl`/`abc_wahl`/`wort_button` die Optionstexte nur auf den Dwell-Buttons selbst. Bei Augensteuerung ein Risiko: Hinschauen zum **Lesen** einer Option löst nach `dwellMs` (Standard 900ms) bereits den **Klick** aus, bevor Laetitia alle Optionen verglichen und sich bewusst entschieden hat. Am 02.08.2026 als eigene, projektweite Regel 20 formalisiert (vorher nur implizit in einzelnen Modulen umgesetzt, nicht überall).
+
+**Kernidee:** Für jede Antwortoption existieren zwei getrennte Stellen:
+1. **Lesefeld** — zeigt den Options-Text passiv (`pointer-events:none`), keine Dwell-Wirkung möglich, beliebig lange betrachtbar.
+2. **Auslösefeld** — der eigentliche Dwell-/Klick-Button, der die Auswahl auslöst (darf denselben Text tragen, das ist unkritisch, da Laetitia ihn zu diesem Zeitpunkt schon kennt).
+
+**Zwei etablierte Referenzimplementierungen, je nach Motor:**
+
+**A) `moduleKit.js`-Module (Mathe/Logik/Sinnesorgane):** eigene passive Text-Elemente `read1txt`–`read4txt`, getrennt von den Dwell-Buttons `pick1`–`pick4`:
+```javascript
+$("read1txt").textContent = displayTextFlow(ansMap[shuffled[0]]);
+// ... read2txt/read3txt/read4txt analog
+// pick1..pick4 sind die separaten, dwell-aktiven Buttons
+```
+
+**B) Eigene Spiel-Engines (Grammatik/Reim/…): `leseHtml()` mit `extraHtml`-Parameter** — Optionen erscheinen zusätzlich im passiven Lesebereich, bevor die Buttons erscheinen:
+```javascript
+function leseHtml(frage, satz, extraHtml){
+  return "<div class=\"lese-bereich\">" +
+    "<div class=\"lese-frage\">" + esc(frage) + "</div>" +
+    (satz ? "<div class=\"lese-satz\">" + esc(satz) + "</div>" : "") +
+    (extraHtml || "") +
+  "</div>" +
+  "<div class=\"trenn-streifen\"><span class=\"trenn-label\">👆 Deine Antwort</span></div>" +
+  "<div class=\"aktions-bereich\" id=\"aktionsBereich\">";
+}
+
+// Aufruf bei Mehrfachauswahl — Optionen zusaetzlich passiv auflisten:
+var optionenHtml =
+  "<div class=\"lese-optionen\">" +
+    "<span class=\"lese-options-eintrag\"><b>A</b> " + esc(aufgabe.option_a) + "</span>" +
+    "<span class=\"lese-options-eintrag\"><b>B</b> " + esc(aufgabe.option_b) + "</span>" +
+  "</div>";
+container.innerHTML = leseHtml(aufgabe.frage, aufgabe.satz, optionenHtml) + /* Buttons */ ;
+```
+CSS (bereits in Grammatik/Reim vorhanden, bei neuen Modulen mitkopieren):
+```css
+.lese-optionen{ display:flex; flex-direction:column; gap:4px; margin-top:8px; }
+.lese-options-eintrag{ font-size:18px; font-weight:800; }
+```
+
+**Für freie Vorschlagslisten (KI-Agenten-Chat, variable Anzahl/Länge statt fester A/B/C-Struktur):** Vorschläge zusätzlich als passive Liste in das bestehende passive Antwort-Feld (`fabuAntwort`/`miloAntwort`/`novaAntwort`/`chatAntwort`, bereits `pointer-events:none`) rendern, **bevor** bzw. **sobald** die eigentlichen Dwell-Buttons erscheinen — nicht erst nach Klick.
+
+**Gilt für JEDE Mehrfachauswahl, auch bei kurzen Einzelwörtern** (z.B. Reimwörter) — nicht nur bei ganzen Sätzen. Ausgenommen sind reine Ja/Nein-Entscheidungen mit fest codierten, immer gleichen Button-Beschriftungen (z.B. "✅ Ja"/"❌ Nein") — dort gibt es keinen variablen Optionstext, der vorab gelesen werden müsste.
+
+**Bekannte Verstöße gefunden + behoben (02.08.2026):** Reime-Werkstatt (`reim_spielen_mod.js`: `reim_wahl`/`luecke_wahl` zeigten Reimwort-Optionen nur auf den Buttons), sowie alle vier KI-Agenten-Chats (Nova/Fabu/Milo/Gruppenchat: Antwortvorschläge nur auf `vorschlag-btn`, keine passive Vorschau). Details siehe `ÜBERGABE_NEUE_SITZUNG.md`.
 
 ---
 

@@ -84,6 +84,20 @@ function zeigeAufgabe(){
   document.getElementById("labelC").textContent = t.antwort_c;
   document.getElementById("labelD").textContent = t.antwort_d || "";
 
+  // Regel 20: Antwortoptionen zuerst passiv anzeigen (optionen-lese hat
+  // pointer-events:none), getrennt von den Dwell-Buttons btnA-D unten.
+  var optLese = document.getElementById("optionenLese");
+  if(optLese){
+    optLese.innerHTML = "";
+    [t.antwort_a, t.antwort_b, t.antwort_c, t.antwort_d].forEach(function(w){
+      if(!w) return;
+      var span = document.createElement("span");
+      span.className = "optionen-lese-eintrag";
+      span.textContent = w;
+      optLese.appendChild(span);
+    });
+  }
+
   var btnD = document.getElementById("btnD");
   btnD.style.display = t.antwort_d ? "" : "none";
 

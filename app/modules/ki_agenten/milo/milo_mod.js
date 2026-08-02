@@ -493,8 +493,20 @@ function zeigeGespraech(antwort, vorschlaege, stimmung, nachAnzeige){
 
   setzeStimmung(stimmung);
 
+  var liste = (Array.isArray(vorschlaege) && vorschlaege.length > 0)
+    ? vorschlaege.slice(0, 4)
+    : ["Ja", "Nein", "Erzähl mehr", "Okay"];
+
   var miloEl = $("miloAntwort");
-  if(miloEl) miloEl.textContent = antwort;
+  if(miloEl){
+    // Regel 20: Antwortvorschlaege zuerst im passiven Lesebereich zeigen
+    // (hier bereits pointer-events:none), getrennt von den Dwell-Buttons
+    // unten -- sonst loest schon das Lesen/Vergleichen eine Auswahl aus.
+    var html = antwort + "<div class=\"vorschlaege-lese\">" +
+      liste.map(function(v){ return "<div class=\"vorschlag-lese-eintrag\">" + v + "</div>"; }).join("") +
+    "</div>";
+    miloEl.innerHTML = html;
+  }
 
   var grid = $("vorschlaegeGrid");
   if(grid) grid.innerHTML = "";
@@ -506,9 +518,6 @@ function zeigeGespraech(antwort, vorschlaege, stimmung, nachAnzeige){
 
   sprich(antwort, function(){
     if(grid){
-      var liste = (Array.isArray(vorschlaege) && vorschlaege.length > 0)
-        ? vorschlaege.slice(0, 4)
-        : ["Ja", "Nein", "Erzähl mehr", "Okay"];
       liste.forEach(function(v){
         var btn = document.createElement("button");
         btn.className = "vorschlag-btn";

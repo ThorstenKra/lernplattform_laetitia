@@ -73,6 +73,11 @@ a.zurueckBtn.dwell-active{ transform:scale(1.02) !important; outline:4px solid #
 .emoji-label{ font-size:14px; font-weight:1000; color:var(--en); letter-spacing:0.05em; }
 
 /* ── Wort-Antworten (E3) ── */
+/* Regel 20: Antwortoptionen zuerst passiv lesbar, getrennt vom Auslösefeld
+   (den Dwell-Buttons unten) -- siehe PROJEKT_WISSEN.md. */
+.optionen-lese{ display:flex; gap:10px; max-width:700px; width:100%; justify-content:center; flex-wrap:wrap; pointer-events:none; }
+.optionen-lese-eintrag{ font-size:15px; font-weight:900; padding:5px 12px; border-radius:10px; background:var(--en-bg); border:1px solid rgba(29,78,216,.30); color:var(--en); }
+
 .wort-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; max-width:700px; width:100%; }
 .wort-btn{ display:flex; align-items:center; justify-content:center; min-height:72px; border-radius:16px; border:2px solid rgba(29,78,216,.25); background:var(--en-bg); color:var(--en); font-size:clamp(15px,2.5vw,20px); font-weight:1000; cursor:pointer; user-select:none; position:relative; text-align:center; padding:8px; transition:none; }
 .wort-btn:hover{ background:rgba(29,78,216,.15); }
@@ -163,6 +168,7 @@ a.zurueckBtn.dwell-active{ transform:scale(1.02) !important; outline:4px solid #
       </button>
     </div>
     <div class="infoLine" id="infoLineWort"></div>
+    <div class="optionen-lese" id="optionenLeseWort"></div>
     <div class="wort-row" id="wortRow">
       <button class="wort-btn" id="btnW0" onclick="antwortenWort('A')">
         <svg class="dwell-ring-svg" viewBox="0 0 70 70"><circle cx="35" cy="35" r="30"/></svg>

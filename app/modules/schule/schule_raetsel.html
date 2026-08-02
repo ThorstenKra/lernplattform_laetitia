@@ -72,6 +72,17 @@ body{
   display:block;
   background:rgba(220,38,38,.12); border:1px solid rgba(220,38,38,.35); color:#991b1b;
 }
+/* Regel 20: Antwortoptionen zuerst passiv lesbar, getrennt vom Auslösefeld
+   (den Dwell-Buttons unten) -- siehe PROJEKT_WISSEN.md. */
+.optionen-lese{
+  display:flex; gap:10px; max-width:700px; width:100%;
+  justify-content:center; flex-wrap:wrap; pointer-events:none;
+}
+.optionen-lese-eintrag{
+  font-size:16px; font-weight:900; padding:6px 14px; border-radius:10px;
+  background:rgba(202,138,4,.08); border:1px solid rgba(202,138,4,.35);
+  color:var(--akzent2);
+}
 .antwort-row{
   display:grid; grid-template-columns:repeat(3,1fr);
   gap:10px; max-width:700px; width:100%;
@@ -151,6 +162,7 @@ a.nav-btn{ color:inherit; }
     <ul class="hinweis-liste" id="hinweisListe"></ul>
   </div>
   <div class="aufgabe-frage" id="aufgabeFrage">Was bin ich?</div>
+  <div class="optionen-lese" id="optionenLese"></div>
   <div class="feedback-banner" id="feedbackBanner"></div>
   <div class="seiten-info" id="seitenInfo"></div>
   <div class="antwort-row" id="antwortRow">

@@ -262,8 +262,22 @@ function zeigeGespraech(agentId, antwort, vorschlaege, stimmung, nachAnzeige){
   var sn = $("sprecherName");  if(sn){ sn.textContent = a.name; sn.style.color = a.farbe; }
   var ss = $("sprecherStimmung"); if(ss) ss.textContent = STIMMUNG_EMOJI[stimmung] || "";
 
+  var liste = (Array.isArray(vorschlaege) && vorschlaege.length > 0)
+    ? vorschlaege.slice(0, 4)
+    : ["Ja", "Nein", "Erzähl mehr", "Okay"];
+
   var antwortEl = $("chatAntwort");
-  if(antwortEl) antwortEl.textContent = antwort;
+  if(antwortEl){
+    // Regel 20: Antwortvorschlaege zuerst im passiven Lesebereich zeigen
+    // (hier bereits pointer-events:none), getrennt von den Dwell-Buttons
+    // unten -- sonst loest schon das Lesen/Vergleichen eine Auswahl aus.
+    var html = antwort + "<div class=\"vorschlaege-lese\">" +
+      liste.map(function(v){
+        return "<div class=\"vorschlag-lese-eintrag\" style=\"border-color:" + a.farbe + ";background:" + a.bg + ";color:" + a.farbe + "\">" + v + "</div>";
+      }).join("") +
+    "</div>";
+    antwortEl.innerHTML = html;
+  }
 
   var grid = $("vorschlaegeGrid");
   if(grid) grid.innerHTML = "";
@@ -274,9 +288,6 @@ function zeigeGespraech(agentId, antwort, vorschlaege, stimmung, nachAnzeige){
 
   sprich(antwort, function(){
     if(grid){
-      var liste = (Array.isArray(vorschlaege) && vorschlaege.length > 0)
-        ? vorschlaege.slice(0, 4)
-        : ["Ja", "Nein", "Erzähl mehr", "Okay"];
       liste.forEach(function(v){
         var btn = document.createElement("button");
         btn.className = "vorschlag-btn";
