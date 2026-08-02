@@ -371,32 +371,103 @@ function beendeGespraech(){
 }
 
 // ── Eigene Antwort (Bildschirmtastatur) ─────────────────────────────────────────
+// Layout an NuVoice-Bildschirmtastatur angelehnt (Zahlenreihe + QWERTZ + Gross/
+// Klein-Umschaltung), Regel 20-konform: Tasten zeigen immer den tatsaechlich
+// getippten Buchstaben (kein Uppercase-Etikett bei Kleinschreib-Eingabe mehr).
+var ZAHLEN_REIHE = ["1","2","3","4","5","6","7","8","9","0"];
 var TASTEN_REIHEN = [
   ["Q","W","E","R","T","Z","U","I","O","P"],
-  ["A","S","D","F","G","H","J","K","L","Ö","Ä"],
-  ["Y","X","C","V","B","N","M","Ü","ß"]
+  ["A","S","D","F","G","H","J","K","L","ß"],
+  ["Y","X","C","V","B","N","M","Ä","Ö","Ü"]
 ];
-var tastaturText = "";
+var tastaturText          = "";
+var tastaturGross         = false; // Dauerhaft Grossschreibung (wie Caps Lock)
+var tastaturEinmalGross   = false; // Naechster Buchstabe einmalig gross
+
+function tastaturGrossAktiv(){ return tastaturGross || tastaturEinmalGross; }
+
+function aktualisiereTastenBeschriftung(){
+  var gross = tastaturGrossAktiv();
+  document.querySelectorAll("#tastaturTasten .buchstabe-btn").forEach(function(btn){
+    btn.textContent = gross ? btn.dataset.taste.toUpperCase() : btn.dataset.taste.toLowerCase();
+  });
+  var gb = $("btnTastaturGross");       if(gb) gb.classList.toggle("aktiv", tastaturGross);
+  var eb = $("btnTastaturEinmalGross"); if(eb) eb.classList.toggle("aktiv", tastaturEinmalGross);
+}
 
 function baueTastatur(){
   var el = $("tastaturTasten");
   if(!el) return;
   el.innerHTML = "";
+
+  ZAHLEN_REIHE.forEach(function(ziffer){
+    var btn = document.createElement("button");
+    btn.className = "tasten-btn";
+    btn.textContent = ziffer;
+    btn.addEventListener("click", function(){
+      tastaturText += ziffer;
+      aktualisiereTastaturAnzeige();
+    });
+    el.appendChild(btn);
+  });
+
   TASTEN_REIHEN.forEach(function(reihe){
     reihe.forEach(function(taste){
       var btn = document.createElement("button");
-      btn.className = "tasten-btn";
-      btn.textContent = taste;
+      btn.className = "tasten-btn buchstabe-btn";
+      btn.dataset.taste = taste;
+      btn.textContent = taste.toLowerCase();
       btn.addEventListener("click", function(){
-        tastaturText += taste.toLowerCase();
+        tastaturText += tastaturGrossAktiv() ? taste.toUpperCase() : taste.toLowerCase();
+        if(tastaturEinmalGross){ tastaturEinmalGross = false; aktualisiereTastenBeschriftung(); }
         aktualisiereTastaturAnzeige();
       });
       el.appendChild(btn);
     });
   });
+
+  var grossBtn = document.createElement("button");
+  grossBtn.className = "tasten-btn tasten-btn-funktion";
+  grossBtn.id = "btnTastaturGross";
+  grossBtn.textContent = "Groß";
+  grossBtn.addEventListener("click", function(){
+    tastaturGross = !tastaturGross;
+    tastaturEinmalGross = false;
+    aktualisiereTastenBeschriftung();
+  });
+  el.appendChild(grossBtn);
+
+  var einmalBtn = document.createElement("button");
+  einmalBtn.className = "tasten-btn tasten-btn-funktion";
+  einmalBtn.id = "btnTastaturEinmalGross";
+  einmalBtn.textContent = "1× Groß";
+  einmalBtn.addEventListener("click", function(){
+    tastaturEinmalGross = !tastaturEinmalGross;
+    aktualisiereTastenBeschriftung();
+  });
+  el.appendChild(einmalBtn);
+
+  var bindestrich = document.createElement("button");
+  bindestrich.className = "tasten-btn";
+  bindestrich.textContent = "–";
+  bindestrich.addEventListener("click", function(){
+    tastaturText += "-";
+    aktualisiereTastaturAnzeige();
+  });
+  el.appendChild(bindestrich);
+
+  var frage = document.createElement("button");
+  frage.className = "tasten-btn";
+  frage.textContent = "?";
+  frage.addEventListener("click", function(){
+    tastaturText += "?";
+    aktualisiereTastaturAnzeige();
+  });
+  el.appendChild(frage);
+
   var leer = document.createElement("button");
   leer.className = "tasten-btn";
-  leer.style.gridColumn = "1 / -1";
+  leer.style.gridColumn = "span 6";
   leer.textContent = "Leerzeichen";
   leer.addEventListener("click", function(){
     tastaturText += " ";
@@ -412,7 +483,10 @@ function aktualisiereTastaturAnzeige(){
 
 function oeffneTastatur(){
   tastaturText = "";
+  tastaturGross = false;
+  tastaturEinmalGross = false;
   aktualisiereTastaturAnzeige();
+  aktualisiereTastenBeschriftung();
   var el = $("tastaturOverlay"); if(el) el.style.display = "flex";
   rebindDwell(true);
 }
