@@ -8,7 +8,8 @@
     "daenemark":          true,
     "sankt_peter_ording": true,
     "sankt_peter_ording_2":true,
-    "sauerland":          true
+    "sauerland":          true,
+    "idstein_2026":       true
   };
   window.LaetitiaFotos = (window.LaetitiaFotos || []).filter(function(a){
     return config[a.id] !== false;

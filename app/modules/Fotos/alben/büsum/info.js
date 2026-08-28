@@ -4,16 +4,16 @@ window.LaetitiaFotos.push({
   id:    "buesum",
   name:  "Büsum",
   fotos: [
-    "./alben/büsum/büsum1.jpeg",
-    "./alben/büsum/büsum2.jpeg",
-    "./alben/büsum/büsum3.jpeg",
-    "./alben/büsum/büsum4.jpeg",
-    "./alben/büsum/büsum5.jpeg",
-    "./alben/büsum/büsum6.jpeg",
-    "./alben/büsum/büsum7.jpeg",
-    "./alben/büsum/büsum8.jpeg",
-    "./alben/büsum/büsum9.jpeg",
-    "./alben/büsum/büsum10.jpeg",
-    "./alben/büsum/büsum11.jpeg"
+    {src:"./alben/büsum/büsum1.jpeg", text:""},
+    {src:"./alben/büsum/büsum2.jpeg", text:""},
+    {src:"./alben/büsum/büsum3.jpeg", text:""},
+    {src:"./alben/büsum/büsum4.jpeg", text:""},
+    {src:"./alben/büsum/büsum5.jpeg", text:""},
+    {src:"./alben/büsum/büsum6.jpeg", text:""},
+    {src:"./alben/büsum/büsum7.jpeg", text:""},
+    {src:"./alben/büsum/büsum8.jpeg", text:""},
+    {src:"./alben/büsum/büsum9.jpeg", text:""},
+    {src:"./alben/büsum/büsum10.jpeg", text:""},
+    {src:"./alben/büsum/büsum11.jpeg", text:""}
   ]
 });

@@ -122,9 +122,38 @@
   a.dia-btn-uebersicht:hover, a.dia-btn-uebersicht:focus{
     background:#ddd6fe; outline:3px solid var(--lila); transition:none;
   }
+  button.dia-btn-vortrag{
+    display:flex; align-items:center; justify-content:center;
+    min-height:72px; border-radius:14px;
+    border:2px solid var(--akzent2); background:var(--akzent-bg); color:var(--akzent2);
+    font-size:12px; font-weight:1000; text-align:center; line-height:1.3;
+    cursor:pointer; user-select:none; position:relative;
+    transition:none; padding:6px; font-family:inherit;
+  }
+  button.dia-btn-vortrag:hover, button.dia-btn-vortrag:focus{
+    background:rgba(245,158,11,0.20); outline:3px solid var(--akzent); transition:none;
+  }
+  #screenDiashow.vortrag-aktiv .dia-btn-uebersicht,
+  #screenDiashow.vortrag-aktiv .dia-btn-vortrag,
+  #screenDiashow.vortrag-aktiv .dia-btn-wrap{
+    display:none !important;
+  }
+  button.dia-btn-stop{
+    display:none; align-items:center; justify-content:center;
+    min-height:72px; width:100%; border-radius:14px;
+    border:2px solid #dc2626; background:#fee2e2; color:#991b1b;
+    font-size:15px; font-weight:1000; text-align:center; line-height:1.3;
+    cursor:pointer; user-select:none; position:relative;
+    transition:none; padding:6px; font-family:inherit;
+  }
+  button.dia-btn-stop:hover, button.dia-btn-stop:focus{
+    background:#fecaca; outline:3px solid #dc2626; transition:none;
+  }
+  #screenDiashow.vortrag-aktiv button.dia-btn-stop{ display:flex; }
 
   /* Bildmitte */
   .dia-bild-wrap{
+    position:relative;
     min-width:0; min-height:0;
     display:flex; align-items:center; justify-content:center;
     background-color:#cce8f4;
@@ -135,6 +164,14 @@
   .dia-bild-wrap img{
     max-width:100%; max-height:100%; object-fit:contain; display:block;
   }
+  /* Bildtext-Overlay (passiv, kein Dwell) */
+  .dia-text-overlay{
+    position:absolute; left:0; right:0; bottom:0;
+    background:rgba(15,23,42,0.72); color:#fff;
+    padding:14px 18px; font-size:clamp(16px,2.4vw,22px); font-weight:800; line-height:1.35;
+    pointer-events:none; user-select:none; display:none;
+  }
+  .dia-text-overlay.sichtbar{ display:block; }
 
   /* Rechte Spalte */
   .dia-seite-rechts{
@@ -202,10 +239,12 @@
     <div class="dia-seite-links">
       <div class="dia-albumname" id="diaAlbumname">Album</div>
       <a class="dia-btn-uebersicht" id="btnZurUebersicht" href="#">← Übersicht</a>
+      <button class="dia-btn-vortrag" id="btnVortragStart" type="button">▶️ Vortrag starten</button>
     </div>
     <!-- Mitte: Foto -->
     <div class="dia-bild-wrap">
       <img id="diaBild" src="" alt="Foto">
+      <div class="dia-text-overlay" id="diaTextOverlay"></div>
     </div>
     <!-- Rechte Spalte: Zähler + Navigation -->
     <div class="dia-seite-rechts">
@@ -214,6 +253,7 @@
         <a class="dia-nav-btn vor" id="btnVor" href="#">◀</a>
         <a class="dia-nav-btn nach" id="btnNach" href="#">▶</a>
       </div>
+      <button class="dia-btn-stop" id="btnVortragStop" type="button">⏹ Vortrag beenden</button>
     </div>
   </div>
 
@@ -231,6 +271,7 @@
 <script src="./alben/Sankt Peter Ording/info.js"></script>
 <script src="./alben/sankt Peter Ording 2/info.js"></script>
 <script src="./alben/sauerland/info.js"></script>
+<script src="./alben/idstein_2026/info.js"></script>
 <script src="./fotos_media_config.js"></script>
 
 <!-- ══ Dwell-System ══ -->

@@ -15,17 +15,53 @@
 
   /* ── DOM ── */
   var elAlben         = document.getElementById("screenAlben");
-  var elDia           = document.getElementById("screenDiashow");
+  var elDia            = document.getElementById("screenDiashow");
   var elGrid          = document.getElementById("albenGrid");
   var elAnzahl        = document.getElementById("albenAnzahl");
   var elDiaName       = document.getElementById("diaAlbumname");
   var elCounter       = document.getElementById("diaCounter");
   var elBild          = document.getElementById("diaBild");
+  var elTextOverlay   = document.getElementById("diaTextOverlay");
   var btnVor          = document.getElementById("btnVor");
   var btnNach         = document.getElementById("btnNach");
   var btnReturn       = document.getElementById("btnReturn");
   var btnZurUebersicht= document.getElementById("btnZurUebersicht");
+  var btnVortragStart = document.getElementById("btnVortragStart");
+  var btnVortragStop  = document.getElementById("btnVortragStop");
   var elZurueckLeiste = document.getElementById("zurueckLeiste");
+
+  /* ── TTS-Goldstandard (Katja Online (Natural), Kaskaden-Fallback) ── */
+  function sprich(text, danach){
+    if(!text){ if(danach) danach(); return; }
+    try{
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.lang = "de-DE"; u.rate = 1.104;
+      var voices = speechSynthesis.getVoices();
+      var de = voices.find(function(v){ return v.name === "Microsoft Katja Online (Natural) - German (Germany)"; })
+            || voices.find(function(v){ return v.name === "Microsoft Katja - German (Germany)"; })
+            || voices.find(function(v){ return v.name.indexOf("Katja") >= 0; })
+            || voices.find(function(v){ return v.name.indexOf("Microsoft") >= 0 && v.lang.indexOf("de") === 0 && v.name.indexOf("Hedda") < 0; })
+            || voices.find(function(v){ return v.name.indexOf("Microsoft") >= 0 && v.lang.indexOf("de") === 0; })
+            || voices.find(function(v){ return v.lang.indexOf("de") === 0; });
+      if(de) u.voice = de;
+      if(window.LaetitiaSprich){
+        window.LaetitiaSprich.wrap(u, danach);
+      } else {
+        setTimeout(function(){
+          var fired = false; var watchdog = null;
+          function naechster(){
+            if(fired) return; fired = true;
+            if(watchdog) clearTimeout(watchdog);
+            if(danach) setTimeout(danach, 300);
+          }
+          u.onend = naechster; u.onerror = naechster;
+          watchdog = setTimeout(naechster, Math.max(3000, text.length * 80));
+          speechSynthesis.speak(u);
+        }, 120);
+      }
+    }catch(e){ if(danach) setTimeout(danach, 400); }
+  }
 
   /* ── Return-URL ── */
   var returnEnt = new URL("../../entertainment.html", window.location.href).href;
@@ -38,7 +74,8 @@
       a.className = "album-kachel";
       a.href = "#";
       a.dataset.albIdx = idx;
-      var coverSrc = alb.fotos && alb.fotos.length ? alb.fotos[0] : "";
+      var coverFoto = alb.fotos && alb.fotos.length ? alb.fotos[0] : null;
+      var coverSrc = coverFoto ? (coverFoto.src || coverFoto) : "";
       a.innerHTML =
         '<img src="' + coverSrc + '" alt="' + alb.name + '" onerror="this.style.background=\'#ccc\';this.src=\'\';">' +
         '<div class="album-kachel-info">' +
@@ -62,24 +99,85 @@
     rebindDwell();
   }
 
-  /* ── Aktuelles Foto anzeigen ── */
-  function zeigeAktFoto(){
-    if(!aktAlbum) return;
+  /* ── Aktuelles Foto darstellen (Bild + Textoverlay, ohne TTS) ── */
+  function darstelleAktFoto(){
     var fotos = aktAlbum.fotos;
     if(aktIndex < 0) aktIndex = fotos.length - 1;
     if(aktIndex >= fotos.length) aktIndex = 0;
-    elBild.src = fotos[aktIndex];
+    var foto = fotos[aktIndex];
+    var src  = (foto && foto.src) || foto || "";
+    var text = (foto && foto.text) || "";
+    elBild.src = src;
     elCounter.textContent = (aktIndex + 1) + " / " + fotos.length;
+    if(text){
+      elTextOverlay.textContent = text;
+      elTextOverlay.classList.add("sichtbar");
+    } else {
+      elTextOverlay.textContent = "";
+      elTextOverlay.classList.remove("sichtbar");
+    }
+    return text;
+  }
+
+  /* ── Aktuelles Foto anzeigen (manuelle Navigation: + einmalig vorlesen) ── */
+  function zeigeAktFoto(){
+    if(!aktAlbum) return;
+    var text = darstelleAktFoto();
+    speechSynthesis.cancel();
+    if(text) sprich(text);
   }
 
   /* ── Zurück zur Alben-Übersicht ── */
   function zeigeAlben(){
+    stoppeVortrag();
     screen   = "alben";
     aktAlbum = null;
     elDia.classList.add("hidden");
     elAlben.classList.remove("hidden");
     elZurueckLeiste.classList.remove("hidden");
     rebindDwell();
+  }
+
+  /* ── Vortragsmodus: automatische Diashow ohne Klicks/Dwell ── */
+  var vortragTimer  = null;
+  var vortragLaeuft = false;
+
+  function starteVortrag(){
+    vortragLaeuft = true;
+    elDia.classList.add("vortrag-aktiv");
+    speechSynthesis.cancel();
+    zeigeVortragFoto();
+    rebindDwell();
+  }
+
+  function stoppeVortrag(){
+    if(vortragTimer){ clearTimeout(vortragTimer); vortragTimer = null; }
+    if(!vortragLaeuft) return;
+    vortragLaeuft = false;
+    speechSynthesis.cancel();
+    elDia.classList.remove("vortrag-aktiv");
+    rebindDwell();
+  }
+
+  function zeigeVortragFoto(){
+    if(!vortragLaeuft) return;
+    var text  = darstelleAktFoto();
+    var fotos = aktAlbum.fotos;
+    if(vortragTimer){ clearTimeout(vortragTimer); vortragTimer = null; }
+    function weiter(){
+      if(!vortragLaeuft) return;
+      vortragTimer = setTimeout(function(){
+        if(!vortragLaeuft) return;
+        aktIndex++;
+        if(aktIndex >= fotos.length) aktIndex = 0;
+        zeigeVortragFoto();
+      }, 3000);
+    }
+    if(text){
+      sprich(text, weiter);
+    } else {
+      vortragTimer = setTimeout(weiter, 4000);
+    }
   }
 
   /* ── Return-Button Logik ── */
@@ -118,6 +216,15 @@
   btnReturn.addEventListener("click", function(e){
     e.preventDefault();
     window.location.href = returnEnt;
+  });
+  btnVortragStart.addEventListener("click", function(e){
+    e.preventDefault();
+    starteVortrag();
+  });
+  btnVortragStop.addEventListener("click", function(e){
+    e.preventDefault();
+    stoppeVortrag();
+    darstelleAktFoto();
   });
 
   /* ── Dwell ── */
@@ -164,12 +271,14 @@
         if(_dwellHandle.rebind) _dwellHandle.rebind(sel);
       }
       /* data-pdwell entfernen damit Buttons beim nächsten Diashow-Öffnen neu gebunden werden */
-      [btnVor, btnNach, btnZurUebersicht].forEach(function(b){ if(b) delete b.dataset.pdwell; });
+      [btnVor, btnNach, btnZurUebersicht, btnVortragStart, btnVortragStop].forEach(function(b){ if(b) delete b.dataset.pdwell; });
     } else {
-      /* Diashow-Buttons ◀ ▶ und Übersicht: direktes pointerenter */
+      /* Diashow-Buttons ◀ ▶, Übersicht, Vortrag: direktes pointerenter */
       bindNavBtn(btnVor);
       bindNavBtn(btnNach);
       bindNavBtn(btnZurUebersicht);
+      bindNavBtn(btnVortragStart);
+      bindNavBtn(btnVortragStop);
     }
   }
 
