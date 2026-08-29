@@ -1,6 +1,8 @@
 # Laetitia Lernsystem — Übergabe für neue Sitzung
 *Stand: 2. August 2026 (Sitzung 19 — abgeschlossen). Fünf Themen bearbeitet, jedes einzeln live verifiziert, committet und gepusht: (1) neue Goldstandard-Regel 20 „Antwortvorschlag ≠ Auslösefeld" formalisiert (Antwortoptionen müssen zuerst passiv lesbar sein, getrennt vom Dwell-Auslösebutton — sonst löst das Vergleichen der Optionen schon eine ungewollte Auswahl aus) und projektweiter Audit + Fix in 9 Dateien: Reimen-Werkstatt (`reim_wahl`/`luecke_wahl`), alle vier KI-Agenten-Chats (Nova/Fabu/Milo/Gruppenchat), `schule_raetsel`, `schule_mathe`, `schule_buchstaben`, `englisch` (Wort-Aufgabe) — Grammatik/Lesen/Deutsch/`schule_lesen` waren bereits konform; (2) Nova und Milo bekamen je 5 zusätzliche Eröffnungsgesprächsvarianten (c–g, insgesamt 7 statt 2: Rückblick-Anknüpfung, Tier-/Wetterbeobachtung, direkte Tagesfrage, Was-wäre-wenn/Musik-Einstieg, Lieblingsfrage) — `listener.ps1` wählt jetzt generisch über beliebig viele Varianten (Tag-des-Jahres modulo Anzahl) statt starrem a/b-Check; die OneDrive-Kopie von `listener.ps1` wurde dabei bewusst chirurgisch gepatcht statt komplett überschrieben, um den echten Gemini-Key nicht zu verlieren; (3) Sprechgeschwindigkeit aller vier Agenten vereinheitlicht (Milo/Fabu/Gruppenchat von 0.88–0.92 auf Novas 1.104 angehoben); (4) Bildschirmtastatur für „Eigene Antwort" (Milo/Nova/Gruppenchat) an eine NuVoice-Vorlage angepasst — Zahlenreihe ergänzt, echte Groß-/Kleinschreibung eingebaut („Groß" dauerhaft + „1× Groß" einmalig — vorher wurden Buchstaben nur groß angezeigt, aber immer klein getippt), größere fettere Schrift, kräftigere dunkle Ränder; (5) erster Schritt einer „Charakter-Welten"-Idee (Nutzerwunsch: jede Agenten-Welt soll unbewusst atmosphärisch spürbar sein) — Novas Bildschirmhintergrund von neutralem Grau auf ein ganz schwaches Violett umgestellt; dabei entdeckt, dass Milo (türkis) und Fabu (creme) dieses Muster bereits hatten, Nova war die einzige Ausnahme; Motiv-Ergänzung (Sterne/Eule/Blätter) auf Nutzerwunsch auf später verschoben. Alle Änderungen live per eigener Edge-CDP-Testinstanz verifiziert (Chrome-Erweiterung war diese Sitzung durchgehend nicht verbunden), `validate.ps1` durchgehend 0 Fehler, Listener-Task mehrfach auf Nutzerwunsch neu gestartet und funktional bestätigt. Wichtigster unveränderter Punkt für die nächste Sitzung: Fabu-Stimme-Installation (diese Sitzung nicht bearbeitet, siehe Abschnitt „🟡 Fabu-Stimme" weiter unten). Siehe „Sitzungsprotokoll 2. August 2026 — Sitzung 19" weiter unten für Details je Commit.*
 
+*Nachtrag 28. August 2026 (Sitzung 20): Fotoalbum-Modul erheblich erweitert. Datenmodell auf `{src, text}` pro Foto umgestellt (vorher nur Bildpfade), optionaler Bildtext erscheint beim Betrachten als Overlay und wird automatisch mit Katja-TTS vorgelesen. Neuer klickfreier Vortragsmodus (Text vorlesen → 3s Pause → nächstes Foto, danach von vorn) mit eigenem Beenden-Button während der Wiedergabe. Neues separates Maus-Werkzeug `fotoalbum_editor.html`/`fotoalbum_editor_mod.js` außerhalb der Laetitia-Oberfläche zum Eintragen/Ändern der Bildtexte (Entwürfe im localStorage, Export als fertiger `info.js`-Code zum Ersetzen). Neues Album „Idstein 2026" (30 Fotos, Ausflug mit Papa/Mama/Oma) ergänzt und über den Editor vollständig mit individuellen Bildtexten versehen. Details siehe Abschnitt „Fotoalbum-Modul" weiter unten und „Sitzungsprotokoll 28. August 2026 — Sitzung 20". Fabu-Stimme-Installation weiterhin unverändert offen — bleibt wichtigster Punkt für die Folgesitzung.*
+
 ---
 
 ## System-Kontext
@@ -278,6 +280,25 @@ Nutzeranfrage: erst Einschätzung, ob Nova/Fabu/Milo dem entsprechen, was man ü
 **Bewusst nicht umgesetzt:** Der ursprünglich genannte fünfte, technische Punkt (gefiltertes Gedächtnis-Retrieval statt das komplette Gedächtnis-JSON in jeden Prompt zu stopfen) wurde selbst als „eher Schulden als Feature, aktuell unkritisch" eingestuft (Gedächtnis ist auf max. 20 rollierende Einträge gedeckelt) — eine Umsetzung ohne echten Bedarf hätte unnötige Komplexität für ein nicht existierendes Problem eingeführt. Bleibt als Idee für später vorgemerkt, falls das Gedächtnis spürbar wächst.
 
 `validate.ps1`: 0 Fehler nach jedem der vier Commits, OneDrive durchgehend synchron.
+
+## Fotoalbum-Modul — Stand 28. August 2026 (Sitzung 20)
+
+Erreichbar: `entertainment.html` → Fotoalbum-Kachel → `fotoalbum.html`. Separates Editor-Werkzeug (nicht Teil der Laetitia-Oberfläche, für den Nutzer selbst): `fotoalbum_editor.html`.
+
+| Datei | Inhalt |
+|---|---|
+| `app/modules/Fotos/fotoalbum.html` + `fotoalbum_mod.js` | Alben-Übersicht (Kachel-Grid) + Diashow. Diashow zeigt optionalen Bildtext als Overlay (`#diaTextOverlay`), liest ihn per Katja-TTS vor (`sprich()`, Rate 1.104) |
+| `app/modules/Fotos/fotoalbum_editor.html` + `_mod.js` | NEU — eigenständiges Maus-Werkzeug außerhalb der Laetitia-Oberfläche zum Eintragen/Ändern von Bildtexten je Album. Entwürfe in `localStorage`, Export als fertiger `info.js`-Code (zum manuellen Ersetzen/Download) |
+| `app/modules/Fotos/alben/*/info.js` | Datenmodell je Album von reinen Bildpfaden auf `{src, text}`-Objekte pro Foto umgestellt (betrifft alle bestehenden Alben: Sankt Peter Ording, Sankt Peter Ording 2, Büsum, Dänemark, Sauerland) |
+| `app/modules/Fotos/alben/idstein_2026/info.js` | NEU — Album „Idstein 2026", 30 Fotos (Ausflug nach Idstein/Wiesbaden mit Papa, Mama, Oma), alle mit individuellen Bildtexten über den Editor eingetragen |
+| `app/modules/Fotos/fotos_media_config.js` | An das neue Album/Datenmodell angepasst |
+| `tests/tools/cdp_fotoalbum_test.js` | NEU — CDP-Testskript für das Modul |
+
+**Vortragsmodus (neu):** Spielt ein Album automatisch und klickfrei durch — Bildtext vorlesen → 3 Sekunden Pause → nächstes Foto, am Albumende wieder von vorn. Eigener Start-Button (`btnVortragStart`) sowie ein einzelner Beenden-Button (`btnVortragStop`), der während der laufenden Wiedergabe erreichbar bleibt. Fotos ohne Text werden nach 4 Sekunden automatisch übersprungen (kein TTS-`onend`-Callback vorhanden).
+
+**Bilddateien** liegen wie bei den bestehenden Alben nur in der OneDrive-Kopie, nicht im Repo (Goldstandard-Regel 14-analog für Fotos).
+
+**Noch nicht geprüft/offen:** Kein expliziter `stats.js`-Eintrag (Fotoalbum ist wie Fabu/Nova kein bewertbares Lernmodul, analog zur bisherigen Einschätzung bei den KI-Agenten) — falls gewünscht, wäre das ein separater Folgeauftrag. Ob der Zurück-Button-Farbe (Regel 8, lila) und die übrigen Goldstandards vollständig eingehalten sind, wurde in dieser Doku-Ergänzung nicht extra nachgeprüft.
 
 ## Quasselkiste / NuVoice-Emulation — Stand 31. Mai 2026
 
@@ -776,6 +797,19 @@ Dann Edge komplett neu starten.
 **Commits (alle gepusht):** 2694aa5, 86df18d, e51413e, f06b0d9
 
 **Grammatik-Werkstatt jetzt:** 44 Einheiten, 440 Aufgaben (E-03–E-46), Stufen 1–9 vollständig.
+
+---
+
+## Sitzungsprotokoll 28. August 2026 — Sitzung 20
+
+| Was | Ergebnis |
+|---|---|
+| Fotoalbum: Bildtexte mit TTS, Vortragsmodus, Editor-Werkzeug | ✅ Datenmodell aller Alben von reinen Bildpfaden auf `{src, text}` pro Foto erweitert. Optionaler Bildtext wird beim Betrachten als Overlay eingeblendet und automatisch mit Katja-TTS vorgelesen. Neuer Vortragsmodus spielt ein Album automatisch und klickfrei durch (Text vorlesen → Pause → nächstes Foto, danach von vorn), mit einzelnem Beenden-Button während der Wiedergabe. Neues, separates Maus-Werkzeug `fotoalbum_editor.html`/`_mod.js` außerhalb der Laetitia-Oberfläche zum Eintragen/Ändern der Bildtexte (Entwürfe im localStorage, Export als fertiger `info.js`-Code) (commit `9bb666e`) |
+| Fotoalbum: neues Album „Idstein 2026" | ✅ 30 Fotos ergänzt (Bilddateien nur in der OneDrive-Kopie, wie bei den anderen Alben). Alle 30 Fotos über `fotoalbum_editor.html` mit individuellen Bildtexten versehen (Ausflug nach Idstein und Wiesbaden mit Papa, Mama und Oma) (commit `04d6098`) |
+
+**Commits (alle gepusht):** `9bb666e`, `04d6098`
+
+Details siehe eigener Abschnitt „Fotoalbum-Modul" weiter oben.
 
 ---
 
