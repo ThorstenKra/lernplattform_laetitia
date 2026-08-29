@@ -7,7 +7,6 @@ window.LaetitiaFotos.push({
     {src:"./alben/Sankt Peter Ording/PS3.jpg", text:""},
     {src:"./alben/Sankt Peter Ording/SP1.jpg", text:""},
     {src:"./alben/Sankt Peter Ording/SP2.jpg", text:""},
-    {src:"./alben/Sankt Peter Ording/SP3.jpg", text:""},
     {src:"./alben/Sankt Peter Ording/SP4.jpg", text:""},
     {src:"./alben/Sankt Peter Ording/SP5.jpg", text:""},
     {src:"./alben/Sankt Peter Ording/SP6.jpg", text:""},
