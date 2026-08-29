@@ -176,7 +176,7 @@
     if(text){
       sprich(text, weiter);
     } else {
-      vortragTimer = setTimeout(weiter, 4000);
+      weiter();
     }
   }
 
