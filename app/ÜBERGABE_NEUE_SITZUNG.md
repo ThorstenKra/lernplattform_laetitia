@@ -3,6 +3,8 @@
 
 *Nachtrag 28. August 2026 (Sitzung 20): Fotoalbum-Modul erheblich erweitert. Datenmodell auf `{src, text}` pro Foto umgestellt (vorher nur Bildpfade), optionaler Bildtext erscheint beim Betrachten als Overlay und wird automatisch mit Katja-TTS vorgelesen. Neuer klickfreier Vortragsmodus (Text vorlesen → 3s Pause → nächstes Foto, danach von vorn) mit eigenem Beenden-Button während der Wiedergabe. Neues separates Maus-Werkzeug `fotoalbum_editor.html`/`fotoalbum_editor_mod.js` außerhalb der Laetitia-Oberfläche zum Eintragen/Ändern der Bildtexte (Entwürfe im localStorage, Export als fertiger `info.js`-Code zum Ersetzen). Neues Album „Idstein 2026" (30 Fotos, Ausflug mit Papa/Mama/Oma) ergänzt und über den Editor vollständig mit individuellen Bildtexten versehen. Details siehe Abschnitt „Fotoalbum-Modul" weiter unten und „Sitzungsprotokoll 28. August 2026 — Sitzung 20". Fabu-Stimme-Installation weiterhin unverändert offen — bleibt wichtigster Punkt für die Folgesitzung.*
 
+*Nachtrag 29. August 2026 (Sitzung 21): Fotoalbum-Modul komplett live getestet (eigene isolierte Edge-CDP-Testinstanz, deployte OneDrive-Version, alle 6 Alben/174 Fotos), Regel 8/17/20-Konformität geprüft (alle drei erfüllt). Dabei einen echten Bug gefunden und behoben: toter Bildverweis `SP3.jpg` im Album „Sankt Peter Ording" (Datei existierte nicht, führte zu kaputtem Bild in der Diashow) — entfernt, Foto war über den vorhandenen `PS3.jpg`-Eintrag bereits abgedeckt. Bewusst **keine** neuen Bildtexte für die übrigen fünf Alben ergänzt (Nutzerentscheidung — nur der aktuelle Stand sollte geprüft werden). Details siehe Abschnitt „Fotoalbum-Modul" und „Sitzungsprotokoll 29. August 2026 — Sitzung 21".*
+
 ---
 
 ## System-Kontext
@@ -298,7 +300,17 @@ Erreichbar: `entertainment.html` → Fotoalbum-Kachel → `fotoalbum.html`. Sepa
 
 **Bilddateien** liegen wie bei den bestehenden Alben nur in der OneDrive-Kopie, nicht im Repo (Goldstandard-Regel 14-analog für Fotos).
 
-**Noch nicht geprüft/offen:** Kein expliziter `stats.js`-Eintrag (Fotoalbum ist wie Fabu/Nova kein bewertbares Lernmodul, analog zur bisherigen Einschätzung bei den KI-Agenten) — falls gewünscht, wäre das ein separater Folgeauftrag. Ob der Zurück-Button-Farbe (Regel 8, lila) und die übrigen Goldstandards vollständig eingehalten sind, wurde in dieser Doku-Ergänzung nicht extra nachgeprüft.
+**Noch nicht geprüft/offen:** Kein expliziter `stats.js`-Eintrag (Fotoalbum ist wie Fabu/Nova kein bewertbares Lernmodul, analog zur bisherigen Einschätzung bei den KI-Agenten) — falls gewünscht, wäre das ein separater Folgeauftrag.
+
+**Regel-8/17/20-Prüfung (29.08.2026, Sitzung 21):** Alle drei Goldstandards geprüft — konform. Regel 8 (Zurück-Button lila): Haupt-Zurück-Button korrekt unten + lila; der sekundäre „← Übersicht"-Button in der Diashow ist ebenfalls lila, sitzt aber in der linken Spalte statt unten — auf Nutzerwunsch bewusst so belassen. Regel 17 (Lese-/Aktionsbereich-Trennung): nicht wörtlich anwendbar (kein Aufgaben-Screen), das zugrundeliegende Prinzip ist über `pointer-events:none` auf dem Bildtext-Overlay eingehalten. Regel 20 (Antwortvorschlag ≠ Auslösefeld): nicht anwendbar — Album-Kacheln sind Navigation, keine Mehrfachauswahl-Aufgabe (wie auch die Stufen-Kacheln in Grammatik/Mathe nicht darunterfallen).
+
+**Live-Test + Bugfix (29.08.2026, Sitzung 21):** Vollständiger CDP-Test gegen die deployte OneDrive-Version (eigene isolierte Edge-Testinstanz, `--remote-debugging-port=9222`, Profil `C:\EdgeDwellTest`, danach sauber beendet). Dabei einen echten Bug gefunden: `Sankt Peter Ording/info.js` referenzierte `SP3.jpg`, das auf der Festplatte nicht existiert (nur `PS3.jpg`, vermutlich vertauschte Buchstaben beim Fotoexport, bereits als separater Eintrag am Array-Anfang vorhanden) — führte zu einem kaputten Bild ohne Fehlerbehandlung in der Diashow (`elBild.src` hat kein `onerror`, anders als die Album-Cover im Grid). Toten Array-Eintrag entfernt (Foto ist über `PS3.jpg` weiterhin vorhanden), `validate.ps1` 0 Fehler, deployed (commit `fd4c4c6`).
+
+Danach alle 6 Alben (174 Fotos) einzeln per CDP durchgeklickt: keine kaputten Bilder mehr, keine Konsolenfehler, Album-Kachel-Zähler stimmen (Sankt Peter Ording jetzt korrekt 21 statt 22). Idstein 2026 gezielt geprüft: Textoverlay + TTS-Trigger funktionieren auf allen 30 Fotos. Navigation (Diashow → Übersicht → Modul verlassen) und Editor-Werkzeug (alle 6 Alben ladbar, korrekte Text-Zähler je Album) ebenfalls verifiziert. Neues, dauerhaftes Testskript `tests/tools/cdp_fotoalbum_full_check.js` ergänzt (prüft künftig automatisiert alle Alben auf kaputte Bilder + Konsolenfehler).
+
+**Beobachtung, nicht behoben:** Im Vortragsmodus warten Fotos ohne Bildtext 4s + zusätzliche 3s Übergangspause (7s statt der ~3s Pause, die Fotos mit Text nach TTS-Ende bekommen) — `zeigeVortragFoto()` in `fotoalbum_mod.js` ruft bei leerem Text `setTimeout(weiter, 4000)` auf, `weiter()` selbst wartet aber nochmal 3000ms bevor es weiterschaltet. Könnte Absicht sein (mehr Betrachtungszeit ohne Vorlese-Führung) oder ein Doppel-Wartezeit-Bug — Rückmeldung vom Nutzer nötig, bevor das geändert wird.
+
+**Fazit Sitzung 21:** Fotoalbum-Modul ist nach dem SP3-Fix vollständig funktionsfähig getestet (0 Konsolenfehler, 0 kaputte Bilder über alle 6 Alben) und bereit zum Testen auf dem Talker.
 
 ## Quasselkiste / NuVoice-Emulation — Stand 31. Mai 2026
 
@@ -797,6 +809,22 @@ Dann Edge komplett neu starten.
 **Commits (alle gepusht):** 2694aa5, 86df18d, e51413e, f06b0d9
 
 **Grammatik-Werkstatt jetzt:** 44 Einheiten, 440 Aufgaben (E-03–E-46), Stufen 1–9 vollständig.
+
+---
+
+## Sitzungsprotokoll 29. August 2026 — Sitzung 21
+
+| Was | Ergebnis |
+|---|---|
+| Fotoalbum: 3 Bildtexte Idstein 2026 überarbeitet | ✅ Nutzer hat 3 Bildtexte (Fotos 1–3) über `fotoalbum_editor.html` neu formuliert und als `info.js` heruntergeladen. Zwei Tippfehler beim Übernehmen mitkorrigiert. Deployed, committet (commit `5633c0e`) |
+| Regel 8/17/20-Prüfung Fotoalbum-Modul | ✅ Alle drei Goldstandards geprüft, konform. Details siehe Abschnitt „Fotoalbum-Modul" |
+| Bug gefunden + behoben: kaputter Bildverweis `SP3.jpg` | ✅ `Sankt Peter Ording/info.js` referenzierte eine nicht existierende Datei (nur `PS3.jpg` vorhanden, bereits separat im Array). Toten Eintrag entfernt, `validate.ps1` 0 Fehler, deployed (commit `fd4c4c6`) |
+| Vollständiger Live-Test aller 6 Alben (174 Fotos) | ✅ Eigene isolierte Edge-CDP-Testinstanz (`--remote-debugging-port=9222`, Profil `C:\EdgeDwellTest`), neues Testskript `tests/tools/cdp_fotoalbum_full_check.js`. Ergebnis: 0 kaputte Bilder, 0 Konsolenfehler über alle Alben, Album-Kachel-Zähler korrekt (Sankt Peter Ording jetzt 21). Idstein 2026: Textoverlay + TTS auf allen 30 Fotos bestätigt. Navigation (Diashow/Übersicht/Zurück) + Editor-Werkzeug (alle 6 Alben ladbar) verifiziert. Testinstanz danach sauber beendet |
+| Beobachtung (nicht behoben) | 🟡 Vortragsmodus wartet bei Fotos ohne Text 7s statt ~3s (Doppel-Timeout in `zeigeVortragFoto()`) — Rückmeldung vom Nutzer nötig, ob das Absicht oder Bug ist |
+
+**Commits (alle gepusht):** `5633c0e` (Bildtexte, bereits vor dem Test), `fd4c4c6` (SP3-Bugfix + Testskript)
+
+**Fazit:** Fotoalbum-Modul ist vollständig getestet und bugfrei — bereit zum Testen auf dem Talker (Tobii Accent 1400).
 
 ---
 
