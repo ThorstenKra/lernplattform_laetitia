@@ -308,7 +308,7 @@ Erreichbar: `entertainment.html` → Fotoalbum-Kachel → `fotoalbum.html`. Sepa
 
 Danach alle 6 Alben (174 Fotos) einzeln per CDP durchgeklickt: keine kaputten Bilder mehr, keine Konsolenfehler, Album-Kachel-Zähler stimmen (Sankt Peter Ording jetzt korrekt 21 statt 22). Idstein 2026 gezielt geprüft: Textoverlay + TTS-Trigger funktionieren auf allen 30 Fotos. Navigation (Diashow → Übersicht → Modul verlassen) und Editor-Werkzeug (alle 6 Alben ladbar, korrekte Text-Zähler je Album) ebenfalls verifiziert. Neues, dauerhaftes Testskript `tests/tools/cdp_fotoalbum_full_check.js` ergänzt (prüft künftig automatisiert alle Alben auf kaputte Bilder + Konsolenfehler).
 
-**Beobachtung, nicht behoben:** Im Vortragsmodus warten Fotos ohne Bildtext 4s + zusätzliche 3s Übergangspause (7s statt der ~3s Pause, die Fotos mit Text nach TTS-Ende bekommen) — `zeigeVortragFoto()` in `fotoalbum_mod.js` ruft bei leerem Text `setTimeout(weiter, 4000)` auf, `weiter()` selbst wartet aber nochmal 3000ms bevor es weiterschaltet. Könnte Absicht sein (mehr Betrachtungszeit ohne Vorlese-Führung) oder ein Doppel-Wartezeit-Bug — Rückmeldung vom Nutzer nötig, bevor das geändert wird.
+**Vortragsmodus-Timing-Bug behoben (29.08.2026, Sitzung 21 Fortsetzung):** Fotos ohne Bildtext warteten 4s + zusätzliche 3s Übergangspause (7s statt der ~3s Pause, die Fotos mit Text nach TTS-Ende bekommen) — `zeigeVortragFoto()` in `fotoalbum_mod.js` rief bei leerem Text `setTimeout(weiter, 4000)` auf, `weiter()` selbst wartete aber nochmal 3000ms bevor es weiterschaltete. Auf Nutzerwunsch behoben: bei leerem Text wird `weiter()` jetzt direkt aufgerufen statt über einen zusätzlichen 4000ms-Timer — einheitlich ~3s Pause für alle Fotos, mit oder ohne Text. Per CDP-Zeitmessung bestätigt (Counter wechselt nach ca. 3s statt 7s), keine Konsolenfehler, `validate.ps1` 0 Fehler, deployed.
 
 **Fazit Sitzung 21:** Fotoalbum-Modul ist nach dem SP3-Fix vollständig funktionsfähig getestet (0 Konsolenfehler, 0 kaputte Bilder über alle 6 Alben) und bereit zum Testen auf dem Talker.
 
@@ -820,9 +820,9 @@ Dann Edge komplett neu starten.
 | Regel 8/17/20-Prüfung Fotoalbum-Modul | ✅ Alle drei Goldstandards geprüft, konform. Details siehe Abschnitt „Fotoalbum-Modul" |
 | Bug gefunden + behoben: kaputter Bildverweis `SP3.jpg` | ✅ `Sankt Peter Ording/info.js` referenzierte eine nicht existierende Datei (nur `PS3.jpg` vorhanden, bereits separat im Array). Toten Eintrag entfernt, `validate.ps1` 0 Fehler, deployed (commit `fd4c4c6`) |
 | Vollständiger Live-Test aller 6 Alben (174 Fotos) | ✅ Eigene isolierte Edge-CDP-Testinstanz (`--remote-debugging-port=9222`, Profil `C:\EdgeDwellTest`), neues Testskript `tests/tools/cdp_fotoalbum_full_check.js`. Ergebnis: 0 kaputte Bilder, 0 Konsolenfehler über alle Alben, Album-Kachel-Zähler korrekt (Sankt Peter Ording jetzt 21). Idstein 2026: Textoverlay + TTS auf allen 30 Fotos bestätigt. Navigation (Diashow/Übersicht/Zurück) + Editor-Werkzeug (alle 6 Alben ladbar) verifiziert. Testinstanz danach sauber beendet |
-| Beobachtung (nicht behoben) | 🟡 Vortragsmodus wartet bei Fotos ohne Text 7s statt ~3s (Doppel-Timeout in `zeigeVortragFoto()`) — Rückmeldung vom Nutzer nötig, ob das Absicht oder Bug ist |
+| Vortragsmodus-Timing behoben | ✅ Fotos ohne Bildtext warteten 7s statt ~3s (Doppel-Timeout in `zeigeVortragFoto()`). Auf Nutzerwunsch auf einheitlich ~3s verkürzt, per CDP-Zeitmessung bestätigt, `validate.ps1` 0 Fehler, deployed (commit `0b7351c`) |
 
-**Commits (alle gepusht):** `5633c0e` (Bildtexte, bereits vor dem Test), `fd4c4c6` (SP3-Bugfix + Testskript)
+**Commits (alle gepusht):** `5633c0e` (Bildtexte, bereits vor dem Test), `fd4c4c6` (SP3-Bugfix + Testskript), `0b7351c` (Vortragsmodus-Timing-Fix)
 
 **Fazit:** Fotoalbum-Modul ist vollständig getestet und bugfrei — bereit zum Testen auf dem Talker (Tobii Accent 1400).
 
