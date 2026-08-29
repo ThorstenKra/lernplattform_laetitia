@@ -4,9 +4,9 @@ window.LaetitiaFotos.push({
   id:    "idstein_2026",
   name:  "Idstein 2026",
   fotos: [
-    {src:"./alben/idstein_2026/IMG_4460.JPG", text:"Papa und ich in einer prächtigen alten Halle."},
-    {src:"./alben/idstein_2026/IMG_4461.JPG", text:"Das alte Stadttor mit der Mauer."},
-    {src:"./alben/idstein_2026/IMG_4462.JPG", text:"Papa und Oma sitzen in der Sonne im Garten."},
+    {src:"./alben/idstein_2026/IMG_4460.JPG", text:"Bei Oma zu Hause. Nein Scherz: Das ist die Kurhalle in Wiesbaden."},
+    {src:"./alben/idstein_2026/IMG_4461.JPG", text:"Oma wohnt in Idstein, einer wunderschönen Stadt mit vielen Gebäuden aus dem Mittelalter."},
+    {src:"./alben/idstein_2026/IMG_4462.JPG", text:"Ein wunderschönes Restaurant zwischen Wiesbaden und Idstein."},
     {src:"./alben/idstein_2026/IMG_4463.JPG", text:"Ich sitze mit Papa und Oma am Tisch."},
     {src:"./alben/idstein_2026/IMG_4464.JPG", text:"Ich unterhalte mich mit Oma auf dem Marktplatz."},
     {src:"./alben/idstein_2026/IMG_4465.JPG", text:"Oma und Papa trinken Kaffee am alten Stadttor."},
